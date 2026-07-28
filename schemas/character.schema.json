@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "character.schema.json",
+  "type": "object",
+  "required": ["id", "name", "desire", "values", "beliefs", "constraints", "voice"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^char-[a-z0-9-]+$"},
+    "name": {"type": "string"},
+    "desire": {"type": "string"},
+    "need": {"type": "string"},
+    "values": {"type": "array", "items": {"type": "string"}},
+    "fears": {"type": "array", "items": {"type": "string"}},
+    "contradictions": {"type": "array", "items": {"type": "string"}},
+    "beliefs": {"type": "array", "items": {"type": "string"}},
+    "knowledge": {"type": "array", "items": {"type": "string"}},
+    "constraints": {"type": "array", "items": {"type": "string"}},
+    "voice": {
+      "type": "object",
+      "required": ["lexicon", "syntax", "avoid"],
+      "properties": {
+        "lexicon": {"type": "array", "items": {"type": "string"}},
+        "syntax": {"type": "array", "items": {"type": "string"}},
+        "avoid": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

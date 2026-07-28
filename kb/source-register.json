@@ -1,0 +1,13 @@
+{
+  "sources": [],
+  "fields": {
+    "id": "stable identifier",
+    "title": "source title",
+    "creator": "author or organization",
+    "type": "book, article, paper, corpus, user-file, website",
+    "license": "public-domain, licensed, fair-summary-only, user-owned, unknown",
+    "location": "citation, URL, or local reference",
+    "domains": ["domain tags"],
+    "notes": "what was extracted and what must not be copied"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "id": "replace-me",
+  "title": "Untitled",
+  "form": "novel",
+  "audience": "",
+  "reader_contract": [],
+  "theme_question": "",
+  "desired_affect": [],
+  "constraints": [],
+  "human_gates": ["premise", "macro-outline", "voice-profile", "chapter", "final"]
+}

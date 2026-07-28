@@ -1,0 +1,33 @@
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 6
+default_subagent_reasoning_effort = "high"
+
+# Skills are stored in Claude's project skill directory but use the shared Agent Skills format.
+[[skills.config]]
+path = ".claude/skills/bootstrap-story/SKILL.md"
+enabled = true
+
+[[skills.config]]
+path = ".claude/skills/generate-premises/SKILL.md"
+enabled = true
+
+[[skills.config]]
+path = ".claude/skills/compile-scene-context/SKILL.md"
+enabled = true
+
+[[skills.config]]
+path = ".claude/skills/draft-scene/SKILL.md"
+enabled = true
+
+[[skills.config]]
+path = ".claude/skills/triple-audit/SKILL.md"
+enabled = true
+
+[[skills.config]]
+path = ".claude/skills/promote-candidate/SKILL.md"
+enabled = true
+
+[[skills.config]]
+path = ".claude/skills/retrospective/SKILL.md"
+enabled = true

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "critique.schema.json",
+  "type": "object",
+  "required": ["candidate", "critic", "verdict", "findings", "confidence"],
+  "properties": {
+    "candidate": {"type": "string"},
+    "critic": {"type": "string"},
+    "verdict": {"enum": ["pass", "revise", "reject", "uncertain"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["dimension", "severity", "evidence", "diagnosis", "repair_layer"],
+        "properties": {
+          "dimension": {"type": "string"},
+          "severity": {"enum": ["minor", "material", "fatal"]},
+          "evidence": {"type": "string", "minLength": 1},
+          "diagnosis": {"type": "string"},
+          "repair_layer": {"enum": ["brief", "world", "character", "plot", "discourse", "scene", "prose", "process"]}
+        }
+      }
+    }
+  }
+}

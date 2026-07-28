@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "state-delta.schema.json",
+  "type": "object",
+  "required": ["scene_id", "facts_added", "facts_removed", "knowledge_changes", "relationship_changes", "promises_opened", "promises_closed"],
+  "properties": {
+    "scene_id": {"type": "string"},
+    "facts_added": {"type": "array", "items": {"type": "string"}},
+    "facts_removed": {"type": "array", "items": {"type": "string"}},
+    "knowledge_changes": {"type": "array", "items": {"type": "string"}},
+    "relationship_changes": {"type": "array", "items": {"type": "string"}},
+    "promises_opened": {"type": "array", "items": {"type": "string"}},
+    "promises_closed": {"type": "array", "items": {"type": "string"}}
+  }
+}

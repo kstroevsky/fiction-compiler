@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "event.schema.json",
+  "type": "object",
+  "required": ["id", "time", "actors", "preconditions", "action", "effects", "causes"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^evt-[a-z0-9-]+$"},
+    "time": {"type": ["string", "number"]},
+    "actors": {"type": "array", "items": {"type": "string"}},
+    "preconditions": {"type": "array", "items": {"type": "string"}},
+    "action": {"type": "string"},
+    "effects": {"type": "array", "items": {"type": "string"}},
+    "causes": {"type": "array", "items": {"type": "string"}},
+    "revealed_to": {"type": "array", "items": {"type": "string"}},
+    "cost": {"type": "string"}
+  }
+}

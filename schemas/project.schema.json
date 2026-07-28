@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "project.schema.json",
+  "type": "object",
+  "required": ["id", "title", "form", "audience", "reader_contract", "theme_question", "constraints"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "title": {"type": "string", "minLength": 1},
+    "form": {"enum": ["short-story", "novella", "novel", "serial", "screenplay", "play", "interactive"]},
+    "audience": {"type": "string"},
+    "reader_contract": {"type": "array", "items": {"type": "string"}},
+    "theme_question": {"type": "string"},
+    "desired_affect": {"type": "array", "items": {"type": "string"}},
+    "constraints": {"type": "array", "items": {"type": "string"}},
+    "human_gates": {"type": "array", "items": {"type": "string"}}
+  }
+}
