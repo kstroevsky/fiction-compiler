@@ -34,11 +34,32 @@ Suggested first instruction:
 ## Core commands
 
 ```bash
-make validate                         # structural and continuity checks
+make validate                         # schema + KB + continuity checks (see below)
 make test                             # regression tests
-python3 scripts/compile_scene_context.py projects/my-novel ch01-sc01
-python3 scripts/promote_candidate.py projects/my-novel ch01-sc01 candidate-a.md
+make audit  PROJECT=projects/my-novel # deterministic hard audit (Audit 1)
+make lint   PROJECT=projects/my-novel SCENE=ch01-sc01   # defaultness linter
+make pipeline                         # validate -> audit -> test
+
+python3 scripts/compile_scene_context.py projects/my-novel ch01-sc01   # leak-free context
+python3 scripts/promote_candidate.py    projects/my-novel ch01-sc01 candidate-a.md
 ```
+
+## Deterministic engine (`src/fiction_compiler/`)
+
+The pipeline shifts as much judgment as possible off the LLM and onto code:
+
+- **`schema.py`** — dependency-free JSON-Schema validation; `validate_workspace.py` enforces
+  every typed artifact against `schemas/` (schemas are no longer decorative).
+- **`state.py`** — event-sourced `reconstruct_state_before(scene)`: story state is
+  `seed canon + accepted deltas`, replayed. This is what stops a fact a later scene introduces
+  from leaking into an earlier one.
+- **`hard_audit.py`** — Audit 1 in code: knowledge cutoff, causal references, POV, promise
+  ledger, chronology. Emits `critique.schema`-valid findings with exact evidence.
+- **`defaultness.py`** — deterministic slice of Audit 3: clichés, told emotion, filter words,
+  weak-word density, adverb tags, opener runs — patterns in `kb/style/defaultness-catalog.json`.
+
+See `docs/implementation-roadmap.md` for what is built vs. deferred, and
+`projects/salt-in-the-wire/` for a worked end-to-end example.
 
 ## Important rule
 

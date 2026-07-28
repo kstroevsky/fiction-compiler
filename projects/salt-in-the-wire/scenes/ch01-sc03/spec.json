@@ -1,0 +1,20 @@
+{
+  "id": "ch01-sc03",
+  "chapter": "1",
+  "pov": "char-mara",
+  "participants": ["char-mara"],
+  "purpose": ["force Mara to act on the inheritance", "stage the theme as a choice, not an argument", "close the story without closing the question"],
+  "entry_state": ["Mara knows the chart is wrong", "the inspection is now imminent", "the fault is still unfiled"],
+  "desire": "do right — and she cannot tell which act that is",
+  "conflict": "restore the relay (duty, and maybe kill the next crew) versus keep the silence (mercy, and maybe cowardice); the inspector will read the log either way",
+  "turn": "she makes an irreversible entry in the log — the specific act is the story's final image, enacted not explained",
+  "exit_state": ["Mara has chosen", "the reader cannot cleanly call it right or wrong", "the central question stays alive"],
+  "required_events": [],
+  "forbidden_moves": ["a duty-affirming resolution that erases the cost", "Mara narrating what she has learned", "a hopeful last line"],
+  "knowledge_required": [{"character": "char-mara", "fact": "fact-chart-mis-surveyed"}],
+  "style_constraints": ["pull the distance back at the turn", "end on an action, not a reflection"],
+  "candidate_strategies": [
+    "A: she files it — but what she writes is the ambiguity",
+    "B: she restores the relay and corrects the chart in the same hour, trusting no one to fund the survey"
+  ]
+}

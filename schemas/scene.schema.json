@@ -17,6 +17,17 @@
     "required_events": {"type": "array", "items": {"type": "string"}},
     "forbidden_moves": {"type": "array", "items": {"type": "string"}},
     "style_constraints": {"type": "array", "items": {"type": "string"}},
-    "candidate_strategies": {"type": "array", "items": {"type": "string"}}
+    "candidate_strategies": {"type": "array", "items": {"type": "string"}},
+    "knowledge_required": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["character", "fact"],
+        "properties": {
+          "character": {"type": "string", "pattern": "^char-[a-z0-9-]+$"},
+          "fact": {"type": "string", "pattern": "^fact-[a-z0-9-]+$"}
+        }
+      }
+    }
   }
 }

@@ -1,0 +1,14 @@
+{
+  "narrator": {"person": "third", "reliability": "reliable but limited to Mara's perception"},
+  "focalization": {"mode": "fixed internal", "focalizer": "char-mara"},
+  "time": {"order": "chronological with one buried backstory reveal", "dominant_duration": "scene", "tense": "past"},
+  "revelations": [
+    {"id": "rev-cut-is-deliberate", "scene": "ch01-sc01", "to_reader": "with Mara", "to_mara": true},
+    {"id": "rev-why", "scene": "ch01-sc02", "to_reader": "with Mara", "to_mara": true},
+    {"id": "rev-maras-choice", "scene": "ch01-sc03", "to_reader": "enacted, not explained"}
+  ],
+  "chapter_map": [
+    {"chapter": "1", "scenes": ["ch01-sc01", "ch01-sc02", "ch01-sc03"]}
+  ],
+  "notes": "Dramatic irony is minimal: the reader learns with Mara. Withholding comes from her genuine limits, never author fiat."
+}

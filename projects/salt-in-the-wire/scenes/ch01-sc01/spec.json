@@ -1,0 +1,20 @@
+{
+  "id": "ch01-sc01",
+  "chapter": "1",
+  "pov": "char-mara",
+  "participants": ["char-mara"],
+  "purpose": ["reveal the fault is a deliberate, old cut", "open the story's central question", "commit Mara to a first small transgression"],
+  "entry_state": ["relay reads OFFLINE as it always has", "inspection due within the week", "Mara means to file a routine fault"],
+  "desire": "log the fault and requisition a repair by the book",
+  "conflict": "the damage is not weather or wear; the cut is clean, deliberate, and older than her posting",
+  "turn": "she stops mid-entry when she understands the cut predates her — someone chose this silence, and filing it will expose them",
+  "exit_state": ["Mara knows the relay was cut by hand", "Mara knows the cut is years old", "Mara withholds the fault report", "the central question is open"],
+  "required_events": ["evt-mara-finds-cut"],
+  "forbidden_moves": ["name Mara's feelings", "a storm or outsider as cause", "instant certainty about who cut it", "a tidy moral summary"],
+  "knowledge_required": [{"character": "char-mara", "fact": "fact-relay-offline"}],
+  "style_constraints": ["close third on Mara", "discovery through hands and instrument", "no filter words", "no told emotion"],
+  "candidate_strategies": [
+    "A: procedural restraint — the cut discovered through the body and the log, feeling implied",
+    "B: default-heavy control sample — clichE and told emotion, for linter contrast"
+  ]
+}

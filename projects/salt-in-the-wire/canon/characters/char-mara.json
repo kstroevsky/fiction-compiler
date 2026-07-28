@@ -1,0 +1,17 @@
+{
+  "id": "char-mara",
+  "name": "Mara Vos",
+  "desire": "keep the station honest and get the fault fixed by the book",
+  "need": "to stop atoning, without knowing it, for a silence she never chose",
+  "values": ["duty", "precision", "a mercy she would not say aloud"],
+  "fears": ["being the one who lets people die through correctness", "being the one who lets them die through cowardice"],
+  "contradictions": ["reveres the log yet is about to withhold from it", "wants rules to protect the weak and suspects they are killing them"],
+  "beliefs": ["the relay saves lives", "the record is the only thing that outlasts an operator"],
+  "knowledge": ["the station routine", "the corrected tide table", "that an inspection is due"],
+  "constraints": ["alone on the station most of the watch", "an inspection is days away", "no authority to re-survey the chart"],
+  "voice": {
+    "lexicon": ["procedural", "nautical", "plain nouns over adjectives"],
+    "syntax": ["short declaratives", "verbs of hand and instrument"],
+    "avoid": ["naming her feelings", "rhetorical questions", "aphorism"]
+  }
+}

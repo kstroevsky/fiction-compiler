@@ -1,0 +1,19 @@
+{
+  "scene_id": "ch01-sc01",
+  "time": 0,
+  "facts_added": [
+    {"id": "fact-cut-is-old", "text": "The corrosion on the severed ends shows the cable was cut years ago, not on Mara's watch."}
+  ],
+  "facts_removed": [],
+  "knowledge_changes": [
+    {"character": "char-mara", "fact": "fact-relay-cut-by-hand"},
+    {"character": "char-mara", "fact": "fact-cut-is-old"}
+  ],
+  "relationship_changes": [
+    {"pair": ["char-mara", "char-jonas"], "state": "she is keeping his secret before she knows it is his", "note": "the silence becomes shared the moment she does not file it"}
+  ],
+  "promises_opened": [
+    {"id": "promise-who-and-why", "text": "Who cut the relay, and why?", "owed_by": "the story"}
+  ],
+  "promises_closed": []
+}

@@ -1,0 +1,23 @@
+{
+  "narrative_distance": "close third, mostly level 3-4; pull back only at the turn",
+  "voice_principles": [
+    "perception before interpretation",
+    "the hand's work carries the feeling",
+    "no emotion is named that a gesture could imply"
+  ],
+  "diction": ["plain nouns", "instrument and tide vocabulary", "few adjectives, each load-bearing"],
+  "syntax": ["short declaratives", "occasional long sentence for a single sustained action"],
+  "rhythm": ["vary sentence openings", "let silence be an action, not a described feeling"],
+  "imagery": ["salt, copper, corrosion, cold light", "the tide table as recurring object/motif"],
+  "dialogue": ["Jonas deflects; Mara presses in nouns", "subtext over statement", "no adverbial tags"],
+  "sentence_distribution": {"short": 0.5, "medium": 0.4, "long": 0.1},
+  "avoid": [
+    "generic emotional abstraction",
+    "stock atmospheric openings",
+    "unearned aphorisms",
+    "automatic hopeful uplift",
+    "metaphors that repeat the literal meaning",
+    "filter words (she felt / saw / realized)",
+    "emotion named then paraphrased"
+  ]
+}

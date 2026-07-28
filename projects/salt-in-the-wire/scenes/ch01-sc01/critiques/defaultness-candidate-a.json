@@ -1,0 +1,7 @@
+{
+  "candidate": "candidate-a.md",
+  "critic": "defaultness-lint",
+  "verdict": "pass",
+  "confidence": 0.7,
+  "findings": []
+}

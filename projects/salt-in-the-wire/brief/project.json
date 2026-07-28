@@ -1,0 +1,22 @@
+{
+  "id": "salt-in-the-wire",
+  "title": "Salt in the Wire",
+  "form": "short-story",
+  "audience": "adult literary / quiet speculative readers who like moral ambiguity and restraint",
+  "reader_contract": [
+    "5-15 pages, single sitting",
+    "close third person, one focalizer (Mara)",
+    "a concrete central question with no clean answer",
+    "the ending withholds comfort; ambiguity is intended, not evasive",
+    "no supernatural element; the strangeness is moral, not physical"
+  ],
+  "theme_question": "When following the rule would kill and breaking it saved lives, is inherited silence a betrayal or a mercy?",
+  "desired_affect": ["unease that outlasts the last line", "retrospective inevitability", "complicity"],
+  "constraints": [
+    "no storm or outsider as the cause of the fault",
+    "no villain; the antagonist force is duty itself",
+    "Mara must act, not merely understand",
+    "prose earns emotion through behavior, never names it"
+  ],
+  "human_gates": ["premise", "voice-profile", "ending", "final"]
+}

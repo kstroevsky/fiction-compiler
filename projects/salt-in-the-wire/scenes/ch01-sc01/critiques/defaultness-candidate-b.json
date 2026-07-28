@@ -1,0 +1,113 @@
+{
+  "candidate": "candidate-b.md",
+  "critic": "defaultness-lint",
+  "verdict": "revise",
+  "confidence": 0.7,
+  "findings": [
+    {
+      "dimension": "defaultness",
+      "severity": "material",
+      "evidence": "L1: 'heart pounded' in “Mara's heart pounded as she opened the panel. She felt a wave of dread wash over her. She saw that the cable had been cu”",
+      "diagnosis": "Stock phrase; the image is inherited, not perceived. Replace with something only this character in this moment would notice.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "defaultness",
+      "severity": "material",
+      "evidence": "L3: 'time stood still' in “Suddenly, time stood still. A shiver ran down her spine. She couldn't help but wonder who would do such a thing.”",
+      "diagnosis": "Stock phrase; the image is inherited, not perceived. Replace with something only this character in this moment would notice.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "defaultness",
+      "severity": "material",
+      "evidence": "L3: 'A shiver ran down her spine' in “Suddenly, time stood still. A shiver ran down her spine. She couldn't help but wonder who would do such a thing.”",
+      "diagnosis": "Stock phrase; the image is inherited, not perceived. Replace with something only this character in this moment would notice.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "defaultness",
+      "severity": "material",
+      "evidence": "L7: 'Little did she know' in “Little did she know, her whole life was about to change forever. She just stood there, filled with a mixture of fear and”",
+      "diagnosis": "Stock phrase; the image is inherited, not perceived. Replace with something only this character in this moment would notice.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "defaultness",
+      "severity": "material",
+      "evidence": "L1: 'felt a wave of' in “Mara's heart pounded as she opened the panel. She felt a wave of dread wash over her. She saw that the cable had been cu”",
+      "diagnosis": "Emotion named then paraphrased instead of enacted. Cut the label; show the behavior that implies it.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "defaultness",
+      "severity": "material",
+      "evidence": "L3: \"couldn't help but\" in “Suddenly, time stood still. A shiver ran down her spine. She couldn't help but wonder who would do such a thing.”",
+      "diagnosis": "Emotion named then paraphrased instead of enacted. Cut the label; show the behavior that implies it.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "defaultness",
+      "severity": "material",
+      "evidence": "L7: 'with a mixture of fear and anger' in “Little did she know, her whole life was about to change forever. She just stood there, filled with a mixture of fear and”",
+      "diagnosis": "Emotion named then paraphrased instead of enacted. Cut the label; show the behavior that implies it.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "defaultness",
+      "severity": "material",
+      "evidence": "L7: 'filled with a mixture' in “Little did she know, her whole life was about to change forever. She just stood there, filled with a mixture of fear and”",
+      "diagnosis": "Emotion named then paraphrased instead of enacted. Cut the label; show the behavior that implies it.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "defaultness",
+      "severity": "minor",
+      "evidence": "L1: 'She felt' in “Mara's heart pounded as she opened the panel. She felt a wave of dread wash over her. She saw that the cable had been cu”",
+      "diagnosis": "POV filter word distances the reader from perception. Usually deletable ('she saw the door open' -> 'the door opened').",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "defaultness",
+      "severity": "minor",
+      "evidence": "L1: 'She saw' in “Mara's heart pounded as she opened the panel. She felt a wave of dread wash over her. She saw that the cable had been cu”",
+      "diagnosis": "POV filter word distances the reader from perception. Usually deletable ('she saw the door open' -> 'the door opened').",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "defaultness",
+      "severity": "minor",
+      "evidence": "L1: 'She realized' in “Mara's heart pounded as she opened the panel. She felt a wave of dread wash over her. She saw that the cable had been cu”",
+      "diagnosis": "POV filter word distances the reader from perception. Usually deletable ('she saw the door open' -> 'the door opened').",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "defaultness",
+      "severity": "minor",
+      "evidence": "2 'weak_intensifiers' hits (21.3 per 1000 words), e.g. just; suddenly",
+      "diagnosis": "Weak-word density exceeds 6/1000; prune or replace with specifics.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "defaultness",
+      "severity": "minor",
+      "evidence": "L7: 'began to' in “Little did she know, her whole life was about to change forever. She just stood there, filled with a mixture of fear and”",
+      "diagnosis": "'began to / seemed to' softens action into approximation. Commit to the action.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "defaultness",
+      "severity": "minor",
+      "evidence": "L5: 'whispered quietly' in “\"Impossible,\" she whispered quietly.”",
+      "diagnosis": "Adverb props up a weak verb or redundant tag. Prefer the line itself carrying the tone.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "rhythm",
+      "severity": "minor",
+      "evidence": "3 consecutive sentences open with 'she' (from sentence 2)",
+      "diagnosis": "Repeated sentence openers flatten rhythm; vary syntax or subordinate.",
+      "repair_layer": "prose"
+    }
+  ]
+}

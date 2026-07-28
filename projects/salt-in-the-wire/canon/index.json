@@ -1,0 +1,26 @@
+{
+  "characters": [
+    "char-mara",
+    "char-jonas"
+  ],
+  "world_rules": [
+    "The relay is a legal obligation: an operator who knows it is down must report and restore it.",
+    "The approach chart is the authority ships trust; correcting it officially takes a survey the district must fund.",
+    "The station keeps a paper log; every fault filed is permanent and auditable."
+  ],
+  "locations": [
+    "the signal station on the point",
+    "the harbor town ashore"
+  ],
+  "objects": [
+    "the relay panel",
+    "the hand-corrected tide table",
+    "the severed cable"
+  ],
+  "factions": [
+    "the district maritime authority"
+  ],
+  "accepted_state_deltas": [
+    "ch01-sc01"
+  ]
+}

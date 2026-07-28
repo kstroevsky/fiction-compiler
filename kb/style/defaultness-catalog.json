@@ -1,0 +1,63 @@
+{
+  "_about": "Deterministic patterns for the defaultness linter (src/fiction_compiler/defaultness.py). These encode ABSTRACT model-default tendencies, not any copyrighted text. A match is evidence to inspect, not proof of a defect: the repair may belong to a lower layer (scene, character, conflict, premise), not the sentence. Extend deliberately; never add a pattern that punishes a legitimate deliberate choice.",
+  "cliches": {
+    "severity": "material",
+    "patterns": [
+      "heart (pounded|hammered|raced|thundered|skipped a beat|sank|leapt)",
+      "time (stood|seemed to stand) still",
+      "little did (he|she|they|we|i) know",
+      "if only (he|she|they|we|i) had known",
+      "a shiver (ran|went|crawled) (down|up) (his|her|their|my) spine",
+      "breath (he|she|they|i) didn'?t (know|realize|realise)[^.]{0,40}holding",
+      "let out a breath[^.]{0,30}(didn'?t|hadn'?t)",
+      "(a )?wave of \\w+ washed over",
+      "blood ran cold",
+      "before (he|she|they|i) (knew it|could stop)",
+      "eyes (widened|narrowed) (in|with)",
+      "lump in (his|her|their|my) throat",
+      "deafening silence",
+      "the world (around (him|her|them) )?(seemed to |began to )?(melt|fade|blur|tilt)",
+      "sent a chill",
+      "breath caught in (his|her|their|my) throat",
+      "heart in (his|her|their|my) throat"
+    ]
+  },
+  "telling_emotion": {
+    "severity": "material",
+    "patterns": [
+      "felt a (surge|wave|pang|rush|flicker|stab|jolt|pulse) of",
+      "with a mix(ture)? of \\w+ and \\w+",
+      "a sense of \\w+ (washed|settled|crept|descended)",
+      "couldn'?t help but",
+      "overcome with \\w+",
+      "filled with (a )?(sense of )?\\w+"
+    ]
+  },
+  "filter_perception": {
+    "severity": "minor",
+    "patterns": [
+      "\\b(he|she|they|i|we)\\s+(felt|saw|heard|noticed|realized|realised|watched|sensed|wondered|observed)\\b",
+      "could (see|feel|hear|sense|tell) that"
+    ]
+  },
+  "weak_intensifiers": {
+    "severity": "minor",
+    "density_per_1000_words": 6,
+    "patterns": [
+      "\\b(very|really|quite|suddenly|somehow|just|simply|actually|literally|rather|almost)\\b"
+    ]
+  },
+  "progressive_hedge": {
+    "severity": "minor",
+    "patterns": [
+      "\\b(began|started) to\\b",
+      "\\bseemed to\\b"
+    ]
+  },
+  "adverb_dialogue_tag": {
+    "severity": "minor",
+    "patterns": [
+      "\\b(said|asked|replied|whispered|shouted|muttered|exclaimed|added|answered|breathed|hissed)\\s+\\w+ly\\b"
+    ]
+  }
+}

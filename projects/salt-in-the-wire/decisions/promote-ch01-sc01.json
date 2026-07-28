@@ -1,0 +1,11 @@
+{
+  "scene_id": "ch01-sc01",
+  "candidate": "scenes/ch01-sc01/candidates/candidate-a.md",
+  "promoted_to": "manuscript/chapters/ch01-sc01.md",
+  "promoted_at": "2026-07-28T21:38:59.817150+00:00",
+  "critique_files": [
+    "scenes/ch01-sc01/critiques/defaultness-candidate-a.json",
+    "scenes/ch01-sc01/critiques/defaultness-candidate-b.json",
+    "scenes/ch01-sc01/critiques/hard-audit.json"
+  ]
+}

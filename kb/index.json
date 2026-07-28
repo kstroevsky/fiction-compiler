@@ -1,0 +1,104 @@
+{
+  "_about": "Level-0 concept index. Each concept is an ABSTRACT craft feature (no copyrighted text), a concise card, and — critically — a `used_by` link naming the deterministic check, agent, or skill that consumes it. A concept with no `used_by` is inert and should not be here. `validate_workspace.py` verifies every card file exists and every source id is registered.",
+  "concepts": [
+    {
+      "id": "fabula-vs-discourse",
+      "layer": "narratology",
+      "card": "narratology/fabula-vs-discourse.md",
+      "use_when": "Any time a problem might be causal (what happens) vs. presentational (how it is told).",
+      "used_by": ["src/fiction_compiler/state.py", "docs/architecture.md"],
+      "related": ["order-duration-frequency", "focalization-and-knowledge"],
+      "sources": ["lhn"]
+    },
+    {
+      "id": "causality-and-preconditions",
+      "layer": "craft",
+      "card": "craft/causality-and-preconditions.md",
+      "use_when": "Planning or auditing whether an event can happen yet.",
+      "used_by": ["src/fiction_compiler/hard_audit.py:audit_scene", "narrative-architect"],
+      "related": ["character-intentionality", "eventfulness"],
+      "sources": ["egri-dramatic-writing", "swain-techniques"]
+    },
+    {
+      "id": "character-intentionality",
+      "layer": "craft",
+      "card": "craft/character-intentionality.md",
+      "use_when": "Deciding or testing whether an action follows from a character rather than the plot.",
+      "used_by": ["character-simulator", "constitution/quality-contract.md"],
+      "related": ["causality-and-preconditions", "dialogue-subtext"],
+      "sources": ["egri-dramatic-writing"]
+    },
+    {
+      "id": "focalization-and-knowledge",
+      "layer": "narratology",
+      "card": "narratology/focalization-and-knowledge.md",
+      "use_when": "Choosing/auditing whose perception filters a scene and who knows what.",
+      "used_by": ["src/fiction_compiler/hard_audit.py:audit_scene", "continuity-auditor"],
+      "related": ["narrative-distance", "fabula-vs-discourse"],
+      "sources": ["lhn", "wood-how-fiction-works"]
+    },
+    {
+      "id": "promise-and-payoff",
+      "layer": "craft",
+      "card": "craft/promise-and-payoff.md",
+      "use_when": "Opening a reader expectation, or checking whether one was paid off.",
+      "used_by": ["src/fiction_compiler/hard_audit.py:audit_canon", "continuity-auditor"],
+      "related": ["suspense-surprise-curiosity", "eventfulness"],
+      "sources": ["swain-techniques"]
+    },
+    {
+      "id": "scene-dramaturgy",
+      "layer": "craft",
+      "card": "craft/scene-dramaturgy.md",
+      "use_when": "Writing a scene spec or judging whether a scene is necessary.",
+      "used_by": ["schemas/scene.schema.json", "draft-scene"],
+      "related": ["character-intentionality", "dialogue-subtext"],
+      "sources": ["swain-techniques", "mckee-dialogue"]
+    },
+    {
+      "id": "dialogue-subtext",
+      "layer": "craft",
+      "card": "craft/dialogue-subtext.md",
+      "use_when": "Writing or auditing dialogue; testing conflict beneath the words.",
+      "used_by": ["style-editor", "character-simulator"],
+      "related": ["scene-dramaturgy", "character-intentionality"],
+      "sources": ["mckee-dialogue"]
+    },
+    {
+      "id": "suspense-surprise-curiosity",
+      "layer": "narratology",
+      "card": "narratology/suspense-surprise-curiosity.md",
+      "use_when": "Scheduling information; judging whether a surprise is earned.",
+      "used_by": ["adversarial-reader", "docs/evaluation.md"],
+      "related": ["promise-and-payoff", "defaultness"],
+      "sources": ["lhn"]
+    },
+    {
+      "id": "narrative-distance",
+      "layer": "style",
+      "card": "style/narrative-distance.md",
+      "use_when": "Tuning how close the prose sits to a character's consciousness.",
+      "used_by": ["style-editor", "planning/style-profile.json"],
+      "related": ["focalization-and-knowledge", "concrete-vs-abstract"],
+      "sources": ["wood-how-fiction-works", "gardner-art-fiction"]
+    },
+    {
+      "id": "concrete-vs-abstract",
+      "layer": "style",
+      "card": "style/concrete-vs-abstract.md",
+      "use_when": "Diagnosing generic, abstract, or ornamental prose.",
+      "used_by": ["src/fiction_compiler/defaultness.py", "style-editor"],
+      "related": ["defaultness", "narrative-distance"],
+      "sources": ["prose-reading", "gardner-art-fiction"]
+    },
+    {
+      "id": "defaultness",
+      "layer": "style",
+      "card": "style/defaultness.md",
+      "use_when": "Detecting model-default phrasing and predictable continuations.",
+      "used_by": ["src/fiction_compiler/defaultness.py", "kb/style/defaultness-catalog.json", "adversarial-reader"],
+      "related": ["concrete-vs-abstract", "suspense-surprise-curiosity"],
+      "sources": ["prose-reading"]
+    }
+  ]
+}

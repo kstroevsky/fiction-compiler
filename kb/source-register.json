@@ -1,13 +1,88 @@
 {
-  "sources": [],
-  "fields": {
-    "id": "stable identifier",
-    "title": "source title",
-    "creator": "author or organization",
-    "type": "book, article, paper, corpus, user-file, website",
-    "license": "public-domain, licensed, fair-summary-only, user-owned, unknown",
-    "location": "citation, URL, or local reference",
-    "domains": ["domain tags"],
-    "notes": "what was extracted and what must not be copied"
-  }
+  "_about": "Provenance for craft knowledge. Titles and authors are facts (not copyrightable). We register sources so cards can cite where an abstract craft feature was learned. We DO NOT reproduce protected text; only abstract heuristics, claims, and failure modes are extracted. `license` and `copyright_note` record what may and may not be copied, and flag the German/EU check the brief calls for (US public-domain status does not settle EU/DE status).",
+  "sources": [
+    {
+      "id": "lhn",
+      "title": "The Living Handbook of Narratology",
+      "creator": "Hamburg University (eds.)",
+      "type": "website",
+      "license": "reference-online",
+      "location": "https://www-archiv.fdm.uni-hamburg.de/lhn/",
+      "domains": ["narratology", "focalization", "computational-narratology"],
+      "notes": "Concept definitions (focalization, order/duration/frequency, tellability). Summarize concepts; do not paste article text.",
+      "copyright_note": "Cite and paraphrase concepts only."
+    },
+    {
+      "id": "egri-dramatic-writing",
+      "title": "The Art of Dramatic Writing",
+      "creator": "Lajos Egri",
+      "type": "book",
+      "license": "in-copyright",
+      "location": "first published 1946",
+      "domains": ["character", "premise", "conflict"],
+      "notes": "Extract abstract heuristics: premise as testable proposition, character contradiction, orchestration of forces. No text reproduction.",
+      "copyright_note": "US: possibly PD via non-renewal (verify). DE/EU: author died 1967, so protected until 2037 (life+70). Treat as in-copyright in the EU; abstract features only."
+    },
+    {
+      "id": "swain-techniques",
+      "title": "Techniques of the Selling Writer",
+      "creator": "Dwight V. Swain",
+      "type": "book",
+      "license": "in-copyright",
+      "domains": ["scene", "sequel", "motivation-reaction", "setup-payoff"],
+      "notes": "Extract scene/sequel structure and motivation-reaction units as abstract patterns.",
+      "copyright_note": "In-copyright (author died 1992). EU protected until 2062. Abstract features only."
+    },
+    {
+      "id": "mckee-dialogue",
+      "title": "Dialogue: The Art of Verbal Action",
+      "creator": "Robert McKee",
+      "type": "book",
+      "license": "in-copyright",
+      "domains": ["dialogue", "subtext", "scene"],
+      "notes": "Extract the idea of dialogue as action with objective/subtext/turn. No text reproduction.",
+      "copyright_note": "In-copyright. Abstract features only."
+    },
+    {
+      "id": "wood-how-fiction-works",
+      "title": "How Fiction Works",
+      "creator": "James Wood",
+      "type": "book",
+      "license": "in-copyright",
+      "domains": ["free-indirect-style", "detail", "narrative-distance"],
+      "notes": "Extract free-indirect discourse and the mechanics of narrative distance as abstract craft.",
+      "copyright_note": "In-copyright. Abstract features only."
+    },
+    {
+      "id": "gardner-art-fiction",
+      "title": "The Art of Fiction",
+      "creator": "John Gardner",
+      "type": "book",
+      "license": "in-copyright",
+      "domains": ["prose", "vivid-detail", "psychic-distance"],
+      "notes": "Extract 'continuous dream' and psychic-distance gradations as abstract concepts.",
+      "copyright_note": "In-copyright (author died 1982). EU protected until 2052. Abstract features only."
+    },
+    {
+      "id": "prose-reading",
+      "title": "Reading Like a Writer",
+      "creator": "Francine Prose",
+      "type": "book",
+      "license": "in-copyright",
+      "domains": ["close-reading", "word-choice", "sentence"],
+      "notes": "Extract close-reading discipline and specificity heuristics. No text reproduction.",
+      "copyright_note": "In-copyright. Abstract features only."
+    },
+    {
+      "id": "standard-ebooks",
+      "title": "Standard Ebooks (public-domain corpus)",
+      "creator": "Standard Ebooks",
+      "type": "corpus",
+      "license": "public-domain-us",
+      "location": "https://standardebooks.org/",
+      "domains": ["corpus", "public-domain"],
+      "notes": "Source of US-public-domain texts for corpus analysis (annotation, not reproduction into prompts wholesale).",
+      "copyright_note": "US public domain. EU/DE status must be verified per author death date before ingesting any specific title."
+    }
+  ]
 }

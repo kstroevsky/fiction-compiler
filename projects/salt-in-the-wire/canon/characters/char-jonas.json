@@ -1,0 +1,17 @@
+{
+  "id": "char-jonas",
+  "name": "Jonas Reell",
+  "desire": "to be left in the silence he chose, and forgiven without having to confess",
+  "need": "to hand the weight to someone who will carry it as he did, not to be absolved",
+  "values": ["lives over rules", "the sea's verdict over the district's paperwork"],
+  "fears": ["that restoring the relay will kill the next crew", "that he was only ever a coward dressed as a savior"],
+  "contradictions": ["kept meticulous logs while committing the one act he never logged", "deflects yet corrected the tide table so the next operator would be safe"],
+  "beliefs": ["the chart is wrong and no one will pay to prove it", "some rescues are executions with better lighting"],
+  "knowledge": ["that he cut the relay and why", "that the chart mis-marks the reef"],
+  "constraints": ["old, tired, ashore", "no proof of the mis-survey that a district would accept"],
+  "voice": {
+    "lexicon": ["terse", "weather and tide", "answers a question with a question"],
+    "syntax": ["fragments", "long silences rendered as action"],
+    "avoid": ["direct admission", "self-justification in the open"]
+  }
+}

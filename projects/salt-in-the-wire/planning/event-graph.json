@@ -1,0 +1,41 @@
+{
+  "events": [
+    {
+      "id": "evt-relay-cut",
+      "time": -3650,
+      "actors": ["char-jonas"],
+      "preconditions": ["fact-chart-mis-surveyed", "jonas is the station operator"],
+      "action": "Jonas severs the relay cable by hand to stop it guiding ships onto the mis-charted reef.",
+      "effects": ["fact-relay-cut-by-hand", "fact-relay-offline"],
+      "causes": ["fact-chart-mis-surveyed"],
+      "revealed_to": [],
+      "cost": "he becomes the man who let the station go silent, and can never say why on the record"
+    },
+    {
+      "id": "evt-mara-finds-cut",
+      "time": 0,
+      "actors": ["char-mara"],
+      "preconditions": ["fact-relay-offline", "mara opens the panel to file a routine fault"],
+      "action": "Mara opens the relay housing and finds the cable was cut clean, and the cut is old.",
+      "effects": ["mara knows fact-relay-cut-by-hand"],
+      "causes": ["evt-relay-cut"],
+      "revealed_to": ["char-mara"],
+      "cost": "she can no longer file an honest fault without indicting a predecessor she never met"
+    },
+    {
+      "id": "evt-jonas-admits",
+      "time": 1,
+      "actors": ["char-jonas", "char-mara"],
+      "preconditions": ["mara knows fact-relay-cut-by-hand", "mara reaches Jonas ashore"],
+      "action": "Pressed, Jonas gives Mara the reason obliquely: the chart is wrong; the relay was drowning the ships it called.",
+      "effects": ["mara knows fact-chart-mis-surveyed"],
+      "causes": ["evt-mara-finds-cut"],
+      "revealed_to": ["char-mara"],
+      "cost": "he passes her the weight he has carried alone"
+    }
+  ],
+  "edges": [
+    {"from": "evt-relay-cut", "to": "evt-mara-finds-cut", "type": "causes"},
+    {"from": "evt-mara-finds-cut", "to": "evt-jonas-admits", "type": "causes"}
+  ]
+}

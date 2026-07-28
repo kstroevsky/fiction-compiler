@@ -1,0 +1,20 @@
+{
+  "id": "ch01-sc02",
+  "chapter": "1",
+  "pov": "char-mara",
+  "participants": ["char-mara", "char-jonas"],
+  "purpose": ["deliver the reason obliquely", "convert a whodunit into a moral problem", "pass the weight from Jonas to Mara"],
+  "entry_state": ["Mara knows the cut was deliberate and old", "she has withheld the fault", "she has found Jonas ashore"],
+  "desire": "make Jonas say plainly why he cut the relay",
+  "conflict": "he deflects; the plain answer indicts him and cannot be proven to any authority",
+  "turn": "he gives her the reason sideways — the chart is wrong, the relay was drowning the ships it called — and she believes him without proof",
+  "exit_state": ["Mara knows the chart mis-marks the reef", "the question is no longer who but what she will do", "the promise of who-and-why is paid, a heavier one opens"],
+  "required_events": ["evt-jonas-admits"],
+  "forbidden_moves": ["a full confession monologue", "Jonas justifying himself in the open", "Mara stating the theme"],
+  "knowledge_required": [{"character": "char-mara", "fact": "fact-relay-cut-by-hand"}],
+  "style_constraints": ["dialogue as verbal action", "subtext over statement", "no adverbial tags"],
+  "candidate_strategies": [
+    "A: near-silence — Jonas answers with the corrected tide table, not words",
+    "B: minimal exchange — three questions, none answered directly"
+  ]
+}
