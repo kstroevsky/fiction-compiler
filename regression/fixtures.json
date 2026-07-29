@@ -64,6 +64,15 @@
       "expect": "select"
     },
     {
+      "name": "tournament ignores the scene-level hard audit as a phantom candidate",
+      "check": "tournament_decision",
+      "input": {"critiques": [
+        {"candidate": "ch01-sc02", "critic": "hard-audit", "findings": []},
+        {"candidate": "candidate-a.md", "findings": []},
+        {"candidate": "candidate-b.md", "findings": [{"dimension": "cliche", "severity": "material"}]}]},
+      "expect": "select"
+    },
+    {
       "name": "ontology rejects a predicate typo (ADR 0005)",
       "check": "ontology_valid",
       "input": {

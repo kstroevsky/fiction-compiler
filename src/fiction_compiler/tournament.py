@@ -114,7 +114,10 @@ def scores_from_critiques(critiques: list[dict]) -> dict[str, dict[str, float]]:
     scores: dict[str, dict[str, float]] = {}
     for critique in critiques:
         candidate = Path(str(critique.get("candidate", ""))).name
-        if not candidate:
+        # Only prose candidates (``*.md``) are contestants. A candidate-independent critique — the
+        # scene-level hard audit, whose ``candidate`` is the scene id — must not become a phantom
+        # candidate that dominates the field.
+        if not candidate.endswith(".md"):
             continue
         bucket = scores.setdefault(candidate, {})
         for finding in critique.get("findings", []):
