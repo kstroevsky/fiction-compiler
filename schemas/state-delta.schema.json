@@ -41,6 +41,33 @@
         }
       }
     },
+    "relationship_edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["subject", "object", "dimension"],
+        "properties": {
+          "subject": {"type": "string", "pattern": "^char-[a-z0-9-]+$"},
+          "object": {"type": "string", "pattern": "^char-[a-z0-9-]+$"},
+          "dimension": {"type": "string", "minLength": 1},
+          "value": {}
+        }
+      }
+    },
+    "predicate_changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["op", "predicate", "subject"],
+        "properties": {
+          "op": {"enum": ["add", "remove"]},
+          "predicate": {"type": "string", "minLength": 1},
+          "subject": {"type": "string", "minLength": 1},
+          "object": {"type": "string"},
+          "value": {}
+        }
+      }
+    },
     "promises_opened": {
       "type": "array",
       "items": {

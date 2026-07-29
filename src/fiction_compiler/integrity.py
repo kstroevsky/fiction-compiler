@@ -22,7 +22,7 @@ from pathlib import Path
 from .state import accepted_scene_ids
 
 _SEED_LEDGERS = ("facts.jsonl", "knowledge-state.jsonl", "relationship-state.jsonl",
-                 "promises.jsonl", "timeline.jsonl")
+                 "world-state.jsonl", "promises.jsonl", "timeline.jsonl")
 
 
 def sha256_bytes(data: bytes) -> str:

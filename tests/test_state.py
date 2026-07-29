@@ -96,5 +96,54 @@ class StateReconstructionTests(unittest.TestCase):
             self.assertEqual(before.time, 0)
 
 
+def build_typed_project(root: Path) -> Path:
+    """A project exercising the typed-predicate layer and directional relationships (P1)."""
+    project = root / "proj"
+    canon = project / "canon"
+    for name in ("facts.jsonl", "knowledge-state.jsonl", "relationship-state.jsonl", "promises.jsonl"):
+        write(canon / name, "")
+    # Seed: Jonas is at the station; Mara starts by trusting Jonas (directional).
+    write(canon / "world-state.jsonl", json.dumps({"predicate": "located_at", "subject": "char-jonas", "object": "loc-station"}) + "\n")
+    write(canon / "relationship-state.jsonl", json.dumps({"subject": "char-mara", "object": "char-jonas", "dimension": "trusts", "value": "high"}) + "\n")
+    write(canon / "timeline.jsonl", json.dumps({"time": 0}) + "\n")
+    write(canon / "index.json", json.dumps({"accepted_state_deltas": ["ch01-sc01"]}))
+    write_delta(project, "ch01-sc01", {
+        "scene_id": "ch01-sc01", "time": 1,
+        "facts_added": [], "facts_removed": [], "knowledge_changes": [],
+        "relationship_changes": [],
+        "relationship_edges": [{"subject": "char-mara", "object": "char-jonas", "dimension": "trusts", "value": "broken"}],
+        "predicate_changes": [
+            {"op": "add", "predicate": "offline", "subject": "obj-relay"},
+            {"op": "remove", "predicate": "located_at", "subject": "char-jonas", "object": "loc-station"},
+        ],
+        "promises_opened": [], "promises_closed": [],
+    })
+    return project
+
+
+class TypedIRStateTests(unittest.TestCase):
+    def test_seed_predicate_and_directional_relationship(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            before = state.reconstruct_state_before(build_typed_project(Path(tmp)), "ch01-sc01")
+            self.assertTrue(before.holds("located_at", "char-jonas", "loc-station"))
+            self.assertEqual(before.relationship_directed("char-mara", "char-jonas", "trusts"), "high")
+            # Directional: trust does not imply the reverse edge exists.
+            self.assertIsNone(before.relationship_directed("char-jonas", "char-mara", "trusts"))
+
+    def test_delta_predicate_add_and_remove(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            final = state.reconstruct(build_typed_project(Path(tmp)))
+            self.assertTrue(final.holds("offline", "obj-relay"))  # added
+            self.assertFalse(final.holds("located_at", "char-jonas", "loc-station"))  # removed
+            self.assertEqual(final.relationship_directed("char-mara", "char-jonas", "trusts"), "broken")
+
+    def test_holds_bridges_knowledge(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build_project(Path(tmp))  # reuse the knowledge fixture
+            before = state.reconstruct_state_before(project, "ch01-sc02")
+            self.assertTrue(before.holds("knows", "char-mara", "fact-relay-cut"))
+            self.assertFalse(before.holds("knows", "char-mara", "fact-jonas-confesses"))
+
+
 if __name__ == "__main__":
     unittest.main()

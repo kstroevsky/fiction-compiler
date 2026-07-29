@@ -36,9 +36,14 @@ def compile_bundle(project: Path, scene_id: str) -> dict:
     before = reconstruct_state_before(project, scene_id)
     knowledge = {c: sorted(before.knowledge.get(c, set())) for c in participant_set if c in before.knowledge}
     relationships = [
-        {"pair": sorted(pair), "state": state}
-        for pair, state in before.relationships.items()
-        if pair & participant_set
+        {"subject": subject, "object": obj, "dimensions": dims}
+        for (subject, obj), dims in before.relationships.items()
+        if {subject, obj} & participant_set
+    ]
+    predicates = [
+        {"predicate": predicate, "subject": subject, "object": obj, "value": value}
+        for (predicate, subject, obj), value in before.predicates.items()
+        if subject in participant_set or obj in participant_set
     ]
     canon_index = _load(project / "canon" / "index.json", {})
 
@@ -53,6 +58,7 @@ def compile_bundle(project: Path, scene_id: str) -> dict:
             "facts": before.facts,
             "participant_knowledge": knowledge,
             "relationships": relationships,
+            "predicates": predicates,
             "open_promises": before.open_promises,
         },
         "world_rules": canon_index.get("world_rules", []),

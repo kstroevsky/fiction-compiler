@@ -93,6 +93,67 @@ class HardAuditSceneTests(unittest.TestCase):
             self.assertIn("causal", dims)
 
 
+class HardAuditExecutableEventTests(unittest.TestCase):
+    """The event graph is executable: typed preconditions must hold, typed effects must be recorded."""
+
+    def _project(self, root: Path, event: dict, delta_extra: dict, world_state: str = "") -> Path:
+        project = base_project(root, ["ch01-sc01"])
+        write_json(project / "planning" / "event-graph.json", {"events": [event], "edges": []})
+        if world_state:
+            write(project / "canon" / "world-state.jsonl", world_state)
+        delta = {
+            "scene_id": "ch01-sc01", "time": 1, "facts_added": [], "facts_removed": [],
+            "knowledge_changes": [], "relationship_changes": [], "promises_opened": [], "promises_closed": [],
+        }
+        delta.update(delta_extra)
+        write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", delta)
+        write_json(project / "scenes" / "ch01-sc01" / "spec.json", {
+            "id": "ch01-sc01", "pov": "char-mara", "participants": ["char-mara"],
+            "required_events": [event["id"]], "knowledge_required": [],
+        })
+        return project
+
+    def test_unmet_typed_precondition_is_material(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut",
+                     "preconditions": [{"predicate": "located_at", "subject": "char-jonas", "object": "loc-station"}],
+                     "effects": []}
+            project = self._project(Path(tmp), event, {})  # no world-state: precondition can't hold
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any(f["dimension"] == "causal" and f["severity"] == "material"
+                                and "precondition" in f["evidence"] for f in critique["findings"]))
+
+    def test_met_precondition_and_recorded_effect_passes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut",
+                     "preconditions": [{"predicate": "located_at", "subject": "char-jonas", "object": "loc-station"}],
+                     "effects": [{"op": "add", "predicate": "offline", "subject": "obj-relay"}]}
+            world = json.dumps({"predicate": "located_at", "subject": "char-jonas", "object": "loc-station"}) + "\n"
+            delta_extra = {"predicate_changes": [{"op": "add", "predicate": "offline", "subject": "obj-relay"}]}
+            project = self._project(Path(tmp), event, delta_extra, world_state=world)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+
+    def test_effect_missing_from_delta_is_material(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": [],
+                     "effects": [{"op": "add", "predicate": "offline", "subject": "obj-relay"}]}
+            project = self._project(Path(tmp), event, {})  # delta records no predicate_changes
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertTrue(any(f["dimension"] == "causal" and f["severity"] == "material"
+                                and "effect" in f["evidence"] for f in critique["findings"]))
+
+    def test_prose_precondition_earns_migration_advisory(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": ["jonas is the station operator"], "effects": []}
+            project = self._project(Path(tmp), event, {})
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertTrue(any(f["dimension"] == "causal" and f["severity"] == "minor"
+                                for f in critique["findings"]))
+            self.assertEqual(critique["verdict"], "pass")  # advisory only, does not block
+
+
 class HardAuditCanonTests(unittest.TestCase):
     def test_clean_canon_only_flags_nothing_material(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

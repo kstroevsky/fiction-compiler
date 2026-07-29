@@ -119,8 +119,17 @@ test, not just a feature.
 > now fail their own gate by design — retained as negative regression fixtures. Remaining P0 (⬜):
 > immutable acceptance *signatures* / human-gate identity.
 >
+> **Story IR is becoming executable (ADR 0004, P1 slice 1).** State now carries typed predicates
+> (`predicate_changes` + `canon/world-state.jsonl`, queried via `StoryState.holds`) and *directional*
+> relationships (ordered `(subject, object)` with dimensions like trusts/fears/owes; legacy `{pair,
+> state}` still works). Event preconditions/effects may be typed atoms, and the hard audit now
+> *evaluates* them — an unmet precondition or an effect missing from the scene's delta is a material
+> finding, turning the event graph from descriptive into checkable. Still ⬜ in P1: a predicate
+> ontology, richer resource/physical state, and fabula-time vs discourse-order separation.
+>
 > See `docs/decisions/0001-structured-state-delta.md`, `0002-promotion-audit-gate.md`,
-> `0003-tamper-evident-promotion.md`, and the worked example in `projects/salt-in-the-wire/`.
+> `0003-tamper-evident-promotion.md`, `0004-executable-story-ir.md`, and the worked example in
+> `projects/salt-in-the-wire/`.
 
 ### Stage 0 — Make the scaffold honest (foundations)
 **Goal:** the checks that pass should mean something.

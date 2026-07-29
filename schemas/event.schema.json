@@ -7,9 +7,36 @@
     "id": {"type": "string", "pattern": "^evt-[a-z0-9-]+$"},
     "time": {"type": ["string", "number"]},
     "actors": {"type": "array", "items": {"type": "string"}},
-    "preconditions": {"type": "array", "items": {"type": "string"}},
+    "preconditions": {
+      "type": "array",
+      "comment": "A precondition is a legacy prose string OR a typed atom {predicate, subject, object?}. Only typed atoms are machine-checked (hard_audit.audit_scene); prose atoms earn a migrate-to-typed advisory.",
+      "items": {
+        "type": ["string", "object"],
+        "required": ["predicate", "subject"],
+        "properties": {
+          "predicate": {"type": "string", "minLength": 1},
+          "subject": {"type": "string", "minLength": 1},
+          "object": {"type": "string"},
+          "value": {}
+        }
+      }
+    },
     "action": {"type": "string"},
-    "effects": {"type": "array", "items": {"type": "string"}},
+    "effects": {
+      "type": "array",
+      "comment": "An effect is a legacy prose string OR a typed op {op, predicate, subject, object?}. Typed effects must appear in the scene's state-delta predicate_changes.",
+      "items": {
+        "type": ["string", "object"],
+        "required": ["op", "predicate", "subject"],
+        "properties": {
+          "op": {"enum": ["add", "remove"]},
+          "predicate": {"type": "string", "minLength": 1},
+          "subject": {"type": "string", "minLength": 1},
+          "object": {"type": "string"},
+          "value": {}
+        }
+      }
+    },
     "causes": {"type": "array", "items": {"type": "string"}},
     "revealed_to": {"type": "array", "items": {"type": "string"}},
     "cost": {"type": "string"}

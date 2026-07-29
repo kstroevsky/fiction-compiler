@@ -5,7 +5,9 @@ LLM whether a date comparison is correct when ordinary code can calculate it"). 
 finding here is a fact about the artifacts, computed from the event-sourced state:
 
   * knowledge cutoff  — a scene may not require knowledge no earlier scene established
-  * causal reference  — a scene's required events must exist in the event graph
+  * causal reference  — a scene's required events must exist; their *typed* preconditions must
+                        hold in the state reconstructed before the scene, and their *typed*
+                        effects must be recorded in the scene's state delta (executable IR)
   * point of view     — pov / participants must resolve to defined characters
   * referential canon — a delta may not grant knowledge of a non-existent fact, or
                         close a promise never opened, or remove a fact that isn't there
@@ -91,12 +93,27 @@ def _event_ids(project: Path) -> set[str]:
     return {e.get("id") for e in graph.get("events", []) if e.get("id")}
 
 
+def _events(project: Path) -> dict[str, dict]:
+    graph = _load_json(project / "planning" / "event-graph.json", {})
+    return {e["id"]: e for e in graph.get("events", []) if e.get("id")}
+
+
+# A precondition/effect string that already names a canon id is a reference we tolerate; a bare
+# prose string is what earns the "migrate to a typed atom" advisory.
+_REF_ID = re.compile(r"^(fact|char|obj|loc|evt|promise)-[a-z0-9-]+$")
+
+
+def _atom_str(atom: dict) -> str:
+    obj = atom.get("object")
+    inside = f"{atom.get('subject', '?')}" + (f", {obj}" if obj else "")
+    return f"{atom.get('predicate', '?')}({inside})"
+
+
 def audit_scene(project: Path, scene_id: str) -> dict:
     """Per-scene spec checks that depend on the state reconstructed before it."""
     spec = _load_json(project / "scenes" / scene_id / "spec.json", {})
     findings: list[dict] = []
     characters = _character_ids(project)
-    events = _event_ids(project)
     before = reconstruct_state_before(project, scene_id)
 
     pov = spec.get("pov", "")
@@ -128,10 +145,36 @@ def audit_scene(project: Path, scene_id: str) -> dict:
                 f"{character} does not know {fact!r} at this point; knowledge would leak from the future.",
                 "plot"))
 
-    for event in spec.get("required_events", []):
-        if EVENT_ID.match(event) and event not in events:
-            findings.append(_finding("causal", "material", f"required_events includes {event!r}",
+    event_map = _events(project)
+    declared_effects = {
+        (p.get("op"), p.get("predicate"), p.get("subject"), p.get("object"))
+        for p in (_load_delta(project, scene_id) or {}).get("predicate_changes", [])
+    }
+    for event_id in spec.get("required_events", []):
+        if not EVENT_ID.match(event_id):
+            continue
+        if event_id not in event_map:
+            findings.append(_finding("causal", "material", f"required_events includes {event_id!r}",
                                      "Required event is not present in planning/event-graph.json.", "plot"))
+            continue
+        event = event_map[event_id]
+        for pre in event.get("preconditions", []):
+            if isinstance(pre, dict):
+                if not before.holds(pre.get("predicate"), pre.get("subject"), pre.get("object")):
+                    findings.append(_finding(
+                        "causal", "material", f"{event_id} precondition {_atom_str(pre)}",
+                        "Event precondition does not hold in the state reconstructed before this scene.", "plot"))
+            elif isinstance(pre, str) and not _REF_ID.match(pre):
+                findings.append(_finding(
+                    "causal", "minor", f"{event_id} precondition {pre!r}",
+                    "Precondition is unstructured prose; encode it as a typed atom to make it verifiable.", "plot"))
+        for eff in event.get("effects", []):
+            if isinstance(eff, dict):
+                key = (eff.get("op"), eff.get("predicate"), eff.get("subject"), eff.get("object"))
+                if key not in declared_effects:
+                    findings.append(_finding(
+                        "causal", "material", f"{event_id} effect {_atom_str(eff)}",
+                        "Event effect is declared but not recorded in this scene's state-delta predicate_changes.", "scene"))
 
     return {
         "candidate": scene_id,

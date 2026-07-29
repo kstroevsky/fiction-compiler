@@ -25,7 +25,10 @@ def _state_json(state: StoryState) -> dict:
         "time": state.time,
         "facts": state.facts,
         "knowledge": {c: sorted(v) for c, v in state.knowledge.items()},
-        "relationships": [{"pair": sorted(p), "state": s} for p, s in state.relationships.items()],
+        "relationships": [{"subject": s, "object": o, "dimensions": dims}
+                          for (s, o), dims in state.relationships.items()],
+        "predicates": [{"predicate": p, "subject": s, "object": o, "value": v}
+                       for (p, s, o), v in state.predicates.items()],
         "open_promises": state.open_promises,
         "closed_promises": sorted(state.closed_promises),
         "applied_scenes": state.applied_scenes,

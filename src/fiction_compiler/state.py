@@ -18,7 +18,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 # A scene id like "ch03-sc02" -> sort key (3, 2). Anything malformed sorts last.
 def scene_sort_key(scene_id: str) -> tuple[int, int]:
@@ -44,8 +44,10 @@ def _read_json(path: Path, default: Any) -> Any:
     return json.loads(path.read_text(encoding="utf-8")) if path.exists() else default
 
 
-def _pair_key(pair: Iterable[str]) -> frozenset[str]:
-    return frozenset(pair)
+# A relationship key is an ORDERED (subject, object) pair; a predicate key is
+# (predicate, subject, object) with object optional (None for unary state like offline(obj)).
+RelKey = tuple[str, str]
+PredKey = tuple[str, str, str | None]
 
 
 @dataclass
@@ -55,7 +57,11 @@ class StoryState:
     time: Any = None
     facts: dict[str, str] = field(default_factory=dict)  # fact id -> text
     knowledge: dict[str, set[str]] = field(default_factory=dict)  # char id -> {fact id}
-    relationships: dict[frozenset[str], str] = field(default_factory=dict)
+    # Directional: (subject, object) -> {dimension: value}. A legacy symmetric relationship is
+    # stored in BOTH directions under the "state" dimension (see _apply_relationship_record).
+    relationships: dict[RelKey, dict[str, Any]] = field(default_factory=dict)
+    # Typed world/spatial/object predicates: (predicate, subject, object) -> value (default True).
+    predicates: dict[PredKey, Any] = field(default_factory=dict)
     open_promises: dict[str, str] = field(default_factory=dict)  # promise id -> text
     closed_promises: set[str] = field(default_factory=set)
     applied_scenes: list[str] = field(default_factory=list)
@@ -67,10 +73,56 @@ class StoryState:
         return fact_id in self.knowledge.get(character, set())
 
     def relationship(self, a: str, b: str) -> str | None:
-        return self.relationships.get(_pair_key((a, b)))
+        """The descriptive 'state' of the a/b relationship, order-independent (back-compat)."""
+        for key in ((a, b), (b, a)):
+            dims = self.relationships.get(key)
+            if dims and "state" in dims:
+                return dims["state"]
+        return None
+
+    def relationship_directed(self, subject: str, object: str, dimension: str = "state") -> Any:
+        """A directional relationship dimension (e.g. trusts/fears/owes) from subject to object."""
+        return self.relationships.get((subject, object), {}).get(dimension)
+
+    def holds(self, predicate: str, subject: str, object: str | None = None) -> bool:
+        """Whether a typed atom holds — the query event preconditions are evaluated against.
+
+        Bridges the existing stores: ``knows`` consults per-character knowledge, a relationship
+        verb consults the directional relationship dimensions, and everything else consults the
+        typed predicate store.
+        """
+        if predicate == "knows":
+            return object is not None and self.knows(subject, object)
+        if (predicate, subject, object) in self.predicates:
+            return bool(self.predicates[(predicate, subject, object)])
+        if object is not None:
+            dims = self.relationships.get((subject, object))
+            if dims is not None and predicate in dims:
+                return bool(dims[predicate])
+        return False
 
     def promise_is_open(self, promise_id: str) -> bool:
         return promise_id in self.open_promises
+
+
+def _apply_relationship_record(state: StoryState, record: dict) -> None:
+    """Apply one relationship record (legacy symmetric ``{pair, state}`` or directional edge)."""
+    if "pair" in record:  # legacy symmetric descriptive relationship -> both directions
+        a, b = record["pair"]
+        state.relationships.setdefault((a, b), {})["state"] = record["state"]
+        state.relationships.setdefault((b, a), {})["state"] = record["state"]
+    else:  # directional: {subject, object, dimension, value?}
+        key = (record["subject"], record["object"])
+        state.relationships.setdefault(key, {})[record["dimension"]] = record.get("value", True)
+
+
+def _apply_predicate_record(state: StoryState, record: dict) -> None:
+    """Apply one typed predicate record. Seed records omit ``op`` (treated as add)."""
+    key = (record["predicate"], record["subject"], record.get("object"))
+    if record.get("op") == "remove":
+        state.predicates.pop(key, None)
+    else:
+        state.predicates[key] = record.get("value", True)
 
 
 def _apply_delta(state: StoryState, delta: dict) -> None:
@@ -80,8 +132,12 @@ def _apply_delta(state: StoryState, delta: dict) -> None:
         state.facts.pop(fact_id, None)
     for change in delta.get("knowledge_changes", []):
         state.knowledge.setdefault(change["character"], set()).add(change["fact"])
-    for change in delta.get("relationship_changes", []):
-        state.relationships[_pair_key(change["pair"])] = change["state"]
+    for change in delta.get("relationship_changes", []):  # legacy symmetric {pair, state}
+        _apply_relationship_record(state, change)
+    for edge in delta.get("relationship_edges", []):  # directional {subject, object, dimension}
+        _apply_relationship_record(state, edge)
+    for predicate in delta.get("predicate_changes", []):  # typed world/spatial/object atoms
+        _apply_predicate_record(state, predicate)
     for promise in delta.get("promises_opened", []):
         state.open_promises[promise["id"]] = promise["text"]
     for promise_id in delta.get("promises_closed", []):
@@ -99,8 +155,10 @@ def seed_state(project: Path) -> StoryState:
         state.facts[fact["id"]] = fact["text"]
     for record in _read_jsonl(canon / "knowledge-state.jsonl"):
         state.knowledge.setdefault(record["character"], set()).add(record["fact"])
-    for record in _read_jsonl(canon / "relationship-state.jsonl"):
-        state.relationships[_pair_key(record["pair"])] = record["state"]
+    for record in _read_jsonl(canon / "relationship-state.jsonl"):  # legacy or directional
+        _apply_relationship_record(state, record)
+    for record in _read_jsonl(canon / "world-state.jsonl"):  # typed predicates (optional ledger)
+        _apply_predicate_record(state, record)
     for record in _read_jsonl(canon / "promises.jsonl"):
         state.open_promises[record["id"]] = record["text"]
     timeline = _read_jsonl(canon / "timeline.jsonl")
