@@ -1,0 +1,48 @@
+{
+  "id": "char-nadia",
+  "name": "Nadia Okafor",
+  "desire": "get the wake order out right and hold the shop on her own",
+  "need": "to stop measuring herself against Esther and trust her own hands",
+  "values": [
+    "care taken with small things",
+    "keeping a promise",
+    "the shop"
+  ],
+  "fears": [
+    "ruining the wake bread",
+    "proving she is not ready to be left alone with it"
+  ],
+  "contradictions": [
+    "wants to be trusted with the shop yet reaches for the phone at the first fault"
+  ],
+  "beliefs": [
+    "Esther's way is the only right way",
+    "a good loaf is proof you can be trusted"
+  ],
+  "knowledge": [
+    "the overnight routine",
+    "the wake order",
+    "the proofer drifts warm",
+    "Esther's milk-loaf recipe"
+  ],
+  "constraints": [
+    "alone in the shop overnight",
+    "about four hours to the six o'clock pickup",
+    "Esther reachable only by waking her in a hospital bed"
+  ],
+  "voice": {
+    "lexicon": [
+      "baker's nouns: crumb, proof, scald, crust, tin",
+      "plain, concrete"
+    ],
+    "syntax": [
+      "short declaratives",
+      "verbs of the hand and the oven"
+    ],
+    "avoid": [
+      "naming her feelings",
+      "rhetorical questions",
+      "aphorism"
+    ]
+  }
+}

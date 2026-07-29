@@ -1,0 +1,55 @@
+{
+  "scene_id": "ch01-sc03",
+  "candidate": "scenes/ch01-sc03/candidates/candidate-a.md",
+  "candidate_sha256": "c892cffea733e2e93e9c5741a20df0e589677c360384f9809c906162d96a90be",
+  "promoted_to": "manuscript/chapters/ch01-sc03.md",
+  "promoted_at": "2026-07-29T21:16:28.604341+00:00",
+  "state_delta_sha256": "d2bf78ae9ac1b3cf2652cd064ad8eec36c655314ea6b3ea904a5267feff93cdc",
+  "parent_canon_hash": "0e51d873efff0a45a951d3896257787ce60e8626f112b0363a7a30be50144117",
+  "resulting_canon_hash": "7446f958f56d7517a7eea992ed8c3c435dc7b7ddc8b43f8128f3daeb66b351d5",
+  "critique_files": [
+    "scenes/ch01-sc03/critiques/adversarial-reader-a.json",
+    "scenes/ch01-sc03/critiques/character-simulator-a.json",
+    "scenes/ch01-sc03/critiques/defaultness-candidate-a.json",
+    "scenes/ch01-sc03/critiques/defaultness-candidate-b.json",
+    "scenes/ch01-sc03/critiques/hard-audit.json",
+    "scenes/ch01-sc03/critiques/style-editor-a.json"
+  ],
+  "binding_critiques": [
+    {
+      "file": "adversarial-reader-a.json",
+      "critic": "adversarial-reader",
+      "audit_class": "literary",
+      "verdict": "pass",
+      "sha256": "486bf3372ffa93321a77ae9e360a5a6161a9864bdab0ded8c33436d33adf6405"
+    },
+    {
+      "file": "character-simulator-a.json",
+      "critic": "character-simulator",
+      "audit_class": "literary",
+      "verdict": "pass",
+      "sha256": "f35e0da6ebca1e5fbbd2be09a12f57be41c129f567905c93d46652c112dc648e"
+    },
+    {
+      "file": "defaultness-candidate-a.json",
+      "critic": "defaultness-lint",
+      "audit_class": "defaultness",
+      "verdict": "pass",
+      "sha256": "d8ec55b8d01aa4543d63024a157bf1a43255d09805419198add08777113c21ff"
+    },
+    {
+      "file": "hard-audit.json",
+      "critic": "hard-audit",
+      "audit_class": "hard",
+      "verdict": "pass",
+      "sha256": "e2dadf89ae3e03c4d59c2e17183e508f8ad8e4b66a742d6c111ff2d4942f93cf"
+    },
+    {
+      "file": "style-editor-a.json",
+      "critic": "style-editor",
+      "audit_class": "literary",
+      "verdict": "pass",
+      "sha256": "038af61e3be46fae4f4ab437772d3434909d4bcfca87ba5bc2ccbe30ef06de25"
+    }
+  ]
+}

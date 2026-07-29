@@ -1,0 +1,76 @@
+{
+  "candidates": [
+    "candidate-a.md",
+    "candidate-b.md",
+    "ch01-sc01"
+  ],
+  "blind_labels": {
+    "candidate-a.md": "A",
+    "ch01-sc01": "B",
+    "candidate-b.md": "C"
+  },
+  "reveal_map": {
+    "A": "candidate-a.md",
+    "B": "ch01-sc01",
+    "C": "candidate-b.md"
+  },
+  "presentation_orders": [
+    [
+      "A",
+      "B",
+      "C"
+    ],
+    [
+      "C",
+      "B",
+      "A"
+    ],
+    [
+      "B",
+      "C",
+      "A"
+    ]
+  ],
+  "scores": {
+    "candidate-a.md": {
+      "diction": -1.0,
+      "agency": -1.0,
+      "rhythm": -2.0
+    },
+    "candidate-b.md": {
+      "subtext": -1.0,
+      "texture": -1.0
+    },
+    "ch01-sc01": {}
+  },
+  "pareto_front": [
+    "ch01-sc01"
+  ],
+  "dimension_winners": {
+    "agency": [
+      "candidate-b.md",
+      "ch01-sc01"
+    ],
+    "diction": [
+      "candidate-b.md",
+      "ch01-sc01"
+    ],
+    "rhythm": [
+      "candidate-b.md",
+      "ch01-sc01"
+    ],
+    "subtext": [
+      "candidate-a.md",
+      "ch01-sc01"
+    ],
+    "texture": [
+      "candidate-a.md",
+      "ch01-sc01"
+    ]
+  },
+  "recommendation": {
+    "decision": "select",
+    "candidate": "ch01-sc01"
+  },
+  "disagreement": true
+}

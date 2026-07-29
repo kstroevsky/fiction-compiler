@@ -1,0 +1,47 @@
+{
+  "id": "ch01-sc03",
+  "chapter": "1",
+  "narrative_mode": "linear",
+  "pov": "char-nadia",
+  "participants": [
+    "char-nadia",
+    "char-halloran"
+  ],
+  "purpose": [
+    "deliver the loaves to Halloran",
+    "withhold tidy validation",
+    "enact Nadia's self-recognition"
+  ],
+  "entry_state": [
+    "Nadia's loaves are cooling",
+    "it is six o'clock",
+    "Halloran is due for the wake bread"
+  ],
+  "desire": "hand over bread worth the wake",
+  "conflict": "she wants the loaves noticed; Halloran is too far into grief to notice, and that has to be enough",
+  "turn": "she keeps one loaf back and writes her own method on a card for the recipe box, in her own hand",
+  "exit_state": [
+    "the wake order is delivered",
+    "Nadia has claimed the recipe as hers",
+    "the shop held"
+  ],
+  "required_events": [
+    "evt-handover"
+  ],
+  "knowledge_required": [],
+  "forbidden_moves": [
+    "Halloran praising the bread",
+    "a triumphant ending",
+    "Esther calling to approve",
+    "a moral summary"
+  ],
+  "style_constraints": [
+    "close third on Nadia",
+    "restraint at the handover",
+    "the turn enacted, not explained"
+  ],
+  "candidate_strategies": [
+    "A: the handover plain and spare, the card at the end",
+    "B: a touch more of Halloran's grief in the room"
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "narrative_distance": "close third, level 3-4; steady, never showy",
+  "voice_principles": [
+    "perception and action before interpretation",
+    "the hand's work carries the feeling",
+    "no emotion named that a gesture could imply"
+  ],
+  "diction": [
+    "plain nouns",
+    "baker's vocabulary: crumb, proof, scald, crust, tin, oven",
+    "few adjectives, each earning its place"
+  ],
+  "syntax": [
+    "short declaratives",
+    "an occasional long sentence for one sustained action"
+  ],
+  "rhythm": [
+    "vary sentence openings",
+    "let a pause be an action, not a described feeling"
+  ],
+  "imagery": [
+    "flour, warm milk, the oven's heat, the cold walk-in",
+    "the recipe card as recurring object"
+  ],
+  "dialogue": [
+    "few words",
+    "subtext over statement",
+    "no adverbial tags"
+  ],
+  "sentence_distribution": {
+    "short": 0.5,
+    "medium": 0.4,
+    "long": 0.1
+  },
+  "avoid": [
+    "generic emotional abstraction",
+    "stock atmospheric openings",
+    "unearned uplift",
+    "filter words (she felt / saw / realized / noticed / watched)",
+    "emotion named then paraphrased",
+    "adverbial dialogue tags",
+    "cliche"
+  ]
+}

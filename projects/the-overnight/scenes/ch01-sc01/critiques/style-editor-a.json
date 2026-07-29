@@ -1,0 +1,16 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "e32b924cdbff073d7b5f5423543c90d29a4d926b6b4e1964180d0ad6e9872454",
+  "critic": "style-editor",
+  "verdict": "pass",
+  "confidence": 0.85,
+  "findings": [
+    {
+      "dimension": "rhythm",
+      "severity": "minor",
+      "evidence": "The dial across the room only confirmed it. The needle sat well above the mark. The old thermostat had drifted",
+      "diagnosis": "Three consecutive sentences open with 'The'; a small monotony worth varying.",
+      "repair_layer": "prose"
+    }
+  ]
+}

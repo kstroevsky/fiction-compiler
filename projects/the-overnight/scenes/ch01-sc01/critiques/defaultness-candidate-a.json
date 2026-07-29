@@ -1,0 +1,17 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "e32b924cdbff073d7b5f5423543c90d29a4d926b6b4e1964180d0ad6e9872454",
+  "critic": "defaultness-lint",
+  "audit_class": "defaultness",
+  "verdict": "pass",
+  "confidence": 0.7,
+  "findings": [
+    {
+      "dimension": "rhythm",
+      "severity": "minor",
+      "evidence": "3 consecutive sentences open with 'the' (from sentence 26)",
+      "diagnosis": "Repeated sentence openers flatten rhythm; vary syntax or subordinate.",
+      "repair_layer": "prose"
+    }
+  ]
+}

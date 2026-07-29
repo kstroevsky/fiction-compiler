@@ -1,0 +1,16 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "e32b924cdbff073d7b5f5423543c90d29a4d926b6b4e1964180d0ad6e9872454",
+  "critic": "character-simulator",
+  "verdict": "pass",
+  "confidence": 0.8,
+  "findings": [
+    {
+      "dimension": "agency",
+      "severity": "minor",
+      "evidence": "She stood with the tub against her hip and did the arithmetic she did not want",
+      "diagnosis": "Nadia is receptive through the discovery; her will surfaces only at the close. Fits the scene's function.",
+      "repair_layer": "scene"
+    }
+  ]
+}

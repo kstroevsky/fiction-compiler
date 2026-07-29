@@ -1,0 +1,32 @@
+{
+  "scene_id": "ch01-sc01",
+  "time": 0,
+  "facts_added": [
+    {
+      "id": "fact-dough-ruined",
+      "text": "The overnight dough over-proofed in the warm proofer and collapsed; it cannot be baked into the wake loaves."
+    }
+  ],
+  "facts_removed": [],
+  "knowledge_changes": [
+    {
+      "character": "char-nadia",
+      "fact": "fact-dough-ruined"
+    }
+  ],
+  "relationship_changes": [],
+  "predicate_changes": [
+    {
+      "op": "add",
+      "predicate": "ruined",
+      "subject": "obj-wake-dough"
+    },
+    {
+      "op": "remove",
+      "predicate": "available",
+      "subject": "obj-proofer"
+    }
+  ],
+  "promises_opened": [],
+  "promises_closed": []
+}

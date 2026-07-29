@@ -1,0 +1,35 @@
+{
+  "id": "char-gran",
+  "name": "Esther Okafor",
+  "desire": "keep the shop's standard even from a hospital bed",
+  "values": [
+    "the recipe",
+    "precision",
+    "the shop's name"
+  ],
+  "fears": [
+    "the standard slipping when she is not there"
+  ],
+  "beliefs": [
+    "the milk loaf must proof slow, overnight",
+    "the girl is not ready to run the shop alone"
+  ],
+  "constraints": [
+    "in the hospital after a fall",
+    "reachable by phone if woken"
+  ],
+  "voice": {
+    "lexicon": [
+      "clipped, exacting",
+      "recipe imperatives"
+    ],
+    "syntax": [
+      "imperatives",
+      "corrections"
+    ],
+    "avoid": [
+      "praise",
+      "reassurance"
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "scene_id": "ch01-sc03",
+  "time": 2,
+  "facts_added": [
+    {
+      "id": "fact-loaves-delivered",
+      "text": "The wake loaves, Nadia's own and not Esther's, went out to Mr. Halloran at six; Nadia kept one back and wrote the method on a card."
+    }
+  ],
+  "facts_removed": [],
+  "knowledge_changes": [
+    {
+      "character": "char-nadia",
+      "fact": "fact-loaves-delivered"
+    }
+  ],
+  "relationship_changes": [],
+  "predicate_changes": [
+    {
+      "op": "add",
+      "predicate": "has_object",
+      "subject": "char-halloran",
+      "object": "obj-own-loaves"
+    },
+    {
+      "op": "remove",
+      "predicate": "has_object",
+      "subject": "char-nadia",
+      "object": "obj-own-loaves"
+    }
+  ],
+  "promises_opened": [],
+  "promises_closed": [
+    "promise-wake-order"
+  ]
+}

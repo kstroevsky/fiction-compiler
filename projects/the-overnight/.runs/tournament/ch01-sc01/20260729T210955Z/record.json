@@ -1,0 +1,65 @@
+{
+  "candidates": [
+    "candidate-a.md",
+    "candidate-b.md"
+  ],
+  "blind_labels": {
+    "candidate-a.md": "A",
+    "candidate-b.md": "B"
+  },
+  "reveal_map": {
+    "A": "candidate-a.md",
+    "B": "candidate-b.md"
+  },
+  "presentation_orders": [
+    [
+      "A",
+      "B"
+    ],
+    [
+      "B",
+      "A"
+    ]
+  ],
+  "scores": {
+    "candidate-a.md": {
+      "diction": -1.0,
+      "agency": -1.0,
+      "rhythm": -2.0
+    },
+    "candidate-b.md": {
+      "subtext": -1.0,
+      "texture": -1.0
+    }
+  },
+  "pareto_front": [
+    "candidate-a.md",
+    "candidate-b.md"
+  ],
+  "dimension_winners": {
+    "agency": [
+      "candidate-b.md"
+    ],
+    "diction": [
+      "candidate-b.md"
+    ],
+    "rhythm": [
+      "candidate-b.md"
+    ],
+    "subtext": [
+      "candidate-a.md"
+    ],
+    "texture": [
+      "candidate-a.md"
+    ]
+  },
+  "recommendation": {
+    "decision": "human_decision_required",
+    "pareto_front": [
+      "candidate-a.md",
+      "candidate-b.md"
+    ],
+    "reason": "multiple non-dominated candidates — a genuine tradeoff; do not average it away"
+  },
+  "disagreement": true
+}

@@ -1,0 +1,32 @@
+{
+  "id": "the-overnight",
+  "title": "The Overnight",
+  "form": "short-story",
+  "audience": "adult literary readers who like quiet, grounded realism and craft",
+  "reader_contract": [
+    "5-8 pages, single sitting",
+    "close third person, one focalizer (Nadia)",
+    "strictly linear: one night, 2 a.m. to dawn; no flashback, no framing device",
+    "a concrete problem with a clear cause and a clear, earned turn",
+    "accessible, sensory prose; feeling is carried by the hands' work, not named",
+    "a quiet, legible ending: recognition, not triumph; no twist, no cryptic withholding"
+  ],
+  "theme_question": "What does it take to stop measuring yourself against the person who taught you, and make something that is your own?",
+  "desired_affect": [
+    "quiet recognition",
+    "the steadiness of competence under pressure",
+    "earned self-possession"
+  ],
+  "constraints": [
+    "events happen in the order the reader receives them; no gimmick structure",
+    "no magic and no coincidence-rescue; the fix comes from Nadia's own competence",
+    "prose earns feeling through concrete action; no told emotion, no cliche, no adverbial dialogue tags",
+    "the customer does not deliver tidy validation"
+  ],
+  "human_gates": [
+    "premise",
+    "voice-profile",
+    "ending",
+    "final"
+  ]
+}

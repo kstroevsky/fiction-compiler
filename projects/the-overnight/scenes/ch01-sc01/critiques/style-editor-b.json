@@ -1,0 +1,16 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "642d1305b2cafcdbc69d59328b44d7ceb9f3ce62569c69381be32afa6564a617",
+  "critic": "style-editor",
+  "verdict": "pass",
+  "confidence": 0.8,
+  "findings": [
+    {
+      "dimension": "texture",
+      "severity": "minor",
+      "evidence": "yeast gone too far",
+      "diagnosis": "Admirably lean, but under-textured against the sensory reader-contract; the ruin lands less on the senses than candidate A.",
+      "repair_layer": "prose"
+    }
+  ]
+}

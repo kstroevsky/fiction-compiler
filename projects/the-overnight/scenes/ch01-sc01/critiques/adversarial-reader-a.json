@@ -1,0 +1,16 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "e32b924cdbff073d7b5f5423543c90d29a4d926b6b4e1964180d0ad6e9872454",
+  "critic": "adversarial-reader",
+  "verdict": "pass",
+  "confidence": 0.8,
+  "findings": [
+    {
+      "dimension": "diction",
+      "severity": "minor",
+      "evidence": "a grayscape of burst bubbles",
+      "diagnosis": "A coined compound that draws attention to itself and verges on showy in an otherwise plain register.",
+      "repair_layer": "prose"
+    }
+  ]
+}

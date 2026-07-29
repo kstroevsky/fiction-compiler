@@ -1,0 +1,43 @@
+{
+  "narrator": {
+    "person": "third",
+    "reliability": "reliable, limited to Nadia's perception"
+  },
+  "focalization": {
+    "mode": "fixed internal",
+    "focalizer": "char-nadia"
+  },
+  "time": {
+    "order": "strictly chronological, one continuous night",
+    "dominant_duration": "scene",
+    "tense": "past"
+  },
+  "revelations": [
+    {
+      "id": "rev-dough-ruined",
+      "scene": "ch01-sc01",
+      "to_reader": "with Nadia"
+    },
+    {
+      "id": "rev-her-choice",
+      "scene": "ch01-sc02",
+      "to_reader": "enacted, with Nadia"
+    },
+    {
+      "id": "rev-recognition",
+      "scene": "ch01-sc03",
+      "to_reader": "enacted, not explained"
+    }
+  ],
+  "chapter_map": [
+    {
+      "chapter": "1",
+      "scenes": [
+        "ch01-sc01",
+        "ch01-sc02",
+        "ch01-sc03"
+      ]
+    }
+  ],
+  "notes": "No dramatic irony; the reader learns exactly with Nadia. Linear throughout; every scene is narrative_mode linear."
+}

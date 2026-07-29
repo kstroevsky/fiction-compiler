@@ -1,0 +1,30 @@
+{
+  "id": "char-halloran",
+  "name": "Mr. Halloran",
+  "desire": "collect the bread for his wife's wake and get through the morning",
+  "values": [
+    "doing the next thing on the list",
+    "ritual"
+  ],
+  "beliefs": [
+    "the small tasks are what is left to hold on to"
+  ],
+  "constraints": [
+    "newly widowed",
+    "early, distracted, spent"
+  ],
+  "voice": {
+    "lexicon": [
+      "few words",
+      "practical"
+    ],
+    "syntax": [
+      "short",
+      "unfinished"
+    ],
+    "avoid": [
+      "sentiment",
+      "eloquence"
+    ]
+  }
+}

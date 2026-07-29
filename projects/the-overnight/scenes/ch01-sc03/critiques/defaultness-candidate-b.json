@@ -1,0 +1,17 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "b9fa1ebd458558249c190d30c468b779652de6a78e30746902b44c66eae04428",
+  "critic": "defaultness-lint",
+  "audit_class": "defaultness",
+  "verdict": "pass",
+  "confidence": 0.7,
+  "findings": [
+    {
+      "dimension": "defaultness",
+      "severity": "minor",
+      "evidence": "2 'weak_intensifiers' hits (7.2 per 1000 words), e.g. just; quite",
+      "diagnosis": "Weak-word density exceeds 6/1000; prune or replace with specifics.",
+      "repair_layer": "prose"
+    }
+  ]
+}

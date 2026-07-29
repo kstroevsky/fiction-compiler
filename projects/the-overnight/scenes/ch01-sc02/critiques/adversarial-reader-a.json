@@ -1,0 +1,8 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "3c41832431e25ede97f4d2382051d7ab9ef1e9b8f62875f68aff679eca600f57",
+  "critic": "adversarial-reader",
+  "verdict": "pass",
+  "confidence": 0.85,
+  "findings": []
+}

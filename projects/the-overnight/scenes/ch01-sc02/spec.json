@@ -1,0 +1,52 @@
+{
+  "id": "ch01-sc02",
+  "chapter": "1",
+  "narrative_mode": "linear",
+  "pov": "char-nadia",
+  "participants": [
+    "char-nadia"
+  ],
+  "purpose": [
+    "Nadia nearly wakes Esther, then chooses her own way",
+    "she commits to a faster bread of her own",
+    "earn the turn through action, not statement"
+  ],
+  "entry_state": [
+    "the dough is ruined",
+    "the phone holds the hospital's number",
+    "four hours have become three"
+  ],
+  "desire": "answer the order without failing Esther or the Hallorans",
+  "conflict": "waking Esther means admitting she cannot hold the shop; making her own bread risks the order on herself alone",
+  "turn": "she sets the phone down and starts a faster milk bread by her own method",
+  "exit_state": [
+    "Nadia has made her own loaves",
+    "she has not called Esther",
+    "the order rests on her judgment"
+  ],
+  "required_events": [
+    "evt-commit-own-bread"
+  ],
+  "knowledge_required": [
+    {
+      "character": "char-nadia",
+      "fact": "fact-dough-ruined"
+    }
+  ],
+  "forbidden_moves": [
+    "name Nadia's feelings",
+    "a pep-talk",
+    "Esther phoned and consulted",
+    "aphorism"
+  ],
+  "style_constraints": [
+    "close third on Nadia",
+    "the decision shown in the hands",
+    "no filter words",
+    "no told emotion"
+  ],
+  "candidate_strategies": [
+    "A: the near-call and the turn held in small actions",
+    "B: faster cutting between the phone and the mixing bowl"
+  ]
+}

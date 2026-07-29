@@ -1,0 +1,3 @@
+{"predicate": "located_at", "subject": "char-nadia", "object": "loc-bakery"}
+{"predicate": "has_object", "subject": "char-nadia", "object": "obj-phone"}
+{"predicate": "available", "subject": "obj-proofer"}

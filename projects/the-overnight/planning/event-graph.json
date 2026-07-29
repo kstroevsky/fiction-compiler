@@ -1,0 +1,117 @@
+{
+  "events": [
+    {
+      "id": "evt-find-ruin",
+      "time": 0,
+      "actors": [
+        "char-nadia"
+      ],
+      "preconditions": [
+        {
+          "predicate": "located_at",
+          "subject": "char-nadia",
+          "object": "loc-bakery"
+        },
+        {
+          "predicate": "knows",
+          "subject": "char-nadia",
+          "object": "fact-wake-order"
+        }
+      ],
+      "action": "Nadia opens the proofer to shape the wake loaves and finds the dough over-proofed and collapsed.",
+      "effects": [
+        {
+          "op": "add",
+          "predicate": "ruined",
+          "subject": "obj-wake-dough"
+        },
+        {
+          "op": "remove",
+          "predicate": "available",
+          "subject": "obj-proofer"
+        }
+      ],
+      "causes": [
+        "fact-proofer-drifts"
+      ]
+    },
+    {
+      "id": "evt-commit-own-bread",
+      "time": 1,
+      "actors": [
+        "char-nadia"
+      ],
+      "preconditions": [
+        {
+          "predicate": "ruined",
+          "subject": "obj-wake-dough"
+        },
+        {
+          "predicate": "has_object",
+          "subject": "char-nadia",
+          "object": "obj-phone"
+        }
+      ],
+      "action": "With the phone lit to the hospital, Nadia sets it down and starts a faster milk bread by her own method.",
+      "effects": [
+        {
+          "op": "add",
+          "predicate": "has_object",
+          "subject": "char-nadia",
+          "object": "obj-own-loaves"
+        }
+      ],
+      "causes": [
+        "evt-find-ruin"
+      ]
+    },
+    {
+      "id": "evt-handover",
+      "time": 2,
+      "actors": [
+        "char-nadia",
+        "char-halloran"
+      ],
+      "preconditions": [
+        {
+          "predicate": "has_object",
+          "subject": "char-nadia",
+          "object": "obj-own-loaves"
+        },
+        {
+          "predicate": "located_at",
+          "subject": "char-nadia",
+          "object": "loc-bakery"
+        }
+      ],
+      "action": "At six, Halloran comes for the wake bread and Nadia gives him the loaves she made.",
+      "effects": [
+        {
+          "op": "add",
+          "predicate": "has_object",
+          "subject": "char-halloran",
+          "object": "obj-own-loaves"
+        },
+        {
+          "op": "remove",
+          "predicate": "has_object",
+          "subject": "char-nadia",
+          "object": "obj-own-loaves"
+        }
+      ],
+      "causes": [
+        "evt-commit-own-bread"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "evt-find-ruin",
+      "to": "evt-commit-own-bread"
+    },
+    {
+      "from": "evt-commit-own-bread",
+      "to": "evt-handover"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "id": "ch01-sc01",
+  "chapter": "1",
+  "narrative_mode": "linear",
+  "pov": "char-nadia",
+  "participants": [
+    "char-nadia"
+  ],
+  "purpose": [
+    "establish the overnight shift and the wake order",
+    "reveal the proofer failed and the dough is ruined",
+    "commit Nadia to answering the problem"
+  ],
+  "entry_state": [
+    "Nadia is covering Esther's overnight shift alone",
+    "the wake order is due at six",
+    "she means to shape and bake Esther's dough"
+  ],
+  "desire": "shape and bake the wake loaves the way Esther makes them",
+  "conflict": "the proofer ran warm; the overnight dough has over-proofed and collapsed and cannot be saved",
+  "turn": "she understands the dough is gone and Esther's slow recipe cannot be remade in the hours left",
+  "exit_state": [
+    "Nadia knows the dough is ruined",
+    "the wake order is in jeopardy",
+    "she must choose how to answer it"
+  ],
+  "required_events": [
+    "evt-find-ruin"
+  ],
+  "knowledge_required": [
+    {
+      "character": "char-nadia",
+      "fact": "fact-wake-order"
+    }
+  ],
+  "forbidden_moves": [
+    "name Nadia's feelings",
+    "a rescue by coincidence",
+    "a flashback",
+    "tidy uplift"
+  ],
+  "style_constraints": [
+    "close third on Nadia",
+    "discovery through the hands",
+    "no filter words",
+    "no told emotion"
+  ],
+  "candidate_strategies": [
+    "A: sensory and close, the ruin found through touch and smell",
+    "B: leaner, plainer sentences and more white space"
+  ]
+}

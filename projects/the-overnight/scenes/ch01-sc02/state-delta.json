@@ -1,0 +1,36 @@
+{
+  "scene_id": "ch01-sc02",
+  "time": 1,
+  "facts_added": [
+    {
+      "id": "fact-nadia-made-own",
+      "text": "Nadia set the phone down and made a faster milk bread by her own method instead of waking Esther."
+    }
+  ],
+  "facts_removed": [],
+  "knowledge_changes": [
+    {
+      "character": "char-nadia",
+      "fact": "fact-nadia-made-own"
+    }
+  ],
+  "relationship_changes": [],
+  "relationship_edges": [
+    {
+      "subject": "char-nadia",
+      "object": "char-gran",
+      "dimension": "defers_to",
+      "value": "loosening"
+    }
+  ],
+  "predicate_changes": [
+    {
+      "op": "add",
+      "predicate": "has_object",
+      "subject": "char-nadia",
+      "object": "obj-own-loaves"
+    }
+  ],
+  "promises_opened": [],
+  "promises_closed": []
+}

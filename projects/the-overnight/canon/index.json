@@ -1,0 +1,30 @@
+{
+  "characters": [
+    "char-nadia",
+    "char-gran",
+    "char-halloran"
+  ],
+  "world_rules": [
+    "The milk loaf follows Esther's slow overnight method: it proofs for hours in the walk-in and cannot be hurried without changing the bread.",
+    "The proofer's thermostat drifts warm; left unwatched it over-proofs dough until the gluten collapses and it bakes flat and sour.",
+    "Esther can be reached by phone, but only by waking her in a hospital bed the night after a fall.",
+    "The wake order is a promise the shop made; the Hallorans are burying someone and the bread is due at six."
+  ],
+  "locations": [
+    "the bakery, overnight",
+    "the hospital (offstage, by phone)"
+  ],
+  "objects": [
+    "the walk-in proofer",
+    "the ruined overnight dough",
+    "the phone",
+    "Nadia's own loaves",
+    "the recipe card"
+  ],
+  "factions": [],
+  "accepted_state_deltas": [
+    "ch01-sc01",
+    "ch01-sc02",
+    "ch01-sc03"
+  ]
+}

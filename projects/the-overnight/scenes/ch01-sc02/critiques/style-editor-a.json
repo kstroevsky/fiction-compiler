@@ -1,0 +1,16 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "3c41832431e25ede97f4d2382051d7ab9ef1e9b8f62875f68aff679eca600f57",
+  "critic": "style-editor",
+  "verdict": "pass",
+  "confidence": 0.85,
+  "findings": [
+    {
+      "dimension": "rhythm",
+      "severity": "minor",
+      "evidence": "Push, fold, quarter turn. Push, fold, quarter turn.",
+      "diagnosis": "Deliberate repetition for the kneading rhythm; effective, but it is the scene's one showy device — keep it the only one.",
+      "repair_layer": "prose"
+    }
+  ]
+}

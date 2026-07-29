@@ -1,0 +1,62 @@
+{
+  "scene_id": "ch01-sc01",
+  "candidate": "scenes/ch01-sc01/candidates/candidate-a-r1.md",
+  "candidate_sha256": "aa9bcd920e3e4fb6fc6066c36a96818051b869d70f4f562d9057fa1b6b220440",
+  "promoted_to": "manuscript/chapters/ch01-sc01.md",
+  "promoted_at": "2026-07-29T21:11:14.732252+00:00",
+  "state_delta_sha256": "b7f5c451485de5946b4dba8298fdb2d144ffbbed38ef11d4f4f6bcc606fa9746",
+  "parent_canon_hash": "51f19f93d3708d4096cfa26034097fb90373867de81988efff46b6c6fbc02e55",
+  "resulting_canon_hash": "f806e4057a982be2dbac3255f0cf5b7b8f4c6e59066e74e6b65d2323b66cce0e",
+  "critique_files": [
+    "scenes/ch01-sc01/critiques/adversarial-reader-a-r1.json",
+    "scenes/ch01-sc01/critiques/adversarial-reader-a.json",
+    "scenes/ch01-sc01/critiques/adversarial-reader-b.json",
+    "scenes/ch01-sc01/critiques/character-simulator-a-r1.json",
+    "scenes/ch01-sc01/critiques/character-simulator-a.json",
+    "scenes/ch01-sc01/critiques/character-simulator-b.json",
+    "scenes/ch01-sc01/critiques/defaultness-candidate-a-r1.json",
+    "scenes/ch01-sc01/critiques/defaultness-candidate-a.json",
+    "scenes/ch01-sc01/critiques/defaultness-candidate-b.json",
+    "scenes/ch01-sc01/critiques/hard-audit.json",
+    "scenes/ch01-sc01/critiques/style-editor-a-r1.json",
+    "scenes/ch01-sc01/critiques/style-editor-a.json",
+    "scenes/ch01-sc01/critiques/style-editor-b.json"
+  ],
+  "binding_critiques": [
+    {
+      "file": "adversarial-reader-a-r1.json",
+      "critic": "adversarial-reader",
+      "audit_class": "literary",
+      "verdict": "pass",
+      "sha256": "7fbf77c1fa0be366051a6d6fda0c91d3094f5e9f6117ff01c6a1fc1cfb874288"
+    },
+    {
+      "file": "character-simulator-a-r1.json",
+      "critic": "character-simulator",
+      "audit_class": "literary",
+      "verdict": "pass",
+      "sha256": "da6422ae609ce792d89ea82fa874a32ab145906b69b272e9408c3440504b8918"
+    },
+    {
+      "file": "defaultness-candidate-a-r1.json",
+      "critic": "defaultness-lint",
+      "audit_class": "defaultness",
+      "verdict": "pass",
+      "sha256": "9a411afb5fa69c7107be017075e32b2fc8819b9cad93719e2c82084da58be558"
+    },
+    {
+      "file": "hard-audit.json",
+      "critic": "hard-audit",
+      "audit_class": "hard",
+      "verdict": "pass",
+      "sha256": "4d4d8ab9d3410ad8b98545472a29212f3daa0b1ad45c4f45af33e8da29e307b3"
+    },
+    {
+      "file": "style-editor-a-r1.json",
+      "critic": "style-editor",
+      "audit_class": "literary",
+      "verdict": "pass",
+      "sha256": "0ab51c3f46577db6454ead084a4367cfffa04b5857d519dbec3822005205b35c"
+    }
+  ]
+}
