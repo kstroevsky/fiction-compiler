@@ -138,12 +138,21 @@ test, not just a feature.
 > map), forward/reversed presentation orders, per-candidate *multidimensional* penalty scores from
 > critiques, a **Pareto** non-dominated set (never collapsed to one number), per-dimension winners,
 > and a disagreement flag. It recommends `select` only when one candidate dominates, else
-> `human_decision_required` over the tradeoff. Still ⬜ in P2: ingesting LLM judge scores/pairwise
-> rankings, a judge-isolation ledger, and writing blinded copies + tournament records to `.runs/`.
+> `human_decision_required` over the tradeoff. Slice 2 (ADR 0008) adds a per-judge isolation ledger,
+> ingestion of LLM judges' rankings (a split among judges flips `disagreement`, never averaged), and
+> `persist=true` writing blinded candidate copies + the record to `.runs/`. Still ⬜ in P2: enforcing
+> the blind/ boundary at transport, and signed judgments.
+>
+> **Revision loop now diffs by finding identity (ADR 0009, P3 slice 1).** `evaluate_revision` gives
+> each finding a fingerprint (dimension + normalized evidence) and classifies fixed / persisted /
+> worsened / newly-introduced, so a *new* material finding is rejected even when the raw count falls
+> (the review's two-minors→one-material trap). Still ⬜ in P3: fingerprint-based *acceptance* trigger,
+> and rerunning prose-reading audits (blocked on the hard audit reading prose, review §4).
 >
 > See `docs/decisions/0001-structured-state-delta.md`, `0002-promotion-audit-gate.md`,
 > `0003-tamper-evident-promotion.md`, `0004-executable-story-ir.md`, `0005-predicate-ontology.md`,
-> `0006-fabula-vs-discourse.md`, `0007-tournament-selection-engine.md`, and the worked example in
+> `0006-fabula-vs-discourse.md`, `0007-tournament-selection-engine.md`,
+> `0008-tournament-judges-and-evidence.md`, `0009-revision-by-finding-identity.md`, and the worked example in
 > `projects/salt-in-the-wire/`.
 
 ### Stage 0 — Make the scaffold honest (foundations)

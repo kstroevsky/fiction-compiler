@@ -86,5 +86,54 @@ class RunTournamentTests(unittest.TestCase):
             self.assertEqual(result["recommendation"]["candidate"], "candidate-a.md")
 
 
+class JudgeAndPersistenceTests(unittest.TestCase):
+    def test_assign_orders_cycles_across_judges(self) -> None:
+        orders = [["A", "B"], ["B", "A"]]
+        ledger = tournament.assign_orders(["judge-1", "judge-2", "judge-3"], orders)
+        self.assertEqual([e["judge"] for e in ledger], ["judge-1", "judge-2", "judge-3"])
+        self.assertEqual(ledger[0]["presentation_order"], ["A", "B"])
+        self.assertEqual(ledger[1]["presentation_order"], ["B", "A"])  # cycles
+        self.assertEqual(ledger[2]["presentation_order"], ["A", "B"])
+
+    def test_disagreement_from_rankings(self) -> None:
+        agree = tournament.disagreement_from_rankings([["a", "b"], ["a", "b"]])
+        self.assertTrue(agree["agree_on_winner"])
+        split = tournament.disagreement_from_rankings([["a", "b"], ["b", "a"]])
+        self.assertFalse(split["agree_on_winner"])
+        self.assertEqual(split["distinct_top_picks"], ["a", "b"])
+
+    def test_run_tournament_records_judges_and_disagreement(self) -> None:
+        critiques = [
+            {"candidate": "candidate-a.md", "findings": []},
+            {"candidate": "candidate-b.md", "findings": [{"dimension": "cliche", "severity": "material"}]},
+        ]
+        result = tournament.run_tournament(
+            critiques, seed=1, judges=["judge-1", "judge-2"],
+            judge_rankings=[["candidate-a.md", "candidate-b.md"], ["candidate-b.md", "candidate-a.md"]])
+        self.assertEqual(len(result["judge_ledger"]), 2)
+        self.assertFalse(result["judge_disagreement"]["agree_on_winner"])
+        self.assertTrue(result["disagreement"])  # judges split, even though scores had a dominator
+
+    def test_persist_writes_blinded_copies_without_reveal(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            scene = Path(tmp) / "scenes" / "ch01-sc01"
+            (scene / "candidates").mkdir(parents=True)
+            (scene / "critiques").mkdir(parents=True)
+            (scene / "candidates" / "candidate-a.md").write_text("Clean prose.")
+            (scene / "candidates" / "candidate-b.md").write_text("Her heart pounded.")
+            (scene / "critiques" / "a.json").write_text(json.dumps(
+                {"candidate": "candidate-a.md", "findings": []}))
+            (scene / "critiques" / "b.json").write_text(json.dumps(
+                {"candidate": "candidate-b.md", "findings": [{"dimension": "cliche", "severity": "material"}]}))
+            result = tools.tournament(str(Path(tmp)), "ch01-sc01", persist=True)
+            run_dir = Path(tmp) / result["persisted_to"]
+            blind = run_dir / "blind"
+            self.assertEqual(sorted(p.name for p in blind.glob("*.md")), ["A.md", "B.md"])
+            self.assertTrue((run_dir / "record.json").exists())
+            # The blind dir must not leak the true candidate identity.
+            for md in blind.glob("*.md"):
+                self.assertNotIn("candidate-", md.read_text())
+
+
 if __name__ == "__main__":
     unittest.main()

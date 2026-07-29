@@ -46,6 +46,51 @@ def _flatten(items: list[dict]) -> list[dict]:
     return findings
 
 
+_SEV_RANK = {"minor": 0, "material": 1, "fatal": 2}
+
+
+def _normalize_evidence(text: object) -> str:
+    return " ".join(str(text).lower().split())
+
+
+def finding_fingerprint(finding: dict) -> tuple[str, str]:
+    """Stable identity of a finding: dimension + normalized evidence span.
+
+    Deliberately independent of severity, so the *same* defect can be tracked as it is fixed,
+    persists, or worsens across a revision — the review's requirement that acceptance operate on
+    issue identity, not raw counts.
+    """
+    return (finding.get("dimension", "?"), _normalize_evidence(finding.get("evidence", "")))
+
+
+def diff_findings(before: list[dict], after: list[dict]) -> dict:
+    """Classify findings by identity: fixed / persisted / worsened / newly_introduced."""
+    def index(items: list[dict]) -> dict[tuple[str, str], dict]:
+        idx: dict[tuple[str, str], dict] = {}
+        for finding in _flatten(items):
+            fp = finding_fingerprint(finding)
+            if fp not in idx or _SEV_RANK.get(finding.get("severity"), 0) > _SEV_RANK.get(idx[fp].get("severity"), 0):
+                idx[fp] = finding  # keep the worst severity seen for a fingerprint
+        return idx
+
+    before_idx, after_idx = index(before), index(after)
+    fixed = [before_idx[fp] for fp in before_idx if fp not in after_idx]
+    newly_introduced = [after_idx[fp] for fp in after_idx if fp not in before_idx]
+    persisted, worsened = [], []
+    for fp, finding in after_idx.items():
+        if fp in before_idx:
+            if _SEV_RANK.get(finding.get("severity"), 0) > _SEV_RANK.get(before_idx[fp].get("severity"), 0):
+                worsened.append(finding)
+            else:
+                persisted.append(finding)
+    return {"fixed": fixed, "persisted": persisted, "worsened": worsened, "newly_introduced": newly_introduced}
+
+
+def _compact(findings: list[dict]) -> list[dict]:
+    return [{"dimension": f.get("dimension"), "severity": f.get("severity"), "evidence": f.get("evidence")}
+            for f in findings]
+
+
 def tally(items: list[dict]) -> dict:
     findings = _flatten(items)
     by_severity = Counter(f.get("severity", "minor") for f in findings)
@@ -75,6 +120,11 @@ class RevisionOutcome:
     target_after: int
     material_regressions: list[str] = field(default_factory=list)
     fixed_dimensions: list[str] = field(default_factory=list)
+    # Identity-based diff (fingerprint = dimension + normalized evidence), not just counts.
+    fixed_findings: list[dict] = field(default_factory=list)
+    persisted_findings: list[dict] = field(default_factory=list)
+    worsened_findings: list[dict] = field(default_factory=list)
+    new_findings: list[dict] = field(default_factory=list)
 
     def counts(self, before: dict, after: dict) -> dict:
         return {
@@ -119,10 +169,21 @@ def evaluate_revision(
     )
     fatal_regressed = a["fatal"] > b["fatal"]
 
-    if fatal_regressed or regressions:
+    # Identity-based regression: a specific serious finding that did not exist before, or the same
+    # finding at a worse severity. This catches what counts miss — e.g. two minor findings replaced
+    # by one *new* material finding reads as "count went down" but is a regression.
+    diff = diff_findings(before, after)
+    new_serious = [f for f in diff["newly_introduced"] if f.get("severity") in _SERIOUS]
+    worsened_serious = [f for f in diff["worsened"] if f.get("severity") in _SERIOUS]
+
+    if fatal_regressed or regressions or new_serious or worsened_serious:
         decision = REJECT_REGRESSION
-        where = regressions or ["fatal count"]
-        reason = f"revision caused a material/fatal regression in {where}; do not accept"
+        where = list(regressions)
+        where += [f"new {f.get('severity')} {f.get('dimension')}" for f in new_serious]
+        where += [f"worsened {f.get('dimension')}" for f in worsened_serious]
+        if fatal_regressed and not where:
+            where = ["fatal count"]
+        reason = f"revision caused a material/fatal regression by identity in {where}; do not accept"
     elif a["fatal"] == 0 and target_improved:
         label = target_dimension or "serious findings"
         reason = f"target '{label}' improved {target_before}->{target_after}, no regressions, no fatals"
@@ -149,6 +210,10 @@ def evaluate_revision(
         target_after=target_after,
         material_regressions=regressions,
         fixed_dimensions=fixed,
+        fixed_findings=_compact(diff["fixed"]),
+        persisted_findings=_compact(diff["persisted"]),
+        worsened_findings=_compact(diff["worsened"]),
+        new_findings=_compact(diff["newly_introduced"]),
     )
 
 

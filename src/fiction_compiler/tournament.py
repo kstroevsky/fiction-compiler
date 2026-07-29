@@ -85,6 +85,30 @@ def has_disagreement(scores: dict[str, dict[str, float]]) -> bool:
     return len(pareto_front(scores)) > 1 or len(distinct_winner_sets) > 1
 
 
+def assign_orders(judges: list[str], orders: list[list[str]]) -> list[dict]:
+    """Isolation ledger: give each judge a presentation order, cycling through the available orders.
+
+    Records *which* judge saw *which* order so a later reader can see the blinding/ordering each
+    judgment was made under — the "judge isolation metadata" the review asked the code to own.
+    """
+    return [{"judge": judge, "presentation_order": orders[i % len(orders)]}
+            for i, judge in enumerate(judges)]
+
+
+def disagreement_from_rankings(rankings: list[list[str]]) -> dict:
+    """Given each judge's ranked candidate list (best first), report agreement on the winner.
+
+    Disagreement is information (operating contract): we record the distinct top picks rather than
+    averaging the judges into a single, unsupported verdict.
+    """
+    top_picks = [ranking[0] for ranking in rankings if ranking]
+    return {
+        "top_picks": top_picks,
+        "distinct_top_picks": sorted(set(top_picks)),
+        "agree_on_winner": len(set(top_picks)) <= 1,
+    }
+
+
 def scores_from_critiques(critiques: list[dict]) -> dict[str, dict[str, float]]:
     """Derive a per-candidate, per-dimension penalty score from critique findings (higher better)."""
     scores: dict[str, dict[str, float]] = {}
@@ -99,14 +123,20 @@ def scores_from_critiques(critiques: list[dict]) -> dict[str, dict[str, float]]:
     return scores
 
 
-def run_tournament(critiques: list[dict], *, seed: int = 0) -> dict:
-    """Blind, ordered, Pareto-scored selection over a scene's candidates from their critiques."""
+def run_tournament(critiques: list[dict], *, seed: int = 0,
+                   judges: list[str] | None = None, judge_rankings: list[list[str]] | None = None) -> dict:
+    """Blind, ordered, Pareto-scored selection over a scene's candidates from their critiques.
+
+    ``judges`` (ids/models) get a per-judge isolation ledger; ``judge_rankings`` (each judge's ranked
+    candidate ids, best first) fold explicit LLM judgments into the recorded disagreement.
+    """
     scores = scores_from_critiques(critiques)
     candidate_ids = sorted(scores)
     if not candidate_ids:
         return {"decision": "no_candidates", "reason": "no critiques with a candidate were supplied"}
 
     label_by_id, id_by_label = anonymize(candidate_ids, seed=seed)
+    orders = presentation_orders(list(label_by_id.values()), seed=seed)
     front = pareto_front(scores)
     if len(front) == 1:
         recommendation = {"decision": "select", "candidate": next(iter(front))}
@@ -116,14 +146,22 @@ def run_tournament(critiques: list[dict], *, seed: int = 0) -> dict:
             "pareto_front": sorted(front),
             "reason": "multiple non-dominated candidates — a genuine tradeoff; do not average it away",
         }
-    return {
+    disagreement = has_disagreement(scores)
+    record = {
         "candidates": candidate_ids,
         "blind_labels": label_by_id,          # id -> blinded label (what a judge may see)
         "reveal_map": id_by_label,            # label -> id (keep OUT of the judges' view)
-        "presentation_orders": presentation_orders(list(label_by_id.values()), seed=seed),
+        "presentation_orders": orders,
         "scores": scores,
         "pareto_front": sorted(front),
         "dimension_winners": dimension_winners(scores),
-        "disagreement": has_disagreement(scores),
         "recommendation": recommendation,
     }
+    if judges:
+        record["judge_ledger"] = assign_orders(judges, orders)
+    if judge_rankings:
+        judge_disagreement = disagreement_from_rankings(judge_rankings)
+        record["judge_disagreement"] = judge_disagreement
+        disagreement = disagreement or not judge_disagreement["agree_on_winner"]
+    record["disagreement"] = disagreement
+    return record

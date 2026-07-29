@@ -74,5 +74,51 @@ class RevisionDecisionTests(unittest.TestCase):
             self.assertEqual(history[1]["decision"], revision.ACCEPT)
 
 
+def _fe(dimension: str, severity: str, evidence: str) -> dict:
+    return {"dimension": dimension, "severity": severity, "evidence": evidence,
+            "diagnosis": "", "repair_layer": "prose"}
+
+
+class FindingIdentityTests(unittest.TestCase):
+    def test_diff_classifies_fixed_persisted_worsened_new(self) -> None:
+        before = [_fe("cliche", "minor", "heart pounded"), _fe("style", "material", "throat-clearing open")]
+        after = [_fe("style", "fatal", "throat-clearing open"),   # same identity, worse -> worsened
+                 _fe("rhythm", "material", "monotone sentences")]  # -> newly_introduced
+        diff = revision.diff_findings([{"findings": before}], [{"findings": after}])
+        self.assertEqual([f["dimension"] for f in diff["fixed"]], ["cliche"])
+        self.assertEqual([f["dimension"] for f in diff["worsened"]], ["style"])
+        self.assertEqual([f["dimension"] for f in diff["newly_introduced"]], ["rhythm"])
+        self.assertEqual(diff["persisted"], [])
+
+    def test_fingerprint_ignores_severity_and_whitespace(self) -> None:
+        self.assertEqual(revision.finding_fingerprint(_fe("cliche", "minor", "Heart  Pounded")),
+                         revision.finding_fingerprint(_fe("cliche", "fatal", "heart pounded")))
+
+
+class IdentityDecisionTests(unittest.TestCase):
+    def test_count_drop_hiding_a_new_material_is_rejected(self) -> None:
+        # The review's motivating example: two minor findings replaced by one NEW material finding.
+        # Counts fall (2 -> 1) so a count-only check "accepts" — identity must reject.
+        before = [{"findings": [_fe("cliche", "minor", "heart pounded"), _fe("cliche", "minor", "time stood still")]}]
+        after = [{"findings": [_fe("cliche", "material", "a wholly new default")]}]
+        outcome = revision.evaluate_revision(before, after, target_dimension="cliche")
+        self.assertEqual(outcome.decision, revision.REJECT_REGRESSION)
+        self.assertEqual([f["dimension"] for f in outcome.new_findings], ["cliche"])
+
+    def test_worsened_same_finding_is_rejected(self) -> None:
+        before = [{"findings": [_fe("cliche", "minor", "heart pounded")]}]
+        after = [{"findings": [_fe("cliche", "material", "heart pounded")]}]  # same identity, escalated
+        outcome = revision.evaluate_revision(before, after, target_dimension="style")
+        self.assertEqual(outcome.decision, revision.REJECT_REGRESSION)
+        self.assertEqual([f["dimension"] for f in outcome.worsened_findings], ["cliche"])
+
+    def test_target_fixed_cleanly_is_accepted_and_reported(self) -> None:
+        before = [{"findings": [_fe("cliche", "material", "heart pounded")]}]
+        after: list[dict] = [{"findings": []}]
+        outcome = revision.evaluate_revision(before, after, target_dimension="cliche")
+        self.assertEqual(outcome.decision, revision.ACCEPT)
+        self.assertEqual([f["dimension"] for f in outcome.fixed_findings], ["cliche"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -10,6 +10,7 @@ Every handler returns a JSON-serialisable dict. Keep them pure and cheap.
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
@@ -101,6 +102,10 @@ def evaluate_revision(
         "target_after": outcome.target_after,
         "material_regressions": outcome.material_regressions,
         "fixed_dimensions": outcome.fixed_dimensions,
+        "fixed": outcome.fixed_findings,
+        "persisted": outcome.persisted_findings,
+        "worsened": outcome.worsened_findings,
+        "newly_introduced": outcome.new_findings,
     }
 
 
@@ -135,6 +140,8 @@ def record_revision(project: str, scene_id: str, before: str, after: str, target
     revision.log_revision(scene_dir, {
         "iteration": iteration, "before": before_path.name, "after": after_path.name,
         "target_dimension": target, "counts": outcome.counts(b, a),
+        "finding_diff": {"fixed": len(outcome.fixed_findings), "persisted": len(outcome.persisted_findings),
+                         "worsened": len(outcome.worsened_findings), "new": len(outcome.new_findings)},
         "decision": outcome.decision, "reason": outcome.reason,
     })
     return {
@@ -154,15 +161,20 @@ def promote(project: str, scene_id: str, candidate_file: str, confirm: bool = Fa
         return {"error": str(exc)}
 
 
-def tournament(project: str, scene_id: str, seed: int = 0) -> dict:
+def tournament(project: str, scene_id: str, seed: int = 0, persist: bool = False,
+               judges: list | None = None, judge_rankings: list | None = None) -> dict:
     """Blind, Pareto-scored selection over a scene's candidates from their committed critiques.
 
     Reads ``scenes/<scene_id>/critiques/*.json`` and returns blinded labels, presentation orders
     (forward + reversed), per-candidate multidimensional scores, the non-dominated (Pareto) set,
     per-dimension winners, whether the judges disagree, and a recommendation. The code owns
-    anonymization/ordering/selection so blind A/B is guaranteed, not merely requested.
+    anonymization/ordering/selection so blind A/B is guaranteed, not merely requested. With
+    ``persist=true`` it writes blinded candidate copies (``.runs/.../blind/<label>.md`` — the only
+    thing a judge should see) and the full record to ``.runs/`` so the evidence is preserved.
     """
-    crit_dir = project_dir(project) / "scenes" / scene_id / "critiques"
+    proj = project_dir(project)
+    scene_dir = proj / "scenes" / scene_id
+    crit_dir = scene_dir / "critiques"
     critiques: list[dict] = []
     if crit_dir.exists():
         for path in sorted(crit_dir.glob("*.json")):
@@ -170,7 +182,20 @@ def tournament(project: str, scene_id: str, seed: int = 0) -> dict:
                 critiques.append(json.loads(path.read_text(encoding="utf-8")))
             except json.JSONDecodeError:
                 pass
-    return run_tournament(critiques, seed=seed)
+    record = run_tournament(critiques, seed=seed, judges=judges, judge_rankings=judge_rankings)
+    if persist and record.get("candidates"):
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        run_dir = proj / ".runs" / "tournament" / scene_id / stamp
+        blind = run_dir / "blind"
+        blind.mkdir(parents=True, exist_ok=True)
+        for candidate_id, label in record["blind_labels"].items():
+            src = scene_dir / "candidates" / candidate_id
+            if src.exists():
+                (blind / f"{label}.md").write_bytes(src.read_bytes())
+        (run_dir / "record.json").write_text(json.dumps(record, indent=2, ensure_ascii=False) + "\n",
+                                             encoding="utf-8")
+        record["persisted_to"] = str(run_dir.relative_to(proj))
+    return record
 
 
 def assemble(project: str) -> dict:
@@ -251,8 +276,11 @@ TOOLS: list[dict] = [
           "Returns blinded labels + reveal map, forward/reversed presentation orders, per-candidate "
           "multidimensional scores, the non-dominated (Pareto) set, per-dimension winners, a "
           "disagreement flag, and a recommendation (select when one candidate dominates, else "
-          "human_decision_required). Do NOT show the reveal_map to judge agents.",
-          {"project": {"type": "string"}, "scene_id": {"type": "string"}, "seed": {"type": "integer"}},
+          "human_decision_required). Optional judges[] add an isolation ledger and judge_rankings[] "
+          "(each judge's ranked candidate ids) fold into disagreement. persist=true writes blinded "
+          "copies + the record to .runs/. Do NOT show the reveal_map to judge agents.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"}, "seed": {"type": "integer"},
+           "persist": {"type": "boolean"}, "judges": {"type": "array"}, "judge_rankings": {"type": "array"}},
           ["project", "scene_id"], tournament),
     _tool("assemble",
           "Stitch the accepted (promoted) scenes into a single manuscript.md, in fabula order, "
