@@ -14,6 +14,7 @@ from typing import Any, Callable
 
 from . import defaultness, hard_audit, kb, revision
 from .context import compile_bundle
+from .promote import promote_candidate
 from .state import StoryState, accepted_scene_ids, reconstruct_state_before
 from .workspace import project_dir
 
@@ -72,8 +73,20 @@ def defaultness_lint(text: str | None = None, path: str | None = None) -> dict:
     return {"error": "provide either 'text' or 'path'"}
 
 
-def evaluate_revision(before_findings: list, after_findings: list, target: str | None = None) -> dict:
-    outcome = revision.evaluate_revision(before_findings, after_findings, target_dimension=target)
+def evaluate_revision(
+    before_findings: list,
+    after_findings: list,
+    target: str | None = None,
+    iteration: int = 1,
+    attempts_at_current_layer: int = 1,
+    max_iterations: int = 3,
+    max_attempts_per_layer: int = 2,
+) -> dict:
+    outcome = revision.evaluate_revision(
+        before_findings, after_findings, target_dimension=target,
+        iteration=iteration, attempts_at_current_layer=attempts_at_current_layer,
+        max_iterations=max_iterations, max_attempts_per_layer=max_attempts_per_layer,
+    )
     return {
         "decision": outcome.decision,
         "reason": outcome.reason,
@@ -83,6 +96,56 @@ def evaluate_revision(before_findings: list, after_findings: list, target: str |
         "material_regressions": outcome.material_regressions,
         "fixed_dimensions": outcome.fixed_dimensions,
     }
+
+
+def _resolve_candidate(scene_dir, name: str):
+    candidate = Path(name)
+    return candidate if candidate.exists() else scene_dir / "candidates" / name
+
+
+def record_revision(project: str, scene_id: str, before: str, after: str, target: str | None = None,
+                    max_iterations: int = 3, max_attempts_per_layer: int = 2) -> dict:
+    """Lint before/after, derive iteration+attempts from the persisted revision-log, decide, and log.
+
+    Unlike ``evaluate_revision`` this reads and writes history, so the loop's stop conditions
+    (ESCALATE_LAYER, STOP_NO_PROGRESS) become reachable and each iteration leaves a durable trace.
+    """
+    scene_dir = project_dir(project) / "scenes" / scene_id
+    before_path = _resolve_candidate(scene_dir, before)
+    after_path = _resolve_candidate(scene_dir, after)
+    if not before_path.exists() or not after_path.exists():
+        return {"error": "before/after candidate not found"}
+    before_findings = [defaultness.lint_file(before_path)]
+    after_findings = [defaultness.lint_file(after_path)]
+    history = revision.revision_history(scene_dir)
+    iteration = len(history) + 1
+    attempts = 1 + sum(1 for h in history if h.get("target_dimension") == target)
+    outcome = revision.evaluate_revision(
+        before_findings, after_findings, target_dimension=target,
+        iteration=iteration, attempts_at_current_layer=attempts,
+        max_iterations=max_iterations, max_attempts_per_layer=max_attempts_per_layer,
+    )
+    b, a = revision.tally(before_findings), revision.tally(after_findings)
+    revision.log_revision(scene_dir, {
+        "iteration": iteration, "before": before_path.name, "after": after_path.name,
+        "target_dimension": target, "counts": outcome.counts(b, a),
+        "decision": outcome.decision, "reason": outcome.reason,
+    })
+    return {
+        "iteration": iteration, "attempts_at_layer": attempts,
+        "decision": outcome.decision, "reason": outcome.reason,
+        "target_before": outcome.target_before, "target_after": outcome.target_after, "logged": True,
+    }
+
+
+def promote(project: str, scene_id: str, candidate_file: str, confirm: bool = False) -> dict:
+    """Promote a candidate into manuscript + canon. State-changing, so it is gated on ``confirm``."""
+    if not confirm:
+        return {"error": "promotion changes canon and the manuscript; call again with confirm=true to proceed"}
+    try:
+        return promote_candidate(project_dir(project), scene_id, candidate_file)
+    except ValueError as exc:
+        return {"error": str(exc)}
 
 
 # --- registry ---------------------------------------------------------------
@@ -130,11 +193,28 @@ TOOLS: list[dict] = [
           "to inspect, not proof — the fix may belong to a lower layer.",
           {"text": {"type": "string"}, "path": {"type": "string"}}, [], defaultness_lint),
     _tool("evaluate_revision",
-          "Decide whether a revision should be accepted. Give the prior and revised versions' "
-          "findings (arrays of critique objects) and the target dimension. Applies the contract's "
-          "accept/regression/stop rules so revision converges instead of drifting to blandness.",
-          {"before_findings": {"type": "array"}, "after_findings": {"type": "array"}, "target": {"type": "string"}},
+          "Decide whether a revision should be accepted (stateless). Give the prior and revised "
+          "versions' findings (arrays of critique objects) and the target dimension. Pass iteration "
+          "/ attempts_at_current_layer to reach the ESCALATE_LAYER and STOP_NO_PROGRESS decisions.",
+          {"before_findings": {"type": "array"}, "after_findings": {"type": "array"}, "target": {"type": "string"},
+           "iteration": {"type": "integer"}, "attempts_at_current_layer": {"type": "integer"},
+           "max_iterations": {"type": "integer"}, "max_attempts_per_layer": {"type": "integer"}},
           ["before_findings", "after_findings"], evaluate_revision),
+    _tool("record_revision",
+          "Run one revision iteration for a scene: lint the before/after candidates, derive iteration "
+          "and attempts from the scene's revision-log, decide, and append the log. Use this (not the "
+          "stateless evaluate_revision) to drive the loop with real history — it can ESCALATE/STOP and "
+          "leaves a durable trace.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "before": {"type": "string"}, "after": {"type": "string"}, "target": {"type": "string"}},
+          ["project", "scene_id", "before", "after"], record_revision),
+    _tool("promote",
+          "Promote a reviewed candidate into the manuscript and fold its state delta into canon. "
+          "STATE-CHANGING and gated: requires confirm=true, plus a spec, at least one critique, and a "
+          "schema-valid matching state-delta.json.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "candidate_file": {"type": "string"}, "confirm": {"type": "boolean"}},
+          ["project", "scene_id", "candidate_file"], promote),
 ]
 
 _BY_NAME: dict[str, dict] = {t["name"]: t for t in TOOLS}

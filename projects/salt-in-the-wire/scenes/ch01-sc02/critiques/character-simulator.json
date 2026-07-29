@@ -1,0 +1,29 @@
+{
+  "candidate": "candidate-a.md",
+  "critic": "character-simulator",
+  "verdict": "revise",
+  "confidence": 0.68,
+  "findings": [
+    {
+      "dimension": "knowledge",
+      "severity": "material",
+      "evidence": "Mara's sheet knowledge 'the corrected tide table' vs the reveal 'the reef where the district drew it, and the reef where the water said it stood'",
+      "diagnosis": "If the corrected tide table is the same fact as the reef mis-mark, the turn lands on information Mara already had. Distinguish tide-height correction from reef-position error, in canon or in-scene (e.g. she used his tide numbers for years without reading the accusation in them).",
+      "repair_layer": "character"
+    },
+    {
+      "dimension": "agency",
+      "severity": "minor",
+      "evidence": "Mara looked at it for a long moment.",
+      "diagnosis": "Given she 'reveres the log', accepting the official chart is wrong meets almost no internal friction; her contradiction predicts one flicker of record-reverence before it yields.",
+      "repair_layer": "scene"
+    },
+    {
+      "dimension": "subtext",
+      "severity": "minor",
+      "evidence": "I told the water, every year, and I wrote down what it answered ... every season between, the light calls them in.",
+      "diagnosis": "Jonas's longest open speech grazes the forbidden 'justifying himself in the open'; defensible (institutional futility, not self-righteousness) but trimmable.",
+      "repair_layer": "discourse"
+    }
+  ]
+}

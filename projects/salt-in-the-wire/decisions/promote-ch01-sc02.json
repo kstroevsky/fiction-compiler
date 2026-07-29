@@ -1,0 +1,12 @@
+{
+  "scene_id": "ch01-sc02",
+  "candidate": "scenes/ch01-sc02/candidates/candidate-b.md",
+  "promoted_to": "manuscript/chapters/ch01-sc02.md",
+  "promoted_at": "2026-07-29T08:45:06.204188+00:00",
+  "critique_files": [
+    "scenes/ch01-sc02/critiques/adversarial-reader-rev.json",
+    "scenes/ch01-sc02/critiques/adversarial-reader.json",
+    "scenes/ch01-sc02/critiques/character-simulator.json",
+    "scenes/ch01-sc02/critiques/style-editor.json"
+  ]
+}

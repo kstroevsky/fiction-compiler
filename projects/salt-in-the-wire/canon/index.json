@@ -6,7 +6,9 @@
   "world_rules": [
     "The relay is a legal obligation: an operator who knows it is down must report and restore it.",
     "The approach chart is the authority ships trust; correcting it officially takes a survey the district must fund.",
-    "The station keeps a paper log; every fault filed is permanent and auditable."
+    "The station keeps a paper log; every fault filed is permanent and auditable.",
+    "The 'distress relay' is a homing signal: live, it broadcasts the approach bearing taken from the official chart, so vessels steer onto that line; cut, it simply stops guiding (it does not withhold rescue calls).",
+    "The tide table gives water heights and times; the chart gives the reef's position. Jonas's corrections to the tide table (heights) are separate from, and do not reveal, his private reef soundings (position)."
   ],
   "locations": [
     "the signal station on the point",
@@ -21,6 +23,7 @@
     "the district maritime authority"
   ],
   "accepted_state_deltas": [
-    "ch01-sc01"
+    "ch01-sc01",
+    "ch01-sc02"
   ]
 }

@@ -1,0 +1,36 @@
+{
+  "candidate": "candidate-a.md",
+  "critic": "style-editor",
+  "verdict": "pass",
+  "confidence": 0.72,
+  "findings": [
+    {
+      "dimension": "abstraction",
+      "severity": "material",
+      "evidence": "On the bench lay the approach to the point, as familiar to her as her own hand",
+      "diagnosis": "Simile tells familiarity instead of rendering it; 'familiar as her own hand' is stock residue. Cut the simile; let the reef-ink and her reading of it carry recognition.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "prose",
+      "severity": "minor",
+      "evidence": "Mara looked at it for a long moment.",
+      "diagnosis": "'for a long moment' is filler and redundant beside the following silence-beat.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "rhythm",
+      "severity": "minor",
+      "evidence": "six sentences open with 'He' (He had / He walked / He set / He turned / He picked / He looked)",
+      "diagnosis": "Pronoun-subject opening density; the profile wants varied sentence openings. Recast one or two.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "repetition",
+      "severity": "minor",
+      "evidence": "moved between the two until the gap stood open between them",
+      "diagnosis": "'between' twice in one clause; one instance suffices.",
+      "repair_layer": "prose"
+    }
+  ]
+}

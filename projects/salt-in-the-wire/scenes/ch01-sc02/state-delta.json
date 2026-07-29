@@ -1,0 +1,16 @@
+{
+  "scene_id": "ch01-sc02",
+  "time": 1,
+  "facts_added": [],
+  "facts_removed": [],
+  "knowledge_changes": [
+    {"character": "char-mara", "fact": "fact-chart-mis-surveyed"}
+  ],
+  "relationship_changes": [
+    {"pair": ["char-mara", "char-jonas"], "state": "the weight has passed; she knowingly carries his silence now", "note": "she has read his reef soundings against the district chart and believes them"}
+  ],
+  "promises_opened": [
+    {"id": "promise-what-mara-does", "text": "Restore the relay by the book (and risk the reef) or keep the silence?", "owed_by": "the story"}
+  ],
+  "promises_closed": ["promise-who-and-why"]
+}

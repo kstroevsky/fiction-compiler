@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -56,6 +57,33 @@ class ToolDispatchTests(unittest.TestCase):
 
     def test_unknown_tool_returns_error(self) -> None:
         self.assertIn("error", tools.call_tool("nope", {}))
+
+    def test_promote_requires_confirm(self) -> None:
+        out = tools.call_tool("promote", {"project": "salt-in-the-wire", "scene_id": "ch01-sc01",
+                                          "candidate_file": "candidate-a.md"})
+        self.assertIn("error", out)
+        self.assertIn("confirm", out["error"])
+
+    def test_evaluate_revision_reaches_escalate_via_params(self) -> None:
+        no_progress = [{"findings": [{"dimension": "defaultness", "severity": "material"}]}]
+        out = tools.call_tool("evaluate_revision", {
+            "before_findings": no_progress, "after_findings": no_progress, "target": "defaultness",
+            "iteration": 1, "attempts_at_current_layer": 2, "max_attempts_per_layer": 2,
+        })
+        self.assertEqual(out["decision"], "escalate_layer")
+
+
+class ToolWriteTests(unittest.TestCase):
+    def test_record_revision_lints_and_logs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            scene = Path(tmp) / "scenes" / "ch01-sc01"
+            (scene / "candidates").mkdir(parents=True)
+            (scene / "candidates" / "before.md").write_text("Her heart pounded and time stood still.")
+            (scene / "candidates" / "after.md").write_text("The relay lay open, two wires bright.")
+            out = tools.record_revision(str(Path(tmp)), "ch01-sc01", "before.md", "after.md", target="defaultness")
+            self.assertTrue(out["logged"])
+            self.assertEqual(out["decision"], "accept")
+            self.assertTrue((scene / "revision-log.jsonl").exists())
 
 
 if __name__ == "__main__":

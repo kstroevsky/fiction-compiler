@@ -28,7 +28,12 @@ It runs anywhere `python3` runs — no install step.
 | `compile_context` | The minimal, leak-free drafting bundle for a scene |
 | `hard_audit` | Deterministic Audit 1 (knowledge cutoff, causal refs, POV, chronology, promise ledger) |
 | `defaultness_lint` | Model-default tics in prose, with evidence |
-| `evaluate_revision` | Accept/stop decision for a revision (the story PDCA CHECK/ACT) |
+| `evaluate_revision` | Accept/stop decision for a revision (stateless; takes iteration/attempts to reach every branch) |
+| `record_revision` | Runs one revision iteration, derives iteration/attempts from the scene's `revision-log`, and **persists** it — the history-driven, ESCALATE/STOP-capable path |
+| `promote` | **State-changing, gated by `confirm`** — copies a reviewed candidate into the manuscript and folds its delta into canon |
+
+Both write-path gaps are closed: an agent driving purely over MCP can now persist revision history
+(`record_revision`), reach the full stop-condition logic, and promote (`promote`, confirm-gated).
 
 ### Register with Claude Code
 `.mcp.json` at the repo root is auto-detected:

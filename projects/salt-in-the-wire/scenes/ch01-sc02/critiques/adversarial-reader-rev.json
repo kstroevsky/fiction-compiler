@@ -1,0 +1,22 @@
+{
+  "candidate": "candidate-b.md",
+  "critic": "adversarial-reader",
+  "verdict": "pass",
+  "confidence": 0.78,
+  "findings": [
+    {
+      "dimension": "subtext",
+      "severity": "minor",
+      "evidence": "Go home and keep closing it, or go home and file.",
+      "diagnosis": "The two options are handed over as an explicit binary — the draft's most on-the-nose beat; not a forbidden move (theme stays unspoken), but could be trimmed to an image in a later pass.",
+      "repair_layer": "discourse"
+    },
+    {
+      "dimension": "subtext",
+      "severity": "minor",
+      "evidence": "I told the water, every year, and wrote down what it answered.",
+      "diagnosis": "Flirts with 'Jonas justifying himself in the open' but reads as oblique method-description capped by refusal; watch-point only.",
+      "repair_layer": "discourse"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "candidate": "candidate-a.md",
+  "critic": "adversarial-reader",
+  "verdict": "pass",
+  "confidence": 0.78,
+  "findings": [
+    {
+      "dimension": "cliche",
+      "severity": "material",
+      "evidence": "the approach to the point, as familiar to her as her own hand",
+      "diagnosis": "Stock comparison in a characterization line — exactly the default the scene otherwise defeats.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "obvious-narration",
+      "severity": "minor",
+      "evidence": "Outside, a halyard knocked against a mast, and knocked again.",
+      "diagnosis": "Ambient-punctuation-of-silence reflex; 'knocked again' partly redeems it as a stall marker.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "world",
+      "severity": "minor",
+      "evidence": "brief 'automated distress relay' vs 'The relay called a ship onto the district's line'",
+      "diagnosis": "'Distress relay' connotes relaying distress calls, not a homing light guiding ships onto a mis-charted bearing; reconcile the mechanism with canon.",
+      "repair_layer": "world"
+    },
+    {
+      "dimension": "subtext",
+      "severity": "minor",
+      "evidence": "Tell the district and they fund a survey in ten years, or they don't, and every season between, the light calls them in.",
+      "diagnosis": "Verbalizes the 'why' the wordless demonstration already carried; nears the forbidden 'Jonas justifying himself in the open'.",
+      "repair_layer": "discourse"
+    }
+  ]
+}
