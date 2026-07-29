@@ -1,0 +1,12 @@
+{
+  "candidate": "candidate-a.md",
+  "critic": "adversarial-reader",
+  "verdict": "pass",
+  "confidence": 0.70,
+  "findings": [
+    {"dimension": "discourse", "severity": "material", "evidence": "She had kept her oath. She had put the word down true, with both its hands", "diagnosis": "Ends on a reflective coda; the spec asks to end on the act.", "repair_layer": "discourse"},
+    {"dimension": "defaultness", "severity": "material", "evidence": "the only thing she had ever truly chosen", "diagnosis": "Model-favored 'profound last line'; asserts the neutrality answer the brief wants held in vertigo.", "repair_layer": "prose"},
+    {"dimension": "clarity", "severity": "material", "evidence": "he had spent the recess taking the clean half out of her reach", "diagnosis": "The only beat that makes the ambiguity-flag partisan rather than proper-and-neutral; harden it so the flag's partisanship is unmissable.", "repair_layer": "discourse"},
+    {"dimension": "prose", "severity": "minor", "evidence": "She could feel the valley going out of the length of him", "diagnosis": "Filter/decorative; strip and let the images land.", "repair_layer": "prose"}
+  ]
+}

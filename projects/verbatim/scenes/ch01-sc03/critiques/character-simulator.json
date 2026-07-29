@@ -1,0 +1,11 @@
+{
+  "candidate": "candidate-a.md",
+  "critic": "character-simulator",
+  "verdict": "revise",
+  "confidence": 0.7,
+  "findings": [
+    {"dimension": "agency", "severity": "material", "evidence": "I cannot make it two for you. You will have to.", "diagnosis": "Deviates from the spec's silent single-sense rendering; risks Mira breaking her defining 'pane of glass' invisibility / stating the theme. Reconcile with spec or accept as her earned climax (see decision record).", "repair_layer": "discourse"},
+    {"dimension": "causal", "severity": "material", "evidence": "he had spent the recess taking the clean half out of her reach", "diagnosis": "Off-page mechanism asserted while Josif is watched and may not confer; largely earned by ch01-sc02 but under-dramatized here.", "repair_layer": "world"},
+    {"dimension": "scene", "severity": "minor", "evidence": "She would know it for the rest of her life", "diagnosis": "Ends on reflection, not the act, against the scene's own style constraint.", "repair_layer": "discourse"}
+  ]
+}

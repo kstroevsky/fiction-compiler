@@ -1,0 +1,12 @@
+{
+  "candidate": "candidate-a.md",
+  "critic": "style-editor",
+  "verdict": "revise",
+  "confidence": 0.82,
+  "findings": [
+    {"dimension": "prose", "severity": "material", "evidence": "She could feel the valley going out of the length of him", "diagnosis": "Filter word ('she felt') the profile explicitly bans; strip it and let the images land unmediated.", "repair_layer": "prose"},
+    {"dimension": "defaultness", "severity": "material", "evidence": "the only thing she had ever truly chosen", "diagnosis": "Last-line uplift plus theme-stating; end on a withheld concrete beat.", "repair_layer": "prose"},
+    {"dimension": "prose", "severity": "minor", "evidence": "a second long sentence in the aftermath competes with the reserved held-breath sentence", "diagnosis": "Break the aftermath into shorter units so the earmarked long sentence stays singular.", "repair_layer": "prose"},
+    {"dimension": "rhythm", "severity": "minor", "evidence": "four of five final-paragraph sentences open with 'She'", "diagnosis": "Vary the openings.", "repair_layer": "prose"}
+  ]
+}
