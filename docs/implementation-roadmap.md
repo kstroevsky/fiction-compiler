@@ -124,12 +124,15 @@ test, not just a feature.
 > relationships (ordered `(subject, object)` with dimensions like trusts/fears/owes; legacy `{pair,
 > state}` still works). Event preconditions/effects may be typed atoms, and the hard audit now
 > *evaluates* them — an unmet precondition or an effect missing from the scene's delta is a material
-> finding, turning the event graph from descriptive into checkable. Still ⬜ in P1: a predicate
-> ontology, richer resource/physical state, and fabula-time vs discourse-order separation.
+> finding, turning the event graph from descriptive into checkable. An optional per-project
+> **predicate ontology** (`canon/ontology.json`, ADR 0005) declares legal predicates + arity + entity
+> types, so a typo like `located_att` is caught as a material finding instead of silently becoming an
+> unsatisfiable predicate. Still ⬜ in P1: richer resource/physical state, a real entity type system,
+> and fabula-time vs discourse-order separation.
 >
 > See `docs/decisions/0001-structured-state-delta.md`, `0002-promotion-audit-gate.md`,
-> `0003-tamper-evident-promotion.md`, `0004-executable-story-ir.md`, and the worked example in
-> `projects/salt-in-the-wire/`.
+> `0003-tamper-evident-promotion.md`, `0004-executable-story-ir.md`, `0005-predicate-ontology.md`,
+> and the worked example in `projects/salt-in-the-wire/`.
 
 ### Stage 0 — Make the scaffold honest (foundations)
 **Goal:** the checks that pass should mean something.

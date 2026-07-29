@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ontology.schema.json",
+  "type": "object",
+  "required": ["predicates"],
+  "properties": {
+    "predicates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "arity"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "arity": {"enum": ["unary", "binary"]},
+          "subject_types": {"type": "array", "items": {"type": "string"}},
+          "object_types": {"type": "array", "items": {"type": "string"}},
+          "relationship": {"type": "boolean"},
+          "description": {"type": "string"}
+        }
+      }
+    }
+  }
+}

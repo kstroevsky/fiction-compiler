@@ -24,6 +24,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+from .ontology import check_atom, load_ontology
 from .state import accepted_scene_ids, reconstruct_state_before, seed_state
 
 CHAR_ID = re.compile(r"^char-[a-z0-9-]+$")
@@ -109,6 +110,32 @@ def _atom_str(atom: dict) -> str:
     return f"{atom.get('predicate', '?')}({inside})"
 
 
+def _ontology_findings(ontology: dict, spec: dict, event_map: dict, scene_delta: dict) -> list[dict]:
+    """Every typed atom the scene touches must use a declared predicate at the right arity/type."""
+    findings: list[dict] = []
+
+    def check(context: str, predicate: str | None, subject: str | None, object: str | None) -> None:
+        for message in check_atom(ontology, predicate, subject, object):
+            findings.append(_finding("ontology", "material", f"{context}: {message}",
+                                     "Typed atom violates the predicate ontology (canon/ontology.json).", "world"))
+
+    for event_id in spec.get("required_events", []):
+        event = event_map.get(event_id)
+        if not event:
+            continue
+        for pre in event.get("preconditions", []):
+            if isinstance(pre, dict):
+                check(f"{event_id} precondition", pre.get("predicate"), pre.get("subject"), pre.get("object"))
+        for eff in event.get("effects", []):
+            if isinstance(eff, dict):
+                check(f"{event_id} effect", eff.get("predicate"), eff.get("subject"), eff.get("object"))
+    for change in scene_delta.get("predicate_changes", []):
+        check("delta predicate_changes", change.get("predicate"), change.get("subject"), change.get("object"))
+    for edge in scene_delta.get("relationship_edges", []):
+        check("delta relationship_edges", edge.get("dimension"), edge.get("subject"), edge.get("object"))
+    return findings
+
+
 def audit_scene(project: Path, scene_id: str) -> dict:
     """Per-scene spec checks that depend on the state reconstructed before it."""
     spec = _load_json(project / "scenes" / scene_id / "spec.json", {})
@@ -146,9 +173,10 @@ def audit_scene(project: Path, scene_id: str) -> dict:
                 "plot"))
 
     event_map = _events(project)
+    scene_delta = _load_delta(project, scene_id) or {}
     declared_effects = {
         (p.get("op"), p.get("predicate"), p.get("subject"), p.get("object"))
-        for p in (_load_delta(project, scene_id) or {}).get("predicate_changes", [])
+        for p in scene_delta.get("predicate_changes", [])
     }
     for event_id in spec.get("required_events", []):
         if not EVENT_ID.match(event_id):
@@ -175,6 +203,10 @@ def audit_scene(project: Path, scene_id: str) -> dict:
                     findings.append(_finding(
                         "causal", "material", f"{event_id} effect {_atom_str(eff)}",
                         "Event effect is declared but not recorded in this scene's state-delta predicate_changes.", "scene"))
+
+    ontology = load_ontology(project)
+    if ontology is not None:
+        findings.extend(_ontology_findings(ontology, spec, event_map, scene_delta))
 
     return {
         "candidate": scene_id,

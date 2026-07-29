@@ -111,6 +111,10 @@ def validate_projects(errors: list[str]) -> None:
         if data.get("id") != project.name:
             errors.append(f"{project.name}: project id must equal directory name")
 
+        ontology_path = project / "canon" / "ontology.json"
+        if ontology_path.exists():
+            check_schema(errors, ontology_path, read_json(ontology_path), "ontology")
+
         validate_characters(errors, project)
         validate_event_graph(errors, project)
         validate_scenes(errors, project)

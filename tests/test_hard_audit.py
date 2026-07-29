@@ -154,6 +154,61 @@ class HardAuditExecutableEventTests(unittest.TestCase):
             self.assertEqual(critique["verdict"], "pass")  # advisory only, does not block
 
 
+class HardAuditOntologyTests(unittest.TestCase):
+    """A declared predicate ontology turns a predicate typo into a material finding (P1 slice 2)."""
+
+    def _project(self, root: Path, precondition: dict, *, with_ontology: bool, world: str) -> Path:
+        project = base_project(root, ["ch01-sc01"])
+        write_json(project / "planning" / "event-graph.json",
+                   {"events": [{"id": "evt-relay-cut", "preconditions": [precondition], "effects": []}], "edges": []})
+        write(project / "canon" / "world-state.jsonl", world)
+        if with_ontology:
+            write_json(project / "canon" / "ontology.json", {"predicates": [
+                {"name": "located_at", "arity": "binary", "subject_types": ["char"], "object_types": ["loc"]},
+            ]})
+        write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+            "scene_id": "ch01-sc01", "time": 1, "facts_added": [], "facts_removed": [],
+            "knowledge_changes": [], "relationship_changes": [], "promises_opened": [], "promises_closed": [],
+        })
+        write_json(project / "scenes" / "ch01-sc01" / "spec.json", {
+            "id": "ch01-sc01", "pov": "char-mara", "participants": ["char-mara"],
+            "required_events": ["evt-relay-cut"], "knowledge_required": [],
+        })
+        return project
+
+    def test_typo_predicate_flagged_when_ontology_present(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            # 'located_att' is a typo; even though world-state would satisfy the intended predicate,
+            # the ontology has no such name.
+            world = json.dumps({"predicate": "located_att", "subject": "char-jonas", "object": "loc-station"}) + "\n"
+            project = self._project(Path(tmp),
+                                    {"predicate": "located_att", "subject": "char-jonas", "object": "loc-station"},
+                                    with_ontology=True, world=world)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertTrue(any(f["dimension"] == "ontology" for f in critique["findings"]), critique["findings"])
+            self.assertEqual(critique["verdict"], "revise")
+
+    def test_no_ontology_means_no_ontology_findings(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            # Same custom predicate, satisfied by world-state, but no ontology declared -> tolerated.
+            world = json.dumps({"predicate": "guards", "subject": "char-jonas", "object": "loc-station"}) + "\n"
+            project = self._project(Path(tmp),
+                                    {"predicate": "guards", "subject": "char-jonas", "object": "loc-station"},
+                                    with_ontology=False, world=world)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertFalse(any(f["dimension"] == "ontology" for f in critique["findings"]))
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+
+    def test_declared_predicate_passes_ontology(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            world = json.dumps({"predicate": "located_at", "subject": "char-jonas", "object": "loc-station"}) + "\n"
+            project = self._project(Path(tmp),
+                                    {"predicate": "located_at", "subject": "char-jonas", "object": "loc-station"},
+                                    with_ontology=True, world=world)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertFalse(any(f["dimension"] == "ontology" for f in critique["findings"]), critique["findings"])
+
+
 class HardAuditCanonTests(unittest.TestCase):
     def test_clean_canon_only_flags_nothing_material(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

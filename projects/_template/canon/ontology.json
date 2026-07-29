@@ -1,0 +1,11 @@
+{
+  "predicates": [
+    {"name": "knows", "arity": "binary", "subject_types": ["char"], "object_types": ["fact"], "description": "character knows a fact (bridges canon/knowledge-state.jsonl)"},
+    {"name": "located_at", "arity": "binary", "subject_types": ["char", "obj"], "object_types": ["loc"], "description": "an entity is at a location"},
+    {"name": "has_object", "arity": "binary", "subject_types": ["char"], "object_types": ["obj"], "description": "a character holds or owns an object"},
+    {"name": "available", "arity": "unary", "subject_types": ["obj"], "description": "an object is present and usable"},
+    {"name": "trusts", "arity": "binary", "subject_types": ["char"], "object_types": ["char"], "relationship": true, "description": "directional trust (a relationship dimension)"},
+    {"name": "owes", "arity": "binary", "subject_types": ["char"], "object_types": ["char"], "relationship": true, "description": "directional obligation or debt"},
+    {"name": "injured", "arity": "unary", "subject_types": ["char"], "description": "a character is injured"}
+  ]
+}
