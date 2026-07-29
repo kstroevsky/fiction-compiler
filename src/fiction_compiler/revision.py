@@ -91,6 +91,12 @@ def _compact(findings: list[dict]) -> list[dict]:
             for f in findings]
 
 
+def _waiver_index(waivers: list[dict] | None) -> dict[tuple[str, str], dict]:
+    """Index waivers by the finding fingerprint they excuse. Each waiver should carry a reason."""
+    return {(w.get("dimension", "?"), _normalize_evidence(w.get("evidence", ""))): w
+            for w in (waivers or [])}
+
+
 def tally(items: list[dict]) -> dict:
     findings = _flatten(items)
     by_severity = Counter(f.get("severity", "minor") for f in findings)
@@ -125,6 +131,7 @@ class RevisionOutcome:
     persisted_findings: list[dict] = field(default_factory=list)
     worsened_findings: list[dict] = field(default_factory=list)
     new_findings: list[dict] = field(default_factory=list)
+    waived_findings: list[dict] = field(default_factory=list)
 
     def counts(self, before: dict, after: dict) -> dict:
         return {
@@ -142,11 +149,14 @@ def evaluate_revision(
     max_iterations: int = 3,
     max_attempts_per_layer: int = 2,
     attempts_at_current_layer: int = 1,
+    waivers: list[dict] | None = None,
 ) -> RevisionOutcome:
     """Decide the fate of one revision against the previous version's critiques.
 
     ``target_dimension`` is the defect the revision was meant to fix (e.g. "defaultness",
     "knowledge"). If omitted, the target is the total count of serious (material+fatal) findings.
+    ``waivers`` are findings (by dimension + evidence) deliberately accepted with a reason; a waived
+    finding neither blocks acceptance nor counts as a regression.
     """
     b, a = tally(before), tally(after)
 
@@ -156,37 +166,46 @@ def evaluate_revision(
     else:
         target_before = b["fatal"] + b["material"]
         target_after = a["fatal"] + a["material"]
-    target_improved = target_after < target_before
 
-    dimensions = set(b["serious_by_dimension"]) | set(a["serious_by_dimension"])
-    regressions = sorted(
-        d for d in dimensions
-        if d != target_dimension and a["serious_by_dimension"].get(d, 0) > b["serious_by_dimension"].get(d, 0)
-    )
-    fixed = sorted(
-        d for d in dimensions
-        if a["serious_by_dimension"].get(d, 0) < b["serious_by_dimension"].get(d, 0)
-    )
     fatal_regressed = a["fatal"] > b["fatal"]
 
-    # Identity-based regression: a specific serious finding that did not exist before, or the same
-    # finding at a worse severity. This catches what counts miss — e.g. two minor findings replaced
-    # by one *new* material finding reads as "count went down" but is a regression.
+    # Regression and acceptance are judged by finding IDENTITY, not raw counts. A finding whose
+    # fingerprint matches a waiver is deliberately accepted (reason recorded) and neither blocks nor
+    # counts as a regression; everything else is judged by identity, so e.g. two minors replaced by
+    # one *new* material finding is a regression even though the raw count fell.
     diff = diff_findings(before, after)
-    new_serious = [f for f in diff["newly_introduced"] if f.get("severity") in _SERIOUS]
-    worsened_serious = [f for f in diff["worsened"] if f.get("severity") in _SERIOUS]
+    waiver_index = _waiver_index(waivers)
 
-    if fatal_regressed or regressions or new_serious or worsened_serious:
+    def _waived(finding: dict) -> bool:
+        return finding_fingerprint(finding) in waiver_index
+
+    new_serious = [f for f in diff["newly_introduced"] if f.get("severity") in _SERIOUS and not _waived(f)]
+    worsened_serious = [f for f in diff["worsened"] if f.get("severity") in _SERIOUS and not _waived(f)]
+    waived = [f for f in diff["newly_introduced"] + diff["worsened"] if _waived(f)]
+    regression_dims = sorted({f.get("dimension") for f in new_serious + worsened_serious})
+    fixed = sorted({f.get("dimension") for f in diff["fixed"] if f.get("severity") in _SERIOUS})
+
+    # Acceptance operates on issue IDENTITY: the target defect must have a finding actually resolved
+    # (by fingerprint) with no unwaived serious regression in that dimension.
+    if target_dimension:
+        target_fixed = [f for f in diff["fixed"] if f.get("dimension") == target_dimension]
+        target_regressed = [f for f in new_serious + worsened_serious if f.get("dimension") == target_dimension]
+        target_resolved = bool(target_fixed) and not target_regressed
+    else:
+        target_resolved = any(f.get("severity") in _SERIOUS for f in diff["fixed"]) \
+            and not new_serious and not worsened_serious
+
+    if fatal_regressed or new_serious or worsened_serious:
         decision = REJECT_REGRESSION
-        where = list(regressions)
-        where += [f"new {f.get('severity')} {f.get('dimension')}" for f in new_serious]
+        where = [f"new {f.get('severity')} {f.get('dimension')}" for f in new_serious]
         where += [f"worsened {f.get('dimension')}" for f in worsened_serious]
         if fatal_regressed and not where:
             where = ["fatal count"]
         reason = f"revision caused a material/fatal regression by identity in {where}; do not accept"
-    elif a["fatal"] == 0 and target_improved:
+    elif a["fatal"] == 0 and target_resolved:
         label = target_dimension or "serious findings"
-        reason = f"target '{label}' improved {target_before}->{target_after}, no regressions, no fatals"
+        waived_note = f" ({len(waived)} waived)" if waived else ""
+        reason = f"target '{label}' resolved by identity ({target_before}->{target_after} count), no unwaived regressions{waived_note}"
         decision = ACCEPT
     elif iteration >= max_iterations:
         decision = STOP_NO_PROGRESS
@@ -208,12 +227,14 @@ def evaluate_revision(
         fatals_after=a["fatal"],
         target_before=target_before,
         target_after=target_after,
-        material_regressions=regressions,
+        material_regressions=regression_dims,
         fixed_dimensions=fixed,
         fixed_findings=_compact(diff["fixed"]),
         persisted_findings=_compact(diff["persisted"]),
         worsened_findings=_compact(diff["worsened"]),
         new_findings=_compact(diff["newly_introduced"]),
+        waived_findings=[{**_compact([f])[0], "reason": waiver_index[finding_fingerprint(f)].get("reason")}
+                         for f in waived],
     )
 
 

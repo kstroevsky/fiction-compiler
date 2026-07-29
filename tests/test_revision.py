@@ -119,6 +119,32 @@ class IdentityDecisionTests(unittest.TestCase):
         self.assertEqual(outcome.decision, revision.ACCEPT)
         self.assertEqual([f["dimension"] for f in outcome.fixed_findings], ["cliche"])
 
+    def test_no_identity_fix_of_target_does_not_accept(self) -> None:
+        # The target finding merely PERSISTS (same fingerprint, unchanged) — nothing resolved by
+        # identity, so acceptance must not trigger even though there is no regression.
+        same = [{"findings": [_fe("cliche", "material", "heart pounded")]}]
+        outcome = revision.evaluate_revision(same, same, target_dimension="cliche",
+                                             iteration=1, attempts_at_current_layer=1)
+        self.assertNotEqual(outcome.decision, revision.ACCEPT)
+
+
+class WaiverTests(unittest.TestCase):
+    def test_waived_new_finding_does_not_block_acceptance(self) -> None:
+        before = [{"findings": [_fe("cliche", "material", "heart pounded")]}]
+        after = [{"findings": [_fe("style", "material", "a deliberate genre flourish")]}]  # new material
+        waivers = [{"dimension": "style", "evidence": "a deliberate genre flourish",
+                    "reason": "genre obligation", "approved_by": "human"}]
+        outcome = revision.evaluate_revision(before, after, target_dimension="cliche", waivers=waivers)
+        self.assertEqual(outcome.decision, revision.ACCEPT)
+        self.assertEqual([f["dimension"] for f in outcome.waived_findings], ["style"])
+        self.assertEqual(outcome.waived_findings[0]["reason"], "genre obligation")
+
+    def test_without_the_waiver_the_same_revision_is_rejected(self) -> None:
+        before = [{"findings": [_fe("cliche", "material", "heart pounded")]}]
+        after = [{"findings": [_fe("style", "material", "a deliberate genre flourish")]}]
+        outcome = revision.evaluate_revision(before, after, target_dimension="cliche")
+        self.assertEqual(outcome.decision, revision.REJECT_REGRESSION)
+
 
 if __name__ == "__main__":
     unittest.main()

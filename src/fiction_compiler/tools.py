@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
-from . import defaultness, hard_audit, kb, revision
+from . import defaultness, hard_audit, kb, regression, revision
 from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
@@ -88,11 +88,13 @@ def evaluate_revision(
     attempts_at_current_layer: int = 1,
     max_iterations: int = 3,
     max_attempts_per_layer: int = 2,
+    waivers: list | None = None,
 ) -> dict:
     outcome = revision.evaluate_revision(
         before_findings, after_findings, target_dimension=target,
         iteration=iteration, attempts_at_current_layer=attempts_at_current_layer,
         max_iterations=max_iterations, max_attempts_per_layer=max_attempts_per_layer,
+        waivers=waivers,
     )
     return {
         "decision": outcome.decision,
@@ -106,6 +108,7 @@ def evaluate_revision(
         "persisted": outcome.persisted_findings,
         "worsened": outcome.worsened_findings,
         "newly_introduced": outcome.new_findings,
+        "waived": outcome.waived_findings,
     }
 
 
@@ -198,6 +201,16 @@ def tournament(project: str, scene_id: str, seed: int = 0, persist: bool = False
     return record
 
 
+def run_regression() -> dict:
+    """Run the framework regression fixtures (the FRAMEWORK loop's deterministic CHECK).
+
+    Returns pass/fail for each pinned invariant plus a framework fingerprint. Run before/after any
+    change to a prompt, rubric, schema, or the deterministic code; a failure means an invariant
+    regressed and the change must be rejected or rolled back.
+    """
+    return regression.run_regressions()
+
+
 def assemble(project: str) -> dict:
     """Stitch the accepted scenes into one manuscript.md and return its path + word count."""
     return _assemble(project_dir(project))
@@ -253,7 +266,8 @@ TOOLS: list[dict] = [
           "/ attempts_at_current_layer to reach the ESCALATE_LAYER and STOP_NO_PROGRESS decisions.",
           {"before_findings": {"type": "array"}, "after_findings": {"type": "array"}, "target": {"type": "string"},
            "iteration": {"type": "integer"}, "attempts_at_current_layer": {"type": "integer"},
-           "max_iterations": {"type": "integer"}, "max_attempts_per_layer": {"type": "integer"}},
+           "max_iterations": {"type": "integer"}, "max_attempts_per_layer": {"type": "integer"},
+           "waivers": {"type": "array"}},
           ["before_findings", "after_findings"], evaluate_revision),
     _tool("record_revision",
           "Run one revision iteration for a scene: lint the before/after candidates, derive iteration "
@@ -286,6 +300,12 @@ TOOLS: list[dict] = [
           "Stitch the accepted (promoted) scenes into a single manuscript.md, in fabula order, "
           "with title and chapter/scene breaks. Returns the path and word count.",
           {"project": {"type": "string"}}, ["project"], assemble),
+    _tool("run_regression",
+          "Run the FRAMEWORK regression fixtures — the deterministic invariants the ADRs pinned "
+          "(defaultness, revision identity, tournament selection, ontology). Returns pass/fail per "
+          "fixture plus a framework fingerprint. Run before/after changing a prompt, rubric, schema, "
+          "or the deterministic code; any failure means an invariant regressed.",
+          {}, [], run_regression),
 ]
 
 _BY_NAME: dict[str, dict] = {t["name"]: t for t in TOOLS}

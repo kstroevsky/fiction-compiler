@@ -146,14 +146,25 @@ test, not just a feature.
 > **Revision loop now diffs by finding identity (ADR 0009, P3 slice 1).** `evaluate_revision` gives
 > each finding a fingerprint (dimension + normalized evidence) and classifies fixed / persisted /
 > worsened / newly-introduced, so a *new* material finding is rejected even when the raw count falls
-> (the review's two-minors→one-material trap). Still ⬜ in P3: fingerprint-based *acceptance* trigger,
-> and rerunning prose-reading audits (blocked on the hard audit reading prose, review §4).
+> (the review's two-minors→one-material trap). Slice 2 (ADR 0010) makes **acceptance** itself
+> identity-based (the target finding must be resolved by fingerprint, not merely by a lower count) and
+> adds **waivers** (a human-approved finding, with a recorded reason, that no longer blocks). Still ⬜
+> in P3: rerunning prose-reading audits (blocked on the hard audit reading prose, review §4).
+>
+> **Framework loop now has a regression harness (ADR 0011, P5 slice 1).** `scripts/run_regression.py`
+> + the `run_regression` tool run fixed fixtures (`regression/fixtures.json`) that pin the invariants
+> the ADRs established — defaultness, the revision traps + waiver, tournament select/defer, ontology
+> typo — through a closed check whitelist, and report a **framework fingerprint** (schemas + KB index
+> + package source). A change to a prompt/rubric/schema/code that regresses an invariant fails the
+> run (non-zero exit). Still ⬜ in P5: fingerprinting prompt/agent files + model params, and
+> automating the threshold/approval/rollback workflow around the runner.
 >
 > See `docs/decisions/0001-structured-state-delta.md`, `0002-promotion-audit-gate.md`,
 > `0003-tamper-evident-promotion.md`, `0004-executable-story-ir.md`, `0005-predicate-ontology.md`,
 > `0006-fabula-vs-discourse.md`, `0007-tournament-selection-engine.md`,
-> `0008-tournament-judges-and-evidence.md`, `0009-revision-by-finding-identity.md`, and the worked example in
-> `projects/salt-in-the-wire/`.
+> `0008-tournament-judges-and-evidence.md`, `0009-revision-by-finding-identity.md`,
+> `0010-revision-acceptance-by-identity-and-waivers.md`, `0011-framework-regression-harness.md`,
+> and the worked example in `projects/salt-in-the-wire/`.
 
 ### Stage 0 — Make the scaffold honest (foundations)
 **Goal:** the checks that pass should mean something.

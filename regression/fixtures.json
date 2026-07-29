@@ -1,0 +1,85 @@
+{
+  "_comment": "Fixed framework-regression fixtures. Each pins a deterministic invariant an ADR established. Run with scripts/run_regression.py; a failure means a framework change regressed an invariant and must be rejected or rolled back.",
+  "fixtures": [
+    {
+      "name": "defaultness catches a stock cliché (ADR pre-0004 linter)",
+      "check": "defaultness_verdict",
+      "input": {"text": "Her heart pounded and time stood still as little did she know."},
+      "expect": "revise"
+    },
+    {
+      "name": "defaultness passes concrete, unhedged prose",
+      "check": "defaultness_verdict",
+      "input": {"text": "The relay lay open, two wires bright against the salt."},
+      "expect": "pass"
+    },
+    {
+      "name": "revision rejects the count-drop trap: 2 minors -> 1 new material (ADR 0009)",
+      "check": "revision_decision",
+      "input": {
+        "before": [{"findings": [
+          {"dimension": "cliche", "severity": "minor", "evidence": "heart pounded"},
+          {"dimension": "cliche", "severity": "minor", "evidence": "time stood still"}]}],
+        "after": [{"findings": [
+          {"dimension": "cliche", "severity": "material", "evidence": "a wholly new default"}]}],
+        "target": "cliche"
+      },
+      "expect": "reject_regression"
+    },
+    {
+      "name": "revision accepts a clean, identity-resolved target fix (ADR 0009)",
+      "check": "revision_decision",
+      "input": {
+        "before": [{"findings": [{"dimension": "cliche", "severity": "material", "evidence": "heart pounded"}]}],
+        "after": [{"findings": []}],
+        "target": "cliche"
+      },
+      "expect": "accept"
+    },
+    {
+      "name": "revision accepts a waived deliberate regression (ADR 0009)",
+      "check": "revision_decision",
+      "input": {
+        "before": [{"findings": [{"dimension": "cliche", "severity": "material", "evidence": "heart pounded"}]}],
+        "after": [{"findings": [{"dimension": "style", "severity": "material", "evidence": "a deliberate genre flourish"}]}],
+        "target": "cliche",
+        "waivers": [{"dimension": "style", "evidence": "a deliberate genre flourish", "reason": "genre obligation", "approved_by": "human"}]
+      },
+      "expect": "accept"
+    },
+    {
+      "name": "tournament defers a genuine style-vs-cliche tradeoff (ADR 0007)",
+      "check": "tournament_decision",
+      "input": {"critiques": [
+        {"candidate": "a.md", "findings": [{"dimension": "style", "severity": "material"}]},
+        {"candidate": "b.md", "findings": [{"dimension": "cliche", "severity": "material"}]}]},
+      "expect": "human_decision_required"
+    },
+    {
+      "name": "tournament selects a clean dominator (ADR 0007)",
+      "check": "tournament_decision",
+      "input": {"critiques": [
+        {"candidate": "a.md", "findings": []},
+        {"candidate": "b.md", "findings": [{"dimension": "cliche", "severity": "material"}]}]},
+      "expect": "select"
+    },
+    {
+      "name": "ontology rejects a predicate typo (ADR 0005)",
+      "check": "ontology_valid",
+      "input": {
+        "ontology": {"predicates": [{"name": "located_at", "arity": "binary", "subject_types": ["char"], "object_types": ["loc"]}]},
+        "atom": {"predicate": "located_att", "subject": "char-jonas", "object": "loc-station"}
+      },
+      "expect": false
+    },
+    {
+      "name": "ontology accepts a declared, well-typed atom (ADR 0005)",
+      "check": "ontology_valid",
+      "input": {
+        "ontology": {"predicates": [{"name": "located_at", "arity": "binary", "subject_types": ["char"], "object_types": ["loc"]}]},
+        "atom": {"predicate": "located_at", "subject": "char-jonas", "object": "loc-station"}
+      },
+      "expect": true
+    }
+  ]
+}
