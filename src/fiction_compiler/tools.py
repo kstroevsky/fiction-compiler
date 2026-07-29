@@ -9,6 +9,7 @@ Every handler returns a JSON-serialisable dict. Keep them pure and cheap.
 """
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any, Callable
 
@@ -17,6 +18,7 @@ from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
 from .state import StoryState, accepted_scene_ids, reconstruct_state_before
+from .tournament import run_tournament
 from .workspace import confine_file, confine_project, project_dir
 
 
@@ -152,6 +154,25 @@ def promote(project: str, scene_id: str, candidate_file: str, confirm: bool = Fa
         return {"error": str(exc)}
 
 
+def tournament(project: str, scene_id: str, seed: int = 0) -> dict:
+    """Blind, Pareto-scored selection over a scene's candidates from their committed critiques.
+
+    Reads ``scenes/<scene_id>/critiques/*.json`` and returns blinded labels, presentation orders
+    (forward + reversed), per-candidate multidimensional scores, the non-dominated (Pareto) set,
+    per-dimension winners, whether the judges disagree, and a recommendation. The code owns
+    anonymization/ordering/selection so blind A/B is guaranteed, not merely requested.
+    """
+    crit_dir = project_dir(project) / "scenes" / scene_id / "critiques"
+    critiques: list[dict] = []
+    if crit_dir.exists():
+        for path in sorted(crit_dir.glob("*.json")):
+            try:
+                critiques.append(json.loads(path.read_text(encoding="utf-8")))
+            except json.JSONDecodeError:
+                pass
+    return run_tournament(critiques, seed=seed)
+
+
 def assemble(project: str) -> dict:
     """Stitch the accepted scenes into one manuscript.md and return its path + word count."""
     return _assemble(project_dir(project))
@@ -225,6 +246,14 @@ TOOLS: list[dict] = [
           {"project": {"type": "string"}, "scene_id": {"type": "string"},
            "candidate_file": {"type": "string"}, "confirm": {"type": "boolean"}},
           ["project", "scene_id", "candidate_file"], promote),
+    _tool("tournament",
+          "Run a blind, Pareto-scored tournament over a scene's candidates from their critiques. "
+          "Returns blinded labels + reveal map, forward/reversed presentation orders, per-candidate "
+          "multidimensional scores, the non-dominated (Pareto) set, per-dimension winners, a "
+          "disagreement flag, and a recommendation (select when one candidate dominates, else "
+          "human_decision_required). Do NOT show the reveal_map to judge agents.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"}, "seed": {"type": "integer"}},
+          ["project", "scene_id"], tournament),
     _tool("assemble",
           "Stitch the accepted (promoted) scenes into a single manuscript.md, in fabula order, "
           "with title and chapter/scene breaks. Returns the path and word count.",

@@ -127,12 +127,24 @@ test, not just a feature.
 > finding, turning the event graph from descriptive into checkable. An optional per-project
 > **predicate ontology** (`canon/ontology.json`, ADR 0005) declares legal predicates + arity + entity
 > types, so a typo like `located_att` is caught as a material finding instead of silently becoming an
-> unsatisfiable predicate. Still ⬜ in P1: richer resource/physical state, a real entity type system,
-> and fabula-time vs discourse-order separation.
+> unsatisfiable predicate. Fabula vs discourse are now distinct (ADR 0006): scene id is discourse
+> (reading) order, `delta.time` is fabula (event) time, and a scene's optional `narrative_mode`
+> (analepsis/prolepsis) marks a deliberate divergence so a flashback is no longer flagged as "time
+> runs backward". Still ⬜ in P1: richer resource/physical state, a real entity type system, and
+> fabula-**ordered** state reconstruction (a flashback still replays in discourse order today).
+>
+> **Selection engine exists (ADR 0007, P2 slice 1).** A deterministic `tournament` module + MCP tool
+> owns the fairness machinery the contract requires: seeded anonymization (blinded labels + reveal
+> map), forward/reversed presentation orders, per-candidate *multidimensional* penalty scores from
+> critiques, a **Pareto** non-dominated set (never collapsed to one number), per-dimension winners,
+> and a disagreement flag. It recommends `select` only when one candidate dominates, else
+> `human_decision_required` over the tradeoff. Still ⬜ in P2: ingesting LLM judge scores/pairwise
+> rankings, a judge-isolation ledger, and writing blinded copies + tournament records to `.runs/`.
 >
 > See `docs/decisions/0001-structured-state-delta.md`, `0002-promotion-audit-gate.md`,
 > `0003-tamper-evident-promotion.md`, `0004-executable-story-ir.md`, `0005-predicate-ontology.md`,
-> and the worked example in `projects/salt-in-the-wire/`.
+> `0006-fabula-vs-discourse.md`, `0007-tournament-selection-engine.md`, and the worked example in
+> `projects/salt-in-the-wire/`.
 
 ### Stage 0 — Make the scaffold honest (foundations)
 **Goal:** the checks that pass should mean something.
