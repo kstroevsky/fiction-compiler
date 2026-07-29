@@ -238,6 +238,38 @@ class HardAuditCanonTests(unittest.TestCase):
             self.assertIn("knowledge", dims)   # learned a fact that does not exist
             self.assertEqual(critique["verdict"], "revise")
 
+    def test_flashback_marked_analepsis_is_not_backward_time(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01", "ch01-sc02"])
+            # sc01 is the present (time 5); sc02 is a flashback to time 1.
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": 5, "facts_added": [], "facts_removed": [],
+                "knowledge_changes": [], "relationship_changes": [], "promises_opened": [], "promises_closed": [],
+            })
+            write_json(project / "scenes" / "ch01-sc02" / "state-delta.json", {
+                "scene_id": "ch01-sc02", "time": 1, "facts_added": [], "facts_removed": [],
+                "knowledge_changes": [], "relationship_changes": [], "promises_opened": [], "promises_closed": [],
+            })
+            write_json(project / "scenes" / "ch01-sc02" / "spec.json", {
+                "id": "ch01-sc02", "narrative_mode": "analepsis", "required_events": [],
+            })
+            critique = hard_audit.audit_canon(project)
+            self.assertFalse(any(f["dimension"] == "temporal" for f in critique["findings"]), critique["findings"])
+
+    def test_backward_time_in_linear_narration_still_flagged(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01", "ch01-sc02"])
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": 5, "facts_added": [], "facts_removed": [],
+                "knowledge_changes": [], "relationship_changes": [], "promises_opened": [], "promises_closed": [],
+            })
+            write_json(project / "scenes" / "ch01-sc02" / "state-delta.json", {
+                "scene_id": "ch01-sc02", "time": 1, "facts_added": [], "facts_removed": [],
+                "knowledge_changes": [], "relationship_changes": [], "promises_opened": [], "promises_closed": [],
+            })  # no narrative_mode -> linear -> backward time is a contradiction
+            critique = hard_audit.audit_canon(project)
+            self.assertTrue(any(f["dimension"] == "temporal" for f in critique["findings"]))
+
     def test_open_promise_reported_as_minor(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project = base_project(Path(tmp), ["ch01-sc01"])

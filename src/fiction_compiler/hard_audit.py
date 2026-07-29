@@ -80,6 +80,12 @@ def _load_delta(project: Path, scene_id: str) -> dict | None:
     return _load_json(project / "scenes" / scene_id / "state-delta.json", None)
 
 
+def _narrative_mode(project: Path, scene_id: str) -> str:
+    """Discourse/fabula relation of a scene: linear (default), analepsis (flashback), prolepsis."""
+    mode = _load_json(project / "scenes" / scene_id / "spec.json", {}).get("narrative_mode", "linear")
+    return mode if mode in ("linear", "analepsis", "prolepsis") else "linear"
+
+
 def _character_ids(project: Path) -> set[str]:
     ids: set[str] = set()
     for path in (project / "canon" / "characters").glob("*.json"):
@@ -250,14 +256,20 @@ def audit_canon(project: Path) -> dict:
                 findings.append(_finding("promise", "material", f"{scene_id} closes {promise_id!r}",
                                          "Delta pays off a promise that was never opened.", "plot"))
 
+        # Chronology is checked along the LINEAR (discourse == fabula) thread only. A scene marked
+        # analepsis/prolepsis is a deliberate divergence: it neither trips the backward-time rule nor
+        # advances the linear clock (so a flashback between two present scenes is not a contradiction).
         current_time = delta.get("time")
-        if current_time is not None and prev_time is not None:
-            comparison = _compare_time(prev_time, current_time)
-            if comparison is not None and comparison > 0:
-                findings.append(_finding(
-                    "temporal", "material",
-                    f"{scene_id}: time {current_time!r} precedes previous {prev_time!r}",
-                    "Story time runs backward across accepted scenes (encode flashbacks explicitly).", "plot"))
+        mode = _narrative_mode(project, scene_id)
+        if mode == "linear":
+            if current_time is not None and prev_time is not None:
+                comparison = _compare_time(prev_time, current_time)
+                if comparison is not None and comparison > 0:
+                    findings.append(_finding(
+                        "temporal", "material",
+                        f"{scene_id}: time {current_time!r} precedes previous {prev_time!r}",
+                        "Story time runs backward in linear narration; mark a deliberate flashback "
+                        "with narrative_mode 'analepsis'.", "plot"))
 
         # Apply the delta to the running shadow state.
         for fact in delta.get("facts_added", []):
@@ -270,7 +282,7 @@ def audit_canon(project: Path) -> dict:
             open_promises[promise["id"]] = promise["text"]
         for promise_id in delta.get("promises_closed", []):
             open_promises.pop(promise_id, None)
-        if current_time is not None:
+        if current_time is not None and mode == "linear":
             prev_time = current_time
 
     for promise_id, text in sorted(open_promises.items()):

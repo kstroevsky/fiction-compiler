@@ -6,12 +6,15 @@ replay it. This module is the keystone the hard audits and the context compiler 
 on: it answers "what is true, and who knows what, *before* scene X" — deterministically,
 and without letting a fact a later scene introduces leak backward.
 
-Fabula ordering
----------------
-Scene ids are zero-padded ``chNN-scNN`` and sort lexicographically into reading order,
-which for a linear story equals fabula (chronological) order. v1 uses id order as fabula
-order. Non-linear timelines (flashbacks) must carry an explicit ``time`` in each delta;
-the chronology audit consumes that. This limit is recorded in ADR 0001.
+Discourse vs fabula
+-------------------
+Three identifiers are distinct (per the design review): the **scene id** is repository identity
+*and* discourse (reading) order; each delta's **time** is fabula (event) time — when it happens in
+the story; and a scene spec's **narrative_mode** (linear / analepsis / prolepsis) marks a deliberate
+divergence between the two. Reconstruction still *replays* in scene-id (discourse) order; the
+chronology audit checks fabula time along the linear thread only, so a flashback (analepsis) does not
+read as "time running backward" (ADR 0006). Fabula-ordered state reconstruction — showing a flashback
+only what was true at its earlier fabula time — remains a deferred refinement (see ADR 0001).
 """
 from __future__ import annotations
 

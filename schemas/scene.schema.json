@@ -6,6 +6,7 @@
   "properties": {
     "id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
     "chapter": {"type": "string"},
+    "narrative_mode": {"enum": ["linear", "analepsis", "prolepsis"], "comment": "Discourse vs fabula: scene id is discourse (reading) order; delta.time is fabula (event) time. 'analepsis' (flashback) / 'prolepsis' (flash-forward) mark a deliberate divergence so the chronology audit does not flag them as backward time. Absent = linear."},
     "pov": {"type": "string"},
     "participants": {"type": "array", "items": {"type": "string"}},
     "purpose": {"type": "array", "items": {"type": "string"}},
