@@ -46,7 +46,9 @@ python3 scripts/promote_candidate.py    projects/my-novel ch01-sc01 candidate-a.
 
 ## Deterministic engine (`src/fiction_compiler/`)
 
-The pipeline shifts as much judgment as possible off the LLM and onto code:
+The LLM is the author; this engine is its tooling — reference it reaches for, guardrails that
+catch mechanical failures (continuity, forgotten promises, default phrasing) so the model spends
+its judgment on the creative core. It handles the *checkable*, never the creative:
 
 - **`schema.py`** — dependency-free JSON-Schema validation; `validate_workspace.py` enforces
   every typed artifact against `schemas/` (schemas are no longer decorative).

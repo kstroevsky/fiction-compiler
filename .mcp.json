@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "fiction-compiler": {
+      "command": "python3",
+      "args": ["scripts/fiction_mcp.py"]
+    }
+  }
+}

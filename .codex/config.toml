@@ -3,6 +3,12 @@ enabled = true
 max_concurrent_threads_per_session = 6
 default_subagent_reasoning_effort = "high"
 
+# The fiction-compiler tool surface (KB retrieval, event-sourced state, hard audit, defaultness
+# linter, revision evaluator) exposed to the agent over MCP. Dependency-free stdio server.
+[mcp_servers.fiction-compiler]
+command = "python3"
+args = ["scripts/fiction_mcp.py"]
+
 # Skills are stored in Claude's project skill directory but use the shared Agent Skills format.
 [[skills.config]]
 path = ".claude/skills/bootstrap-story/SKILL.md"
@@ -18,6 +24,10 @@ enabled = true
 
 [[skills.config]]
 path = ".claude/skills/draft-scene/SKILL.md"
+enabled = true
+
+[[skills.config]]
+path = ".claude/skills/avoid-defaults/SKILL.md"
 enabled = true
 
 [[skills.config]]

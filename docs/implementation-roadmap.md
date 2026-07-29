@@ -102,6 +102,12 @@ test, not just a feature.
 > per-scene `revision-log.jsonl`) — this is the manuscript's own improvement loop. The **framework**
 > PDCA loop (Stage 5) still has only the `retrospective` skill + `change-policy`; its
 > regression-fixture runner and run-manifest observability remain ⬜. Stage 6 (GUI) ⬜.
+> **Tools for the author.** The deterministic engine is exposed to the LLM as callable tools via
+> a dependency-free MCP server (`scripts/fiction_mcp.py`, wired in `.mcp.json` and `.codex/config.toml`):
+> `kb_search`/`kb_get`, `state_before`, `compile_context`, `hard_audit`, `defaultness_lint`,
+> `evaluate_revision`. Plus the `avoid-defaults` anti-obviousness skill (LLM-facing craft, not code).
+> The engine equips the author; it does not replace the creative act. See `docs/mcp-and-tools.md`.
+>
 > See `docs/decisions/0001-structured-state-delta.md` and the worked example in
 > `projects/salt-in-the-wire/`.
 
