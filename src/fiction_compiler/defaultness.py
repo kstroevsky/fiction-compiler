@@ -12,6 +12,7 @@ downward when the tic is a symptom of a deeper default. Output conforms to criti
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -125,11 +126,15 @@ def _verdict(findings: list[dict]) -> str:
 
 
 def lint_file(path: Path) -> dict:
-    text = Path(path).read_text(encoding="utf-8")
-    findings = lint_text(text)
+    raw = Path(path).read_bytes()
+    findings = lint_text(raw.decode("utf-8"))
     return {
         "candidate": Path(path).name,
+        # Bind the critique to the exact bytes linted, so the promotion gate can trust it as
+        # candidate-bound evidence for the defaultness class (see promote.evaluate_audit_gate).
+        "candidate_sha256": hashlib.sha256(raw).hexdigest(),
         "critic": "defaultness-lint",
+        "audit_class": "defaultness",
         "verdict": _verdict(findings),
         "confidence": 0.7,
         "findings": findings,

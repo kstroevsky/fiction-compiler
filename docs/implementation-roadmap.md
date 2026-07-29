@@ -29,7 +29,7 @@ code carries almost none of that load.
 | Workspace validation | `scripts/validate_workspace.py` (90 lines) | **Structural only** | Checks id↔dirname, dup ids, delta-exists-if-promoted. No schema, no narrative constraints |
 | Minimal context compilation | `scripts/compile_scene_context.py` (56 lines) | **No** — it's a file concatenator | Statically dumps planning files; no state replay, no relevance filter, no knowledge cutoff |
 | Event-sourced canon / `reconstruct_state_before` | `canon/*.jsonl` templates | **No** — the keystone primitive is absent | No code folds deltas/ledgers into a point-in-time state |
-| Candidate promotion + `append_state_delta` | `src/fiction_compiler/promote.py` | **Yes**, and the triple-audit gate is now **enforced** (ADR 0002) — clean hard+literary+defaultness critiques that judge *this* candidate, or promotion refuses before any write | `evaluate_audit_gate`; committed examples retained as negative fixtures in `tests/test_promote.py`. Content-hash/atomicity/path-confinement still ⬜ (deferred slice) |
+| Candidate promotion + `append_state_delta` | `src/fiction_compiler/promote.py`, `integrity.py` | **Yes**, gate **enforced** (ADR 0002) and promotion **tamper-evident + atomic + confined** (ADR 0003) — candidate-bound hashes, an acceptance manifest with a canon hash chain, `os.replace` under a lock with rollback, and MCP path confinement | `evaluate_audit_gate` + `verify_canon`; committed examples retained as negative fixtures. Immutable *acceptance signatures* / human-gate identity still ⬜ |
 | Audit 1 — hard/symbolic (as code) | `triple-audit` skill | **No** — delegated to an LLM subagent | Skill step 2 hands continuity to `continuity-auditor` agent; brief says this must be code |
 | Audit 2/3 — literary + defaultness | 5 agent defs + skill | **As prose** (LLM personas) | `.claude/agents/*.md`, `.codex/agents/*.toml` — reasonable, but unverified by code |
 | Blind tournament / judge-bias mitigation | described in skill | **No code** | Anonymization/order-reversal/disagreement are instructions, not a harness |
@@ -108,16 +108,19 @@ test, not just a feature.
 > `evaluate_revision`. Plus the `avoid-defaults` anti-obviousness skill (LLM-facing craft, not code).
 > The engine equips the author; it does not replace the creative act. See `docs/mcp-and-tools.md`.
 >
-> **Promotion is now gated (ADR 0002).** The triple-audit protocol is *enforced* in code, not just
-> documented: a candidate promotes only when clean hard, literary, and defaultness critiques that
-> judge that exact candidate exist; a non-`pass` verdict, a `material`/`fatal` finding, or evidence
-> that judged a different candidate blocks it, before any write. The committed `salt-in-the-wire` and
-> `verbatim` examples predate this and now fail their own gate by design — retained as negative
-> regression fixtures. Content-hash binding, an immutable acceptance manifest, atomic writes, and MCP
-> path confinement remain ⬜ for the next slice.
+> **Promotion is now gated (ADR 0002) and tamper-evident (ADR 0003).** The triple-audit protocol is
+> *enforced* in code: a candidate promotes only when clean hard, literary, and defaultness critiques
+> that judge *that exact candidate* (bound by `candidate_sha256`) exist; a non-`pass` verdict, a
+> `material`/`fatal` finding, a wrong/absent hash, or evidence judging a different candidate blocks it,
+> before any write. Promotion writes an acceptance manifest with a canon hash chain (`parent`→
+> `resulting`), so editing an accepted delta is detected by `verify_canon` (run in `validate_workspace`);
+> the three writes commit atomically under a project lock with rollback; and MCP-supplied paths are
+> confined to approved roots. The committed `salt-in-the-wire` and `verbatim` examples predate this and
+> now fail their own gate by design — retained as negative regression fixtures. Remaining P0 (⬜):
+> immutable acceptance *signatures* / human-gate identity.
 >
-> See `docs/decisions/0001-structured-state-delta.md`, `docs/decisions/0002-promotion-audit-gate.md`,
-> and the worked example in `projects/salt-in-the-wire/`.
+> See `docs/decisions/0001-structured-state-delta.md`, `0002-promotion-audit-gate.md`,
+> `0003-tamper-evident-promotion.md`, and the worked example in `projects/salt-in-the-wire/`.
 
 ### Stage 0 — Make the scaffold honest (foundations)
 **Goal:** the checks that pass should mean something.

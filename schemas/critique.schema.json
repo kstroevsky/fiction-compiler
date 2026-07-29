@@ -5,6 +5,7 @@
   "required": ["candidate", "critic", "verdict", "findings", "confidence"],
   "properties": {
     "candidate": {"type": "string"},
+    "candidate_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "critic": {"type": "string"},
     "audit_class": {"enum": ["hard", "literary", "defaultness"]},
     "verdict": {"enum": ["pass", "revise", "reject", "uncertain"]},

@@ -64,6 +64,19 @@ class ToolDispatchTests(unittest.TestCase):
         self.assertIn("error", out)
         self.assertIn("confirm", out["error"])
 
+    def test_call_tool_rejects_project_path_traversal(self) -> None:
+        out = tools.call_tool("state_before", {"project": "../../etc", "scene_id": "ch01-sc01"})
+        self.assertIn("error", out)
+
+    def test_call_tool_rejects_absolute_project_outside_root(self) -> None:
+        out = tools.call_tool("assemble", {"project": "/etc"})
+        self.assertIn("error", out)
+        self.assertIn("approved root", out["error"])
+
+    def test_call_tool_rejects_file_path_escape(self) -> None:
+        out = tools.call_tool("defaultness_lint", {"path": "/etc/passwd"})
+        self.assertIn("error", out)
+
     def test_evaluate_revision_reaches_escalate_via_params(self) -> None:
         no_progress = [{"findings": [{"dimension": "defaultness", "severity": "material"}]}]
         out = tools.call_tool("evaluate_revision", {

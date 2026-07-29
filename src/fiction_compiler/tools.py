@@ -17,7 +17,7 @@ from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
 from .state import StoryState, accepted_scene_ids, reconstruct_state_before
-from .workspace import project_dir
+from .workspace import confine_file, confine_project, project_dir
 
 
 def _state_json(state: StoryState) -> dict:
@@ -240,4 +240,14 @@ def call_tool(name: str, arguments: dict[str, Any] | None) -> dict:
     tool = _BY_NAME.get(name)
     if tool is None:
         return {"error": f"unknown tool {name!r}"}
-    return tool["handler"](**(arguments or {}))
+    args = dict(arguments or {})
+    # MCP boundary: confine agent-supplied paths to approved roots before dispatch. In-process
+    # callers (tests, CLI) call the handlers directly and are trusted; only the wire goes here.
+    try:
+        if isinstance(args.get("project"), str):
+            confine_project(args["project"])
+        if isinstance(args.get("path"), str):
+            confine_file(args["path"])
+    except ValueError as exc:
+        return {"error": str(exc)}
+    return tool["handler"](**args)

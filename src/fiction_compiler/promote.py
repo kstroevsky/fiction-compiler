@@ -21,11 +21,10 @@ ADR for the immutable-manifest slice). It closes the *enforcement* hole first.
 from __future__ import annotations
 
 import json
-import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
-from . import schema
+from . import integrity, schema
 from .state import scene_sort_key
 
 # --- Audit gate ------------------------------------------------------------------------------
@@ -103,12 +102,20 @@ def _collect_binding(loaded: list[tuple[str, dict | None, str | None]],
     return binding, parse_errors
 
 
+def _is_scene_level_hard(critique: dict, cls: str | None, scene_id: str) -> bool:
+    """The hard audit is candidate-independent: its `candidate` is the scene id, not a prose file."""
+    return cls == "hard" and str(critique.get("candidate")) == scene_id
+
+
 def evaluate_audit_gate(loaded: list[tuple[str, dict | None, str | None]],
-                        candidate_name: str, scene_id: str) -> list[str]:
+                        candidate_name: str, candidate_sha256: str, scene_id: str) -> list[str]:
     """Return blocking reasons (empty == the candidate may be promoted).
 
     Enforces, over the critiques that actually judge this candidate: schema validity, verdict/
-    findings consistency, and full triple-audit coverage by *clean* critiques.
+    findings consistency, content-hash binding, and full triple-audit coverage by *clean* critiques.
+    A candidate-specific critique counts toward its class only if it carries a ``candidate_sha256``
+    equal to the promoted candidate's hash, so a critique cannot be credited for prose it never saw.
+    The scene-level hard audit is candidate-independent and is exempt from the hash check.
     """
     binding, reasons = _collect_binding(loaded, candidate_name, scene_id)
     covered: set[str] = set()
@@ -117,11 +124,20 @@ def evaluate_audit_gate(loaded: list[tuple[str, dict | None, str | None]],
         if errs:
             reasons.append(f"{label}: invalid critique ({'; '.join(errs)})")
         reasons.extend(_consistency_problems(critique, label))
-        if cls and critique_is_clean(critique):
+
+        scene_level_hard = _is_scene_level_hard(critique, cls, scene_id)
+        recorded_hash = critique.get("candidate_sha256")
+        if not scene_level_hard and recorded_hash is not None and recorded_hash != candidate_sha256:
+            reasons.append(
+                f"{label}: candidate_sha256 {recorded_hash[:12]}… does not match the promoted "
+                f"candidate {candidate_sha256[:12]}… — this critique judged different bytes"
+            )
+        hash_ok = scene_level_hard or recorded_hash == candidate_sha256
+        if cls and critique_is_clean(critique) and hash_ok:
             covered.add(cls)
     for required in REQUIRED_AUDIT_CLASSES:
         if required not in covered:
-            reasons.append(f"no clean {required} audit found for candidate {candidate_name!r}")
+            reasons.append(f"no clean, candidate-bound {required} audit found for {candidate_name!r}")
     return reasons
 
 
@@ -132,6 +148,10 @@ def promote_candidate(project: Path, scene_id: str, candidate_file: str) -> dict
         candidate = scene_dir / "candidates" / candidate
     if not candidate.exists():
         raise ValueError(f"Candidate not found: {candidate}")
+    # Confinement: a candidate must live inside the project (an absolute path from an agent may not
+    # reach outside it). Defence in depth alongside the MCP-boundary path checks.
+    if not candidate.resolve().is_relative_to(project.resolve()):
+        raise ValueError("candidate must live inside the project directory")
     if not (scene_dir / "spec.json").exists():
         raise ValueError("Scene spec is missing")
 
@@ -149,15 +169,16 @@ def promote_candidate(project: Path, scene_id: str, candidate_file: str) -> dict
     if delta.get("scene_id") != scene_id:
         raise ValueError(f"state-delta scene_id {delta.get('scene_id')!r} != {scene_id!r}")
 
-    # Audit gate: the reviewed critiques must actually clear the candidate. Load them once, run the
-    # gate, and refuse *before* touching the manuscript or canon so a failed gate leaves no trace.
+    # Audit gate: the reviewed critiques must actually clear *these* candidate bytes. Load them once,
+    # run the gate against the candidate's hash, and refuse *before* any write so a failure is inert.
+    candidate_sha256 = integrity.sha256_file(candidate)
     loaded: list[tuple[str, dict | None, str | None]] = []
     for path in critiques:
         try:
             loaded.append((path.name, json.loads(path.read_text(encoding="utf-8")), None))
         except json.JSONDecodeError as exc:
             loaded.append((path.name, None, str(exc)))
-    gate_reasons = evaluate_audit_gate(loaded, candidate.name, scene_id)
+    gate_reasons = evaluate_audit_gate(loaded, candidate.name, candidate_sha256, scene_id)
     if gate_reasons:
         raise ValueError(
             f"Audit gate failed for {scene_id} candidate {candidate.name}:\n  - "
@@ -165,39 +186,56 @@ def promote_candidate(project: Path, scene_id: str, candidate_file: str) -> dict
         )
     binding, _ = _collect_binding(loaded, candidate.name, scene_id)
 
-    target = project / "manuscript" / "chapters" / f"{scene_id}.md"
-    target.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(candidate, target)
+    # Canon hash chain: bind this delta to the exact prior canon state (see integrity.verify_canon).
+    parent_canon_hash = integrity.canon_head(project)
+    delta_sha256 = integrity.sha256_file(delta_path)
+    resulting_canon_hash = integrity.link_hash(parent_canon_hash, scene_id, delta_sha256)
 
+    target = project / "manuscript" / "chapters" / f"{scene_id}.md"
     index_path = project / "canon" / "index.json"
     index = json.loads(index_path.read_text(encoding="utf-8")) if index_path.exists() else {}
     accepted = list(index.get("accepted_state_deltas", []))
     if scene_id not in accepted:
         accepted.append(scene_id)
     index["accepted_state_deltas"] = sorted(set(accepted), key=scene_sort_key)
-    index_path.parent.mkdir(parents=True, exist_ok=True)
-    index_path.write_text(json.dumps(index, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     decision = {
         "scene_id": scene_id,
         "candidate": str(candidate.relative_to(project)) if candidate.is_relative_to(project) else str(candidate),
+        "candidate_sha256": candidate_sha256,
         "promoted_to": str(target.relative_to(project)),
         "promoted_at": datetime.now(timezone.utc).isoformat(),
+        "state_delta_sha256": delta_sha256,
+        "parent_canon_hash": parent_canon_hash,
+        "resulting_canon_hash": resulting_canon_hash,
         "critique_files": [str(p.relative_to(project)) for p in critiques],
-        # The subset the gate actually credited as evidence for *this* candidate, so the decision
-        # record shows which audits cleared it rather than every file that happened to be present.
+        # The subset the gate actually credited as evidence for *this* candidate — with each
+        # critique's own hash — so the manifest shows exactly which audits cleared these bytes.
         "binding_critiques": [
-            {"file": label, "critic": c.get("critic"), "audit_class": audit_class_of(c), "verdict": c.get("verdict")}
+            {"file": label, "critic": c.get("critic"), "audit_class": audit_class_of(c),
+             "verdict": c.get("verdict"), "sha256": integrity.sha256_file(scene_dir / "critiques" / label)}
             for label, c, _ in binding
         ],
     }
     decision_file = project / "decisions" / f"promote-{scene_id}.json"
-    decision_file.parent.mkdir(parents=True, exist_ok=True)
-    decision_file.write_text(json.dumps(decision, indent=2) + "\n", encoding="utf-8")
+
+    # Atomic: hold a project lock and commit all three writes with rollback, so a crash or a
+    # concurrent promotion cannot leave canon half-updated.
+    with integrity.PromotionLock(project):
+        batch = integrity.AtomicBatch()
+        try:
+            batch.write(target, candidate.read_bytes())
+            batch.write(index_path, (json.dumps(index, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+            batch.write(decision_file, (json.dumps(decision, indent=2) + "\n").encode("utf-8"))
+            batch.commit()
+        except Exception:
+            batch.rollback()
+            raise
 
     return {
         "promoted_to": decision["promoted_to"],
         "accepted_state_deltas": index["accepted_state_deltas"],
         "decision_file": str(decision_file.relative_to(project)),
         "critique_files": decision["critique_files"],
+        "resulting_canon_hash": resulting_canon_hash,
     }

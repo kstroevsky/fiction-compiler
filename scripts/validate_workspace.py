@@ -19,7 +19,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from fiction_compiler import schema  # noqa: E402
+from fiction_compiler import integrity, schema  # noqa: E402
 
 
 def read_json(path: Path) -> Any:
@@ -114,6 +114,10 @@ def validate_projects(errors: list[str]) -> None:
         validate_characters(errors, project)
         validate_event_graph(errors, project)
         validate_scenes(errors, project)
+        # Tamper-evidence: any manifest-bearing accepted delta edited since promotion fails here.
+        # Legacy scenes (promoted before ADR 0003, no manifest) are skipped, not failed.
+        for message in integrity.verify_canon(project):
+            errors.append(f"{project.name}: canon integrity — {message}")
 
 
 def validate_source_register(errors: list[str]) -> None:

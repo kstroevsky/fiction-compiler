@@ -1,16 +1,22 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from fiction_compiler import integrity  # noqa: E402
 from fiction_compiler.promote import promote_candidate  # noqa: E402
+
+PROSE = "Prose."
+PROSE_SHA = hashlib.sha256(PROSE.encode("utf-8")).hexdigest()
 
 
 def _critique(**fields) -> str:
@@ -20,16 +26,18 @@ def _critique(**fields) -> str:
     return json.dumps(base)
 
 
-def write_full_audit_set(scene: Path, candidate_name: str = "c.md") -> None:
-    """A complete, clean triple audit (hard + literary + defaultness) that clears the candidate."""
+def write_full_audit_set(scene: Path, candidate_name: str = "c.md", *, sha: str = PROSE_SHA) -> None:
+    """A complete, clean triple audit (hard + literary + defaultness) that clears the candidate.
+
+    Candidate-specific critiques carry the candidate's sha256; the hard audit is scene-level.
+    """
     crit = scene / "critiques"
-    # Hard audit is candidate-independent: its `candidate` is the scene id.
     (crit / "hard-audit.json").write_text(
         _critique(candidate="ch01-sc01", critic="hard-audit"), encoding="utf-8")
     (crit / "style-editor.json").write_text(
-        _critique(candidate=candidate_name, critic="style-editor"), encoding="utf-8")
+        _critique(candidate=candidate_name, critic="style-editor", candidate_sha256=sha), encoding="utf-8")
     (crit / "defaultness-lint.json").write_text(
-        _critique(candidate=candidate_name, critic="defaultness-lint"), encoding="utf-8")
+        _critique(candidate=candidate_name, critic="defaultness-lint", candidate_sha256=sha), encoding="utf-8")
 
 
 def build(root: Path, *, audits: bool = True) -> Path:
@@ -37,7 +45,7 @@ def build(root: Path, *, audits: bool = True) -> Path:
     scene = project / "scenes" / "ch01-sc01"
     (scene / "candidates").mkdir(parents=True)
     (scene / "critiques").mkdir(parents=True)
-    (scene / "candidates" / "c.md").write_text("Prose.", encoding="utf-8")
+    (scene / "candidates" / "c.md").write_text(PROSE, encoding="utf-8")
     (scene / "spec.json").write_text(json.dumps({"id": "ch01-sc01"}), encoding="utf-8")
     if audits:
         write_full_audit_set(scene)
@@ -125,7 +133,8 @@ class PromoteTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             project = with_delta(build(Path(tmp)))
             (project / "scenes" / "ch01-sc01" / "critiques" / "defaultness-lint.json").write_text(
-                _critique(candidate="c.md", critic="defaultness-lint", verdict="pass",
+                _critique(candidate="c.md", critic="defaultness-lint", candidate_sha256=PROSE_SHA,
+                          verdict="pass",
                           findings=[{"dimension": "cliche", "severity": "material",
                                      "evidence": "heart pounded", "diagnosis": "default phrasing",
                                      "repair_layer": "prose"}]),
@@ -138,10 +147,33 @@ class PromoteTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             project = with_delta(build(Path(tmp)))
             (project / "scenes" / "ch01-sc01" / "critiques" / "style-editor.json").write_text(
-                _critique(candidate="c.md", critic="style-editor", verdict="revise"), encoding="utf-8")
+                _critique(candidate="c.md", critic="style-editor", candidate_sha256=PROSE_SHA,
+                          verdict="revise"), encoding="utf-8")
             with self.assertRaises(ValueError) as ctx:
                 promote_candidate(project, "ch01-sc01", "c.md")
             self.assertIn("unresolved", str(ctx.exception))
+
+    def test_critique_with_wrong_hash_refused(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = with_delta(build(Path(tmp)))
+            # A critique that claims to judge c.md but carries a different candidate's hash.
+            (project / "scenes" / "ch01-sc01" / "critiques" / "defaultness-lint.json").write_text(
+                _critique(candidate="c.md", critic="defaultness-lint",
+                          candidate_sha256=hashlib.sha256(b"different bytes").hexdigest()),
+                encoding="utf-8")
+            with self.assertRaises(ValueError) as ctx:
+                promote_candidate(project, "ch01-sc01", "c.md")
+            self.assertIn("does not match", str(ctx.exception))
+
+    def test_unhashed_literary_critique_does_not_cover(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = with_delta(build(Path(tmp)))
+            # Same critique, but with the hash stripped: it can no longer be credited as evidence.
+            (project / "scenes" / "ch01-sc01" / "critiques" / "style-editor.json").write_text(
+                _critique(candidate="c.md", critic="style-editor"), encoding="utf-8")
+            with self.assertRaises(ValueError) as ctx:
+                promote_candidate(project, "ch01-sc01", "c.md")
+            self.assertIn("literary", str(ctx.exception))
 
     def test_missing_defaultness_audit_refused(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -150,6 +182,72 @@ class PromoteTests(unittest.TestCase):
             with self.assertRaises(ValueError) as ctx:
                 promote_candidate(project, "ch01-sc01", "c.md")
             self.assertIn("defaultness", str(ctx.exception))
+
+
+class PromotionIntegrityTests(unittest.TestCase):
+    """Slice 2 (ADR 0003): tamper-evidence, the acceptance manifest, locking, and atomicity."""
+
+    def test_decision_records_acceptance_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = with_delta(build(Path(tmp)))
+            result = promote_candidate(project, "ch01-sc01", "c.md")
+            decision = json.loads((project / "decisions" / "promote-ch01-sc01.json").read_text())
+            self.assertEqual(decision["candidate_sha256"], PROSE_SHA)
+            self.assertTrue(decision["state_delta_sha256"])
+            self.assertEqual(decision["parent_canon_hash"], integrity.seed_hash(project))
+            self.assertEqual(decision["resulting_canon_hash"], result["resulting_canon_hash"])
+            self.assertTrue(all("sha256" in b for b in decision["binding_critiques"]))
+
+    def test_verify_canon_clean_then_detects_delta_edit(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = with_delta(build(Path(tmp)))
+            promote_candidate(project, "ch01-sc01", "c.md")
+            self.assertEqual(integrity.verify_canon(project), [])
+            # Silently rewrite the accepted delta; the recorded canon hash no longer matches.
+            delta = project / "scenes" / "ch01-sc01" / "state-delta.json"
+            tampered = json.loads(delta.read_text())
+            tampered["facts_added"] = [{"id": "fact-x", "text": "smuggled in after acceptance"}]
+            delta.write_text(json.dumps(tampered))
+            errors = integrity.verify_canon(project)
+            self.assertTrue(any("changed since promotion" in e for e in errors), errors)
+
+    def test_lock_blocks_concurrent_promotion(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = with_delta(build(Path(tmp)))
+            (project / ".promote.lock").write_text("")  # a promotion already holds the lock
+            with self.assertRaises(ValueError) as ctx:
+                promote_candidate(project, "ch01-sc01", "c.md")
+            self.assertIn("in progress", str(ctx.exception))
+
+    def test_rollback_leaves_no_partial_state_on_commit_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = with_delta(build(Path(tmp)))
+            import os
+            real_replace = os.replace
+            calls = {"n": 0}
+
+            def flaky(src, dst):  # fail on the third write (the decision manifest)
+                calls["n"] += 1
+                if calls["n"] == 3:
+                    raise RuntimeError("simulated crash mid-commit")
+                return real_replace(src, dst)
+
+            with mock.patch("fiction_compiler.integrity.os.replace", side_effect=flaky):
+                with self.assertRaises(RuntimeError):
+                    promote_candidate(project, "ch01-sc01", "c.md")
+            self.assertFalse((project / "manuscript" / "chapters" / "ch01-sc01.md").exists())
+            index = json.loads((project / "canon" / "index.json").read_text())
+            self.assertEqual(index["accepted_state_deltas"], [])
+            self.assertFalse((project / ".promote.lock").exists(), "lock must be released")
+
+    def test_candidate_outside_project_refused(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = with_delta(build(Path(tmp)))
+            outside = Path(tmp) / "outside.md"
+            outside.write_text(PROSE, encoding="utf-8")
+            with self.assertRaises(ValueError) as ctx:
+                promote_candidate(project, "ch01-sc01", str(outside))
+            self.assertIn("inside the project", str(ctx.exception))
 
 
 class CommittedExampleRegressionTests(unittest.TestCase):

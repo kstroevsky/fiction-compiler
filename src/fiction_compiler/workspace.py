@@ -19,8 +19,15 @@ RUNS = ROOT / ".runs"
 
 
 def project_dir(name_or_path: str) -> Path:
-    """Resolve a project directory from a slug or an explicit path."""
+    """Resolve a project directory from a slug or an explicit path.
+
+    Rejects ``..`` traversal outright (defence in depth); absolute paths are returned as given for
+    trusted in-process/CLI callers. Untrusted (MCP) callers must go through :func:`confine_project`,
+    which additionally requires the result to stay under ``projects/``.
+    """
     candidate = Path(name_or_path)
+    if ".." in candidate.parts:
+        raise ValueError(f"path traversal is not allowed: {name_or_path!r}")
     if candidate.is_absolute():
         return candidate
     # Bare slug -> projects/<slug>; otherwise treat as a path relative to ROOT.
@@ -29,3 +36,27 @@ def project_dir(name_or_path: str) -> Path:
     if len(candidate.parts) == 1:
         return (PROJECTS / candidate).resolve()
     return (ROOT / candidate).resolve()
+
+
+def _within(path: Path, root: Path) -> bool:
+    try:
+        return path.resolve().is_relative_to(root.resolve())
+    except (OSError, ValueError):
+        return False
+
+
+def confine_project(name_or_path: str) -> Path:
+    """Resolve a project path for UNTRUSTED (MCP) input; reject anything outside ``projects/``."""
+    resolved = project_dir(name_or_path)
+    if not _within(resolved, PROJECTS):
+        raise ValueError(f"project path escapes the approved root (projects/): {name_or_path!r}")
+    return resolved
+
+
+def confine_file(path: str) -> Path:
+    """Resolve a file path for UNTRUSTED (MCP) input; reject anything outside the repository root."""
+    resolved = Path(path)
+    resolved = resolved if resolved.is_absolute() else (ROOT / resolved)
+    if ".." in Path(path).parts or not _within(resolved, ROOT):
+        raise ValueError(f"file path escapes the approved root: {path!r}")
+    return resolved.resolve()

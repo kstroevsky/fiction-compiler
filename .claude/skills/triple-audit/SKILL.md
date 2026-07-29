@@ -18,5 +18,10 @@ three independently and preserve disagreement.
 4. Require **exact textual evidence** and a **repair-layer** label in every finding.
 5. Anonymize candidates and reverse order for at least one pairwise comparison (fight order/label bias).
 6. Write separate `critiques/*.json` files (critique.schema). **Preserve disagreement — do not average it away.**
+   Each **candidate-specific** critique (the literary personas + defaultness) must carry
+   `audit_class` and `candidate_sha256` — the sha256 of the exact candidate file it judged — or the
+   promotion gate will not count it as evidence (ADR 0003). Reuse the `candidate_sha256` that
+   `defaultness_lint` already stamps for that candidate, or compute `shasum -a 256 <candidate>`. The
+   hard audit is candidate-independent and needs no hash.
 7. To decide whether a *revision* clears a finding without regressing elsewhere, use `evaluate_revision`
    (the story PDCA CHECK/ACT) rather than judging by feel.
