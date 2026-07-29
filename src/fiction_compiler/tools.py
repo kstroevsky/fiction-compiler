@@ -216,8 +216,9 @@ TOOLS: list[dict] = [
           ["project", "scene_id", "before", "after"], record_revision),
     _tool("promote",
           "Promote a reviewed candidate into the manuscript and fold its state delta into canon. "
-          "STATE-CHANGING and gated: requires confirm=true, plus a spec, at least one critique, and a "
-          "schema-valid matching state-delta.json.",
+          "STATE-CHANGING and gated: requires confirm=true, a spec, a schema-valid matching "
+          "state-delta.json, and a passing triple audit — clean hard, literary, and defaultness "
+          "critiques that each judge THIS candidate (a non-pass verdict or material finding blocks).",
           {"project": {"type": "string"}, "scene_id": {"type": "string"},
            "candidate_file": {"type": "string"}, "confirm": {"type": "boolean"}},
           ["project", "scene_id", "candidate_file"], promote),

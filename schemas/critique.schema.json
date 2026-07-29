@@ -6,6 +6,7 @@
   "properties": {
     "candidate": {"type": "string"},
     "critic": {"type": "string"},
+    "audit_class": {"enum": ["hard", "literary", "defaultness"]},
     "verdict": {"enum": ["pass", "revise", "reject", "uncertain"]},
     "confidence": {"type": "number", "minimum": 0, "maximum": 1},
     "findings": {
