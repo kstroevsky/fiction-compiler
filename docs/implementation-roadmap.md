@@ -91,12 +91,19 @@ Ordering principle: build the primitive everything else depends on first
 and only write KB prose once code consumes it. Every stage ends green and adds a regression
 test, not just a feature.
 
-> **Build status (updated).** Stage 0 ✅, Stage 1 ✅, Stage 2 ✅ are implemented and tested
-> (27 tests). Stage 3 🟡 has a starter KB (10 concept cards + defaultness catalog + source
-> register with EU/DE notes), integrity-checked by `validate_workspace`. Stage 4 🟡 has the
+> **Build status (updated).** Stage 0 ✅, Stage 1 ✅, Stage 2 ✅ are implemented and tested.
+> Stage 3 🟡 has a starter KB — 16 concept cards across two source streams (craft-instruction,
+> many public-domain classics + fiction-corpus), a defaultness catalog, and a source register
+> with EU/DE copyright notes, all integrity-checked by `validate_workspace`. Stage 4 🟡 has the
 > deterministic defaultness linter; the Pareto/tournament/continuation-ensemble pieces remain.
-> Stage 5 ⬜ and Stage 6 ⬜ are not started. See `docs/decisions/0001-structured-state-delta.md`
-> and the worked example in `projects/salt-in-the-wire/`.
+>
+> **Two self-improvement loops** (see `docs/self-improvement-loops.md`): the **story** PDCA loop's
+> deterministic CHECK/ACT is built (`src/fiction_compiler/revision.py`, `scripts/revise_scene.py`,
+> per-scene `revision-log.jsonl`) — this is the manuscript's own improvement loop. The **framework**
+> PDCA loop (Stage 5) still has only the `retrospective` skill + `change-policy`; its
+> regression-fixture runner and run-manifest observability remain ⬜. Stage 6 (GUI) ⬜.
+> See `docs/decisions/0001-structured-state-delta.md` and the worked example in
+> `projects/salt-in-the-wire/`.
 
 ### Stage 0 — Make the scaffold honest (foundations)
 **Goal:** the checks that pass should mean something.

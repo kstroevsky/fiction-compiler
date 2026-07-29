@@ -1,0 +1,1 @@
+{"timestamp": "2026-07-28T21:56:26.651479+00:00", "iteration": 1, "before": "candidate-b.md", "after": "candidate-a.md", "target_dimension": "defaultness", "counts": {"before": {"fatal": 0, "material": 8, "minor": 7}, "after": {"fatal": 0, "material": 0, "minor": 0}}, "decision": "accept", "reason": "target 'defaultness' improved 14->0, no regressions, no fatals"}

@@ -57,9 +57,14 @@ The pipeline shifts as much judgment as possible off the LLM and onto code:
   ledger, chronology. Emits `critique.schema`-valid findings with exact evidence.
 - **`defaultness.py`** — deterministic slice of Audit 3: clichés, told emotion, filter words,
   weak-word density, adverb tags, opener runs — patterns in `kb/style/defaultness-catalog.json`.
+- **`revision.py`** — the **story's** PDCA revision loop (deterministic CHECK/ACT): accept a
+  revision only if it improves the target defect without a material regression; stop instead of
+  drifting toward blandness. Driver: `scripts/revise_scene.py`; per-scene `revision-log.jsonl`.
 
-See `docs/implementation-roadmap.md` for what is built vs. deferred, and
-`projects/salt-in-the-wire/` for a worked end-to-end example.
+Two self-improvement loops — the **story** loop (above) and the **framework** loop
+(`retrospective` skill + `constitution/change-policy.md`) — are kept strictly separate; see
+`docs/self-improvement-loops.md`. For what is built vs. deferred see `docs/implementation-roadmap.md`,
+and `projects/salt-in-the-wire/` for a worked end-to-end example.
 
 ## Important rule
 
