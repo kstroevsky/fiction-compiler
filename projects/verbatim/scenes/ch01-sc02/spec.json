@@ -1,0 +1,20 @@
+{
+  "id": "ch01-sc02",
+  "chapter": "1",
+  "pov": "char-mira",
+  "participants": ["char-mira", "char-josif"],
+  "purpose": ["deliver the private truth (what Radan did) and that the law will free him", "pass the weight from Josif to Mira", "convert 'what is she rendering' into 'what will she do'"],
+  "entry_state": ["a recess", "they are alone in the corridor where they may not confer", "Mira knows Josif is steering"],
+  "desire": "make Josif say plainly why he would damn his own brother",
+  "conflict": "he will not say it plainly — to say it is to become the one who said it — and the rules forbid them speaking at all",
+  "turn": "obliquely, in a proverb and a silence and the valley named once, she understands what Radan did and that the court will acquit him",
+  "exit_state": ["Mira knows what Radan did (fact-radan-opened-sluice)", "the question is now what she will render", "a heavier promise opens"],
+  "required_events": ["evt-josif-tells-why"],
+  "forbidden_moves": ["a full confession", "Josif justifying himself in the open", "Mira stating the theme", "a tidy explanation of the crime"],
+  "knowledge_required": [{"character": "char-mira", "fact": "fact-josif-steering"}],
+  "style_constraints": ["dialect-plain and oblique", "subtext over statement", "no adverbial tags"],
+  "candidate_strategies": [
+    "A: almost no direct speech — a proverb, the water jug, a name",
+    "B: three exchanges, none of them answering the question asked"
+  ]
+}

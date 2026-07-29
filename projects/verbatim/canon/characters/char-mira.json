@@ -1,0 +1,17 @@
+{
+  "id": "char-mira",
+  "name": "Mira Valk",
+  "desire": "render faithfully and remain the neutral conduit she is sworn to be",
+  "need": "to stop pretending the person in the middle is innocent of the outcome",
+  "values": ["fidelity to the word", "precision", "the interpreter's invisibility"],
+  "fears": ["being the one whose tongue decides a man's fate", "betraying the valley she left as a girl"],
+  "contradictions": ["sworn to neutrality yet she softened one word on reflex", "left the valley yet its dead are still hers"],
+  "beliefs": ["a faithful rendering is a just one", "the interpreter is a pane of glass the words pass through"],
+  "knowledge": ["the hill dialect and its double senses", "that the court trusts her as verbatim", "that the case against the accused is thin"],
+  "constraints": ["the sole interpreter of the dialect", "the record is permanent", "she may not confer with a witness"],
+  "voice": {
+    "lexicon": ["precise", "court register in session", "bare and plain in the dialect"],
+    "syntax": ["controlled", "the shape of a sentence weighed before it is said"],
+    "avoid": ["naming her feelings", "editorializing", "legal jargon as ornament"]
+  }
+}

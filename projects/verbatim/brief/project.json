@@ -1,0 +1,23 @@
+{
+  "id": "verbatim",
+  "title": "Verbatim",
+  "form": "short-story",
+  "audience": "adult literary readers who like moral pressure, restraint, and unreliable neutrality",
+  "reader_contract": [
+    "5-8 pages, single sitting",
+    "close third person, one focalizer (Mira, the court interpreter)",
+    "the drama is in what is rendered, not in a verdict",
+    "ends before the verdict, on Mira's act; comfort withheld",
+    "invented tribunal and dialect — not mapped to any real conflict or people"
+  ],
+  "theme_question": "Is a faithful rendering a just one — and can the person in the middle ever be neutral?",
+  "desired_affect": ["moral vertigo", "complicity", "the weight of the invisible middle"],
+  "constraints": [
+    "no villain; the antagonist force is the impossibility of neutrality",
+    "no courtroom-thriller theatrics (no gavel, no objection duels, no verdict scene)",
+    "Mira must act, not merely understand",
+    "the dialect is felt, not lexically explained; never translate the theme aloud",
+    "emotion earned through behavior, never named"
+  ],
+  "human_gates": ["premise", "voice-profile", "ending", "final"]
+}

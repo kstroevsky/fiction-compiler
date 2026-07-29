@@ -1,0 +1,14 @@
+{
+  "narrator": {"person": "third", "reliability": "reliable but confined to Mira's perception and conscience"},
+  "focalization": {"mode": "fixed internal", "focalizer": "char-mira"},
+  "time": {"order": "chronological across one recess", "dominant_duration": "scene", "tense": "past"},
+  "revelations": [
+    {"id": "rev-steering", "scene": "ch01-sc01", "to_reader": "with Mira", "to_mira": true},
+    {"id": "rev-why", "scene": "ch01-sc02", "to_reader": "with Mira", "to_mira": true},
+    {"id": "rev-rendering", "scene": "ch01-sc03", "to_reader": "enacted; the cost shown, the choice perhaps withheld"}
+  ],
+  "chapter_map": [
+    {"chapter": "1", "scenes": ["ch01-sc01", "ch01-sc02", "ch01-sc03"]}
+  ],
+  "notes": "Dramatic irony is minimal: the reader learns with Mira. The dialect is felt in a few carried words, never glossed. Withholding comes from the rules of the room and Mira's limits, never author fiat."
+}

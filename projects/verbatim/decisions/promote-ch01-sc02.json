@@ -1,0 +1,9 @@
+{
+  "scene_id": "ch01-sc02",
+  "candidate": "scenes/ch01-sc02/candidates/candidate-a.md",
+  "promoted_to": "manuscript/chapters/ch01-sc02.md",
+  "promoted_at": "2026-07-29T09:13:16.878521+00:00",
+  "critique_files": [
+    "scenes/ch01-sc02/critiques/hard-audit.json"
+  ]
+}

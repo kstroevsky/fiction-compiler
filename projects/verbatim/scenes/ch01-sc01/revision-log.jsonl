@@ -1,0 +1,1 @@
+{"timestamp": "2026-07-29T09:13:16.871338+00:00", "iteration": 1, "before": "draft-1.md", "after": "candidate-a.md", "target_dimension": "rhythm", "counts": {"before": {"fatal": 0, "material": 0, "minor": 1}, "after": {"fatal": 0, "material": 0, "minor": 0}}, "decision": "accept", "reason": "target 'rhythm' improved 1->0, no regressions, no fatals"}

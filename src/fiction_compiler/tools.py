@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from . import defaultness, hard_audit, kb, revision
+from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
 from .state import StoryState, accepted_scene_ids, reconstruct_state_before
@@ -148,6 +149,11 @@ def promote(project: str, scene_id: str, candidate_file: str, confirm: bool = Fa
         return {"error": str(exc)}
 
 
+def assemble(project: str) -> dict:
+    """Stitch the accepted scenes into one manuscript.md and return its path + word count."""
+    return _assemble(project_dir(project))
+
+
 # --- registry ---------------------------------------------------------------
 
 def _tool(name: str, description: str, properties: dict, required: list[str], handler: Callable) -> dict:
@@ -215,6 +221,10 @@ TOOLS: list[dict] = [
           {"project": {"type": "string"}, "scene_id": {"type": "string"},
            "candidate_file": {"type": "string"}, "confirm": {"type": "boolean"}},
           ["project", "scene_id", "candidate_file"], promote),
+    _tool("assemble",
+          "Stitch the accepted (promoted) scenes into a single manuscript.md, in fabula order, "
+          "with title and chapter/scene breaks. Returns the path and word count.",
+          {"project": {"type": "string"}}, ["project"], assemble),
 ]
 
 _BY_NAME: dict[str, dict] = {t["name"]: t for t in TOOLS}

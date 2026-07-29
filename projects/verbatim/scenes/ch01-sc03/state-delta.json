@@ -1,0 +1,14 @@
+{
+  "scene_id": "ch01-sc03",
+  "time": 2,
+  "facts_added": [
+    {"id": "fact-mira-flagged-ambiguity", "text": "At the decisive question Mira told the court the word carried two senses and refused to part them, so it could not convict — most likely freeing Radan."}
+  ],
+  "facts_removed": [],
+  "knowledge_changes": [],
+  "relationship_changes": [
+    {"pair": ["char-mira", "char-josif"], "state": "she refused to be his instrument; his vengeance guttered out in her hands, and she kept an oath that freed the guilty"}
+  ],
+  "promises_opened": [],
+  "promises_closed": ["promise-what-mira-renders", "promise-mira-choice"]
+}

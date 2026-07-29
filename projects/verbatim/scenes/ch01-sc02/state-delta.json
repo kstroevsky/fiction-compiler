@@ -1,0 +1,16 @@
+{
+  "scene_id": "ch01-sc02",
+  "time": 1,
+  "facts_added": [],
+  "facts_removed": [],
+  "knowledge_changes": [
+    {"character": "char-mira", "fact": "fact-radan-opened-sluice"}
+  ],
+  "relationship_changes": [
+    {"pair": ["char-mira", "char-josif"], "state": "the weight has passed; she carries what he will not say, and he has spent her clean word"}
+  ],
+  "promises_opened": [
+    {"id": "promise-mira-choice", "text": "Will Mira be the blade, the mercy, or refuse the choice?", "owed_by": "the story"}
+  ],
+  "promises_closed": ["promise-why-josif"]
+}

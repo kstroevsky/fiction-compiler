@@ -1,0 +1,20 @@
+{
+  "id": "ch01-sc03",
+  "chapter": "1",
+  "pov": "char-mira",
+  "participants": ["char-mira", "char-josif"],
+  "purpose": ["force Mira's irreversible act", "stage the theme as the choice of a single word", "end before the verdict, comfort withheld"],
+  "entry_state": ["back in session", "the decisive question is coming", "Mira knows what Radan did and that a faithful, innocent rendering acquits"],
+  "desire": "do right — and she cannot tell which rendering that is",
+  "conflict": "render the damning sense (become Josif's blade, convict on a truth the law should not reach) or the innocent sense (free a guilty man, impose her own mercy) — either way she is not neutral",
+  "turn": "the decisive question is put to Josif; he gives the double word; Mira renders the single sense into the record, and it cannot be taken back",
+  "exit_state": ["Mira has chosen", "the reader cannot cleanly call it justice or its opposite", "the verdict is withheld"],
+  "required_events": ["evt-mira-renders"],
+  "forbidden_moves": ["a verdict scene", "Mira's speech about truth versus law", "a last-line uplift", "naming what she feels"],
+  "knowledge_required": [{"character": "char-mira", "fact": "fact-radan-opened-sluice"}],
+  "style_constraints": ["pull the distance to the word itself at the turn", "end on the act, not the reflection"],
+  "candidate_strategies": [
+    "A: the reader sees which sense she renders only through its cost",
+    "B: the word given in the dialect, its chosen sense left for the reader to weigh"
+  ]
+}

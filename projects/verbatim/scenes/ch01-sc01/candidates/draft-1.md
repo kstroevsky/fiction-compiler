@@ -1,0 +1,11 @@
+On the third day Josif spoke of the water, and Mira gave the court his water.
+
+She had his voice in one ear and the chamber in the other, and the half-second between was the only country she governed. He was an old man from the top of the valley, and he spoke the hill way, slow, the sentences turned end to first, so that a listener waited for the verb the way you wait for a stone to reach the bottom of a well. Counsel had asked how the raiders found the upper path. Josif said the path had always been there. He said the water knew it before any man did. Then he came to Radan, and he used the word *vedel*.
+
+*Vedel.* In the court languages it wanted two hands to carry. *He was led to it* — a man swept along, a leaf on the flood. *He led them to it* — a man who walks ahead with a lamp. The dialect held both in one breath and let the breath decide; and Mira, who had been keeping men out of trouble with the cleaner half of a word since she was nineteen, gave the court the leaf. *He was led to it,* she said, in the flat court register, and the keys took it down as though it were the only thing the word had ever meant.
+
+She reached for the water at her elbow and did not drink it.
+
+Because Josif had stopped. Not long — a witness is always stopping, groping for the next stone — but he had turned his head a quarter, off counsel, off the panel, and found her at the low desk where no one looks, and he held there. He did not frown. He did not plead. He waited, the way a man waits at a door he knows will open, until she understood that he had chosen *vedel* the way she chose its cleaner half — on purpose, for its two hands — and that he had watched her wash it, and that he had come all the way down the valley to be washed.
+
+Counsel said, *And then?* Mira put her thumb to the stem of the microphone. In her good ear the old man was already moving on, laying the next stone, and the next, building toward the sluice with the patience of someone who means to be standing there when the wall comes down. She gave the court his words. She gave them true. And one of them she had given true in the wrong direction, and only two people in the room knew it, and both of them had chosen to.

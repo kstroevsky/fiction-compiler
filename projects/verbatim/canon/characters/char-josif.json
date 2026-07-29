@@ -1,0 +1,17 @@
+{
+  "id": "char-josif",
+  "name": "Josif",
+  "desire": "see his brother answer for the valley without being the brother who hanged him",
+  "need": "to keep his own hands clean of his own blood — to hold the instrument, not be the blade",
+  "values": ["the valley's dead over the law's mercy", "blood, and the shame of it"],
+  "fears": ["that an acquittal frees Radan back into the world", "that he is only a coward using a stranger's tongue"],
+  "contradictions": ["loves his brother and is condemning him", "reveres the oath yet corrupts it by shading his words"],
+  "beliefs": ["the law will fail the dead", "some truths only the tongue can carry, and only if someone chooses to carry them"],
+  "knowledge": ["what Radan did at the sluice", "the double sense of the dialect word", "that he is steering his own testimony"],
+  "constraints": ["under oath and watched", "cannot say it plainly without becoming the one who said it"],
+  "voice": {
+    "lexicon": ["dialect-plain", "weather, water, and proverb"],
+    "syntax": ["indirect", "answers a question with a question or a silence"],
+    "avoid": ["direct accusation", "self-justification in the open"]
+  }
+}

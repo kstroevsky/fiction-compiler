@@ -1,0 +1,20 @@
+{
+  "id": "ch01-sc01",
+  "chapter": "1",
+  "pov": "char-mira",
+  "participants": ["char-mira", "char-josif"],
+  "purpose": ["reveal the witness is steering his own testimony through her", "commit Mira to a first transgression (softening a word on reflex)", "open the central power: she decides what the record hears"],
+  "entry_state": ["the third day of testimony", "the case against Radan is thin", "Mira renders faithfully, as she is sworn"],
+  "desire": "render the testimony faithfully and remain invisible",
+  "conflict": "the witness uses a word that carries two senses; the faithful sense damns the accused; she has already softened it on reflex, and he meant the hard one",
+  "turn": "his eyes find hers in the half-second after she softens the word — and she understands he is steering, using her tongue as the blade he will not be seen to wield",
+  "exit_state": ["Mira knows Josif is steering", "Mira knows the word's double sense", "she has already, once, chosen"],
+  "required_events": ["evt-mira-catches-word"],
+  "forbidden_moves": ["gavel/objection theatrics", "Mira naming her feelings", "Josif confessing outright", "explaining the dialect lexically", "stating the theme"],
+  "knowledge_required": [{"character": "char-mira", "fact": "fact-dialect-unverifiable"}],
+  "style_constraints": ["close third on Mira", "the weighing of the word is the interiority", "no told emotion", "the dialect felt, not glossed"],
+  "candidate_strategies": [
+    "A: the whole scene inside one rendered exchange, the double word as the hinge",
+    "B: the reflex-softening shown first, then the eyes that catch it"
+  ]
+}

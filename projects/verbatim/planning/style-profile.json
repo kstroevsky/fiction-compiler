@@ -1,0 +1,23 @@
+{
+  "narrative_distance": "close third on Mira, level 3-4; the interpreter's weighing of a word is the interiority",
+  "voice_principles": [
+    "the discipline of rendering is the texture",
+    "a word is weighed before it is said; the weighing is the drama",
+    "no feeling is named that a choice of word could imply"
+  ],
+  "diction": ["precise", "court register in session vs. bare dialect-plain in private", "law words used sparingly, never as ornament"],
+  "syntax": ["controlled", "one long sentence reserved for the held breath before a rendering"],
+  "rhythm": ["vary openings", "let the pause before a word do the work of description"],
+  "imagery": ["breath, the microphone, the water jug, the two senses of one word", "the valley only in glancing memory"],
+  "dialogue": ["court speech is flat and procedural; the dialect is oblique, proverbial", "subtext over statement", "no adverbial tags"],
+  "sentence_distribution": {"short": 0.5, "medium": 0.4, "long": 0.1},
+  "avoid": [
+    "legal-thriller theatrics (gavel, objection duels, a verdict scene)",
+    "generic emotional abstraction",
+    "emotion named then paraphrased",
+    "Mira stating the theme (truth vs law)",
+    "a confession outburst from Josif",
+    "unearned aphorism or last-line uplift",
+    "filter words (she felt / saw / realized)"
+  ]
+}

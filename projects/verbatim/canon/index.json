@@ -1,0 +1,30 @@
+{
+  "characters": [
+    "char-mira",
+    "char-josif"
+  ],
+  "world_rules": [
+    "The interpreter's rendering enters the record as verbatim; the court cannot check the hill dialect against her.",
+    "A witness and the interpreter may not confer; anything passing between them off the record is neither evidence nor permitted.",
+    "The charge turns on a single act years ago; the only witness who could place the accused there is dead.",
+    "The hill-dialect verb for what happened at the sluice holds two senses — to be led, and to lead — parted only by breath and by the one who carries it across."
+  ],
+  "locations": [
+    "the tribunal chamber",
+    "the witness corridor behind the chamber",
+    "the valley (in memory only)"
+  ],
+  "objects": [
+    "the interpreter's headset and microphone",
+    "the sworn record",
+    "the water jug on the witness rail"
+  ],
+  "factions": [
+    "the tribunal",
+    "the valley and its dead"
+  ],
+  "accepted_state_deltas": [
+    "ch01-sc01",
+    "ch01-sc02"
+  ]
+}

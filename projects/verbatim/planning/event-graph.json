@@ -1,0 +1,60 @@
+{
+  "events": [
+    {
+      "id": "evt-radan-informed",
+      "time": -3000,
+      "actors": ["char-radan"],
+      "preconditions": ["Radan knew the sluice path", "the raiders were near"],
+      "action": "Radan shows the raiders the sluice path to the upper village.",
+      "effects": ["fact-radan-opened-sluice"],
+      "causes": [],
+      "revealed_to": ["char-josif"],
+      "cost": "the upper village and its dead"
+    },
+    {
+      "id": "evt-witness-dies",
+      "time": -100,
+      "actors": [],
+      "preconditions": ["only one living witness could place Radan at the sluice"],
+      "action": "That witness dies before the tribunal convenes.",
+      "effects": ["fact-evidence-thin"],
+      "causes": []
+    },
+    {
+      "id": "evt-mira-catches-word",
+      "time": 0,
+      "actors": ["char-mira", "char-josif"],
+      "preconditions": ["fact-dialect-unverifiable", "Josif is under oath, testifying"],
+      "action": "Josif uses the double-sense verb; Mira renders the innocent sense on reflex, and his eyes tell her he meant the other.",
+      "effects": ["mira learns fact-double-sense-word", "mira learns fact-josif-steering"],
+      "causes": ["evt-radan-informed"],
+      "revealed_to": ["char-mira"]
+    },
+    {
+      "id": "evt-josif-tells-why",
+      "time": 1,
+      "actors": ["char-mira", "char-josif"],
+      "preconditions": ["mira knows fact-josif-steering", "they are alone in the corridor"],
+      "action": "Obliquely, without conferring in any way the record could name, Josif lets Mira understand what Radan did and that the law will free him.",
+      "effects": ["mira learns fact-radan-opened-sluice"],
+      "causes": ["evt-mira-catches-word"],
+      "revealed_to": ["char-mira"]
+    },
+    {
+      "id": "evt-mira-renders",
+      "time": 2,
+      "actors": ["char-mira"],
+      "preconditions": ["mira knows fact-radan-opened-sluice", "the decisive question is put to Josif"],
+      "action": "At the decisive question Mira chooses which sense of the word enters the sworn record.",
+      "effects": [],
+      "causes": ["evt-josif-tells-why"],
+      "cost": "her neutrality, in either direction"
+    }
+  ],
+  "edges": [
+    {"from": "evt-radan-informed", "to": "evt-mira-catches-word", "type": "causes"},
+    {"from": "evt-witness-dies", "to": "evt-mira-renders", "type": "enables"},
+    {"from": "evt-mira-catches-word", "to": "evt-josif-tells-why", "type": "causes"},
+    {"from": "evt-josif-tells-why", "to": "evt-mira-renders", "type": "causes"}
+  ]
+}

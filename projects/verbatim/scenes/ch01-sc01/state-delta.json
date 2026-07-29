@@ -1,0 +1,18 @@
+{
+  "scene_id": "ch01-sc01",
+  "time": 0,
+  "facts_added": [],
+  "facts_removed": [],
+  "knowledge_changes": [
+    {"character": "char-mira", "fact": "fact-double-sense-word"},
+    {"character": "char-mira", "fact": "fact-josif-steering"}
+  ],
+  "relationship_changes": [
+    {"pair": ["char-mira", "char-josif"], "state": "a thing shared without a word — she has washed one of his words and he has watched her do it", "note": "complicity begins"}
+  ],
+  "promises_opened": [
+    {"id": "promise-why-josif", "text": "Why would Josif damn his own brother through her tongue?", "owed_by": "the story"},
+    {"id": "promise-what-mira-renders", "text": "Which sense will Mira give the record when it finally matters?", "owed_by": "the story"}
+  ],
+  "promises_closed": []
+}
