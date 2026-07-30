@@ -25,13 +25,20 @@ def assemble(project: Path) -> dict:
     brief = _load(project / "brief" / "project.json", {})
     accepted = sorted(index.get("accepted_state_deltas", []), key=scene_sort_key)
 
+    # An accepted scene with no manuscript is corruption, not something to quietly omit: canon says
+    # it was promoted but the prose is gone. Refuse to assemble a manuscript that silently drops it.
+    missing = [s for s in accepted if not (project / "manuscript" / "chapters" / f"{s}.md").exists()]
+    if missing:
+        raise ValueError(
+            f"accepted scene(s) missing a manuscript file: {missing}; canon records them as promoted "
+            "but the prose is gone — refusing to assemble a corrupt manuscript"
+        )
+
     pieces: list[str] = []
     prev_chapter: str | None = None
     included: list[str] = []
     for scene_id in accepted:
         md = project / "manuscript" / "chapters" / f"{scene_id}.md"
-        if not md.exists():
-            continue
         chapter = scene_id[2:4]
         if chapter != prev_chapter:
             pieces.append(f"\n## Chapter {int(chapter)}\n")

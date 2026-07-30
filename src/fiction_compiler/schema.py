@@ -4,8 +4,8 @@ The repository deliberately has no runtime dependencies, so rather than pull in
 ``jsonschema`` we implement the subset of draft 2020-12 that our own schemas in
 ``schemas/`` actually use:
 
-    type (incl. union types), required, properties, items,
-    enum, pattern, minLength, minimum, maximum
+    type (incl. union types), required, properties, additionalProperties:false,
+    items, minItems, maxItems, uniqueItems, enum, pattern, minLength, minimum, maximum
 
 This is intentionally NOT a general-purpose validator. It rejects the malformed
 artifacts our pipeline can produce, and nothing more. ``validate`` returns a
@@ -20,6 +20,16 @@ from functools import lru_cache
 from typing import Any
 
 from .workspace import SCHEMAS
+
+
+def _has_duplicates(items: list) -> bool:
+    """uniqueItems check that tolerates unhashable members (dicts/lists) via ``==``."""
+    seen: list = []
+    for item in items:
+        if item in seen:
+            return True
+        seen.append(item)
+    return False
 
 
 def _type_ok(instance: Any, expected: str) -> bool:
@@ -72,14 +82,27 @@ def _validate(instance: Any, schema: dict, path: str, errors: list[str]) -> None
             errors.append(f"{path}: {instance} > maximum {maximum}")
 
     if isinstance(instance, dict):
+        properties = schema.get("properties", {})
         for req in schema.get("required", []):
             if req not in instance:
                 errors.append(f"{path}: missing required property '{req}'")
-        for key, subschema in schema.get("properties", {}).items():
+        for key, subschema in properties.items():
             if key in instance:
                 _validate(instance[key], subschema, f"{path}.{key}", errors)
+        if schema.get("additionalProperties") is False:
+            for key in instance:
+                if key not in properties:
+                    errors.append(f"{path}: additional property '{key}' is not allowed")
 
     if isinstance(instance, list):
+        min_items = schema.get("minItems")
+        if min_items is not None and len(instance) < min_items:
+            errors.append(f"{path}: array length {len(instance)} < minItems {min_items}")
+        max_items = schema.get("maxItems")
+        if max_items is not None and len(instance) > max_items:
+            errors.append(f"{path}: array length {len(instance)} > maxItems {max_items}")
+        if schema.get("uniqueItems") and _has_duplicates(instance):
+            errors.append(f"{path}: array items are not unique")
         items = schema.get("items")
         if isinstance(items, dict):
             for index, item in enumerate(instance):

@@ -22,6 +22,35 @@ def valid_project() -> dict:
     }
 
 
+class ValidatorKeywordTests(unittest.TestCase):
+    """Keywords added in bucket A: minItems / maxItems / uniqueItems / additionalProperties:false."""
+
+    def test_min_and_max_items(self) -> None:
+        s = {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string"}}
+        self.assertEqual(schema.validate(["a", "b"], s), [])
+        self.assertTrue(any("minItems" in e for e in schema.validate(["a"], s)))
+        self.assertTrue(any("maxItems" in e for e in schema.validate(["a", "b", "c"], s)))
+
+    def test_unique_items_tolerates_dicts(self) -> None:
+        s = {"type": "array", "uniqueItems": True}
+        self.assertEqual(schema.validate([{"x": 1}, {"x": 2}], s), [])
+        self.assertTrue(any("unique" in e for e in schema.validate([{"x": 1}, {"x": 1}], s)))
+
+    def test_additional_properties_false(self) -> None:
+        s = {"type": "object", "additionalProperties": False, "properties": {"a": {"type": "string"}}}
+        self.assertEqual(schema.validate({"a": "ok"}, s), [])
+        self.assertTrue(any("additional property 'b'" in e for e in schema.validate({"a": "ok", "b": 1}, s)))
+
+    def test_state_delta_relationship_pair_must_be_two_distinct_chars(self) -> None:
+        # The review's concrete example: a relationship pair of length != 2 (or a self-pair) is now caught.
+        base = {"scene_id": "ch01-sc01", "facts_added": [], "facts_removed": [], "knowledge_changes": [],
+                "relationship_changes": [{"pair": ["char-a", "char-a"], "state": "x"}],
+                "promises_opened": [], "promises_closed": []}
+        self.assertTrue(any("unique" in e for e in schema.validate_named(base, "state-delta")))
+        base["relationship_changes"] = [{"pair": ["char-a"], "state": "x"}]
+        self.assertTrue(any("minItems" in e for e in schema.validate_named(base, "state-delta")))
+
+
 class SchemaValidatorTests(unittest.TestCase):
     def test_all_repo_schemas_load(self) -> None:
         for name in ["project", "character", "scene", "event", "state-delta", "critique"]:

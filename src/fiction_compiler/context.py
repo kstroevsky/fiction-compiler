@@ -47,6 +47,26 @@ def compile_bundle(project: Path, scene_id: str) -> dict:
     ]
     canon_index = _load(project / "canon" / "index.json", {})
 
+    # Inclusion manifest: why each item is in the bundle, and how load-bearing it is. Facts the scene
+    # explicitly requires are "required"; the rest are "background". Makes context packing testable
+    # (and is the first step toward true relevance pruning + token budgets — see the roadmap).
+    required_facts = {r.get("fact") for r in spec.get("knowledge_required", []) if r.get("fact")}
+    context_manifest: list[dict] = []
+    for sheet in character_sheets:
+        context_manifest.append({"kind": "character", "ref": sheet.get("id"),
+                                 "reason": "scene participant", "priority": "required", "source": "canon/characters"})
+    for fact_id in before.facts:
+        needed = fact_id in required_facts
+        context_manifest.append({"kind": "fact", "ref": fact_id,
+                                 "reason": "required knowledge for the scene" if needed else "established before the scene",
+                                 "priority": "required" if needed else "background", "source": "canon"})
+    for promise_id in before.open_promises:
+        context_manifest.append({"kind": "promise", "ref": promise_id, "reason": "open obligation",
+                                 "priority": "reference", "source": "canon"})
+    for rule in canon_index.get("world_rules", []):
+        context_manifest.append({"kind": "world_rule", "ref": rule, "reason": "world constraint",
+                                 "priority": "reference", "source": "canon/index"})
+
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "scene_id": scene_id,
@@ -62,6 +82,7 @@ def compile_bundle(project: Path, scene_id: str) -> dict:
             "open_promises": before.open_promises,
         },
         "world_rules": canon_index.get("world_rules", []),
+        "context_manifest": context_manifest,
         "discourse_plan": _load(project / "planning" / "discourse-plan.json", {}),
         "style_profile": _load(project / "planning" / "style-profile.json", {}),
         "note": (

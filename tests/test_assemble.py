@@ -35,7 +35,7 @@ class AssembleTests(unittest.TestCase):
             self.assertLess(text.index("First scene body."), text.index("Second scene body."))
             self.assertIn("·", text)  # a centered scene break between same-chapter scenes
 
-    def test_skips_unpromoted_scene_files(self) -> None:
+    def test_missing_manuscript_is_a_fatal_integrity_error(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp)
             (project / "brief").mkdir()
@@ -45,8 +45,10 @@ class AssembleTests(unittest.TestCase):
             chapters = project / "manuscript" / "chapters"
             chapters.mkdir(parents=True)
             (chapters / "ch01-sc01.md").write_text("Only real scene.")
-            result = assemble(project)  # ch01-sc09 has no file
-            self.assertEqual(result["scenes"], ["ch01-sc01"])
+            # ch01-sc09 is accepted in canon but its manuscript is gone -> corruption, not a skip.
+            with self.assertRaises(ValueError) as ctx:
+                assemble(project)
+            self.assertIn("ch01-sc09", str(ctx.exception))
 
 
 if __name__ == "__main__":

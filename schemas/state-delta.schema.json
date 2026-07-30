@@ -34,8 +34,10 @@
       "items": {
         "type": "object",
         "required": ["pair", "state"],
+        "additionalProperties": false,
         "properties": {
-          "pair": {"type": "array", "items": {"type": "string", "pattern": "^char-[a-z0-9-]+$"}},
+          "pair": {"type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true,
+                   "items": {"type": "string", "pattern": "^char-[a-z0-9-]+$"}},
           "state": {"type": "string", "minLength": 1},
           "note": {"type": "string"}
         }
@@ -46,6 +48,7 @@
       "items": {
         "type": "object",
         "required": ["subject", "object", "dimension"],
+        "additionalProperties": false,
         "properties": {
           "subject": {"type": "string", "pattern": "^char-[a-z0-9-]+$"},
           "object": {"type": "string", "pattern": "^char-[a-z0-9-]+$"},
@@ -59,6 +62,7 @@
       "items": {
         "type": "object",
         "required": ["op", "predicate", "subject"],
+        "additionalProperties": false,
         "properties": {
           "op": {"enum": ["add", "remove"]},
           "predicate": {"type": "string", "minLength": 1},
