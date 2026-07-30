@@ -141,7 +141,8 @@ def evaluate_audit_gate(loaded: list[tuple[str, dict | None, str | None]],
     return reasons
 
 
-def promote_candidate(project: Path, scene_id: str, candidate_file: str) -> dict:
+def promote_candidate(project: Path, scene_id: str, candidate_file: str, *,
+                      approved_by: str | None = None, rubric_version: str | None = None) -> dict:
     scene_dir = project / "scenes" / scene_id
     candidate = Path(candidate_file)
     if not candidate.is_absolute():
@@ -186,6 +187,18 @@ def promote_candidate(project: Path, scene_id: str, candidate_file: str) -> dict
         )
     binding, _ = _collect_binding(loaded, candidate.name, scene_id)
 
+    # Human gate: if the project lists "promotion" in its human_gates, canon may not advance without a
+    # recorded approver. Completes the reviewer's invariant — the exact candidate passed the exact
+    # audits *under a recorded rubric and human gate* — and, like the audit gate, refuses before any write.
+    brief_path = project / "brief" / "project.json"
+    project_meta = json.loads(brief_path.read_text(encoding="utf-8")) if brief_path.exists() else {}
+    gate_required = "promotion" in project_meta.get("human_gates", [])
+    if gate_required and not approved_by:
+        raise ValueError(
+            "human gate required: this project lists 'promotion' in human_gates; "
+            "promote with approved_by=<approver> to record the approval"
+        )
+
     # Canon hash chain: bind this delta to the exact prior canon state (see integrity.verify_canon).
     parent_canon_hash = integrity.canon_head(project)
     delta_sha256 = integrity.sha256_file(delta_path)
@@ -208,6 +221,8 @@ def promote_candidate(project: Path, scene_id: str, candidate_file: str) -> dict
         "state_delta_sha256": delta_sha256,
         "parent_canon_hash": parent_canon_hash,
         "resulting_canon_hash": resulting_canon_hash,
+        "rubric_version": rubric_version,
+        "human_gate": {"required": gate_required, "approved": bool(approved_by), "approver": approved_by},
         "critique_files": [str(p.relative_to(project)) for p in critiques],
         # The subset the gate actually credited as evidence for *this* candidate — with each
         # critique's own hash — so the manifest shows exactly which audits cleared these bytes.

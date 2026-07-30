@@ -250,6 +250,43 @@ class PromotionIntegrityTests(unittest.TestCase):
             self.assertIn("inside the project", str(ctx.exception))
 
 
+class HumanGateTests(unittest.TestCase):
+    """ADR 0012: a project can require a recorded human approver at promotion."""
+
+    def _gated_project(self, root: Path) -> Path:
+        project = with_delta(build(root))
+        (project / "brief").mkdir(parents=True)
+        (project / "brief" / "project.json").write_text(
+            json.dumps({"id": "proj", "human_gates": ["promotion"]}), encoding="utf-8")
+        return project
+
+    def test_gated_promotion_refused_without_approver(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = self._gated_project(Path(tmp))
+            with self.assertRaises(ValueError) as ctx:
+                promote_candidate(project, "ch01-sc01", "c.md")
+            self.assertIn("human gate", str(ctx.exception))
+            self.assertFalse((project / "manuscript").exists())
+
+    def test_gated_promotion_records_approver_and_rubric(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = self._gated_project(Path(tmp))
+            promote_candidate(project, "ch01-sc01", "c.md",
+                              approved_by="editor@example", rubric_version="literary-rubric@1")
+            decision = json.loads((project / "decisions" / "promote-ch01-sc01.json").read_text())
+            self.assertEqual(decision["human_gate"],
+                             {"required": True, "approved": True, "approver": "editor@example"})
+            self.assertEqual(decision["rubric_version"], "literary-rubric@1")
+
+    def test_ungated_project_promotes_without_approver(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = with_delta(build(Path(tmp)))  # no brief/project.json -> no promotion gate
+            result = promote_candidate(project, "ch01-sc01", "c.md")
+            self.assertEqual(result["accepted_state_deltas"], ["ch01-sc01"])
+            decision = json.loads((project / "decisions" / "promote-ch01-sc01.json").read_text())
+            self.assertEqual(decision["human_gate"]["required"], False)
+
+
 class CommittedExampleRegressionTests(unittest.TestCase):
     """The committed examples violate the triple-audit protocol; the gate must now catch them.
 

@@ -154,12 +154,18 @@ def record_revision(project: str, scene_id: str, before: str, after: str, target
     }
 
 
-def promote(project: str, scene_id: str, candidate_file: str, confirm: bool = False) -> dict:
-    """Promote a candidate into manuscript + canon. State-changing, so it is gated on ``confirm``."""
+def promote(project: str, scene_id: str, candidate_file: str, confirm: bool = False,
+            approved_by: str | None = None, rubric_version: str | None = None) -> dict:
+    """Promote a candidate into manuscript + canon. State-changing, so it is gated on ``confirm``.
+
+    If the project lists ``"promotion"`` in its ``human_gates``, ``approved_by`` is required and is
+    recorded in the acceptance manifest alongside the optional ``rubric_version``.
+    """
     if not confirm:
         return {"error": "promotion changes canon and the manuscript; call again with confirm=true to proceed"}
     try:
-        return promote_candidate(project_dir(project), scene_id, candidate_file)
+        return promote_candidate(project_dir(project), scene_id, candidate_file,
+                                 approved_by=approved_by, rubric_version=rubric_version)
     except ValueError as exc:
         return {"error": str(exc)}
 
@@ -281,9 +287,12 @@ TOOLS: list[dict] = [
           "Promote a reviewed candidate into the manuscript and fold its state delta into canon. "
           "STATE-CHANGING and gated: requires confirm=true, a spec, a schema-valid matching "
           "state-delta.json, and a passing triple audit — clean hard, literary, and defaultness "
-          "critiques that each judge THIS candidate (a non-pass verdict or material finding blocks).",
+          "critiques that each judge THIS candidate (a non-pass verdict or material finding blocks). "
+          "If the project lists 'promotion' in human_gates, approved_by is required and is recorded "
+          "with rubric_version in the acceptance manifest.",
           {"project": {"type": "string"}, "scene_id": {"type": "string"},
-           "candidate_file": {"type": "string"}, "confirm": {"type": "boolean"}},
+           "candidate_file": {"type": "string"}, "confirm": {"type": "boolean"},
+           "approved_by": {"type": "string"}, "rubric_version": {"type": "string"}},
           ["project", "scene_id", "candidate_file"], promote),
     _tool("tournament",
           "Run a blind, Pareto-scored tournament over a scene's candidates from their critiques. "

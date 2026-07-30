@@ -116,8 +116,11 @@ test, not just a feature.
 > `resulting`), so editing an accepted delta is detected by `verify_canon` (run in `validate_workspace`);
 > the three writes commit atomically under a project lock with rollback; and MCP-supplied paths are
 > confined to approved roots. The committed `salt-in-the-wire` and `verbatim` examples predate this and
-> now fail their own gate by design — retained as negative regression fixtures. Remaining P0 (⬜):
-> immutable acceptance *signatures* / human-gate identity.
+> now fail their own gate by design — retained as negative regression fixtures. **P0 is complete
+> (ADR 0012):** a project listing `"promotion"` in its `human_gates` cannot be promoted without a
+> recorded `approved_by`, and the acceptance manifest carries `human_gate` + `rubric_version` — so the
+> reviewer's headline invariant now holds in full: *the exact candidate passed the exact required
+> audits under a recorded rubric and human gate.*
 >
 > **Story IR is becoming executable (ADR 0004, P1 slice 1).** State now carries typed predicates
 > (`predicate_changes` + `canon/world-state.jsonl`, queried via `StoryState.holds`) and *directional*
