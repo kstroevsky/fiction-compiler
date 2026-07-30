@@ -7,8 +7,16 @@
 *Focalization* is the perceptual/cognitive filter through which the narrative is presented —
 whose eyes, whose knowledge, whose limits. Distinct from *voice* (who speaks) and from the
 fabula. A focalized narrative can only convey what the focalizer perceives, knows, or infers.
-Knowledge is per-character and monotonic within a timeline: a character cannot un-know, and
-cannot know a fact established only later (the *knowledge cutoff*).
+Knowledge is per-character and, **in this system's v1 state model, monotonic** within a timeline: a
+character cannot un-know, and cannot know a fact established only later (the *knowledge cutoff*).
+
+**Limitation (honest scope).** Real minds are *not* monotonic — people forget, misremember, revise
+beliefs, hold false beliefs, and learn a former "fact" was wrong. The current `state.py` cannot
+represent forgetting, false belief, confidence, or the source of a belief, so it must not be relied
+on for amnesia, unreliable-narrator, or belief-revision plots. Modelling non-monotonic knowledge
+(belief vs. fact, confidence, source) is deferred (see the roadmap / review §"story state is too
+shallow"). The `knowledge_required` cutoff the hard audit enforces is sound *within* that monotonic
+assumption.
 
 ## Use when
 Choosing a scene's pov and auditing whether the telling stays within its knowledge. The hard

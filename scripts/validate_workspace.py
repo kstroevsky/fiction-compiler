@@ -134,11 +134,13 @@ def validate_source_register(errors: list[str]) -> None:
 
 
 def validate_kb(errors: list[str]) -> None:
-    """Prove the knowledge base has substance, not just directories.
+    """Prove the knowledge base has substance *and depth*, not just directories.
 
-    Every indexed concept must point to a card file that exists and to source ids that are
-    registered; and no card may be orphaned (present but unindexed). This is the check that
-    stops 'the folder exists' from being mistaken for 'the KB is populated'.
+    Every indexed concept must point to a card file that exists and to registered sources; no card
+    may be orphaned; and (P4/ADR 0015) every note must carry the structured depth the review
+    requires — a claim, an evidence-strength grade, conditions where it misleads, counterexamples,
+    a consumer, and resolvable known-conflicts — so a card can never be an inert or over-absolute
+    generalization.
     """
     kb = ROOT / "kb"
     index_path = kb / "index.json"
@@ -147,8 +149,11 @@ def validate_kb(errors: list[str]) -> None:
         return
     index = read_json(index_path)
     source_ids = {s.get("id") for s in read_json(kb / "source-register.json").get("sources", [])}
+    concepts = index.get("concepts", [])
+    concept_ids = {c.get("id") for c in concepts}
+    evidence_grades = {"structural", "craft-heuristic", "theoretical", "contested", "empirical"}
     referenced: set[Path] = set()
-    for concept in index.get("concepts", []):
+    for concept in concepts:
         cid = concept.get("id")
         card = concept.get("card")
         if not card:
@@ -161,6 +166,20 @@ def validate_kb(errors: list[str]) -> None:
         for source_id in concept.get("sources", []):
             if source_id not in source_ids:
                 errors.append(f"kb concept {cid!r}: cites unregistered source {source_id!r}")
+        # Structured depth (P4): a card must be conditional, graded, and consumed — never absolute.
+        if not concept.get("claim"):
+            errors.append(f"kb concept {cid!r}: missing 'claim' (one-line thesis)")
+        if concept.get("evidence_strength") not in evidence_grades:
+            errors.append(f"kb concept {cid!r}: evidence_strength must be one of {sorted(evidence_grades)}")
+        if not concept.get("dangerous_when"):
+            errors.append(f"kb concept {cid!r}: missing 'dangerous_when' (where the card misleads)")
+        if not isinstance(concept.get("counterexamples"), list):
+            errors.append(f"kb concept {cid!r}: 'counterexamples' must be a list")
+        if not concept.get("used_by"):
+            errors.append(f"kb concept {cid!r}: missing 'used_by' (a concept no check/skill consumes is inert)")
+        for conflict in concept.get("conflicts_with", []):
+            if conflict not in concept_ids:
+                errors.append(f"kb concept {cid!r}: conflicts_with {conflict!r} does not resolve to a concept id")
 
     for card in kb.rglob("*.md"):
         if card.name.lower() == "readme.md":

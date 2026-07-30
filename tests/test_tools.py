@@ -29,6 +29,23 @@ class KbRetrievalTests(unittest.TestCase):
     def test_get_unknown_is_none(self) -> None:
         self.assertIsNone(kb.get("no-such-concept"))
 
+    def test_every_concept_carries_structured_depth(self) -> None:
+        # P4/ADR 0015: no card may be an inert or over-absolute generalization.
+        ids = {c["id"] for c in kb.concepts()}
+        grades = {"structural", "craft-heuristic", "theoretical", "contested", "empirical"}
+        for c in kb.concepts():
+            self.assertTrue(c.get("claim"), c["id"])
+            self.assertIn(c.get("evidence_strength"), grades, c["id"])
+            self.assertTrue(c.get("dangerous_when"), c["id"])
+            self.assertIsInstance(c.get("counterexamples"), list, c["id"])
+            for conflict in c.get("conflicts_with", []):
+                self.assertIn(conflict, ids, f"{c['id']} conflicts_with unresolved {conflict}")
+
+    def test_conflicting_theories_are_represented(self) -> None:
+        # The review wanted conflicting theories, not one-sided rules: eventfulness <-> static-scene.
+        self.assertIn("static-scene", kb.get("eventfulness")["conflicts_with"])
+        self.assertIn("eventfulness", kb.get("static-scene")["conflicts_with"])
+
 
 class ToolDispatchTests(unittest.TestCase):
     def test_registry_and_list_shape(self) -> None:

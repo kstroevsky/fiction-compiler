@@ -9,7 +9,13 @@
       "stream": "craft-instruction",
       "license": "public-domain",
       "location": "c. 335 BCE; use a public-domain translation (e.g. Butcher, 1895)",
-      "domains": ["dramatic-structure", "plot", "recognition", "reversal", "unity"],
+      "domains": [
+        "dramatic-structure",
+        "plot",
+        "recognition",
+        "reversal",
+        "unity"
+      ],
       "notes": "Foundational: unity of action, complication/unraveling, peripeteia (reversal), anagnorisis (recognition), hamartia. Extract structure heuristics.",
       "copyright_note": "Original PD worldwide. Modern translations may be in copyright; prefer a PD translation."
     },
@@ -21,7 +27,12 @@
       "stream": "craft-instruction",
       "license": "public-domain",
       "location": "c. 19 BCE; PD translation",
-      "domains": ["decorum", "consistency", "in-medias-res", "revision"],
+      "domains": [
+        "decorum",
+        "consistency",
+        "in-medias-res",
+        "revision"
+      ],
       "notes": "Decorum, character consistency, in medias res, 'labor of the file' (revision). Abstract maxims only.",
       "copyright_note": "Original PD worldwide; use a PD translation."
     },
@@ -33,7 +44,12 @@
       "stream": "craft-instruction",
       "license": "public-domain",
       "location": "1st c. CE; PD translation",
-      "domains": ["elevation", "imagery", "amplification", "figures"],
+      "domains": [
+        "elevation",
+        "imagery",
+        "amplification",
+        "figures"
+      ],
       "notes": "Sources of elevated writing: great conception, strong emotion, figures, diction, arrangement. Extract as abstract effect-levers.",
       "copyright_note": "Original PD; use a PD translation."
     },
@@ -45,7 +61,11 @@
       "stream": "craft-instruction",
       "license": "public-domain",
       "location": "1863",
-      "domains": ["dramatic-structure", "rising-action", "climax"],
+      "domains": [
+        "dramatic-structure",
+        "rising-action",
+        "climax"
+      ],
       "notes": "The five-part dramatic arc ('Freytag's pyramid'). Note it describes classical TRAGEDY; do not apply mechanically to all forms. German-language primary source.",
       "copyright_note": "PD in the EU and DE (Freytag d. 1895, well past life+70) and in the US. Fully clear for ingestion."
     },
@@ -57,7 +77,11 @@
       "stream": "craft-instruction",
       "license": "public-domain",
       "location": "1846",
-      "domains": ["unity-of-effect", "brevity", "design-backward-from-effect"],
+      "domains": [
+        "unity-of-effect",
+        "brevity",
+        "design-backward-from-effect"
+      ],
       "notes": "Single preconceived effect; every element subordinate to it; compose backward from the intended close. Abstract heuristics.",
       "copyright_note": "PD worldwide (Poe d. 1849)."
     },
@@ -69,7 +93,12 @@
       "stream": "craft-instruction",
       "license": "public-domain",
       "location": "essay 1884; prefaces 1907-1909",
-      "domains": ["scenic-method", "point-of-view", "central-consciousness", "showing"],
+      "domains": [
+        "scenic-method",
+        "point-of-view",
+        "central-consciousness",
+        "showing"
+      ],
       "notes": "Dramatize; the 'scenic method'; the central-consciousness / reflector; 'render, don't report'. Extract as abstract craft.",
       "copyright_note": "PD worldwide (James d. 1916; EU term expired 1986)."
     },
@@ -81,7 +110,11 @@
       "stream": "craft-instruction",
       "license": "public-domain-us",
       "location": "1921",
-      "domains": ["picture-vs-drama", "scene-vs-summary", "point-of-view"],
+      "domains": [
+        "picture-vs-drama",
+        "scene-vs-summary",
+        "point-of-view"
+      ],
       "notes": "Systematizes James: 'picture' (summary/telling) vs 'drama' (scene/showing); the governing point of view. Abstract features only.",
       "copyright_note": "US public domain (pub. 1921). EU/DE: Lubbock d. 1965, so protected until 2035-12-31 — do NOT ingest full text in the EU; paraphrase abstract concepts only."
     },
@@ -93,7 +126,11 @@
       "stream": "craft-instruction",
       "license": "public-domain-us",
       "location": "1927",
-      "domains": ["story-vs-plot", "flat-vs-round-character", "rhythm"],
+      "domains": [
+        "story-vs-plot",
+        "flat-vs-round-character",
+        "rhythm"
+      ],
       "notes": "'The king died and then the queen died' (story) vs 'died of grief' (plot = causality); flat vs round characters; pattern and rhythm. Abstract features.",
       "copyright_note": "US public domain (pub. 1927, entered PD 2023). EU/DE: Forster d. 1970, protected until 2040-12-31 — paraphrase concepts only, no full-text ingestion in the EU."
     },
@@ -105,7 +142,11 @@
       "stream": "craft-instruction",
       "license": "public-domain",
       "location": "1918/1920 (Strunk-only edition)",
-      "domains": ["concision", "sentence", "usage"],
+      "domains": [
+        "concision",
+        "sentence",
+        "usage"
+      ],
       "notes": "'Omit needless words'; positive statement; active voice. The original Strunk edition; the later White revisions are separate and in copyright.",
       "copyright_note": "1918 Strunk-only edition is PD in the US and (Strunk d. 1946) now PD in the EU/DE. White-revised editions remain in copyright."
     },
@@ -117,7 +158,12 @@
       "stream": "reference",
       "license": "reference-online",
       "location": "https://www-archiv.fdm.uni-hamburg.de/lhn/",
-      "domains": ["narratology", "focalization", "tellability", "computational-narratology"],
+      "domains": [
+        "narratology",
+        "focalization",
+        "tellability",
+        "computational-narratology"
+      ],
       "notes": "Concept definitions (focalization, order/duration/frequency, eventfulness/tellability). Summarize; do not paste article text.",
       "copyright_note": "Cite and paraphrase concepts only."
     },
@@ -129,7 +175,11 @@
       "stream": "craft-instruction",
       "license": "in-copyright",
       "location": "1946",
-      "domains": ["character", "premise", "conflict"],
+      "domains": [
+        "character",
+        "premise",
+        "conflict"
+      ],
       "notes": "Premise as testable proposition; character contradiction; orchestration of forces. No text reproduction.",
       "copyright_note": "US: possibly PD via non-renewal (verify). DE/EU: Egri d. 1967, protected until 2037. Treat as in-copyright in the EU; abstract features only."
     },
@@ -140,7 +190,12 @@
       "type": "book",
       "stream": "craft-instruction",
       "license": "in-copyright",
-      "domains": ["scene", "sequel", "motivation-reaction", "setup-payoff"],
+      "domains": [
+        "scene",
+        "sequel",
+        "motivation-reaction",
+        "setup-payoff"
+      ],
       "notes": "Scene/sequel structure and motivation-reaction units as abstract patterns.",
       "copyright_note": "In-copyright (Swain d. 1992; EU until 2062). Abstract features only."
     },
@@ -151,7 +206,11 @@
       "type": "book",
       "stream": "craft-instruction",
       "license": "in-copyright",
-      "domains": ["dialogue", "subtext", "scene"],
+      "domains": [
+        "dialogue",
+        "subtext",
+        "scene"
+      ],
       "notes": "Dialogue as action with objective/subtext/turn. No text reproduction.",
       "copyright_note": "In-copyright. Abstract features only."
     },
@@ -162,7 +221,11 @@
       "type": "book",
       "stream": "craft-instruction",
       "license": "in-copyright",
-      "domains": ["free-indirect-style", "detail", "narrative-distance"],
+      "domains": [
+        "free-indirect-style",
+        "detail",
+        "narrative-distance"
+      ],
       "notes": "Free indirect discourse and the mechanics of narrative distance as abstract craft.",
       "copyright_note": "In-copyright. Abstract features only."
     },
@@ -173,7 +236,11 @@
       "type": "book",
       "stream": "craft-instruction",
       "license": "in-copyright",
-      "domains": ["prose", "vivid-detail", "psychic-distance"],
+      "domains": [
+        "prose",
+        "vivid-detail",
+        "psychic-distance"
+      ],
       "notes": "'Continuous dream' and psychic-distance gradations as abstract concepts.",
       "copyright_note": "In-copyright (Gardner d. 1982; EU until 2052). Abstract features only."
     },
@@ -184,7 +251,11 @@
       "type": "book",
       "stream": "craft-instruction",
       "license": "in-copyright",
-      "domains": ["close-reading", "word-choice", "sentence"],
+      "domains": [
+        "close-reading",
+        "word-choice",
+        "sentence"
+      ],
       "notes": "Close-reading discipline and specificity heuristics. No text reproduction.",
       "copyright_note": "In-copyright. Abstract features only."
     },
@@ -196,7 +267,13 @@
       "stream": "craft-instruction",
       "license": "in-copyright-mixed",
       "location": "the open web (individually cite when a specific heuristic is drawn from one)",
-      "domains": ["scene", "dialogue", "revision", "voice", "genre-conventions"],
+      "domains": [
+        "scene",
+        "dialogue",
+        "revision",
+        "voice",
+        "genre-conventions"
+      ],
       "notes": "The large modern body of writing instruction. Mine for ABSTRACT heuristics and failure modes; cite the specific source per heuristic; never paste passages. Cross-check any single claim against the classical sources before promoting it to a card (do not learn a rule from one blog post).",
       "copyright_note": "Mixed/in-copyright. Abstract features only; attribute per heuristic."
     },
@@ -208,7 +285,10 @@
       "stream": "fiction-corpus",
       "license": "public-domain-us",
       "location": "https://standardebooks.org/",
-      "domains": ["corpus", "public-domain"],
+      "domains": [
+        "corpus",
+        "public-domain"
+      ],
       "notes": "US-public-domain texts for corpus analysis (annotation and abstract feature extraction, not wholesale reproduction into prompts).",
       "copyright_note": "US public domain. EU/DE status must be verified per author death date before ingesting any specific title."
     },
@@ -220,9 +300,29 @@
       "stream": "fiction-corpus",
       "license": "public-domain-us",
       "location": "https://www.gutenberg.org/",
-      "domains": ["corpus", "public-domain"],
+      "domains": [
+        "corpus",
+        "public-domain"
+      ],
       "notes": "Large PD text corpus for pattern analysis. Licensing is US-centric.",
       "copyright_note": "Status determined by US copyright. From Germany, verify EU/DE status (author death + 70) per title before ingesting."
+    },
+    {
+      "id": "the-overnight-example",
+      "title": "The Overnight (repository worked example)",
+      "creator": "fiction-compiler (generated in-repo)",
+      "type": "repo-artifact",
+      "license": "repository-internal",
+      "location": "projects/the-overnight/manuscript/",
+      "stream": "fiction-corpus",
+      "domains": [
+        "scene-dramaturgy",
+        "character-decision",
+        "enacted-turn",
+        "showing-and-telling"
+      ],
+      "copyright_note": "Generated within this repository; no external rights. Safe to quote and annotate.",
+      "notes": "First seeded corpus annotation. Analyze abstract craft features; it is a single sample."
     }
   ]
 }

@@ -8,8 +8,13 @@ Not every happening is an *event* worth telling. **Tellability** (Labov's "so wh
 **eventfulness** (Hühn) ask what makes a change narratable: it must be a *significant* change of
 state that *deviates from the expected script* and carries a point. A canonical, predicted
 happening ("she woke, dressed, caught the train") has near-zero eventfulness; a change that
-violates the default course of things — and matters to someone — is high. This is the formal
-core of the "non-boring" requirement: boredom is low eventfulness.
+violates the default course of things — and matters to someone — is high.
+
+**Do not equate low eventfulness with boredom.** That equation is a heuristic, and it is false for a
+whole counter-tradition — lyric, static, observational, ritual, and much modernist fiction — whose
+force is voice, texture, pattern, or slow perceptual transformation rather than a script-deviating
+change. Eventfulness (Labov/Hühn) is *contested* and *mode-dependent*; calibrate it to the reader
+contract. When a scene seems not to turn, consult [[static-scene]] before flagging it inert.
 
 ## Use when
 Testing whether a scene/beat earns its place (the anti-boredom check), and when choosing which

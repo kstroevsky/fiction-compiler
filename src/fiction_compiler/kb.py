@@ -40,7 +40,8 @@ def get(concept_id: str) -> dict | None:
 
 
 def _summary(concept: dict) -> dict:
-    keys = ("id", "layer", "use_when", "card", "related", "used_by", "sources")
+    keys = ("id", "layer", "claim", "evidence_strength", "use_when", "dangerous_when",
+            "conflicts_with", "card", "related", "used_by", "sources")
     return {k: concept[k] for k in keys if k in concept}
 
 

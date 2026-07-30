@@ -153,6 +153,14 @@ test, not just a feature.
 > identity-based (the target finding must be resolved by fingerprint, not merely by a lower count) and
 > adds **waivers** (a human-approved finding, with a recorded reason, that no longer blocks).
 >
+> **KB now has enforced structured depth (ADR 0015, P4 slice 1).** Every concept carries a `claim`, an
+> `evidence_strength` grade, `dangerous_when` conditions, `counterexamples`, and resolvable
+> `conflicts_with` — `validate_workspace` enforces it, so no card can be inert or over-absolute. The
+> three cards the review flagged (eventfulness, scene-dramaturgy, monotonic knowledge) are conditioned;
+> a conflicting-theory card (`static-scene`) and the first annotated scene (the repo's own
+> `the-overnight/ch01-sc02`) are added. Still ⬜ in P4: genre/period modules, a larger annotated
+> corpus (extract-not-copy, public-domain), semantic retrieval — depth first, never volume.
+>
 > **The hard audit now reads the prose (ADR 0014, review §4).** A `prose_audit` proves an extraction
 > agent's `prose-claims` (pov, tense, typed factual/epistemic claims with evidence) against
 > reconstructed state + the spec — a focalizer knowing an ungranted fact (knowledge leak), an
@@ -175,7 +183,9 @@ test, not just a feature.
 > `0006-fabula-vs-discourse.md`, `0007-tournament-selection-engine.md`,
 > `0008-tournament-judges-and-evidence.md`, `0009-revision-by-finding-identity.md`,
 > `0010-revision-acceptance-by-identity-and-waivers.md`, `0011-framework-regression-harness.md`,
-> and the worked example in `projects/salt-in-the-wire/`.
+> `0012-human-gate-and-rubric.md`, `0013-operational-cleanups.md`, `0014-prose-audit.md`,
+> `0015-kb-structured-depth.md`, and the worked examples in `projects/salt-in-the-wire/` and
+> `projects/the-overnight/`.
 
 ### Stage 0 — Make the scaffold honest (foundations)
 **Goal:** the checks that pass should mean something.
