@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "judgment.schema.json",
+  "comment": "A BLIND comparative judgment an LLM critic produces over anonymized candidates (blind labels only — never candidate ids or generation history). The tournament owns the reveal map and de-anonymizes. `scores` maps each blind label to per-dimension scores (higher = better); these drive the Pareto selection BEHIND the deterministic floor. Multiple judges' disagreement is preserved and can force a human decision — nothing is averaged away silently.",
+  "type": "object",
+  "required": ["scene_id", "judge", "scores"],
+  "additionalProperties": false,
+  "properties": {
+    "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+    "judge": {"type": "string"},
+    "presentation_order": {"type": "array", "items": {"type": "string"}},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "rationale": {"type": "string"},
+    "scores": {"type": "object"}
+  }
+}

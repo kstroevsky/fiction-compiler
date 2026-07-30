@@ -126,32 +126,105 @@ def scores_from_critiques(critiques: list[dict]) -> dict[str, dict[str, float]]:
     return scores
 
 
-def run_tournament(critiques: list[dict], *, seed: int = 0,
-                   judges: list[str] | None = None, judge_rankings: list[list[str]] | None = None) -> dict:
-    """Blind, ordered, Pareto-scored selection over a scene's candidates from their critiques.
+# Code audits form the DETERMINISTIC FLOOR: a candidate with a material/fatal finding from one of
+# these cannot be selected, however much a critic prefers it. This is the guard that lets us lean on
+# the (strong) LLM critic for selection without it choosing fluent prose past a hard failure.
+DETERMINISTIC_CRITICS = frozenset({"hard-audit", "defaultness-lint", "prose-audit"})
 
-    ``judges`` (ids/models) get a per-judge isolation ledger; ``judge_rankings`` (each judge's ranked
-    candidate ids, best first) fold explicit LLM judgments into the recorded disagreement.
+
+def floor_eligible(critiques: list[dict]) -> set[str]:
+    """Candidates that clear the deterministic floor — no material/fatal finding from a code audit."""
+    candidates: set[str] = set()
+    disqualified: set[str] = set()
+    for critique in critiques:
+        name = Path(str(critique.get("candidate", ""))).name
+        if not name.endswith(".md"):
+            continue
+        candidates.add(name)
+        if critique.get("critic") in DETERMINISTIC_CRITICS and \
+                any(f.get("severity") in ("material", "fatal") for f in critique.get("findings", [])):
+            disqualified.add(name)
+    return candidates - disqualified
+
+
+def scores_from_judgments(judgments: list[dict], reveal_map: dict[str, str]) -> dict[str, dict[str, float]]:
+    """Aggregate blind per-dimension judge scores into per-candidate scores (mean across judges).
+
+    Each judgment scores anonymized labels; ``reveal_map`` (label -> candidate id) de-anonymizes.
+    Higher = better. The mean is only the *point estimate*; disagreement is recorded separately and
+    can still force a human decision, so nothing is averaged away silently.
     """
-    scores = scores_from_critiques(critiques)
-    candidate_ids = sorted(scores)
+    accumulated: dict[str, dict[str, list[float]]] = {}
+    for judgment in judgments:
+        for label, dim_scores in (judgment.get("scores") or {}).items():
+            candidate = reveal_map.get(label)
+            if candidate is None or not isinstance(dim_scores, dict):
+                continue
+            bucket = accumulated.setdefault(candidate, {})
+            for dimension, value in dim_scores.items():
+                try:
+                    bucket.setdefault(dimension, []).append(float(value))
+                except (TypeError, ValueError):
+                    continue
+    return {c: {d: sum(vs) / len(vs) for d, vs in dims.items()} for c, dims in accumulated.items()}
+
+
+def rankings_from_judgments(judgments: list[dict], reveal_map: dict[str, str]) -> list[list[str]]:
+    """Each judge's candidate-id ranking (best first) by total score — for disagreement detection."""
+    rankings: list[list[str]] = []
+    for judgment in judgments:
+        totals: dict[str, float] = {}
+        for label, dim_scores in (judgment.get("scores") or {}).items():
+            candidate = reveal_map.get(label)
+            if candidate is None or not isinstance(dim_scores, dict):
+                continue
+            totals[candidate] = sum(float(v) for v in dim_scores.values() if isinstance(v, (int, float)))
+        rankings.append([c for c, _ in sorted(totals.items(), key=lambda kv: -kv[1])])
+    return rankings
+
+
+def run_tournament(critiques: list[dict], *, seed: int = 0, judges: list[str] | None = None,
+                   judgments: list[dict] | None = None, judge_rankings: list[list[str]] | None = None) -> dict:
+    """Blind, ordered, Pareto selection over a scene's candidates, behind the deterministic floor.
+
+    Selection basis: if ``judgments`` (blind per-dimension LLM-critic scores) are supplied, the strong
+    critic drives the Pareto pick among floor-eligible candidates; otherwise deterministic critique
+    penalties do. Either way, a candidate that fails the deterministic floor is never selected.
+    ``judges`` add an isolation ledger; ``judge_rankings`` remain accepted for disagreement only.
+    """
+    penalty_scores = scores_from_critiques(critiques)
+    candidate_ids = sorted(penalty_scores)
     if not candidate_ids:
         return {"decision": "no_candidates", "reason": "no critiques with a candidate were supplied"}
 
     label_by_id, id_by_label = anonymize(candidate_ids, seed=seed)
     orders = presentation_orders(list(label_by_id.values()), seed=seed)
+    eligible = floor_eligible(critiques)
+
+    if judgments:
+        judged = scores_from_judgments(judgments, id_by_label)
+        scores = {c: judged[c] for c in candidate_ids if c in eligible and c in judged}
+        basis = "critic-judgments"
+    else:
+        scores = {c: penalty_scores[c] for c in candidate_ids if c in eligible}
+        basis = "deterministic-findings"
+
     front = pareto_front(scores)
-    if len(front) == 1:
+    if not scores:
+        recommendation = {"decision": "no_eligible_candidates",
+                          "reason": "no candidate cleared the deterministic floor (or was scored)"}
+    elif len(front) == 1:
         recommendation = {"decision": "select", "candidate": next(iter(front))}
     else:
-        recommendation = {
-            "decision": "human_decision_required",
-            "pareto_front": sorted(front),
-            "reason": "multiple non-dominated candidates — a genuine tradeoff; do not average it away",
-        }
+        recommendation = {"decision": "human_decision_required", "pareto_front": sorted(front),
+                          "reason": "multiple non-dominated candidates — a genuine tradeoff; do not average it away"}
+
     disagreement = has_disagreement(scores)
     record = {
         "candidates": candidate_ids,
+        "floor_eligible": sorted(eligible),
+        "floor_failed": sorted(set(candidate_ids) - eligible),
+        "selection_basis": basis,
         "blind_labels": label_by_id,          # id -> blinded label (what a judge may see)
         "reveal_map": id_by_label,            # label -> id (keep OUT of the judges' view)
         "presentation_orders": orders,
@@ -162,8 +235,9 @@ def run_tournament(critiques: list[dict], *, seed: int = 0,
     }
     if judges:
         record["judge_ledger"] = assign_orders(judges, orders)
-    if judge_rankings:
-        judge_disagreement = disagreement_from_rankings(judge_rankings)
+    rankings = rankings_from_judgments(judgments, id_by_label) if judgments else judge_rankings
+    if rankings:
+        judge_disagreement = disagreement_from_rankings(rankings)
         record["judge_disagreement"] = judge_disagreement
         disagreement = disagreement or not judge_disagreement["agree_on_winner"]
     record["disagreement"] = disagreement

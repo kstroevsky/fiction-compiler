@@ -54,10 +54,17 @@ def _prose_knowledge_leak(inp: dict) -> bool:
     return prose_audit.is_knowledge_leak(inp["pov_knows_before"], inp["granted_this_scene"])
 
 
+def _tournament_selected(inp: dict) -> str:
+    result = tournament.run_tournament(inp["critiques"], seed=inp.get("seed", 0), judgments=inp.get("judgments"))
+    rec = result["recommendation"]
+    return rec.get("candidate", rec["decision"])
+
+
 CHECKS = {
     "defaultness_verdict": _defaultness_verdict,
     "revision_decision": _revision_decision,
     "tournament_decision": _tournament_decision,
+    "tournament_selected": _tournament_selected,
     "ontology_valid": _ontology_valid,
     "prose_knowledge_leak": _prose_knowledge_leak,
 }

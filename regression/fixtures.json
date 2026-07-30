@@ -101,6 +101,22 @@
       "check": "prose_knowledge_leak",
       "input": {"pov_knows_before": false, "granted_this_scene": true},
       "expect": false
+    },
+    {
+      "name": "tournament floor excludes a candidate with a material code-audit finding (ADR 0016)",
+      "check": "tournament_selected",
+      "input": {"critiques": [
+        {"candidate": "candidate-a.md", "critic": "defaultness-lint", "findings": []},
+        {"candidate": "candidate-b.md", "critic": "defaultness-lint", "findings": [{"dimension": "cliche", "severity": "material"}]}]},
+      "expect": "candidate-a.md"
+    },
+    {
+      "name": "tournament reports no eligible candidate when all fail the deterministic floor (ADR 0016)",
+      "check": "tournament_selected",
+      "input": {"critiques": [
+        {"candidate": "candidate-a.md", "critic": "defaultness-lint", "findings": [{"dimension": "x", "severity": "material"}]},
+        {"candidate": "candidate-b.md", "critic": "prose-audit", "findings": [{"dimension": "y", "severity": "fatal"}]}]},
+      "expect": "no_eligible_candidates"
     }
   ]
 }

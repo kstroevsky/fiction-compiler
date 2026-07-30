@@ -135,5 +135,62 @@ class JudgeAndPersistenceTests(unittest.TestCase):
                 self.assertNotIn("candidate-", md.read_text())
 
 
+class CriticDrivesSelectionTests(unittest.TestCase):
+    """The strong LLM critic drives selection, behind the deterministic floor (ADR 0016)."""
+
+    def _clean(self, *names) -> list:
+        return [{"candidate": n, "critic": "defaultness-lint", "findings": []} for n in names]
+
+    def test_scores_from_judgments_means_across_judges(self) -> None:
+        reveal = {"A": "cand-a", "B": "cand-b"}
+        j1 = {"scores": {"A": {"prose": 4}, "B": {"prose": 2}}}
+        j2 = {"scores": {"A": {"prose": 2}, "B": {"prose": 4}}}
+        s = tournament.scores_from_judgments([j1, j2], reveal)
+        self.assertEqual(s["cand-a"]["prose"], 3.0)
+        self.assertEqual(s["cand-b"]["prose"], 3.0)
+
+    def test_critic_judgment_drives_the_pick(self) -> None:
+        critiques = self._clean("candidate-a.md", "candidate-b.md")  # both floor-clean, no penalties
+        labels = tournament.run_tournament(critiques, seed=0)["blind_labels"]  # id -> blind label
+        judgment = {"scene_id": "ch01-sc01", "judge": "style-editor@1", "scores": {
+            labels["candidate-a.md"]: {"prose": 2, "tension": 2},
+            labels["candidate-b.md"]: {"prose": 4, "tension": 4}}}  # critic clearly prefers B
+        r = tournament.run_tournament(critiques, seed=0, judgments=[judgment])
+        self.assertEqual(r["selection_basis"], "critic-judgments")
+        self.assertEqual(r["recommendation"]["decision"], "select")
+        self.assertEqual(r["recommendation"]["candidate"], "candidate-b.md")
+
+    def test_floor_excludes_a_candidate_even_if_the_critic_prefers_it(self) -> None:
+        critiques = [
+            {"candidate": "candidate-a.md", "critic": "defaultness-lint", "findings": []},
+            {"candidate": "candidate-b.md", "critic": "defaultness-lint",
+             "findings": [{"dimension": "cliche", "severity": "material"}]}]  # B fails the floor
+        labels = tournament.run_tournament(critiques, seed=0)["blind_labels"]
+        judgment = {"scene_id": "ch01-sc01", "judge": "x", "scores": {
+            labels["candidate-a.md"]: {"prose": 1}, labels["candidate-b.md"]: {"prose": 5}}}  # loves B
+        r = tournament.run_tournament(critiques, seed=0, judgments=[judgment])
+        self.assertIn("candidate-b.md", r["floor_failed"])
+        self.assertEqual(r["recommendation"]["candidate"], "candidate-a.md")  # B excluded despite the critic
+
+    def test_all_candidates_failing_the_floor_yields_no_eligible(self) -> None:
+        critiques = [
+            {"candidate": "candidate-a.md", "critic": "defaultness-lint",
+             "findings": [{"dimension": "cliche", "severity": "material"}]},
+            {"candidate": "candidate-b.md", "critic": "prose-audit",
+             "findings": [{"dimension": "knowledge", "severity": "fatal"}]}]
+        r = tournament.run_tournament(critiques, seed=0)
+        self.assertEqual(r["recommendation"]["decision"], "no_eligible_candidates")
+
+    def test_judges_split_forces_human_decision(self) -> None:
+        critiques = self._clean("candidate-a.md", "candidate-b.md")
+        labels = tournament.run_tournament(critiques, seed=0)["blind_labels"]
+        a, b = labels["candidate-a.md"], labels["candidate-b.md"]
+        judgments = [{"scene_id": "ch01-sc01", "judge": "j1", "scores": {a: {"q": 5}, b: {"q": 1}}},
+                     {"scene_id": "ch01-sc01", "judge": "j2", "scores": {a: {"q": 1}, b: {"q": 5}}}]
+        r = tournament.run_tournament(critiques, seed=0, judgments=judgments)
+        self.assertTrue(r["disagreement"])
+        self.assertFalse(r["judge_disagreement"]["agree_on_winner"])
+
+
 if __name__ == "__main__":
     unittest.main()
