@@ -18,7 +18,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from . import defaultness, integrity, ontology, revision, tournament
+from . import defaultness, integrity, ontology, prose_audit, revision, tournament
 from .workspace import KB, ROOT, SCHEMAS
 
 FIXTURES = ROOT / "regression" / "fixtures.json"
@@ -50,11 +50,16 @@ def _ontology_valid(inp: dict) -> bool:
     return not ontology.check_atom(ont, atom.get("predicate"), atom.get("subject"), atom.get("object"))
 
 
+def _prose_knowledge_leak(inp: dict) -> bool:
+    return prose_audit.is_knowledge_leak(inp["pov_knows_before"], inp["granted_this_scene"])
+
+
 CHECKS = {
     "defaultness_verdict": _defaultness_verdict,
     "revision_decision": _revision_decision,
     "tournament_decision": _tournament_decision,
     "ontology_valid": _ontology_valid,
+    "prose_knowledge_leak": _prose_knowledge_leak,
 }
 
 

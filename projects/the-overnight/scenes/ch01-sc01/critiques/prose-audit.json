@@ -1,0 +1,9 @@
+{
+  "candidate": "candidate-a-r1.md",
+  "critic": "prose-audit",
+  "audit_class": "hard",
+  "verdict": "pass",
+  "confidence": 1.0,
+  "findings": [],
+  "candidate_sha256": "aa9bcd920e3e4fb6fc6066c36a96818051b869d70f4f562d9057fa1b6b220440"
+}

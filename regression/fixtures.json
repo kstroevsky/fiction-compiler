@@ -89,6 +89,18 @@
         "atom": {"predicate": "located_at", "subject": "char-jonas", "object": "loc-station"}
       },
       "expect": true
+    },
+    {
+      "name": "prose audit flags a focalizer knowing an ungranted fact (ADR 0014, review §4)",
+      "check": "prose_knowledge_leak",
+      "input": {"pov_knows_before": false, "granted_this_scene": false},
+      "expect": true
+    },
+    {
+      "name": "prose audit allows the focalizer to perceive a fact this scene grants (ADR 0014)",
+      "check": "prose_knowledge_leak",
+      "input": {"pov_knows_before": false, "granted_this_scene": true},
+      "expect": false
     }
   ]
 }

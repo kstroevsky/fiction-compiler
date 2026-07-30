@@ -151,8 +151,16 @@ test, not just a feature.
 > worsened / newly-introduced, so a *new* material finding is rejected even when the raw count falls
 > (the review's two-minors→one-material trap). Slice 2 (ADR 0010) makes **acceptance** itself
 > identity-based (the target finding must be resolved by fingerprint, not merely by a lower count) and
-> adds **waivers** (a human-approved finding, with a recorded reason, that no longer blocks). Still ⬜
-> in P3: rerunning prose-reading audits (blocked on the hard audit reading prose, review §4).
+> adds **waivers** (a human-approved finding, with a recorded reason, that no longer blocks).
+>
+> **The hard audit now reads the prose (ADR 0014, review §4).** A `prose_audit` proves an extraction
+> agent's `prose-claims` (pov, tense, typed factual/epistemic claims with evidence) against
+> reconstructed state + the spec — a focalizer knowing an ungranted fact (knowledge leak), an
+> unplanned character, head-hopping, a tense break, a spatial contradiction, or a promise closed in
+> prose but not in the delta are material findings. LLM extracts, code judges (same split as the
+> tournament). Demonstrated on `the-overnight/ch01-sc01`: honest claims pass; an injected future-fact
+> leak is caught. Still ⬜: making `prose_audit` a *required* gate class, and auto-rerunning it (with
+> the other prose-reading audits) after every revision.
 >
 > **Framework loop now has a regression harness (ADR 0011, P5 slice 1).** `scripts/run_regression.py`
 > + the `run_regression` tool run fixed fixtures (`regression/fixtures.json`) that pin the invariants

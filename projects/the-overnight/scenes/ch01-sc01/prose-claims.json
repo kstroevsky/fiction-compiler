@@ -1,0 +1,33 @@
+{
+  "scene_id": "ch01-sc01",
+  "candidate": "candidate-a-r1.md",
+  "candidate_sha256": "aa9bcd920e3e4fb6fc6066c36a96818051b869d70f4f562d9057fa1b6b220440",
+  "pov": "char-nadia",
+  "tense": "past",
+  "word_count": 495,
+  "claims": [
+    {
+      "type": "character_present",
+      "subject": "char-nadia",
+      "evidence": "the shop belonged to no one but Nadia"
+    },
+    {
+      "type": "focalizer_knows",
+      "subject": "char-nadia",
+      "object": "fact-wake-order",
+      "evidence": "Twelve was the Halloran order, milk loaves for the wake, due at the counter by six"
+    },
+    {
+      "type": "focalizer_knows",
+      "subject": "char-nadia",
+      "object": "fact-proofer-drifts",
+      "evidence": "the way it always drifted, and Esther was not there to bring it down by hand"
+    },
+    {
+      "type": "focalizer_knows",
+      "subject": "char-nadia",
+      "object": "fact-dough-ruined",
+      "evidence": "Over-proofed. Gone."
+    }
+  ]
+}

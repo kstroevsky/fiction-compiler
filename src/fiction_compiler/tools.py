@@ -18,6 +18,7 @@ from . import defaultness, hard_audit, kb, regression, revision
 from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
+from .prose_audit import audit_prose as _audit_prose
 from .state import StoryState, accepted_scene_ids, reconstruct_state_before
 from .tournament import run_tournament
 from .workspace import confine_file, confine_project, project_dir
@@ -207,6 +208,17 @@ def tournament(project: str, scene_id: str, seed: int = 0, persist: bool = False
     return record
 
 
+def prose_audit(project: str, scene_id: str, claims: dict) -> dict:
+    """Prove a candidate's extracted prose-claims against state + spec (the hard audit's prose half).
+
+    ``claims`` is the prose-claims artifact an extraction agent derives from ONE candidate's prose
+    (see schemas/prose-claims.schema.json). Returns a critique.schema critique with critic
+    'prose-audit'; a knowledge leak, unplanned character, head-hop, tense break, spatial
+    contradiction, or an unrecorded promise closure is a material finding.
+    """
+    return _audit_prose(project_dir(project), scene_id, claims)
+
+
 def run_regression() -> dict:
     """Run the framework regression fixtures (the FRAMEWORK loop's deterministic CHECK).
 
@@ -309,6 +321,14 @@ TOOLS: list[dict] = [
           "Stitch the accepted (promoted) scenes into a single manuscript.md, in fabula order, "
           "with title and chapter/scene breaks. Returns the path and word count.",
           {"project": {"type": "string"}}, ["project"], assemble),
+    _tool("prose_audit",
+          "Prove a candidate's extracted prose-claims against reconstructed state + the scene spec — "
+          "the hard audit's PROSE half (review §4). Pass the prose-claims artifact an extraction agent "
+          "derived from the candidate's text (schemas/prose-claims.schema.json). Catches focalizer "
+          "knowledge leaks, unplanned characters, head-hopping, tense breaks, spatial contradictions, "
+          "and promise closures the state delta never recorded. Returns a critique.schema critique.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"}, "claims": {"type": "object"}},
+          ["project", "scene_id", "claims"], prose_audit),
     _tool("run_regression",
           "Run the FRAMEWORK regression fixtures — the deterministic invariants the ADRs pinned "
           "(defaultness, revision identity, tournament selection, ontology). Returns pass/fail per "

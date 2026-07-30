@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "prose-claims.schema.json",
+  "comment": "Structured claims an extraction agent derives from ONE candidate's prose. Deterministic code (prose_audit) proves these against reconstructed state + the scene spec — the LLM extracts, the code judges (review §4).",
+  "type": "object",
+  "required": ["scene_id", "pov", "tense", "word_count", "claims"],
+  "additionalProperties": false,
+  "properties": {
+    "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+    "candidate": {"type": "string"},
+    "candidate_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "pov": {"type": "string"},
+    "tense": {"enum": ["past", "present", "future", "mixed"]},
+    "word_count": {"type": "integer", "minimum": 0},
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "evidence"],
+        "additionalProperties": false,
+        "properties": {
+          "type": {"enum": ["character_present", "focalizer_knows", "interiority_of", "located_at", "closes_promise", "states_fact"]},
+          "subject": {"type": "string"},
+          "object": {"type": "string"},
+          "ref": {"type": "string"},
+          "evidence": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

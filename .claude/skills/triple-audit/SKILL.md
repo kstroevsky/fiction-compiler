@@ -8,6 +8,15 @@ three independently and preserve disagreement.
 1. **Hard audit (code).** `hard_audit(project, scene)` (MCP) or `python3 scripts/hard_audit.py
    <project> <scene>`. Knowledge cutoff, causal refs, POV, chronology, promise ledger. **A fatal
    finding blocks promotion** — fix it before anything else.
+   - **Prose audit (extract → code).** The hard audit above reads the spec, not the text. To check the
+     *prose*, extract a `prose-claims` artifact from the candidate (pov, tense, word_count, and typed
+     claims: character_present / focalizer_knows / interiority_of / located_at / closes_promise /
+     states_fact, each with an evidence span — schema `prose-claims`), then run
+     `prose_audit(project, scene, claims)` (MCP) or `scripts/prose_audit.py <project> <scene>
+     <claims.json>`. Deterministic code proves the claims against state-before + spec: a focalizer
+     knowing an ungranted fact, an unplanned character, head-hopping, a tense break, a spatial
+     contradiction, or an unrecorded promise closure is material. Extract honestly — the audit only
+     proves the claims you give it.
 2. **Defaultness (code).** `defaultness_lint` each candidate (or `scripts/defaultness_lint.py
    <project> <scene>`). Surface tics only; the literary read below finds the deeper defaults.
 3. **Literary audit (LLM).** Delegate to the specialist agents — this is what code cannot check:
