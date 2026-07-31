@@ -1,0 +1,15 @@
+{
+  "scene_id": "ch01-sc01",
+  "time": 0,
+  "facts_added": [],
+  "facts_removed": [],
+  "knowledge_changes": [],
+  "relationship_changes": [],
+  "predicate_changes": [
+    {"op": "add", "predicate": "located_at", "subject": "char-lena", "object": "loc-visit-hall"}
+  ],
+  "promises_opened": [
+    {"id": "promise-mams-love", "text": "Will Danny leave this visit still believing his mother is waiting for him?"}
+  ],
+  "promises_closed": []
+}

@@ -1,0 +1,13 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "76e5a4fd869a1cfdca91db912c5c4b39223ee237d440a17ddc0aa9da71ed315b",
+  "critic": "style-editor",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.7,
+  "findings": [
+    {"dimension": "stated-dramatic-question", "severity": "material", "evidence": "She had decided in the car that she would tell him.", "diagnosis": "The internal stake is declared up front and re-declared at the end rather than emerging from procedural detail. (Note: the character-simulator credits this same move for keeping Lena's contradiction live — disagreement preserved.)", "repair_layer": "discourse"},
+    {"dimension": "near-stated-theme", "severity": "material", "evidence": "It was the thing she had instead of the thing Mam had always handed him for nothing.", "diagnosis": "The meaning crystallized in abstract 'the thing... the thing' terms instead of a concrete image.", "repair_layer": "prose"},
+    {"dimension": "motif-over-repetition", "severity": "minor", "evidence": "like a cup she didn't want to spill / carried the other version up the motorway / the sentence she had carried three hours sat up in her chest", "diagnosis": "The carried-secret figure recurs three times and becomes a visible authorial motif.", "repair_layer": "prose"}
+  ]
+}

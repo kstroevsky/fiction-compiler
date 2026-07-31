@@ -1,0 +1,13 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "2457dc24a077198d13e611508636381e5ca98e5f6bf6a2f4201f015ea56321d3",
+  "critic": "style-editor",
+  "audit_class": "literary",
+  "verdict": "pass",
+  "confidence": 0.7,
+  "findings": [
+    {"dimension": "named-emotion", "severity": "minor", "evidence": "He tapped the table, pleased, sure of it.", "diagnosis": "'pleased, sure of it' names Danny's state — the one place the draft tells rather than lets the tapped table carry it; closest thing to a banned manner tag.", "repair_layer": "prose"},
+    {"dimension": "aphorism", "severity": "minor", "evidence": "she'd said harder true things to easier faces.", "diagnosis": "A general maxim; in-voice and dry so it mostly earns its keep.", "repair_layer": "prose"},
+    {"dimension": "abstract-turn", "severity": "minor", "evidence": "and none of those were the same reason", "diagnosis": "Edges toward telling, but survives because it undercuts sentiment rather than supplying it.", "repair_layer": "discourse"}
+  ]
+}

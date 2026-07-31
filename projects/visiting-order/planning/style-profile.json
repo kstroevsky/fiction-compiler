@@ -1,0 +1,44 @@
+{
+  "narrative_distance": "close third, level 3-4; dry, undemonstrative",
+  "voice_principles": [
+    "the practical word before the felt one",
+    "the mechanics of the visit carry the feeling",
+    "no emotion named that a gesture or a rule could imply"
+  ],
+  "diction": [
+    "plain, working nouns",
+    "the procedural vocabulary of a prison visit: search, stamp, locker, visiting order, the hall, the officer, the table",
+    "few adjectives, each earning its place"
+  ],
+  "syntax": [
+    "short flat declaratives",
+    "an occasional long sentence for one sustained action"
+  ],
+  "rhythm": [
+    "vary sentence openings",
+    "let a silence or a rule be an action, not a described feeling"
+  ],
+  "imagery": [
+    "the stamped hand, the plastic cup, the bolted furniture, the photo kept in a pocket",
+    "the phrase 'Mam sends her love' as the recurring load-bearing line"
+  ],
+  "dialogue": [
+    "mundane visit-talk over subtext",
+    "the theme is never spoken; the one loaded beat is handled in as few words as possible",
+    "no adverbial tags; distinct idiolects (Lena dry and flat, Danny quicker and needier under a front)"
+  ],
+  "sentence_distribution": {
+    "short": 0.55,
+    "medium": 0.35,
+    "long": 0.1
+  },
+  "avoid": [
+    "generic emotional abstraction",
+    "stated theme or moral",
+    "sentimental prison-visit cliche (the single tear, the hands almost touching)",
+    "unearned uplift or reconciliation",
+    "filter words (she felt / saw / realized / noticed / watched)",
+    "emotion named then paraphrased",
+    "adverbial dialogue tags"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "e03aa66b348fd18378912eae457314a4aa098199f17b65906b1e0349c68201d3",
+  "critic": "style-editor",
+  "audit_class": "literary",
+  "verdict": "pass",
+  "confidence": 0.82,
+  "findings": [
+    {"dimension": "named-emotion", "severity": "minor", "evidence": "and looked at her, glad", "diagnosis": "The preceding gesture already carries it; 'glad' names what the beat has shown.", "repair_layer": "prose"},
+    {"dimension": "sententious-generalization", "severity": "minor", "evidence": "the first few minutes always the worst", "diagnosis": "The one spot the close third steps out to generalize the moment.", "repair_layer": "prose"},
+    {"dimension": "decorative-tail", "severity": "minor", "evidence": "in the ordinary light", "diagnosis": "Gilds a plain procedural moment.", "repair_layer": "prose"}
+  ]
+}

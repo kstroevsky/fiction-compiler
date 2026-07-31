@@ -1,0 +1,46 @@
+{
+  "id": "ch01-sc01",
+  "chapter": "1",
+  "narrative_mode": "linear",
+  "pov": "char-lena",
+  "participants": ["char-lena", "char-danny"],
+  "purpose": [
+    "establish Lena, the long drive, the search and the rules of the hall",
+    "first sight of Danny at the table, smaller than he was, glad to see her",
+    "plant the withheld truth (Mam has stopped asking) and the old wound (Mam loved him best)"
+  ],
+  "entry_state": [
+    "Lena has driven three hours and cleared security",
+    "she carries what their mother did not do this week",
+    "she has told Danny for months that Mam sends her love"
+  ],
+  "desire": "get through the visit and back on the road before dark",
+  "conflict": "she is carrying a truth she could put down today, and half wants to",
+  "turn": "at the sight of Danny across the table the decision she thought she had made comes open again",
+  "exit_state": [
+    "Lena is at the table with Danny",
+    "the question of Mam is coming",
+    "she has not decided what she will say"
+  ],
+  "required_events": ["evt-arrive"],
+  "knowledge_required": [
+    {"character": "char-lena", "fact": "fact-mam-stopped"}
+  ],
+  "forbidden_moves": [
+    "name Lena's feelings",
+    "state the theme",
+    "a staged flashback",
+    "sentimental prison-visit cliche",
+    "adverbial dialogue tags"
+  ],
+  "style_constraints": [
+    "close third on Lena",
+    "the procedure of the hall carries the tension",
+    "dry, undemonstrative register",
+    "no filter words"
+  ],
+  "candidate_strategies": [
+    "A: sensory and procedural — the search, the stamp, the walk to the table",
+    "B: leaner, more interior pressure carried by what she won't let herself think"
+  ]
+}

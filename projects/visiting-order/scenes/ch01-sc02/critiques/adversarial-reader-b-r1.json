@@ -1,0 +1,12 @@
+{
+  "candidate": "candidate-b-r1.md",
+  "candidate_sha256": "d90f06251c8de84b4ebb89ec0afb0d9e256cc7601ef4737e0be9c9cbd3acbe5b",
+  "critic": "adversarial-reader",
+  "audit_class": "literary",
+  "verdict": "pass",
+  "confidence": 0.84,
+  "findings": [
+    {"dimension": "feeling-named", "severity": "minor", "evidence": "and she was tired", "diagnosis": "The single place an interior state is named rather than enacted, but flanked by an enacted cause ('she'd driven three hours') and one of the sanctioned un-saintly motives, so it reads as plainspoken bodily fact.", "repair_layer": "prose"},
+    {"dimension": "decorative", "severity": "minor", "evidence": "the light through her hair", "diagnosis": "The one line reaching for lyric prettiness, but 'her eyes gone somewhere past the room' immediately converts the beauty into dementia-absence, so it alters perception rather than decorating.", "repair_layer": "prose"}
+  ]
+}

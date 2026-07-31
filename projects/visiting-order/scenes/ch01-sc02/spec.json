@@ -1,0 +1,47 @@
+{
+  "id": "ch01-sc02",
+  "chapter": "1",
+  "narrative_mode": "linear",
+  "pov": "char-lena",
+  "participants": ["char-lena", "char-danny"],
+  "purpose": [
+    "the mundane business of the visit, over the pressure of the withheld sentence",
+    "Danny asks after Mam; the pull to tell him the truth peaks",
+    "Lena chooses to withhold and says 'Mam sends her love' — for reasons that are not saintly"
+  ],
+  "entry_state": [
+    "Lena and Danny are at the table",
+    "the question of Mam is coming",
+    "the old imbalance is close under the surface"
+  ],
+  "desire": "get Danny through the hour without letting it slip",
+  "conflict": "the truth she could level him with against the lie that keeps him upright; her resentment sharpens the temptation",
+  "turn": "at the edge of telling him Mam has stopped asking, she looks at him and says instead that Mam sends her love, and knows the lie is hers now, not their mother's",
+  "exit_state": [
+    "Danny still believes Mam is waiting for him",
+    "the burden has passed fully to Lena",
+    "nothing is healed"
+  ],
+  "required_events": ["evt-the-question"],
+  "knowledge_required": [
+    {"character": "char-lena", "fact": "fact-mam-stopped"}
+  ],
+  "forbidden_moves": [
+    "the theme spoken by anyone",
+    "a confession or catharsis",
+    "Danny absolving or thanking her in a way that resolves it",
+    "a reveal that Mam 'really' loves him best after all",
+    "named feelings",
+    "adverbial dialogue tags"
+  ],
+  "style_constraints": [
+    "close third on Lena",
+    "two-hander carried by subtext; the withheld sentence is the pressure",
+    "dialogue mundane except the one loaded beat, handled in few words",
+    "no filter words"
+  ],
+  "candidate_strategies": [
+    "A: the choice in near-silence, carried by the photo she does not take out",
+    "B: sharper sibling friction, the old wound closer to the surface"
+  ]
+}

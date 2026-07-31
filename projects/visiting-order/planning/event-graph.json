@@ -1,0 +1,47 @@
+{
+  "events": [
+    {
+      "id": "evt-arrive",
+      "time": 0,
+      "actors": ["char-lena"],
+      "preconditions": [
+        {"predicate": "knows", "subject": "char-lena", "object": "fact-mam-stopped"}
+      ],
+      "action": "Lena clears the search, gets her hand stamped, and comes into the visiting hall to where Danny is waiting at a bolted table.",
+      "effects": [
+        {"op": "add", "predicate": "located_at", "subject": "char-lena", "object": "loc-visit-hall"}
+      ],
+      "causes": ["fact-danny-inside"]
+    },
+    {
+      "id": "evt-the-question",
+      "time": 1,
+      "actors": ["char-lena", "char-danny"],
+      "preconditions": [
+        {"predicate": "located_at", "subject": "char-lena", "object": "loc-visit-hall"},
+        {"predicate": "knows", "subject": "char-lena", "object": "fact-mam-stopped"}
+      ],
+      "action": "Danny asks whether Mam has been asking after him; on the edge of telling him she has stopped, Lena says instead that their mam sends her love.",
+      "effects": [],
+      "causes": ["evt-arrive"]
+    },
+    {
+      "id": "evt-leave",
+      "time": 2,
+      "actors": ["char-lena"],
+      "preconditions": [
+        {"predicate": "located_at", "subject": "char-lena", "object": "loc-visit-hall"}
+      ],
+      "action": "The visit is called; Lena says goodbye, leaves the hall, and sits in the car with the photo she never took out.",
+      "effects": [
+        {"op": "add", "predicate": "located_at", "subject": "char-lena", "object": "loc-carpark"},
+        {"op": "remove", "predicate": "located_at", "subject": "char-lena", "object": "loc-visit-hall"}
+      ],
+      "causes": ["evt-the-question"]
+    }
+  ],
+  "edges": [
+    {"from": "evt-arrive", "to": "evt-the-question"},
+    {"from": "evt-the-question", "to": "evt-leave"}
+  ]
+}

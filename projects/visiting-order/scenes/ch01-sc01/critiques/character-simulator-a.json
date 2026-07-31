@@ -1,0 +1,13 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "e03aa66b348fd18378912eae457314a4aa098199f17b65906b1e0349c68201d3",
+  "critic": "character-simulator",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.65,
+  "findings": [
+    {"dimension": "contradiction-not-live", "severity": "material", "evidence": "she knew what he was going to ask before the tea was cool enough to drink.", "diagnosis": "Lena's half-want to detonate the truth is never armed — no beat of temptation — so she reads as the enduring good one, the saintly-endurer the model warns against.", "repair_layer": "character"},
+    {"dimension": "danny-villain-tilt", "severity": "minor", "evidence": "Danny who'd emptied her purse and worse", "diagnosis": "'and worse' imports unspecified serious harm and nudges Danny from needy-favoured-son toward culprit; thins his sympathy. (Adversarial, by contrast, read it as right-sized and un-over-explained — disagreement preserved.)", "repair_layer": "prose"},
+    {"dimension": "wound-overstatement", "severity": "minor", "evidence": "Lena came every month. Lena she forgot to ask about to Lena's own face.", "diagnosis": "Triple anaphora presses the wound harder than a dry, undemonstrative POV would.", "repair_layer": "prose"}
+  ]
+}

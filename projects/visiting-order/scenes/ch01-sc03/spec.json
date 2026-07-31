@@ -1,0 +1,46 @@
+{
+  "id": "ch01-sc03",
+  "chapter": "1",
+  "narrative_mode": "linear",
+  "pov": "char-lena",
+  "participants": ["char-lena", "char-danny"],
+  "purpose": [
+    "the visit is called; the goodbye; Lena leaves the hall",
+    "the cost of what she kept, carried in the body and the car, not named",
+    "end on a concrete image; refuse resolution"
+  ],
+  "entry_state": [
+    "the hour is up",
+    "Lena has kept the lie",
+    "Danny is being taken back"
+  ],
+  "desire": "get to the car and drive",
+  "conflict": "what she has spent and will not get back; the aloneness of it",
+  "turn": "in the car she takes the photo half out of her pocket and puts it back; she will do this again, and that is settled now",
+  "exit_state": [
+    "Lena drives",
+    "Danny still believes",
+    "Mam is still fading and the old imbalance is unhealed"
+  ],
+  "required_events": ["evt-leave"],
+  "knowledge_required": [
+    {"character": "char-lena", "fact": "fact-mam-stopped"}
+  ],
+  "forbidden_moves": [
+    "a redemptive or consoling close",
+    "a tidy lesson or stated theme",
+    "name the feeling",
+    "a flashback",
+    "adverbial dialogue tags"
+  ],
+  "style_constraints": [
+    "close third on Lena",
+    "end on a concrete image",
+    "dry, spare",
+    "no told emotion"
+  ],
+  "candidate_strategies": [
+    "A: the car park and the photo, the drive not yet started",
+    "B: sparer, more elliptical, more white space around the final image"
+  ]
+}

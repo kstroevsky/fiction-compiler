@@ -1,0 +1,14 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "76e5a4fd869a1cfdca91db912c5c4b39223ee237d440a17ddc0aa9da71ed315b",
+  "critic": "adversarial-reader",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.65,
+  "findings": [
+    {"dimension": "theme-leak", "severity": "material", "evidence": "It had been true enough when she started.", "diagnosis": "The narration adjudicates the moral status of the kind lie — the story's own question surfacing in free-indirect narration; the flagged two-hander risk.", "repair_layer": "prose"},
+    {"dimension": "abstraction", "severity": "material", "evidence": "It was the thing she had instead of the thing Mam had always handed him for nothing.", "diagnosis": "The old wound stated as aphorism; the meaning handed to the reader rather than dramatized in a concrete fact.", "repair_layer": "prose"},
+    {"dimension": "coverage", "severity": "material", "evidence": "Lena was through the search and stamped and sitting on the bolted chairs by ten past", "diagnosis": "The search and rules of the hall — the mechanics the contract asks to carry the feeling — are summarized away in a clause. (Its genuine advantage over candidate-a: it DOES plant the lie on the page — 'Mam sends her love' — which arms the ending.)", "repair_layer": "scene"},
+    {"dimension": "plainspoken-drift", "severity": "minor", "evidence": "held it the rest of the way like a cup she didn't want to spill.", "diagnosis": "More writerly than dry report; pre-echoes the literal tea a touch too neatly.", "repair_layer": "prose"}
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "44ed60d933787e20b1c2313550cea8521ae9c6938a066dd302af82faaa12bae1",
+  "critic": "adversarial-reader",
+  "audit_class": "literary",
+  "verdict": "pass",
+  "confidence": 0.72,
+  "findings": [
+    {"dimension": "sentimentality", "severity": "minor", "evidence": "he let go, and grinned so she'd not see behind it", "diagnosis": "The one soft note in an otherwise dry goodbye; leans on the brave-face-hiding-grief beat and asserts there is something behind it rather than letting the grin stand.", "repair_layer": "prose"},
+    {"dimension": "telling", "severity": "minor", "evidence": "He said it like it was nothing, and it was the nearest he got", "diagnosis": "Close-third glosses the affection instead of rendering it; mild naming-by-proxy.", "repair_layer": "prose"},
+    {"dimension": "over-narration", "severity": "minor", "evidence": "his mother's face with him not in it, not behind it, not anywhere it was looking", "diagnosis": "A composed rhetorical triad that spells out the photo's meaning; still concrete, but edges toward over-explained.", "repair_layer": "prose"}
+  ]
+}

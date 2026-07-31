@@ -1,0 +1,12 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "2457dc24a077198d13e611508636381e5ca98e5f6bf6a2f4201f015ea56321d3",
+  "critic": "character-simulator",
+  "audit_class": "literary",
+  "verdict": "pass",
+  "confidence": 0.82,
+  "findings": [
+    {"dimension": "wound-impulse-sublimated", "severity": "minor", "evidence": "the other thing was to reach across a table she wasn't allowed to reach across and take it off him", "diagnosis": "The wound-impulse reads as withdrawing comfort more than live malice, but survives because 'she'd said harder true things to easier faces' pre-loads her capacity for cruelty, so the restraint is a choice not incapacity.", "repair_layer": "character"},
+    {"dimension": "wound-paragraph-length", "severity": "minor", "evidence": "Once Lena would come in at the door of the home and Mam's face would go past her to the hall behind her to see was Danny there", "diagnosis": "The most direct statement of the favouritism wound; stays character-bound and concrete but would register at two-thirds the words.", "repair_layer": "discourse"}
+  ]
+}

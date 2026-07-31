@@ -1,0 +1,14 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "44ed60d933787e20b1c2313550cea8521ae9c6938a066dd302af82faaa12bae1",
+  "critic": "character-simulator",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.6,
+  "findings": [
+    {"dimension": "told-subtext", "severity": "material", "evidence": "He said it like it was nothing, and it was the nearest he got.", "diagnosis": "'You always do' already carries the beat; appending 'it was the nearest he got' has the narrator name the debt for him — precisely what the character refuses to do.", "repair_layer": "prose"},
+    {"dimension": "front-over-narrated", "severity": "material", "evidence": "and he let go, and grinned so she'd not see behind it.", "diagnosis": "A deflecting grin should deflect the reader too; telling us it exists to hide something hands over the answer the grin is built to withhold.", "repair_layer": "prose"},
+    {"dimension": "thematic-over-statement", "severity": "material", "evidence": "his mother's face with him not in it, not behind it, not anywhere it was looking.", "diagnosis": "The counterfactual unfolds the wound into a fully articulated thesis; comprehension this complete is itself a small catharsis, softening 'recognition without relief'.", "repair_layer": "discourse"},
+    {"dimension": "author-serving-echo", "severity": "minor", "evidence": "She'd think of something. She always did.", "diagnosis": "'She always did' chimes with Danny's 'You always do' — a constructed symmetry, the author tidying. (Adversarial credits this same echo as earned 'endless carrying' — disagreement preserved.)", "repair_layer": "discourse"}
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "id": "char-lena",
+  "name": "Lena Cade",
+  "desire": "give Danny his visit and get back on the road before dark",
+  "need": "to stop waiting for the family to even the score, and carry what is now hers to carry without being thanked for it",
+  "values": [
+    "showing up",
+    "not making a scene",
+    "being the one who can be relied on"
+  ],
+  "fears": [
+    "becoming the one who took the last thing from him",
+    "that she is invisible to them even now, even as the only one left standing"
+  ],
+  "contradictions": [
+    "has driven three hours to see him and half wants to hurt him with the truth",
+    "resents being the good one and needs to be the good one"
+  ],
+  "beliefs": [
+    "you don't tell a man inside a thing he can do nothing about",
+    "Mam always loved him best",
+    "somebody has to"
+  ],
+  "knowledge": [
+    "that their mother has stopped asking after Danny",
+    "that she is the only one who visits",
+    "the drive, the search, the rules of the hall"
+  ],
+  "constraints": [
+    "one visiting hour",
+    "a bolted table, nothing passed across, an officer watching",
+    "Danny cannot be told a thing he can do nothing about"
+  ],
+  "voice": {
+    "lexicon": [
+      "plain, dry, working",
+      "the practical word before the felt one"
+    ],
+    "syntax": [
+      "short flat declaratives",
+      "deflects into the concrete (the drive, the tea, the time)"
+    ],
+    "avoid": [
+      "naming her feelings",
+      "sentiment",
+      "speeches",
+      "rhetorical questions"
+    ]
+  }
+}

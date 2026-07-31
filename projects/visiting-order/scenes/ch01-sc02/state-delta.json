@@ -1,0 +1,18 @@
+{
+  "scene_id": "ch01-sc02",
+  "time": 1,
+  "facts_added": [
+    {"id": "fact-danny-clings", "text": "Danny holds onto the idea of Mam waiting for him as the thing that keeps him upright inside."}
+  ],
+  "facts_removed": [],
+  "knowledge_changes": [
+    {"character": "char-lena", "fact": "fact-danny-clings"}
+  ],
+  "relationship_changes": [],
+  "relationship_edges": [
+    {"subject": "char-lena", "object": "char-danny", "dimension": "shields", "value": "kept"}
+  ],
+  "predicate_changes": [],
+  "promises_opened": [],
+  "promises_closed": []
+}

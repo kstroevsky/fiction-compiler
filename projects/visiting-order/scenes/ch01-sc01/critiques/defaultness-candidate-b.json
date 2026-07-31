@@ -1,0 +1,12 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "76e5a4fd869a1cfdca91db912c5c4b39223ee237d440a17ddc0aa9da71ed315b",
+  "critic": "defaultness-lint",
+  "audit_class": "defaultness",
+  "verdict": "pass",
+  "confidence": 0.7,
+  "findings": [
+    {"dimension": "defaultness", "severity": "minor", "evidence": "Danny stood when he saw her", "diagnosis": "POV filter word 'saw'; usually deletable.", "repair_layer": "prose"},
+    {"dimension": "rhythm", "severity": "minor", "evidence": "three consecutive sentences open with 'he'", "diagnosis": "Repeated openers flatten rhythm; vary or subordinate.", "repair_layer": "prose"}
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "id": "char-danny",
+  "name": "Danny Cade",
+  "desire": "hear that Mam still asks after him — that home is still there, still holding a place",
+  "need": "to be kept in mind by someone on the outside, to not be already erased",
+  "values": [
+    "Mam",
+    "keeping face on the wing",
+    "being the one people were glad to see"
+  ],
+  "fears": [
+    "being forgotten while he is in here",
+    "that Mam will go before he is out"
+  ],
+  "contradictions": [
+    "leans on Lena for everything yet still talks like the favourite who is owed",
+    "asks after Mam every visit and never after Lena"
+  ],
+  "beliefs": [
+    "Mam's waiting for him",
+    "our Lena copes, our Lena's alright",
+    "you do your time and you don't let them see it"
+  ],
+  "knowledge": [
+    "that he is inside and cannot help",
+    "that Mam is unwell"
+  ],
+  "constraints": [
+    "cannot leave, cannot fix anything",
+    "cannot be handed anything across the table"
+  ],
+  "voice": {
+    "lexicon": [
+      "quicker than Lena, needier under the front",
+      "jokes to get out from under a thing; calls her 'our Lena'"
+    ],
+    "syntax": [
+      "banter, then a question that costs him",
+      "trails off rather than finishes the hard ones"
+    ],
+    "avoid": [
+      "introspection",
+      "self-pity said out loud",
+      "thanking her in a way that would admit the debt"
+    ]
+  }
+}

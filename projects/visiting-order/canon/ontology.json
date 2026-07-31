@@ -1,0 +1,33 @@
+{
+  "predicates": [
+    {
+      "name": "knows",
+      "arity": "binary",
+      "subject_types": ["char"],
+      "object_types": ["fact"],
+      "description": "character knows a fact (bridges knowledge-state.jsonl)"
+    },
+    {
+      "name": "located_at",
+      "arity": "binary",
+      "subject_types": ["char"],
+      "object_types": ["loc"],
+      "description": "a character is at a location"
+    },
+    {
+      "name": "has_object",
+      "arity": "binary",
+      "subject_types": ["char"],
+      "object_types": ["obj"],
+      "description": "a character holds or carries an object"
+    },
+    {
+      "name": "shields",
+      "arity": "binary",
+      "subject_types": ["char"],
+      "object_types": ["char"],
+      "relationship": true,
+      "description": "directional: subject keeps a hard truth from object"
+    }
+  ]
+}

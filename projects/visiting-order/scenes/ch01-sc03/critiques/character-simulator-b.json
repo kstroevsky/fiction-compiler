@@ -1,0 +1,11 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "2bbc56aa3d53a2d4dad54460651345e8c4d6411a1200a30c27854d782bcfab14",
+  "critic": "character-simulator",
+  "audit_class": "literary",
+  "verdict": "pass",
+  "confidence": 0.82,
+  "findings": [
+    {"dimension": "authorial-voice", "severity": "minor", "evidence": "A good clear photo of nobody's mother looking at nothing.", "diagnosis": "The one seam where the narrator rises above Lena's flat register to deliver the theme as a polished paradox — a voice problem, not a character problem; everything around it trusts the reader and this one line does not.", "repair_layer": "prose"}
+  ]
+}

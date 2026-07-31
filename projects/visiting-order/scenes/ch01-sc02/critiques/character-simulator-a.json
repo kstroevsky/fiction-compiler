@@ -1,0 +1,13 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "4c937964720c18d40c9a8b42642deb18a57e7b65631bb9c0b3a704526216796e",
+  "critic": "character-simulator",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.66,
+  "findings": [
+    {"dimension": "post-lie-frame-saintly", "severity": "material", "evidence": "It was the best thing she'd brought him in a year and she'd had it off the top of her head.", "diagnosis": "The beat after the choice reframes the lie as an act of loving craft Lena can admire — authorship foregrounded, effect measured — so the net register is tender-redemptive, not tangled-resentful. The 'must not be saintly' caution, crossed at and after the choice.", "repair_layer": "character"},
+    {"dimension": "danny-front-underweight", "severity": "minor", "evidence": "She say owt? About me?", "diagnosis": "Danny tips toward pure need, grasping; the 'talks like the favoured one who's owed' front is slack.", "repair_layer": "character"},
+    {"dimension": "demonstrative-drift", "severity": "minor", "evidence": "I told her you'd got fat as a bishop.", "diagnosis": "Lena invents a whole warm anecdote with a punchline — a step toward the demonstrative for a character built as undemonstrative.", "repair_layer": "prose"}
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "44ed60d933787e20b1c2313550cea8521ae9c6938a066dd302af82faaa12bae1",
+  "critic": "style-editor",
+  "audit_class": "literary",
+  "verdict": "pass",
+  "confidence": 0.71,
+  "findings": [
+    {"dimension": "emotion-glossed", "severity": "minor", "evidence": "He said it like it was nothing, and it was the nearest he got.", "diagnosis": "The tag clause interprets Danny's restraint for us instead of letting the held gesture do it.", "repair_layer": "prose"},
+    {"dimension": "lyric-abstraction", "severity": "minor", "evidence": "her eyes gone past the camera to wherever they went now", "diagnosis": "'to wherever they went now' loosens the plain-noun discipline into a place-that-isn't-a-place.", "repair_layer": "prose"},
+    {"dimension": "worked-triad", "severity": "minor", "evidence": "his mother's face with him not in it, not behind it, not anywhere it was looking", "diagnosis": "A shaped three-beat negation that edges toward stated theme; survives via Danny's imagined wanting.", "repair_layer": "prose"}
+  ]
+}

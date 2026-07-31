@@ -1,0 +1,9 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "2457dc24a077198d13e611508636381e5ca98e5f6bf6a2f4201f015ea56321d3",
+  "critic": "defaultness-lint",
+  "audit_class": "defaultness",
+  "verdict": "pass",
+  "confidence": 0.7,
+  "findings": []
+}

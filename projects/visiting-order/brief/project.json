@@ -1,0 +1,33 @@
+{
+  "id": "visiting-order",
+  "title": "Visiting Order",
+  "form": "short-story",
+  "audience": "adult literary readers who like grounded, character-driven realism and restraint",
+  "reader_contract": [
+    "6-8 pages, single sitting",
+    "close third person, one focalizer (Lena)",
+    "strictly linear: one afternoon, arrival to leaving; no flashback, no framing device",
+    "an interpersonal problem that no proof can settle; the turn is Lena's choice, made on camera",
+    "sensory, plainspoken prose; feeling carried by the mechanics of the visit and physical detail, never named",
+    "resolves by refusal: nothing is forgiven, the mother is not restored, the old imbalance is not healed, and Danny never learns the truth"
+  ],
+  "theme_question": "Is a kind lie a betrayal, or the last way left to keep faith with someone?",
+  "desired_affect": [
+    "the weight of a kindness that costs the one who carries it",
+    "the loneliness of being the one who shows up",
+    "recognition without relief"
+  ],
+  "constraints": [
+    "events happen in the order the reader receives them; no gimmick structure",
+    "the theme is NEVER spoken by a character or the narrator; it lives in one withheld sentence and in 'Mam sends her love'",
+    "no confession, no catharsis, no reconciliation, no absolution from Danny, no reveal that the mother 'really' loves him",
+    "prose earns feeling through concrete action; no told emotion, no cliche, no adverbial dialogue tags",
+    "Lena's choice is complicated, not saintly: pity, exhaustion, old resentment, and love all in it"
+  ],
+  "human_gates": [
+    "premise",
+    "voice-profile",
+    "ending",
+    "final"
+  ]
+}

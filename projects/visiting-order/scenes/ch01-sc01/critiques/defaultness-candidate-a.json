@@ -1,0 +1,12 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "e03aa66b348fd18378912eae457314a4aa098199f17b65906b1e0349c68201d3",
+  "critic": "defaultness-lint",
+  "audit_class": "defaultness",
+  "verdict": "pass",
+  "confidence": 0.7,
+  "findings": [
+    {"dimension": "defaultness", "severity": "minor", "evidence": "He stood when he saw her", "diagnosis": "POV filter word 'saw'; usually deletable.", "repair_layer": "prose"},
+    {"dimension": "rhythm", "severity": "minor", "evidence": "three consecutive sentences open with 'she' (the Mam-morning paragraph)", "diagnosis": "Repeated openers flatten rhythm; vary or subordinate.", "repair_layer": "prose"}
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "44ed60d933787e20b1c2313550cea8521ae9c6938a066dd302af82faaa12bae1",
+  "critic": "defaultness-lint",
+  "audit_class": "defaultness",
+  "verdict": "pass",
+  "confidence": 0.7,
+  "findings": [
+    {"dimension": "defaultness", "severity": "minor", "evidence": "the visits started to end at once", "diagnosis": "'started to' softens action into approximation; commit to the action.", "repair_layer": "prose"}
+  ]
+}

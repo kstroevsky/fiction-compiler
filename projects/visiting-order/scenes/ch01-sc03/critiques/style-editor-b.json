@@ -1,0 +1,13 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "2bbc56aa3d53a2d4dad54460651345e8c4d6411a1200a30c27854d782bcfab14",
+  "critic": "style-editor",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.66,
+  "findings": [
+    {"dimension": "lyric-over-reach", "severity": "material", "evidence": "A good clear photo of nobody's mother looking at nothing.", "diagnosis": "Collapses the scene's meaning into a paradoxical epigram, stating the theme (erasure/absence) as a bon mot instead of dramatizing it — the aphoristic, sententious close the profile warns against.", "repair_layer": "prose"},
+    {"dimension": "mannered-inversion", "severity": "minor", "evidence": "Time was the officer standing up.", "diagnosis": "The 'X was Y' inversion front-loads the abstraction 'Time' for effect, against 'practical word before the felt one'.", "repair_layer": "prose"},
+    {"dimension": "plain-noun-slippage", "severity": "minor", "evidence": "The stamp gone to nothing on her hand.", "diagnosis": "'gone to nothing' blurs the invisible-ink detail and pre-echoes 'looking at nothing', making the later epigram feel contrived.", "repair_layer": "prose"}
+  ]
+}

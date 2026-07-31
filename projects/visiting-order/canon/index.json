@@ -1,0 +1,27 @@
+{
+  "characters": [
+    "char-lena",
+    "char-danny"
+  ],
+  "world_rules": [
+    "In the visiting hall you may not pass anything across the table; you may show a photo but not hand it over; an officer watches; the visit ends when it is called.",
+    "Their mother is in a home and her mind is going; some days she does not know Lena, and this week she stopped asking after Danny.",
+    "Danny cannot leave, cannot help, and cannot be told a thing he can do nothing about without it being a cruelty.",
+    "Lena has told Danny for months that their mam sends her love and asks after him; it was true once and is not now."
+  ],
+  "locations": [
+    "the prison visiting hall",
+    "the visitors' car park"
+  ],
+  "objects": [
+    "a recent photo of their mother, in Lena's pocket",
+    "the visiting order",
+    "the machine tea in a plastic cup"
+  ],
+  "factions": [],
+  "accepted_state_deltas": [
+    "ch01-sc01",
+    "ch01-sc02",
+    "ch01-sc03"
+  ]
+}

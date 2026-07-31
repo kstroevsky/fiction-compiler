@@ -1,0 +1,12 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "2457dc24a077198d13e611508636381e5ca98e5f6bf6a2f4201f015ea56321d3",
+  "critic": "adversarial-reader",
+  "audit_class": "literary",
+  "verdict": "pass",
+  "confidence": 0.62,
+  "findings": [
+    {"dimension": "enacted-vs-narrated", "severity": "minor", "evidence": "Lena let him have it, because the other thing was to reach across a table she wasn't allowed to reach across and take it off him, and she'd driven three hours, and she was tired, and he was her brother, and none of those were the same reason.", "diagnosis": "The choice narrated as a decision-with-reasons — the shape the scene job warns against — but heavily mitigated: the reasons are genuinely un-saintly and the final clause refuses to collapse them, doing the required-(c) work. (The character-simulator credits this exact line as what keeps Lena off the saintly ledge — disagreement preserved.)", "repair_layer": "discourse"},
+    {"dimension": "soft-meaning-gesture", "severity": "minor", "evidence": "and none of those were the same reason", "diagnosis": "Articulates the irreducibility of her motive, close to naming the theme's ambivalence, but stays unresolved.", "repair_layer": "discourse"}
+  ]
+}

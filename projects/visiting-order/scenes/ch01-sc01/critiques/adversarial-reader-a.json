@@ -1,0 +1,13 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "e03aa66b348fd18378912eae457314a4aa098199f17b65906b1e0349c68201d3",
+  "critic": "adversarial-reader",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.58,
+  "findings": [
+    {"dimension": "withheld-truth-engine", "severity": "material", "evidence": "she knew what he was going to ask before the tea was cool enough to drink.", "diagnosis": "The reality (Mam has stopped asking) is planted, but the LIE that makes it withheld — that Lena has been reporting the opposite ('Mam sends her love') — never reaches the page, so the poised ending is under-armed. The scene's core engine.", "repair_layer": "scene"},
+    {"dimension": "narrator-gloss", "severity": "minor", "evidence": "and some of it went out of both of them, the first few minutes always the worst.", "diagnosis": "Names the easing and generalizes it rather than letting the small talk enact it.", "repair_layer": "prose"},
+    {"dimension": "decorative", "severity": "minor", "evidence": "a smudge that glowed and then was nothing again in the ordinary light.", "diagnosis": "Reads as earned subtext (present/not-present rhymes with the withholding) but the tail gilds a procedural moment.", "repair_layer": "prose"}
+  ]
+}

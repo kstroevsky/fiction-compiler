@@ -1,0 +1,13 @@
+{
+  "candidate": "candidate-a-r1.md",
+  "candidate_sha256": "c89b2ca272ac68f1ea9bda7b45b16fea8a89dd968dc35450be24e964b6fe5f6e",
+  "critic": "adversarial-reader",
+  "audit_class": "literary",
+  "verdict": "pass",
+  "confidence": 0.8,
+  "findings": [
+    {"dimension": "temptation-edge", "severity": "minor", "evidence": "let him ask, and hold on to them, and see.", "diagnosis": "The half-want is live and carries a cold edge, but lands as weary withholding rather than the sharper impulse to wound; a fast reader could still tip her toward endurer. Flagged so the edge stays a conscious choice.", "repair_layer": "character"},
+    {"dimension": "linearity", "severity": "minor", "evidence": "She had seen Mam that morning — she went most Sundays before the drive — and this Sunday Mam was in the chair", "diagnosis": "The one recollection rendered as a staged mini-scene; defensible (same-morning close-third memory), but the only passage stepping out of the visit's forward present.", "repair_layer": "discourse"},
+    {"dimension": "filter-words", "severity": "minor", "evidence": "She knew what he was going to ask before the tea was cool enough to drink.", "diagnosis": "Two light interiority filters ('knew', 'thought') in an otherwise filter-clean draft; the final 'She knew' earns its keep by setting the dramatic irony.", "repair_layer": "prose"}
+  ]
+}

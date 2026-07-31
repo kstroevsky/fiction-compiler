@@ -1,0 +1,12 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "76e5a4fd869a1cfdca91db912c5c4b39223ee237d440a17ddc0aa9da71ed315b",
+  "critic": "character-simulator",
+  "audit_class": "literary",
+  "verdict": "pass",
+  "confidence": 0.8,
+  "findings": [
+    {"dimension": "front-loaded-intent", "severity": "minor", "evidence": "She had decided in the car that she would tell him.", "diagnosis": "Tilts Lena from ambivalent toward resolved up front, but rescued by 'she still did not know if she would let it out' — lands as an arc (decided to wavering), not a flat plan.", "repair_layer": "discourse"},
+    {"dimension": "resentment-stated", "severity": "minor", "evidence": "It was the thing she had instead of the thing Mam had always handed him for nothing.", "diagnosis": "States the resentment thesis rather than leaving it in behavior, though terse enough to read as her chewing.", "repair_layer": "prose"}
+  ]
+}

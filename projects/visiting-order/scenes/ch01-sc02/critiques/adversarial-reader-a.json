@@ -1,0 +1,12 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "4c937964720c18d40c9a8b42642deb18a57e7b65631bb9c0b3a704526216796e",
+  "critic": "adversarial-reader",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.58,
+  "findings": [
+    {"dimension": "meaning-adjudication", "severity": "material", "evidence": "it had done him more good than anything in the locker. It was the best thing she'd brought him in a year and she'd had it off the top of her head", "diagnosis": "The narrator delivers a warm verdict on the lie's worth, softly resolving the story's open question toward 'the kind lie is good' and supplying a small catharsis the contract forbids — the flagged theme-leak from the keeping-faith side.", "repair_layer": "prose"},
+    {"dimension": "cadence", "severity": "minor", "evidence": "from his cot, from the back of a classroom, from the dock", "diagnosis": "Familiar life-stages tricolon, mostly earned by the specificity of 'the dock'.", "repair_layer": "prose"}
+  ]
+}

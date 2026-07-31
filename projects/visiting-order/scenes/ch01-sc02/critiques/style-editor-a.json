@@ -1,0 +1,14 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "4c937964720c18d40c9a8b42642deb18a57e7b65631bb9c0b3a704526216796e",
+  "critic": "style-editor",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.72,
+  "findings": [
+    {"dimension": "stated-theme", "severity": "material", "evidence": "because that was the use of her", "diagnosis": "Names the caretaker-role dynamic the scene exists to dramatize — the 'theme must never be spoken' line crossed.", "repair_layer": "prose"},
+    {"dimension": "over-explanation", "severity": "material", "evidence": "Lena had made that. She had made it at a machine-tea table out of nothing at all ... It was the best thing she'd brought him in a year and she'd had it off the top of her head.", "diagnosis": "The narrator evaluates and glosses the lie's worth; the loaded beat gets a full appraising paragraph where the profile asks for the fewest words.", "repair_layer": "discourse"},
+    {"dimension": "writerly-conceit", "severity": "minor", "evidence": "the one that took ten years off him and put them somewhere on her", "diagnosis": "A clever ledger-metaphor in a warmer, showier register than the dry close-third.", "repair_layer": "prose"},
+    {"dimension": "aphoristic-tic", "severity": "minor", "evidence": "It sat in Lena's mouth with its coat on.", "diagnosis": "Paired with 'tried the name like it was a thing he could hold' — two figured metaphors in short range read as a tic; keep one.", "repair_layer": "prose"}
+  ]
+}

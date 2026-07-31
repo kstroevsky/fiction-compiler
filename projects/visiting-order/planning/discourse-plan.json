@@ -1,0 +1,43 @@
+{
+  "narrator": {
+    "person": "third",
+    "reliability": "reliable, limited to Lena's perception"
+  },
+  "focalization": {
+    "mode": "fixed internal",
+    "focalizer": "char-lena"
+  },
+  "time": {
+    "order": "strictly chronological, one continuous afternoon",
+    "dominant_duration": "scene",
+    "tense": "past"
+  },
+  "revelations": [
+    {
+      "id": "rev-the-weight",
+      "scene": "ch01-sc01",
+      "to_reader": "with Lena; the reader learns what she carries, not from a flashback but as present fact"
+    },
+    {
+      "id": "rev-the-choice",
+      "scene": "ch01-sc02",
+      "to_reader": "enacted, with Lena; she withholds and says 'Mam sends her love'"
+    },
+    {
+      "id": "rev-the-cost",
+      "scene": "ch01-sc03",
+      "to_reader": "enacted, not explained"
+    }
+  ],
+  "chapter_map": [
+    {
+      "chapter": "1",
+      "scenes": [
+        "ch01-sc01",
+        "ch01-sc02",
+        "ch01-sc03"
+      ]
+    }
+  ],
+  "notes": "No dramatic irony beyond what Lena knows and Danny doesn't (Mam has stopped asking). Linear throughout; every scene narrative_mode linear. The theme is never stated; it lives in the withheld sentence and in 'Mam sends her love'."
+}
