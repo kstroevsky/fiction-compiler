@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0",
+  "note": "Fixed, versioned diagnostic questions applied to each premise candidate at the premise layer (ADR 0017). These DIAGNOSE; they do not select. Selection stays the human 'premise' gate, informed by preserved disagreement. Power lives in this editable artifact, not in any model instance. Each probe names the risk it watches for; none carries a veto.",
+  "probes": [
+    {
+      "id": "tested-need",
+      "question": "Does the POV character have a need the story actively tests — is the transforming character on camera?",
+      "risk_if": "The POV character is a fixed catalyst and the real arc belongs to someone we never inhabit (diffuse center; the wise-agent archetype). This is exactly where 'Slack Water' lost to 'The Overnight'."
+    },
+    {
+      "id": "proof-resolvable",
+      "question": "Can the central conflict be settled by evidence or proof?",
+      "risk_if": "Once the proof lands, the conflict is over. Character-against-self cannot be closed by evidence and stays richer."
+    },
+    {
+      "id": "obliqueness",
+      "question": "Does the story approach its core feeling directly or from the side?",
+      "risk_if": "Walking straight at the sentiment (death, grief, legacy) is the sentimental default and hard to keep honest."
+    },
+    {
+      "id": "resolution-humility",
+      "question": "Is the turn humble and earned, or clever and engineered?",
+      "risk_if": "A clever 'third thing' shows the author's hand and reads as contrived; humility hides the author."
+    },
+    {
+      "id": "enacted-vs-spoken",
+      "question": "Can the theme be enacted, or will it get spoken aloud?",
+      "risk_if": "Two-handers tempt the theme into dialogue (near-mottos); a single-consciousness piece enacts it through the hands."
+    },
+    {
+      "id": "premise-defaultness",
+      "question": "Is this the model's first, most-probable premise? What are three less-obvious, still-motivated alternatives?",
+      "risk_if": "The most-probable premise is the statistically obvious one — defaultness at the deepest, least-audited layer."
+    }
+  ]
+}

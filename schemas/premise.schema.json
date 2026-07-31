@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "premise.schema.json",
+  "type": "object",
+  "comment": "A premise/architecture candidate emitted at the premise layer (ADR 0017). The structural tags let the deterministic divergence floor confirm the batch explored genuinely different shapes; they are NOT a quality score and nothing here selects a winner.",
+  "required": ["id", "logline", "pov_character", "transforming_character", "conflict_type", "obliqueness", "resolution_type", "theme_question", "why_not_default"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {"type": "string", "minLength": 1},
+    "logline": {"type": "string", "minLength": 1},
+    "pov_character": {"type": "string", "minLength": 1},
+    "transforming_character": {"type": "string", "minLength": 1, "comment": "Who actually changes. If this is not the pov_character, the arc is off-camera."},
+    "conflict_type": {"enum": ["internal", "interpersonal", "character-vs-situation", "character-vs-nature", "character-vs-society"]},
+    "obliqueness": {"enum": ["direct", "oblique"], "comment": "Does the story walk straight at its core feeling, or approach it from the side?"},
+    "resolution_type": {"enum": ["humble", "clever", "ambiguous", "refusal"]},
+    "theme_question": {"type": "string", "minLength": 1},
+    "why_not_default": {"type": "string", "minLength": 1, "comment": "How this departs from the first, most-probable premise a model would reach for."}
+  }
+}

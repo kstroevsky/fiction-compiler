@@ -117,6 +117,24 @@
         {"candidate": "candidate-a.md", "critic": "defaultness-lint", "findings": [{"dimension": "x", "severity": "material"}]},
         {"candidate": "candidate-b.md", "critic": "prose-audit", "findings": [{"dimension": "y", "severity": "fatal"}]}]},
       "expect": "no_eligible_candidates"
+    },
+    {
+      "name": "premise divergence floor rejects a batch collapsed to one architecture (ADR 0017)",
+      "check": "premise_diversity",
+      "input": {"candidates": [
+        {"id": "p1", "logline": "A woman confronts a rival.", "pov_character": "char-a", "transforming_character": "char-b", "conflict_type": "interpersonal", "obliqueness": "direct", "resolution_type": "clever", "theme_question": "who wins?", "why_not_default": "n/a"},
+        {"id": "p2", "logline": "A man confronts a rival.", "pov_character": "char-c", "transforming_character": "char-d", "conflict_type": "interpersonal", "obliqueness": "direct", "resolution_type": "clever", "theme_question": "who wins?", "why_not_default": "n/a"},
+        {"id": "p3", "logline": "A stranger confronts a rival.", "pov_character": "char-e", "transforming_character": "char-f", "conflict_type": "interpersonal", "obliqueness": "direct", "resolution_type": "clever", "theme_question": "who wins?", "why_not_default": "n/a"}]},
+      "expect": false
+    },
+    {
+      "name": "premise divergence floor accepts three distinct architectures (ADR 0017)",
+      "check": "premise_diversity",
+      "input": {"candidates": [
+        {"id": "p1", "logline": "A barman stays sober through one shift.", "pov_character": "char-a", "transforming_character": "char-a", "conflict_type": "internal", "obliqueness": "oblique", "resolution_type": "humble", "theme_question": "can he stand in the place that unmade him?", "why_not_default": "not the fall or the confession"},
+        {"id": "p2", "logline": "A farmhand brings the flock down before a storm.", "pov_character": "char-b", "transforming_character": "char-b", "conflict_type": "character-vs-nature", "obliqueness": "direct", "resolution_type": "humble", "theme_question": "will she trust her own read of the weather?", "why_not_default": "no triumphant rescue"},
+        {"id": "p3", "logline": "A visitor withholds one sentence across a prison table.", "pov_character": "char-c", "transforming_character": "char-c", "conflict_type": "interpersonal", "obliqueness": "oblique", "resolution_type": "refusal", "theme_question": "is a kind lie a betrayal?", "why_not_default": "no confession or catharsis"}]},
+      "expect": true
     }
   ]
 }

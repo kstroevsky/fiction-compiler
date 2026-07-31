@@ -18,7 +18,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from . import defaultness, integrity, ontology, prose_audit, revision, tournament
+from . import defaultness, integrity, ontology, premise, prose_audit, revision, tournament
 from .workspace import KB, ROOT, SCHEMAS
 
 FIXTURES = ROOT / "regression" / "fixtures.json"
@@ -54,6 +54,10 @@ def _prose_knowledge_leak(inp: dict) -> bool:
     return prose_audit.is_knowledge_leak(inp["pov_knows_before"], inp["granted_this_scene"])
 
 
+def _premise_diversity(inp: dict) -> bool:
+    return premise.diversity_floor(inp["candidates"])["ok"]
+
+
 def _tournament_selected(inp: dict) -> str:
     result = tournament.run_tournament(inp["critiques"], seed=inp.get("seed", 0), judgments=inp.get("judgments"))
     rec = result["recommendation"]
@@ -67,6 +71,7 @@ CHECKS = {
     "tournament_selected": _tournament_selected,
     "ontology_valid": _ontology_valid,
     "prose_knowledge_leak": _prose_knowledge_leak,
+    "premise_diversity": _premise_diversity,
 }
 
 
