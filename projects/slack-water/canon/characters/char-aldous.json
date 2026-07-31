@@ -1,0 +1,47 @@
+{
+  "id": "char-aldous",
+  "name": "Aldous Vane",
+  "desire": "see his father's boat launched on the morning tide, today, in front of the men who knew him",
+  "need": "to let his father be finished without pretending the loss away",
+  "values": [
+    "his father's name",
+    "keeping his word to the men he invited",
+    "the boat as proof his father's years meant something"
+  ],
+  "fears": [
+    "that the boat was a waste of the years his father gave it",
+    "standing in front of Tom's friends with nothing to show"
+  ],
+  "contradictions": [
+    "came to a surveyor he trusts, then fights every true thing she tells him"
+  ],
+  "beliefs": [
+    "his father built boats for fifty years and his last one will float",
+    "fresh paint means a sound boat",
+    "letting the launch go means letting his father go"
+  ],
+  "knowledge": [
+    "that the tide is right this morning",
+    "that his father painted the hull the spring before he got sick",
+    "that Tom's friends are coming to the slip"
+  ],
+  "constraints": [
+    "grief he cannot say out loud",
+    "the men are already on their way"
+  ],
+  "voice": {
+    "lexicon": [
+      "blunt, defensive",
+      "his father's phrases repeated as if quoting scripture"
+    ],
+    "syntax": [
+      "short, hard sentences under pressure",
+      "statements where a question would cost him"
+    ],
+    "avoid": [
+      "articulate self-analysis",
+      "therapy language",
+      "conceding gracefully"
+    ]
+  }
+}

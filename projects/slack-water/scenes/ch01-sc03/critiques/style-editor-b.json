@@ -1,0 +1,24 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "6c2898d3ad8a369c8c009b981ef52383474b3e6f26846cb5c2f000ba83c7e43a",
+  "critic": "style-editor",
+  "audit_class": "literary",
+  "verdict": "pass",
+  "confidence": 0.78,
+  "findings": [
+    {
+      "dimension": "mild-tidy-resonance",
+      "severity": "minor",
+      "evidence": "Tom Vane's boat, on the water at last.",
+      "diagnosis": "'at last' injects a small note of payoff-sentiment; stays a fragment tied to a concrete image, within tolerance.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "final-cadence",
+      "severity": "minor",
+      "evidence": "She left the cover off. The sun was on the boat, and the boat could dry.",
+      "diagnosis": "The parallel sun/boat cadence pushes the sun-as-grace reading harder than a plainer close; optional trim.",
+      "repair_layer": "prose"
+    }
+  ]
+}

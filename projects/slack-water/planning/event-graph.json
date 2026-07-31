@@ -1,0 +1,114 @@
+{
+  "events": [
+    {
+      "id": "evt-bring-boat",
+      "time": 0,
+      "actors": [
+        "char-rennie",
+        "char-aldous"
+      ],
+      "preconditions": [
+        {
+          "predicate": "located_at",
+          "subject": "char-rennie",
+          "object": "loc-yard"
+        },
+        {
+          "predicate": "knows",
+          "subject": "char-aldous",
+          "object": "fact-tide-window"
+        }
+      ],
+      "action": "At first light Aldous brings his father's boat to the yard on a trailer and asks Rennie to launch her on the morning tide; running her hand along the garboard under the fresh paint, Rennie feels the plank give.",
+      "effects": [
+        {
+          "op": "add",
+          "predicate": "located_at",
+          "subject": "obj-boat",
+          "object": "loc-yard"
+        },
+        {
+          "op": "add",
+          "predicate": "located_at",
+          "subject": "char-aldous",
+          "object": "loc-yard"
+        },
+        {
+          "op": "add",
+          "predicate": "unsound",
+          "subject": "obj-boat"
+        }
+      ],
+      "causes": [
+        "fact-paint-fresh",
+        "fact-tom-dead"
+      ]
+    },
+    {
+      "id": "evt-survey",
+      "time": 1,
+      "actors": [
+        "char-rennie",
+        "char-aldous"
+      ],
+      "preconditions": [
+        {
+          "predicate": "knows",
+          "subject": "char-rennie",
+          "object": "fact-garboard-rot"
+        },
+        {
+          "predicate": "located_at",
+          "subject": "char-aldous",
+          "object": "loc-yard"
+        }
+      ],
+      "action": "Rennie drives her knife into the garboard to the hilt, shows Aldous the punky wood and the seam weeping under the hose, and tells him the boat will swamp if she is left afloat; she refuses the false launch and offers a true one.",
+      "effects": [],
+      "causes": [
+        "evt-bring-boat"
+      ]
+    },
+    {
+      "id": "evt-launching",
+      "time": 2,
+      "actors": [
+        "char-rennie",
+        "char-aldous"
+      ],
+      "preconditions": [
+        {
+          "predicate": "knows",
+          "subject": "char-aldous",
+          "object": "fact-will-swamp"
+        },
+        {
+          "predicate": "located_at",
+          "subject": "obj-boat",
+          "object": "loc-yard"
+        }
+      ],
+      "action": "At the top of the tide, with Tom's friends there, they set the boat in on the trolley; she floats through the slack while the water climbs the garboard inside, and they haul her out before she settles.",
+      "effects": [
+        {
+          "op": "add",
+          "predicate": "launched",
+          "subject": "obj-boat"
+        }
+      ],
+      "causes": [
+        "evt-survey"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "evt-bring-boat",
+      "to": "evt-survey"
+    },
+    {
+      "from": "evt-survey",
+      "to": "evt-launching"
+    }
+  ]
+}

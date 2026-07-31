@@ -1,0 +1,24 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "3dcd47ec50a242dde535d7b050e126613a0a81829d1637f52c74a0fe26df1ddb",
+  "critic": "character-simulator",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.74,
+  "findings": [
+    {
+      "dimension": "contradiction",
+      "severity": "material",
+      "evidence": "She had the safety chain off already.",
+      "diagnosis": "With the chain already off, Rennie reads as resolute-from-the-start; her central money-temptation plays as steeling herself rather than a live pull she must overcome.",
+      "repair_layer": "scene"
+    },
+    {
+      "dimension": "theme-stated",
+      "severity": "minor",
+      "evidence": "the way you paint a thing you love and cannot finish",
+      "diagnosis": "The narrator states the theme at first glance, outrunning what Rennie could infer from paint before touching the hull.",
+      "repair_layer": "discourse"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "slack-water",
+  "title": "Slack Water",
+  "form": "short-story",
+  "audience": "adult literary readers who like grounded, character-driven realism and craft",
+  "reader_contract": [
+    "6-8 pages, single sitting",
+    "close third person, one focalizer (Rennie)",
+    "strictly linear: one morning, first light to the top of the tide; no flashback, no framing device",
+    "a concrete problem with a clear physical cause and a clear, earned turn",
+    "sensory, plainspoken prose; feeling is carried by the work of the hands and the read of the wood, not named",
+    "a quiet, legible ending: recognition, not triumph; the customer does not hand over tidy thanks"
+  ],
+  "theme_question": "When is it truer to let a made thing be finished than to force it to work?",
+  "desired_affect": [
+    "the steadiness of telling the truth about the work",
+    "grief given an honest shape",
+    "quiet recognition, not consolation"
+  ],
+  "constraints": [
+    "events happen in the order the reader receives them; no gimmick structure",
+    "no coincidence-rescue; the turn comes from Rennie's competence and judgment",
+    "prose earns feeling through concrete action; no told emotion, no cliche, no adverbial dialogue tags",
+    "Aldous is grief-driven, not a villain, and does not deliver tidy validation",
+    "the launching is honest, not a trick: everyone present knows the boat is not sound"
+  ],
+  "human_gates": [
+    "premise",
+    "voice-profile",
+    "ending",
+    "final"
+  ]
+}

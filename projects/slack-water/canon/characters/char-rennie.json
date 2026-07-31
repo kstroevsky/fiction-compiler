@@ -1,0 +1,50 @@
+{
+  "id": "char-rennie",
+  "name": "Rennie Calloway",
+  "desire": "survey Tom Vane's boat and give his son a straight answer before the tide turns",
+  "need": "to trust that a true 'no' is worth more to a grieving man than a paid 'yes'",
+  "values": [
+    "soundness",
+    "telling the truth about wood",
+    "the yard"
+  ],
+  "fears": [
+    "putting an unsound hull in the water with her name on it",
+    "the yard going under for want of the work she turns away"
+  ],
+  "contradictions": [
+    "needs Aldous's money badly enough to be tempted by the easy launch she knows is wrong"
+  ],
+  "beliefs": [
+    "wood tells the truth if you read it",
+    "a boat that isn't sound has no business swimming",
+    "you don't lie to a man about his father"
+  ],
+  "knowledge": [
+    "how to survey a wooden hull by hand and by ear",
+    "the tide table for the estuary",
+    "the state of the yard's books",
+    "that Tom Vane never launched the boat"
+  ],
+  "constraints": [
+    "one short window at the top of the tide",
+    "the rot is structural and cannot be repaired in the hours left",
+    "Aldous has already told Tom's friends the launching is this morning"
+  ],
+  "voice": {
+    "lexicon": [
+      "boatyard nouns: garboard, plank, caulk, keel, frame, transom, hood end, trolley",
+      "plain, concrete"
+    ],
+    "syntax": [
+      "short declaratives",
+      "verbs of the hand, the tool, and the water"
+    ],
+    "avoid": [
+      "naming her feelings",
+      "rhetorical questions",
+      "aphorism",
+      "consoling speeches"
+    ]
+  }
+}

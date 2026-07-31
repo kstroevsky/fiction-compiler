@@ -1,0 +1,45 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "97b8e21220da9b2484d6f5e3f9f95212d0b3d9f5e27ee8cc42710eb52ee98b1b",
+  "critic": "adversarial-reader",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.58,
+  "findings": [
+    {
+      "dimension": "forbidden-move",
+      "severity": "material",
+      "evidence": "He said it again, most of it, quieter.",
+      "diagnosis": "'quieter' is a comparative manner tag on 'said' — the adverbial dialogue tag the spec forbids.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "cliche",
+      "severity": "minor",
+      "evidence": "white as a wedding",
+      "diagnosis": "'white as a ___' is a stock simile frame; writerly against a plainspoken contract.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "false-profundity",
+      "severity": "minor",
+      "evidence": "neither of them said aloud what the quiet was for",
+      "diagnosis": "Points at the emotion instead of trusting the tide to carry it; a half-step toward telling the meaning.",
+      "repair_layer": "scene"
+    },
+    {
+      "dimension": "telegraph",
+      "severity": "minor",
+      "evidence": "That was the first thing wrong with it.",
+      "diagnosis": "Announces wrongness in the narrator's voice, deflating the discovery it is about to stage.",
+      "repair_layer": "discourse"
+    },
+    {
+      "dimension": "over-narration",
+      "severity": "minor",
+      "evidence": "It would be no trouble at all to run the trolley under a boat a man was asking her to launch, and let the harbour cheer, and take his money for it.",
+      "diagnosis": "The temptation is spelled out as a fork rather than carried by the objects.",
+      "repair_layer": "prose"
+    }
+  ]
+}

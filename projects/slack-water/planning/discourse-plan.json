@@ -1,0 +1,43 @@
+{
+  "narrator": {
+    "person": "third",
+    "reliability": "reliable, limited to Rennie's perception"
+  },
+  "focalization": {
+    "mode": "fixed internal",
+    "focalizer": "char-rennie"
+  },
+  "time": {
+    "order": "strictly chronological, one continuous morning",
+    "dominant_duration": "scene",
+    "tense": "past"
+  },
+  "revelations": [
+    {
+      "id": "rev-soft-plank",
+      "scene": "ch01-sc01",
+      "to_reader": "with Rennie, through her hand"
+    },
+    {
+      "id": "rev-rot-proven",
+      "scene": "ch01-sc02",
+      "to_reader": "enacted, with Rennie and Aldous"
+    },
+    {
+      "id": "rev-honest-launching",
+      "scene": "ch01-sc03",
+      "to_reader": "enacted, not explained"
+    }
+  ],
+  "chapter_map": [
+    {
+      "chapter": "1",
+      "scenes": [
+        "ch01-sc01",
+        "ch01-sc02",
+        "ch01-sc03"
+      ]
+    }
+  ],
+  "notes": "No dramatic irony; the reader learns exactly with Rennie. Linear throughout; every scene is narrative_mode linear."
+}

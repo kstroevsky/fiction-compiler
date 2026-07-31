@@ -1,0 +1,107 @@
+{
+  "candidates": [
+    "candidate-a.md",
+    "candidate-b.md"
+  ],
+  "blind_labels": {
+    "candidate-a.md": "A",
+    "candidate-b.md": "B"
+  },
+  "reveal_map": {
+    "A": "candidate-a.md",
+    "B": "candidate-b.md"
+  },
+  "presentation_orders": [
+    [
+      "A",
+      "B"
+    ],
+    [
+      "B",
+      "A"
+    ]
+  ],
+  "scores": {
+    "candidate-a.md": {
+      "earned-discovery": -4.0,
+      "told-emotion": -1.0,
+      "over-narration": -1.0,
+      "contradiction": -4.0,
+      "theme-stated": -1.0,
+      "style-drift": -4.0,
+      "abstraction": -1.0,
+      "interpretive-tag": -1.0
+    },
+    "candidate-b.md": {
+      "forbidden-move": -4.0,
+      "cliche": -2.0,
+      "false-profundity": -1.0,
+      "telegraph": -2.0,
+      "over-narration": -1.0,
+      "staging": -1.0,
+      "manner-tag": -1.0,
+      "on-the-nose": -1.0
+    }
+  },
+  "pareto_front": [
+    "candidate-a.md",
+    "candidate-b.md"
+  ],
+  "dimension_winners": {
+    "abstraction": [
+      "candidate-b.md"
+    ],
+    "cliche": [
+      "candidate-a.md"
+    ],
+    "contradiction": [
+      "candidate-b.md"
+    ],
+    "earned-discovery": [
+      "candidate-b.md"
+    ],
+    "false-profundity": [
+      "candidate-a.md"
+    ],
+    "forbidden-move": [
+      "candidate-a.md"
+    ],
+    "interpretive-tag": [
+      "candidate-b.md"
+    ],
+    "manner-tag": [
+      "candidate-a.md"
+    ],
+    "on-the-nose": [
+      "candidate-a.md"
+    ],
+    "over-narration": [
+      "candidate-a.md",
+      "candidate-b.md"
+    ],
+    "staging": [
+      "candidate-a.md"
+    ],
+    "style-drift": [
+      "candidate-b.md"
+    ],
+    "telegraph": [
+      "candidate-a.md"
+    ],
+    "theme-stated": [
+      "candidate-b.md"
+    ],
+    "told-emotion": [
+      "candidate-b.md"
+    ]
+  },
+  "recommendation": {
+    "decision": "human_decision_required",
+    "pareto_front": [
+      "candidate-a.md",
+      "candidate-b.md"
+    ],
+    "reason": "multiple non-dominated candidates — a genuine tradeoff; do not average it away"
+  },
+  "disagreement": true
+}

@@ -1,0 +1,24 @@
+{
+  "candidate": "candidate-b-r1.md",
+  "candidate_sha256": "58003c37e5e687e66a602adad64866a5b2137cee6ed777123a85b4d6a933d992",
+  "critic": "adversarial-reader",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.6,
+  "findings": [
+    {
+      "dimension": "consolation",
+      "severity": "material",
+      "evidence": "A boat like this went past him because he wasn't there to catch it. Not because he'd have let it go.",
+      "diagnosis": "The plank proves rot and rot-timing; it cannot testify to the dead man's counterfactual judgment. This clause (and 'not while he had the tools in his hands') vindicates his character to comfort the griever, stepping outside the plank — the soft form of the barred wise-craftsperson move.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "narratorial-gloss",
+      "severity": "minor",
+      "evidence": "He said it as though the paint were the argument.",
+      "diagnosis": "The line's dialogue already carries Aldous's reasoning; the narrator's gloss interprets the intent of a line that performs it.",
+      "repair_layer": "prose"
+    }
+  ]
+}

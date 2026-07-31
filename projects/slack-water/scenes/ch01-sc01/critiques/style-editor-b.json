@@ -1,0 +1,31 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "97b8e21220da9b2484d6f5e3f9f95212d0b3d9f5e27ee8cc42710eb52ee98b1b",
+  "critic": "style-editor",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.68,
+  "findings": [
+    {
+      "dimension": "manner-tag",
+      "severity": "minor",
+      "evidence": "He said it again, most of it, quieter.",
+      "diagnosis": "'quieter' tells the delivery the repetition already carries. (Note: the adversarial reader grades this same line material; disagreement preserved.)",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "cliche",
+      "severity": "minor",
+      "evidence": "white as a wedding",
+      "diagnosis": "The softest, most default image in an otherwise hard-edged draft.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "on-the-nose",
+      "severity": "minor",
+      "evidence": "I'm not saying no. I'm saying I have to look first.",
+      "diagnosis": "Spells out subtext the scene already delivered; slackens pressure right after her sharpest line, 'That's why.'",
+      "repair_layer": "prose"
+    }
+  ]
+}

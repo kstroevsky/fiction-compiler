@@ -1,0 +1,31 @@
+{
+  "candidate": "candidate-b-r1.md",
+  "candidate_sha256": "2e55df08c83ace84db0c7c0f80d1770bee01536f32e515828f6d4a2b20a4e604",
+  "critic": "adversarial-reader",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.62,
+  "findings": [
+    {
+      "dimension": "telegraph",
+      "severity": "material",
+      "evidence": "Good paint hid things; that was what it was for.",
+      "diagnosis": "The close-third narrator states the theme as a mini-thesis and primes the reader that the fresh paint conceals a defect, a few lines before the hand finds the give; the concrete beat before it already carries the wariness.",
+      "repair_layer": "discourse"
+    },
+    {
+      "dimension": "false-profundity",
+      "severity": "minor",
+      "evidence": "where the wood had given and would give again.",
+      "diagnosis": "'would give again' reaches past the physical fact for resonance; the image is complete at the thumb on the soft of the plank.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "craft-accuracy",
+      "severity": "minor",
+      "evidence": "three planks aft, the give",
+      "diagnosis": "The garboard is a single strake running fore-and-aft; moving aft you stay on the same plank, so 'three planks aft' does not parse geometrically.",
+      "repair_layer": "prose"
+    }
+  ]
+}

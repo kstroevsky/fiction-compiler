@@ -1,0 +1,48 @@
+{
+  "scene_id": "ch01-sc02",
+  "candidate": "scenes/ch01-sc02/candidates/candidate-b-r2.md",
+  "candidate_sha256": "4e2d9714de739a8133e0fc03722f24d32a5e3a67fea060ff42d0e38711e96f71",
+  "promoted_to": "manuscript/chapters/ch01-sc02.md",
+  "promoted_at": "2026-07-31T07:45:37.608224+00:00",
+  "state_delta_sha256": "8aeabca604cd7e0efb0956c95b21b769d47c380501a24f0ec93018b8ffb47a5e",
+  "parent_canon_hash": "dede49e68038c8d472660b6d3270578faf612417b9a14e66deef55e94d0301d3",
+  "resulting_canon_hash": "258f57f8d96e92683834a5f2780e19e6f2f38e73834fde48ddbd1e56e96befd9",
+  "critique_files": [
+    "scenes/ch01-sc02/critiques/adversarial-reader-a.json",
+    "scenes/ch01-sc02/critiques/adversarial-reader-b-r1.json",
+    "scenes/ch01-sc02/critiques/adversarial-reader-b-r2.json",
+    "scenes/ch01-sc02/critiques/adversarial-reader-b.json",
+    "scenes/ch01-sc02/critiques/character-simulator-a.json",
+    "scenes/ch01-sc02/critiques/character-simulator-b.json",
+    "scenes/ch01-sc02/critiques/defaultness-candidate-a.json",
+    "scenes/ch01-sc02/critiques/defaultness-candidate-b-r1.json",
+    "scenes/ch01-sc02/critiques/defaultness-candidate-b-r2.json",
+    "scenes/ch01-sc02/critiques/defaultness-candidate-b.json",
+    "scenes/ch01-sc02/critiques/hard-audit.json",
+    "scenes/ch01-sc02/critiques/style-editor-a.json",
+    "scenes/ch01-sc02/critiques/style-editor-b.json"
+  ],
+  "binding_critiques": [
+    {
+      "file": "adversarial-reader-b-r2.json",
+      "critic": "adversarial-reader",
+      "audit_class": "literary",
+      "verdict": "pass",
+      "sha256": "abc714693f74bff47436f51c4b9f5100c4cee83c7515b09b346a23f07514fab7"
+    },
+    {
+      "file": "defaultness-candidate-b-r2.json",
+      "critic": "defaultness-lint",
+      "audit_class": "defaultness",
+      "verdict": "pass",
+      "sha256": "f9fc3dc7b04761aa17cce4f31e52724a3798535d7900d86712d1fda038d7ab51"
+    },
+    {
+      "file": "hard-audit.json",
+      "critic": "hard-audit",
+      "audit_class": "hard",
+      "verdict": "pass",
+      "sha256": "9c197b481b42a8bb1761791275aa2af0d9ad04ae4adb6b7df110ef69329725e0"
+    }
+  ]
+}

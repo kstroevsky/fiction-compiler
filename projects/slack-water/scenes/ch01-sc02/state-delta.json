@@ -1,0 +1,39 @@
+{
+  "scene_id": "ch01-sc02",
+  "time": 1,
+  "facts_added": [
+    {
+      "id": "fact-will-swamp",
+      "text": "Left afloat, the boat will work her rotten seams open and take water until she swamps; she cannot be sailed."
+    }
+  ],
+  "facts_removed": [],
+  "knowledge_changes": [
+    {
+      "character": "char-aldous",
+      "fact": "fact-garboard-rot"
+    },
+    {
+      "character": "char-rennie",
+      "fact": "fact-will-swamp"
+    },
+    {
+      "character": "char-aldous",
+      "fact": "fact-will-swamp"
+    }
+  ],
+  "relationship_changes": [],
+  "relationship_edges": [
+    {
+      "subject": "char-aldous",
+      "object": "char-rennie",
+      "dimension": "trusts",
+      "value": "grudging"
+    }
+  ],
+  "predicate_changes": [],
+  "promises_opened": [],
+  "promises_closed": [
+    "promise-truth"
+  ]
+}

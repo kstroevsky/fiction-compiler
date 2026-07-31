@@ -1,0 +1,45 @@
+{
+  "predicates": [
+    {
+      "name": "knows",
+      "arity": "binary",
+      "subject_types": ["char"],
+      "object_types": ["fact"],
+      "description": "character knows a fact (bridges knowledge-state.jsonl)"
+    },
+    {
+      "name": "located_at",
+      "arity": "binary",
+      "subject_types": ["char", "obj"],
+      "object_types": ["loc"],
+      "description": "an entity is at a location"
+    },
+    {
+      "name": "has_object",
+      "arity": "binary",
+      "subject_types": ["char"],
+      "object_types": ["obj"],
+      "description": "a character holds an object"
+    },
+    {
+      "name": "unsound",
+      "arity": "unary",
+      "subject_types": ["obj"],
+      "description": "a hull is structurally rotten and cannot safely swim"
+    },
+    {
+      "name": "launched",
+      "arity": "unary",
+      "subject_types": ["obj"],
+      "description": "a boat has met the water (been given her launching)"
+    },
+    {
+      "name": "trusts",
+      "arity": "binary",
+      "subject_types": ["char"],
+      "object_types": ["char"],
+      "relationship": true,
+      "description": "directional trust from subject toward object"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "dc008b5c6114b8613d01dd7bb5379b94a24a229b4ea1d97d7fa8ea1595c44e4f",
+  "critic": "style-editor",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.72,
+  "findings": [
+    {
+      "dimension": "lyric-over-reach",
+      "severity": "material",
+      "evidence": "and for a moment the boat was only a boat on the water, and fifty years of Tom Vane were floating in front of the men who had known him",
+      "diagnosis": "Two offenses: 'the boat was only a boat' is the sententious X-is-only-X construction, and 'fifty years of Tom Vane were floating' names the freight as abstraction. The float already does the work; the gloss deflates it.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "aphoristic-tic",
+      "severity": "minor",
+      "evidence": "Rennie read the boat the way she had read the plank.",
+      "diagnosis": "The explicit 'the way she had...' manner-comparison is the profile's flagged tic; cut to the perception itself.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "decorative-lyric",
+      "severity": "minor",
+      "evidence": "the Kittiwake went down stern-first into her own reflection",
+      "diagnosis": "'into her own reflection' is a pretty flourish that doesn't alter perception; against plainspoken.",
+      "repair_layer": "prose"
+    }
+  ]
+}

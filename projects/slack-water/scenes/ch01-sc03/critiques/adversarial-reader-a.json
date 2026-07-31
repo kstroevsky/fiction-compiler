@@ -1,0 +1,31 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "dc008b5c6114b8613d01dd7bb5379b94a24a229b4ea1d97d7fa8ea1595c44e4f",
+  "critic": "adversarial-reader",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.6,
+  "findings": [
+    {
+      "dimension": "feeling-named",
+      "severity": "material",
+      "evidence": "and fifty years of Tom Vane were floating in front of the men who had known him.",
+      "diagnosis": "Lands at the emotional apex and names/measures the freight instead of letting the white hull on flat water carry it; tips the peak toward elegy, a more consoling effect than the earned quiet recognition.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "sentimentality",
+      "severity": "minor",
+      "evidence": "Not to Rennie. To the boat, maybe, or the man who built her.",
+      "diagnosis": "'or the man who built her' reaches past the concrete for pathos; the bare 'Not to Rennie' was enough.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "editorial-tell",
+      "severity": "minor",
+      "evidence": "No one cheered; it was not that kind of morning.",
+      "diagnosis": "The first clause shows; the second tells the reader how to weight it.",
+      "repair_layer": "prose"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "id": "ch01-sc01",
+  "chapter": "1",
+  "narrative_mode": "linear",
+  "pov": "char-rennie",
+  "participants": [
+    "char-rennie",
+    "char-aldous"
+  ],
+  "purpose": [
+    "establish the yard, the tide window, and Aldous's demand to launch his father's boat",
+    "let Rennie's hands find the first sign the fresh paint is hiding bad wood",
+    "set the money temptation: the yard needs the work"
+  ],
+  "entry_state": [
+    "Rennie is opening the yard at first light",
+    "Aldous arrives with the boat and Tom's friends already invited",
+    "the hull is freshly painted"
+  ],
+  "desire": "take the boat as the straightforward launch job the yard needs",
+  "conflict": "Aldous wants her in the water on the tide and does not want Rennie poking at his father's paint; Rennie will not put a trolley under a boat she has not read",
+  "turn": "running her hand along the garboard, Rennie feels the plank give under the paint and knows the wood is wrong",
+  "exit_state": [
+    "Rennie knows the garboard is soft under the paint",
+    "the launch is now in question",
+    "she has to survey before she can answer"
+  ],
+  "required_events": [
+    "evt-bring-boat"
+  ],
+  "knowledge_required": [
+    {
+      "character": "char-aldous",
+      "fact": "fact-tide-window"
+    }
+  ],
+  "forbidden_moves": [
+    "name Rennie's feelings",
+    "a rescue by coincidence",
+    "a flashback",
+    "tidy uplift",
+    "adverbial dialogue tags"
+  ],
+  "style_constraints": [
+    "close third on Rennie",
+    "discovery through the hands and the read of the wood",
+    "no filter words",
+    "no told emotion"
+  ],
+  "candidate_strategies": [
+    "A: sensory and close, the fault found through touch under the paint",
+    "B: leaner, more dialogue-forward, the tension carried by what Aldous will not say"
+  ]
+}

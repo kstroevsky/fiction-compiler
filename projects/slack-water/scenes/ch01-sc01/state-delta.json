@@ -1,0 +1,48 @@
+{
+  "scene_id": "ch01-sc01",
+  "time": 0,
+  "facts_added": [
+    {
+      "id": "fact-garboard-rot",
+      "text": "The garboard strake and hood ends are rotten under the fresh paint; the wood is punky and will not hold caulk."
+    }
+  ],
+  "facts_removed": [],
+  "knowledge_changes": [
+    {
+      "character": "char-rennie",
+      "fact": "fact-garboard-rot"
+    }
+  ],
+  "relationship_changes": [],
+  "predicate_changes": [
+    {
+      "op": "add",
+      "predicate": "located_at",
+      "subject": "obj-boat",
+      "object": "loc-yard"
+    },
+    {
+      "op": "add",
+      "predicate": "located_at",
+      "subject": "char-aldous",
+      "object": "loc-yard"
+    },
+    {
+      "op": "add",
+      "predicate": "unsound",
+      "subject": "obj-boat"
+    }
+  ],
+  "promises_opened": [
+    {
+      "id": "promise-truth",
+      "text": "Will Rennie give Aldous a straight answer about the hull before the tide, even if it costs her the work?"
+    },
+    {
+      "id": "promise-launching",
+      "text": "Will Tom Vane's boat meet the morning tide?"
+    }
+  ],
+  "promises_closed": []
+}

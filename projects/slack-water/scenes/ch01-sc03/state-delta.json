@@ -1,0 +1,27 @@
+{
+  "scene_id": "ch01-sc03",
+  "time": 2,
+  "facts_added": [],
+  "facts_removed": [],
+  "knowledge_changes": [],
+  "relationship_changes": [],
+  "relationship_edges": [
+    {
+      "subject": "char-aldous",
+      "object": "char-rennie",
+      "dimension": "trusts",
+      "value": "earned"
+    }
+  ],
+  "predicate_changes": [
+    {
+      "op": "add",
+      "predicate": "launched",
+      "subject": "obj-boat"
+    }
+  ],
+  "promises_opened": [],
+  "promises_closed": [
+    "promise-launching"
+  ]
+}

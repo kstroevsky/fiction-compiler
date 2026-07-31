@@ -1,0 +1,31 @@
+{
+  "candidate": "candidate-b-r2.md",
+  "candidate_sha256": "4e2d9714de739a8133e0fc03722f24d32a5e3a67fea060ff42d0e38711e96f71",
+  "critic": "adversarial-reader",
+  "audit_class": "literary",
+  "verdict": "pass",
+  "confidence": 0.76,
+  "findings": [
+    {
+      "dimension": "narratorial-tell",
+      "severity": "minor",
+      "evidence": "under it the white paint was perfect, and that was the trouble",
+      "diagnosis": "The narrator flags the significance instead of letting the perfect-paint image carry the irony on its own; a mild show-don't-announce lapse.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "engineered-adjacent-hinge",
+      "severity": "minor",
+      "evidence": "\"That's not a launch.\" / \"No. But it's a launching.\"",
+      "diagnosis": "The hinge leans partly on a launch/launching redefinition that is a touch neat, though rescued by the immediately concrete offer and 'It's the one she's got,' so acceptance stays character-caused.",
+      "repair_layer": "discourse"
+    },
+    {
+      "dimension": "theme-in-dialogue",
+      "severity": "minor",
+      "evidence": "Honest, or not at all.",
+      "diagnosis": "A near-motto that states the scene's ethic aloud; terse and character-appropriate, so it does not tip into narrator-announced theme, but it is the one line where the theme is spoken.",
+      "repair_layer": "prose"
+    }
+  ]
+}

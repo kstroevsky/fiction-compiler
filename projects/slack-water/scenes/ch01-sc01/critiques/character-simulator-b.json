@@ -1,0 +1,24 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "97b8e21220da9b2484d6f5e3f9f95212d0b3d9f5e27ee8cc42710eb52ee98b1b",
+  "critic": "character-simulator",
+  "audit_class": "literary",
+  "verdict": "pass",
+  "confidence": 0.82,
+  "findings": [
+    {
+      "dimension": "staging",
+      "severity": "minor",
+      "evidence": "Cut the engine,",
+      "diagnosis": "The engine idle is never planted before this command, so the closing 'killed it' lacks an antecedent.",
+      "repair_layer": "discourse"
+    },
+    {
+      "dimension": "telegraph",
+      "severity": "minor",
+      "evidence": "That was the first thing wrong with it.",
+      "diagnosis": "Slightly reader-facing, though defensible as a surveyor's real instinct about a too-perfect finish.",
+      "repair_layer": "discourse"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "candidate": "candidate-b-r1.md",
+  "candidate_sha256": "68c811454522ce0c62b7998ed77134893cf05ff9a1787e9c21e731c583513d46",
+  "critic": "adversarial-reader",
+  "audit_class": "literary",
+  "verdict": "pass",
+  "confidence": 0.72,
+  "findings": [
+    {
+      "dimension": "elegiac-lift",
+      "severity": "minor",
+      "evidence": "She floated. The white of her sat on the flat grey, and the gold name held the light, and along the top of the slip the men went quiet. Tom Vane's boat, on the water.",
+      "diagnosis": "The prose's lyrical high-water mark follows the default launch-scene swell (doubled 'floated', rising polysyndeton), but it names no feeling and is immediately undercut by 'Then the seam.', so the swell buys structural irony rather than decoration. Borderline, non-blocking.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "benedictory-close",
+      "severity": "minor",
+      "evidence": "She left the cover off. The boat could dry.",
+      "diagnosis": "The trailing modal 'could' is the softest, most forward-tilting note in a story contracted to end on recognition; defensible as futile tenderness (drying cannot make a rotten hull sound), which is why it is minor, not a violation.",
+      "repair_layer": "prose"
+    }
+  ]
+}

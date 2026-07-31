@@ -1,0 +1,31 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "dc008b5c6114b8613d01dd7bb5379b94a24a229b4ea1d97d7fa8ea1595c44e4f",
+  "critic": "character-simulator",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.66,
+  "findings": [
+    {
+      "dimension": "authorial-catharsis",
+      "severity": "material",
+      "evidence": "Not to Rennie. To the boat, maybe, or the man who built her.",
+      "diagnosis": "Aldous's act stays silent and true, but the narration names the dead father as the addressee, supplying the recognition-as-grief the scene should let the reader infer from the hand on cold paint.",
+      "repair_layer": "discourse"
+    },
+    {
+      "dimension": "elegiac-swell",
+      "severity": "material",
+      "evidence": "and fifty years of Tom Vane were floating in front of the men who had known him.",
+      "diagnosis": "The narration states the elegy outright at the highest beat — the clearest instance of the narrator delivering the tidy validation the contract bars, while the men are silent and no character has moved.",
+      "repair_layer": "discourse"
+    },
+    {
+      "dimension": "undemonstrative-voice",
+      "severity": "minor",
+      "evidence": "\"She floated.\"",
+      "diagnosis": "Rennie echoing Aldous's exact words forms a warm matched cadence; for a woman who does not console with words, a drier non-matching confirmation holds her model harder.",
+      "repair_layer": "prose"
+    }
+  ]
+}

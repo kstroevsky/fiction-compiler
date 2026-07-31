@@ -1,0 +1,31 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "3dcd47ec50a242dde535d7b050e126613a0a81829d1637f52c74a0fe26df1ddb",
+  "critic": "adversarial-reader",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.6,
+  "findings": [
+    {
+      "dimension": "earned-discovery",
+      "severity": "material",
+      "evidence": "the smell reached her before her hand did",
+      "diagnosis": "The spec reserves the first sign for Rennie's hands; the rot-smell arriving first demotes the tactile turn from discovery to confirmation.",
+      "repair_layer": "discourse"
+    },
+    {
+      "dimension": "told-emotion",
+      "severity": "minor",
+      "evidence": "the way you paint a thing you love and cannot finish",
+      "diagnosis": "The narrator interprets Tom's grief-state rather than letting the poured white and the gold lettering carry it.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "over-narration",
+      "severity": "minor",
+      "evidence": "the low plank that runs against the keel and does the hardest of the work, the one that lives in the water",
+      "diagnosis": "A shipwright would not gloss 'garboard' for herself; a reader-facing lecture that steps outside the focalizer.",
+      "repair_layer": "prose"
+    }
+  ]
+}

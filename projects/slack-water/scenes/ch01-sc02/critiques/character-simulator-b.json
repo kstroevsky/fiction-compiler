@@ -1,0 +1,24 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "fb6a10e4c1fd8ab80d8299bcc2dfcd950ed76fa3e9e2f08ea326d16ac93cf0b5",
+  "critic": "character-simulator",
+  "audit_class": "literary",
+  "verdict": "pass",
+  "confidence": 0.8,
+  "findings": [
+    {
+      "dimension": "convenient-accusation",
+      "severity": "minor",
+      "evidence": "I hear a woman who wants a survey fee.",
+      "diagnosis": "Plausible as grief-deflection, but convenient that his accusation names the exact temptation the story needs surfaced; a grieving man would likelier impugn any motive, not the precise financial one.",
+      "repair_layer": "discourse"
+    },
+    {
+      "dimension": "theme-stated",
+      "severity": "minor",
+      "evidence": "It is a launching. The true one instead of the lying one.",
+      "diagnosis": "Edges toward stating the thesis aloud, though it stays inside Rennie's plainspoken register.",
+      "repair_layer": "prose"
+    }
+  ]
+}

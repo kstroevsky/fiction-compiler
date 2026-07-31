@@ -1,0 +1,38 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "f69562da5dfc936c086e4f34e042b3675142b331c07560efa825a3c2321d2869",
+  "critic": "style-editor",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.72,
+  "findings": [
+    {
+      "dimension": "sententious-narrator",
+      "severity": "material",
+      "evidence": "Under the big light the paint looked better than ever, which was the cruelty of paint.",
+      "diagnosis": "Lands an aphoristic abstraction before any perception is established — interpretation-before-perception; the image is doing the work and the gloss steals it.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "aphoristic-tic",
+      "severity": "material",
+      "evidence": "It came out plain and sure, the way a thing does when it is right.",
+      "diagnosis": "The forbidden 'the way...' construction, double-telling: the line is already plain and sure, then the narrator moralizes the general case.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "vague-placeholder",
+      "severity": "minor",
+      "evidence": "His voice did a thing and came back level.",
+      "diagnosis": "Withholding the emotion is right, but 'did a thing' is a limp placeholder; a concrete catch would hold the same restraint.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "stated-intention",
+      "severity": "minor",
+      "evidence": "She wanted him to hear it.",
+      "diagnosis": "Names the intention the staged action already carries.",
+      "repair_layer": "prose"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "narrative_distance": "close third, level 3-4; steady, unshowy",
+  "voice_principles": [
+    "perception and action before interpretation",
+    "the read of the wood carries the feeling",
+    "no emotion named that a gesture or the tide could imply"
+  ],
+  "diction": [
+    "plain nouns",
+    "boatyard vocabulary: garboard, plank, caulk, keel, frame, transom, hood end, trolley, slip",
+    "few adjectives, each earning its place"
+  ],
+  "syntax": [
+    "short declaratives",
+    "an occasional long sentence for one sustained action"
+  ],
+  "rhythm": [
+    "vary sentence openings",
+    "let a silence be an action, not a described feeling"
+  ],
+  "imagery": [
+    "wet paint, punky wood, the cold of the estuary, the creeping line of water",
+    "the surveying knife and the tide as recurring pressures"
+  ],
+  "dialogue": [
+    "few words",
+    "subtext over statement; Aldous says less than he means",
+    "no adverbial tags"
+  ],
+  "sentence_distribution": {
+    "short": 0.5,
+    "medium": 0.4,
+    "long": 0.1
+  },
+  "avoid": [
+    "generic emotional abstraction",
+    "stock atmospheric openings",
+    "unearned uplift",
+    "filter words (she felt / saw / realized / noticed / watched)",
+    "emotion named then paraphrased",
+    "adverbial dialogue tags",
+    "cliche"
+  ]
+}

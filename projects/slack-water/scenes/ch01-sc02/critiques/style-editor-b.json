@@ -1,0 +1,31 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "fb6a10e4c1fd8ab80d8299bcc2dfcd950ed76fa3e9e2f08ea326d16ac93cf0b5",
+  "critic": "style-editor",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.7,
+  "findings": [
+    {
+      "dimension": "dropped-craft-detail",
+      "severity": "material",
+      "evidence": "She coiled the hose off the reel.",
+      "diagnosis": "The hose — one of the three instruments the brief names — is never staged; the water test surfaces only in past perfect for a beat that was never shown, so the scene's strongest sensory demonstration becomes a reported afterthought.",
+      "repair_layer": "scene"
+    },
+    {
+      "dimension": "telling",
+      "severity": "minor",
+      "evidence": "That reached him.",
+      "diagnosis": "Narrator states the emotional effect; the next clause already renders it.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "stock-simile",
+      "severity": "minor",
+      "evidence": "the blade went in to the handle with no more argument than it would give a pat of butter",
+      "diagnosis": "'pat of butter' is soft, domestic, stock; this beat wants a harder image.",
+      "repair_layer": "prose"
+    }
+  ]
+}

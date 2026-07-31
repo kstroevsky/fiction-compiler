@@ -1,0 +1,17 @@
+{
+  "candidate": "candidate-b-r2.md",
+  "candidate_sha256": "c4569d2ebeb458377af53b01069a70f2c47a30cc1e2d6797e7ca10a8f7d1c32d",
+  "critic": "adversarial-reader",
+  "audit_class": "literary",
+  "verdict": "pass",
+  "confidence": 0.85,
+  "findings": [
+    {
+      "dimension": "plainspoken-register",
+      "severity": "minor",
+      "evidence": "He had his father in the shoulders and nowhere else.",
+      "diagnosis": "The single most writerly line — a summarizing read of Aldous that edges toward telling-about — but it is concrete, is Rennie's perception, names no feeling or theme, and seeds the recurring 'closed the subject the way his father used to' motif. Disclosed as a watch-point, not a blocker.",
+      "repair_layer": "prose"
+    }
+  ]
+}

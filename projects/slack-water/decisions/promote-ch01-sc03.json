@@ -1,0 +1,46 @@
+{
+  "scene_id": "ch01-sc03",
+  "candidate": "scenes/ch01-sc03/candidates/candidate-b-r1.md",
+  "candidate_sha256": "68c811454522ce0c62b7998ed77134893cf05ff9a1787e9c21e731c583513d46",
+  "promoted_to": "manuscript/chapters/ch01-sc03.md",
+  "promoted_at": "2026-07-31T07:46:23.810298+00:00",
+  "state_delta_sha256": "9aac9783d63cc856d33023f2f9797261ea4f6db891c4b51b37cc9ced8431646d",
+  "parent_canon_hash": "258f57f8d96e92683834a5f2780e19e6f2f38e73834fde48ddbd1e56e96befd9",
+  "resulting_canon_hash": "7967bc0cd194d49c19348b2e7ff8045683e624c1216ba0bc2b8bde7c3f3cbe1f",
+  "critique_files": [
+    "scenes/ch01-sc03/critiques/adversarial-reader-a.json",
+    "scenes/ch01-sc03/critiques/adversarial-reader-b-r1.json",
+    "scenes/ch01-sc03/critiques/adversarial-reader-b.json",
+    "scenes/ch01-sc03/critiques/character-simulator-a.json",
+    "scenes/ch01-sc03/critiques/character-simulator-b.json",
+    "scenes/ch01-sc03/critiques/defaultness-candidate-a.json",
+    "scenes/ch01-sc03/critiques/defaultness-candidate-b-r1.json",
+    "scenes/ch01-sc03/critiques/defaultness-candidate-b.json",
+    "scenes/ch01-sc03/critiques/hard-audit.json",
+    "scenes/ch01-sc03/critiques/style-editor-a.json",
+    "scenes/ch01-sc03/critiques/style-editor-b.json"
+  ],
+  "binding_critiques": [
+    {
+      "file": "adversarial-reader-b-r1.json",
+      "critic": "adversarial-reader",
+      "audit_class": "literary",
+      "verdict": "pass",
+      "sha256": "2fef8df54d76f9b3f0cfa2fa795c29e1c5230fc916968f12857596f18385bfb6"
+    },
+    {
+      "file": "defaultness-candidate-b-r1.json",
+      "critic": "defaultness-lint",
+      "audit_class": "defaultness",
+      "verdict": "pass",
+      "sha256": "fb6ad548b70ecb3ed9b46ff19cf2b1a670c2015c5f3b7453bf24421efbdd59dc"
+    },
+    {
+      "file": "hard-audit.json",
+      "critic": "hard-audit",
+      "audit_class": "hard",
+      "verdict": "pass",
+      "sha256": "0f7aaed0eed43670bfc45656e6d16996a38e3d1d53d22a67bc3d37b10bd660e3"
+    }
+  ]
+}

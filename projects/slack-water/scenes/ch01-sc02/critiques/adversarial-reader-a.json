@@ -1,0 +1,31 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "f69562da5dfc936c086e4f34e042b3675142b331c07560efa825a3c2321d2869",
+  "critic": "adversarial-reader",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.6,
+  "findings": [
+    {
+      "dimension": "narratorial-self-validation",
+      "severity": "material",
+      "evidence": "It came out plain and sure, the way a thing does when it is right.",
+      "diagnosis": "The contract bars the customer from delivering tidy validation; this relocates that validation to the narrator, which pronounces the turn correct — the story congratulating its own compromise.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "under-dramatized-choice",
+      "severity": "material",
+      "evidence": "\"No's the easy one.\" Rennie shut the hose off. \"I've a harder one, if you want it.\"",
+      "diagnosis": "The spec's purpose is to force Rennie's choice between the paid false launch and the true answer, but she is on the side of truth from the first tap; the false launch is never a live temptation, so the turn reads as a clever fix, not a moral choice.",
+      "repair_layer": "scene"
+    },
+    {
+      "dimension": "authorial-aphorism",
+      "severity": "minor",
+      "evidence": "Under the big light the paint looked better than ever, which was the cruelty of paint.",
+      "diagnosis": "Opens on an interpretive abstraction instead of letting the image carry it.",
+      "repair_layer": "prose"
+    }
+  ]
+}

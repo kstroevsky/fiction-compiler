@@ -1,0 +1,31 @@
+{
+  "candidate": "candidate-a.md",
+  "candidate_sha256": "f69562da5dfc936c086e4f34e042b3675142b331c07560efa825a3c2321d2869",
+  "critic": "character-simulator",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.68,
+  "findings": [
+    {
+      "dimension": "dropped-contradiction",
+      "severity": "material",
+      "evidence": "\"No's the easy one.\" Rennie shut the hose off. \"I've a harder one, if you want it.\"",
+      "diagnosis": "Rennie's defining contradiction (needing the money, tempted by the easy launch) is never dramatized; 'easy/hard' refers to the difficulty of the answer, not any financial pull, so her honesty costs her nothing and she drifts toward a truth-oracle.",
+      "repair_layer": "character"
+    },
+    {
+      "dimension": "grief-as-menace-risk",
+      "severity": "material",
+      "evidence": "For a second it seemed he might put his hand on her, and she stood square and let him decide what to do with it.",
+      "diagnosis": "Introduces implied physical threat toward Rennie that his 'trusts Rennie' model does not support; routing his rage through her body first is the author raising stakes, and risks miscoding grief as menace toward a woman.",
+      "repair_layer": "scene"
+    },
+    {
+      "dimension": "timeline",
+      "severity": "minor",
+      "evidence": "a plank that has been drinking three years under a tarp",
+      "diagnosis": "'three years' under a tarp fights with paint that looks 'better than ever' and a father only just dead; pin the timeline so the fresh surface and the rot do not contradict.",
+      "repair_layer": "world"
+    }
+  ]
+}

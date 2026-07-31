@@ -1,0 +1,54 @@
+{
+  "id": "ch01-sc02",
+  "chapter": "1",
+  "narrative_mode": "linear",
+  "pov": "char-rennie",
+  "participants": [
+    "char-rennie",
+    "char-aldous"
+  ],
+  "purpose": [
+    "prove the rot to Aldous through the survey",
+    "force Rennie's choice between the paid false launch and the true answer",
+    "turn the demand into an honest launching Aldous can accept"
+  ],
+  "entry_state": [
+    "Rennie knows the garboard is soft",
+    "Aldous is pressing to get the boat in the water",
+    "the tide is coming"
+  ],
+  "desire": "get Aldous to accept the truth about the boat without breaking the man",
+  "conflict": "the true answer costs Rennie the work and costs Aldous the launching he promised the men; Aldous fights every proof",
+  "turn": "Rennie stops arguing launch-or-not and offers the third thing: float her on the slack and haul her before she swamps, a launching that is not a lie",
+  "exit_state": [
+    "Aldous knows the boat will swamp and cannot be sailed",
+    "Aldous agrees to the honest launching",
+    "Rennie has told the truth and kept the man"
+  ],
+  "required_events": [
+    "evt-survey"
+  ],
+  "knowledge_required": [
+    {
+      "character": "char-rennie",
+      "fact": "fact-garboard-rot"
+    }
+  ],
+  "forbidden_moves": [
+    "name Rennie's or Aldous's feelings outright",
+    "a consoling speech",
+    "a flashback",
+    "tidy uplift",
+    "adverbial dialogue tags"
+  ],
+  "style_constraints": [
+    "close third on Rennie",
+    "the survey carries the argument",
+    "dialogue with subtext",
+    "no filter words"
+  ],
+  "candidate_strategies": [
+    "A: the proof done mostly in silence, the knife and the hose doing the talking",
+    "B: sharper verbal conflict, Aldous's grief coming out as anger"
+  ]
+}

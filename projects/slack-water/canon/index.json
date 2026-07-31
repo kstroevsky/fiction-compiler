@@ -1,0 +1,29 @@
+{
+  "characters": [
+    "char-rennie",
+    "char-aldous"
+  ],
+  "world_rules": [
+    "The estuary is tidal; a boat can be floated at the slip only for the short window around the top of the tide, and this morning that window is near seven.",
+    "Rot in the garboard strake and the hood ends is structural: it will not hold caulk, and under load the seam works open and takes water. Fresh paint hides it but does not mend it.",
+    "The rot cannot be cut out and replaced in the hours left; it is a winter's work of new plank and possibly frames.",
+    "Tom Vane restored the boat for years, painted her the spring before he fell ill, and died with her never launched; she sat under a tarp that let the wet in."
+  ],
+  "locations": [
+    "the boatyard at first light",
+    "the slip and the tidal estuary"
+  ],
+  "objects": [
+    "the boat (Tom Vane's, unlaunched)",
+    "the fresh-painted garboard strake",
+    "Rennie's surveying knife",
+    "the boat trolley",
+    "the invoice"
+  ],
+  "factions": [],
+  "accepted_state_deltas": [
+    "ch01-sc01",
+    "ch01-sc02",
+    "ch01-sc03"
+  ]
+}

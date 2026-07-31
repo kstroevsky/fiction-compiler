@@ -1,0 +1,54 @@
+{
+  "id": "ch01-sc03",
+  "chapter": "1",
+  "narrative_mode": "linear",
+  "pov": "char-rennie",
+  "participants": [
+    "char-rennie",
+    "char-aldous"
+  ],
+  "purpose": [
+    "carry out the honest launching at the top of the tide",
+    "let Aldous have his father's boat on the water without a lie",
+    "end on recognition, not triumph"
+  ],
+  "entry_state": [
+    "Aldous has agreed to the honest launching",
+    "Tom's friends are arriving",
+    "the tide is near the top"
+  ],
+  "desire": "give the boat a true launching and get her out before she swamps",
+  "conflict": "the boat floats but takes water; the moment has to be let go at exactly the right time, before the water wins",
+  "turn": "before she settles they haul her out; Aldous puts his hand on the wet plank and lets the boat be finished",
+  "exit_state": [
+    "the boat has met the water honestly and been hauled",
+    "Aldous has let his father's work be done",
+    "the yard's troubles are unchanged; nothing is tidied"
+  ],
+  "required_events": [
+    "evt-launching"
+  ],
+  "knowledge_required": [
+    {
+      "character": "char-aldous",
+      "fact": "fact-will-swamp"
+    }
+  ],
+  "forbidden_moves": [
+    "name the feeling at the end",
+    "a triumphant beat",
+    "a tidy lesson",
+    "a flashback",
+    "adverbial dialogue tags"
+  ],
+  "style_constraints": [
+    "close third on Rennie",
+    "the launching enacted through action",
+    "end on a concrete image",
+    "no told emotion"
+  ],
+  "candidate_strategies": [
+    "A: the slack water and the creeping line, the haul-out timed to the water",
+    "B: sparer, more elliptical, more white space around the final image"
+  ]
+}

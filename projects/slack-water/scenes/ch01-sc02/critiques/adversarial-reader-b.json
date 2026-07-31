@@ -1,0 +1,31 @@
+{
+  "candidate": "candidate-b.md",
+  "candidate_sha256": "fb6a10e4c1fd8ab80d8299bcc2dfcd950ed76fa3e9e2f08ea326d16ac93cf0b5",
+  "critic": "adversarial-reader",
+  "audit_class": "literary",
+  "verdict": "revise",
+  "confidence": 0.6,
+  "findings": [
+    {
+      "dimension": "continuity",
+      "severity": "material",
+      "evidence": "She coiled the hose off the reel.",
+      "diagnosis": "The hose demonstration is never staged, yet water 'she had run' is already dripping while she is only now taking the hose off the reel — a timeline gap; the leak that justifies the swamping stakes is asserted, not enacted.",
+      "repair_layer": "scene"
+    },
+    {
+      "dimension": "cliche-console-the-griever",
+      "severity": "material",
+      "evidence": "Your father would not have thanked me for the lying one.",
+      "diagnosis": "Rennie backs her offer by speaking for the dead father's approval — the wise-craftsperson-consoles-the-griever cliche, borrowing moral authority from the deceased rather than from the evidence in the plank. (Note: the character-simulator reads the adjacent 'He would never have let her go in like this' as load-bearing, not cliche; disagreement preserved.)",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "on-the-nose",
+      "severity": "minor",
+      "evidence": "No. It is a launching. The true one instead of the lying one.",
+      "diagnosis": "States the true/false binary in the abstract instead of trusting the concrete offer to carry it.",
+      "repair_layer": "prose"
+    }
+  ]
+}
