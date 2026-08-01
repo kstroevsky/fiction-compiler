@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
+from . import critique as _critique
 from . import defaultness, hard_audit, kb, regression, revision
 from .assemble import assemble as _assemble
 from .context import compile_bundle
@@ -221,6 +222,20 @@ def prose_audit(project: str, scene_id: str, claims: dict) -> dict:
     return _audit_prose(project_dir(project), scene_id, claims)
 
 
+def record_critique(project: str, scene_id: str, candidate: str, critic: str, verdict: str,
+                    findings: list | None = None, confidence: float = 1.0,
+                    audit_class: str | None = None, filename: str | None = None) -> dict:
+    """Write a schema-valid, candidate-bound critique with the sha stamped from the actual bytes."""
+    return _critique.record_critique(project_dir(project), scene_id, candidate, critic, verdict,
+                                     findings=findings, confidence=confidence,
+                                     audit_class=audit_class, filename=filename)
+
+
+def scene_status(project: str, scene_id: str, candidate: str) -> dict:
+    """Read-only: would promote accept this candidate, and if not, exactly why?"""
+    return _critique.scene_status(project_dir(project), scene_id, candidate)
+
+
 def run_regression() -> dict:
     """Run the framework regression fixtures (the FRAMEWORK loop's deterministic CHECK).
 
@@ -335,6 +350,31 @@ TOOLS: list[dict] = [
           "and promise closures the state delta never recorded. Returns a critique.schema critique.",
           {"project": {"type": "string"}, "scene_id": {"type": "string"}, "claims": {"type": "object"}},
           ["project", "scene_id", "claims"], prose_audit),
+    _tool("record_critique",
+          "Write a schema-valid, candidate-BOUND critique into scenes/<scene_id>/critiques/. Stamps "
+          "candidate_sha256 from the candidate file's ACTUAL bytes, derives audit_class from the "
+          "critic (hard-audit->hard, defaultness-lint->defaultness, adversarial-reader/style-editor/"
+          "character-simulator/continuity-auditor->literary), validates against critique.schema, and "
+          "REFUSES a verdict/severity contradiction (a 'pass' carrying a material/fatal finding) with "
+          "a remediation message. Use this instead of hand-writing critique JSON so the promote gate "
+          "credits the exact bytes you judged. For the candidate-independent hard audit, pass "
+          "candidate=<scene_id> (no sha is stamped).",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"}, "candidate": {"type": "string"},
+           "critic": {"type": "string"},
+           "verdict": {"type": "string", "enum": ["pass", "revise", "reject", "uncertain"]},
+           "findings": {"type": "array"}, "confidence": {"type": "number"},
+           "audit_class": {"type": "string", "enum": ["hard", "literary", "defaultness"]},
+           "filename": {"type": "string"}},
+          ["project", "scene_id", "candidate", "critic", "verdict"], record_critique),
+    _tool("scene_status",
+          "Read-only gate-readiness inspector: would `promote` accept this candidate, and if not, "
+          "exactly why? Runs the real triple-audit gate (candidate-bound, per class) plus the "
+          "structural preconditions (spec, schema-valid matching state-delta) WITHOUT mutating canon "
+          "or the manuscript. Returns critiques present, which bind to this candidate, "
+          "audit_gate.ready + audit_gate.reasons (the same blocking messages promote would raise), and "
+          "whether the scene is already promoted. Call before promote to see what is missing.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"}, "candidate": {"type": "string"}},
+          ["project", "scene_id", "candidate"], scene_status),
     _tool("run_regression",
           "Run the FRAMEWORK regression fixtures — the deterministic invariants the ADRs pinned "
           "(defaultness, revision identity, tournament selection, ontology). Returns pass/fail per "

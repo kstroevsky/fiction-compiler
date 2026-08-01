@@ -67,8 +67,10 @@ def compile_bundle(project: Path, scene_id: str) -> dict:
         context_manifest.append({"kind": "world_rule", "ref": rule, "reason": "world constraint",
                                  "priority": "reference", "source": "canon/index"})
 
+    # Cache-prefix hygiene (agents-best-practices): the stable, cacheable content leads; the one
+    # volatile field (generated_at) goes LAST so it can never fragment a cached prompt prefix when
+    # this bundle is embedded as drafting/audit context. "Stable instructions before volatile state."
     return {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
         "scene_id": scene_id,
         "project": {k: v for k, v in _load(project / "brief" / "project.json", {}).items() if k in _PROJECT_KEEP},
         "scene_spec": spec,
@@ -90,6 +92,7 @@ def compile_bundle(project: Path, scene_id: str) -> dict:
             "contain anything a later scene introduces. Add targeted missing canon if needed; "
             "never paste the whole project."
         ),
+        "generated_at": datetime.now(timezone.utc).isoformat(),
     }
 
 

@@ -135,6 +135,24 @@
         {"id": "p2", "logline": "A farmhand brings the flock down before a storm.", "pov_character": "char-b", "transforming_character": "char-b", "conflict_type": "character-vs-nature", "obliqueness": "direct", "resolution_type": "humble", "theme_question": "will she trust her own read of the weather?", "why_not_default": "no triumphant rescue"},
         {"id": "p3", "logline": "A visitor withholds one sentence across a prison table.", "pov_character": "char-c", "transforming_character": "char-c", "conflict_type": "interpersonal", "obliqueness": "oblique", "resolution_type": "refusal", "theme_question": "is a kind lie a betrayal?", "why_not_default": "no confession or catharsis"}]},
       "expect": true
+    },
+    {
+      "name": "record_critique refuses a pass that carries a material finding (ADR 0018)",
+      "check": "critique_consistency",
+      "input": {"verdict": "pass", "findings": [{"dimension": "cliche", "severity": "material", "evidence": "heart pounded"}]},
+      "expect": false
+    },
+    {
+      "name": "record_critique accepts a clean pass (ADR 0018)",
+      "check": "critique_consistency",
+      "input": {"verdict": "pass", "findings": []},
+      "expect": true
+    },
+    {
+      "name": "record_critique allows a revise to carry a material finding (ADR 0018)",
+      "check": "critique_consistency",
+      "input": {"verdict": "revise", "findings": [{"dimension": "cliche", "severity": "material", "evidence": "heart pounded"}]},
+      "expect": true
     }
   ]
 }
