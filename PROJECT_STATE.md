@@ -1,12 +1,12 @@
 # Project state
 
-> Evidence snapshot collected 2026-07-30T19:44:37.884Z from Git commit `54f7d7142856dc1ec1f8168a9727f271da664163` on the remote default branch `main`. This document records verifiable repository facts; Linear remains canonical for active priority and status.
+> Evidence snapshot collected 2026-07-30T19:44:37.884Z from Git commit `54f7d7142856dc1ec1f8168a9727f271da664163` on the remote default branch `main`. This document records verifiable repository facts; Anklav is the active task-control system.
 
 ## Product promise
 See the repository README and linked canonical architecture/product documents.
 
 ## Current phase
-No delivery-phase inference is made by this bootstrap. Review the active Linear issue against the evidence snapshot below.
+No delivery-phase inference is made by this bootstrap. Read the active Anklav task and load its context pack before interpreting this evidence.
 
 ## Current implementation
 Verified base commit: `54f7d7142856dc1ec1f8168a9727f271da664163`. Use the recent commits and canonical artifacts below as entry points for code-level inspection.
@@ -44,7 +44,7 @@ Verified base commit: `54f7d7142856dc1ec1f8168a9727f271da664163`. Use the recent
 - `docs/decisions/0015-kb-structured-depth.md`
 
 ## Active work
-Linear is the canonical priority/status layer. GitHub pull requests and commits are implementation evidence.
+Anklav is the canonical priority/status layer. GitHub pull requests and commits are implementation evidence.
 
 ## Important decisions
 Existing equivalents:
@@ -57,7 +57,7 @@ See the open GitHub issues above; do not infer additional problems without evide
 Refresh this evidence snapshot when the default branch, open work, or accepted technical state changes.
 
 ## Next recommended action
-Read the active Linear issue and its linked canonical artifacts, then inspect the relevant current code.
+Read the active Anklav task, load its context pack, read the linked canonical artifacts, then inspect the relevant current code.
 
 ## Context index
 - Agent rules: `AGENTS.md`
