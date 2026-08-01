@@ -18,7 +18,8 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from . import critique, defaultness, integrity, ontology, premise, prose_audit, revision, tournament
+from . import (critic_eval, critique, defaultness, integrity, ontology, premise, prose_audit,
+               revision, tournament)
 from .workspace import KB, ROOT, SCHEMAS
 
 FIXTURES = ROOT / "regression" / "fixtures.json"
@@ -62,6 +63,11 @@ def _critique_consistency(inp: dict) -> bool:
     return critique.consistency_problem(inp["verdict"], inp["findings"]) is None
 
 
+def _critic_case(inp: dict) -> bool:
+    """Critic-recall invariant: a deterministic detector must catch (or not) a gold planted defect."""
+    return critic_eval.run_deterministic_case(inp)
+
+
 def _tournament_selected(inp: dict) -> str:
     result = tournament.run_tournament(inp["critiques"], seed=inp.get("seed", 0), judgments=inp.get("judgments"))
     rec = result["recommendation"]
@@ -77,6 +83,7 @@ CHECKS = {
     "prose_knowledge_leak": _prose_knowledge_leak,
     "premise_diversity": _premise_diversity,
     "critique_consistency": _critique_consistency,
+    "critic_case": _critic_case,
 }
 
 
