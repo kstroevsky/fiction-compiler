@@ -1,0 +1,24 @@
+{
+  "candidate": "candidate-a.md",
+  "critic": "character-simulator",
+  "verdict": "pass",
+  "confidence": 0.75,
+  "findings": [
+    {
+      "dimension": "ambiguity-glove-lean",
+      "severity": "minor",
+      "evidence": "she understood he did not want to leave anything of himself on the wipes",
+      "diagnosis": "Narrated with certainty and forensic specificity ('on the wipes'), thinning the frightened-decent reading; recoverable, a lean not a collapse.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "author-thumb",
+      "severity": "minor",
+      "evidence": "a rep who bought forty Bensons and a Twix and wouldn't meet her eye",
+      "diagnosis": "Primes generalized menace with no in-scene motivation or payoff.",
+      "repair_layer": "prose"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "fd4ba9fd04a9f8292efe8cebee72470219fb5c4b68ac568fabd3d69afebb894f"
+}

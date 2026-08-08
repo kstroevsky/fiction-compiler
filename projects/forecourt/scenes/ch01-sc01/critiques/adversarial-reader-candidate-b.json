@@ -1,0 +1,24 @@
+{
+  "candidate": "candidate-b.md",
+  "critic": "adversarial-reader",
+  "verdict": "revise",
+  "confidence": 0.72,
+  "findings": [
+    {
+      "dimension": "scene-job-coverage",
+      "severity": "material",
+      "evidence": "Jo sat behind the glass with her thumb a half-inch from the button",
+      "diagnosis": "The scene must establish glass, drawer, button, cameras, and locked door; cameras and the locked door never appear, so it reads less caged.",
+      "repair_layer": "scene"
+    },
+    {
+      "dimension": "told-not-shown",
+      "severity": "minor",
+      "evidence": "For a second there was nothing dangerous about him at all",
+      "diagnosis": "Asserts his (non)dangerousness rather than rendering it.",
+      "repair_layer": "prose"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "1d42c9e0ab2d771fdb852187854fd236a3b7e0481e9aa5cd6de90d927771af0d"
+}

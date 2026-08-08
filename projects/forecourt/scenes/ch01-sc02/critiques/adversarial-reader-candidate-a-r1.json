@@ -1,0 +1,24 @@
+{
+  "candidate": "candidate-a-r1.md",
+  "critic": "adversarial-reader",
+  "verdict": "pass",
+  "confidence": 0.68,
+  "findings": [
+    {
+      "dimension": "ambiguity-police-signal",
+      "severity": "minor",
+      "evidence": "the blue of it woke up along the canopy struts, once",
+      "diagnosis": "The blue flash identifies the car as police — a soft tip (hiding-from-police leans some readers toward guilt) — but double-edged (guilty fugitive vs. distrust of the law), so it does not confirm him; it raises Jo's un-saintliness (obstructing police). Kept as a deliberate trade, and the officer is police in sc03 regardless.",
+      "repair_layer": "discourse"
+    },
+    {
+      "dimension": "exhaustion-strand-faint",
+      "severity": "minor",
+      "evidence": "as nothing came at this hour",
+      "diagnosis": "Fear and son-recognition are vivid; the exhaustion strand survives only as dead-hour framing — completeness-against-brief, not a prose flaw (sc01 carries her exhaustion).",
+      "repair_layer": "prose"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "0d85cf33584308b3faffb185e4edcf6aef556fd70ea34aa82ca91e14fb808692"
+}

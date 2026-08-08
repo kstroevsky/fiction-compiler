@@ -1,0 +1,48 @@
+{
+  "events": [
+    {
+      "id": "evt-arrival",
+      "time": 0,
+      "actors": ["char-jo", "char-stranger"],
+      "preconditions": [
+        {"predicate": "located_at", "subject": "char-jo", "object": "loc-kiosk"},
+        {"predicate": "knows", "subject": "char-jo", "object": "fact-alone"}
+      ],
+      "action": "The man comes on foot to the night hatch with blood on his sleeve and asks for something small; from behind the glass Jo cannot tell what he is, and pushes the first-aid kit out to him through the drawer.",
+      "effects": [
+        {"op": "add", "predicate": "located_at", "subject": "char-stranger", "object": "loc-forecourt"}
+      ],
+      "causes": []
+    },
+    {
+      "id": "evt-choice",
+      "time": 1,
+      "actors": ["char-jo", "char-stranger"],
+      "preconditions": [
+        {"predicate": "located_at", "subject": "char-stranger", "object": "loc-forecourt"},
+        {"predicate": "knows", "subject": "char-jo", "object": "fact-blood"}
+      ],
+      "action": "A car comes up the road and slows. The man moves out of the light and asks not to be seen. Jo's hand goes to the panic button and does not press it; she pushes the key to the back toilet out through the drawer.",
+      "effects": [],
+      "causes": ["evt-arrival"]
+    },
+    {
+      "id": "evt-after",
+      "time": 2,
+      "actors": ["char-jo", "char-stranger", "char-officer"],
+      "preconditions": [
+        {"predicate": "knows", "subject": "char-jo", "object": "fact-car"},
+        {"predicate": "located_at", "subject": "char-stranger", "object": "loc-forecourt"}
+      ],
+      "action": "The car is a police car. The officer comes to the hatch and asks if she has seen a man. Jo says she has seen no one. The officer goes; the man is gone into the dark; Jo is left with the blood on the drawer and the not-knowing.",
+      "effects": [
+        {"op": "remove", "predicate": "located_at", "subject": "char-stranger", "object": "loc-forecourt"}
+      ],
+      "causes": ["evt-choice"]
+    }
+  ],
+  "edges": [
+    {"from": "evt-arrival", "to": "evt-choice"},
+    {"from": "evt-choice", "to": "evt-after"}
+  ]
+}

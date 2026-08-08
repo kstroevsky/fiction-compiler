@@ -1,0 +1,18 @@
+{
+  "scene_id": "ch01-sc02",
+  "time": 1,
+  "facts_added": [
+    {"id": "fact-car", "text": "A car has come up the road and slowed onto the forecourt; it could be the police, and the man does not want to be seen."}
+  ],
+  "facts_removed": [],
+  "knowledge_changes": [
+    {"character": "char-jo", "fact": "fact-car"}
+  ],
+  "relationship_changes": [],
+  "relationship_edges": [
+    {"subject": "char-jo", "object": "char-stranger", "dimension": "stance", "value": "shielded"}
+  ],
+  "predicate_changes": [],
+  "promises_opened": [],
+  "promises_closed": []
+}

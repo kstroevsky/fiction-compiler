@@ -1,0 +1,38 @@
+{
+  "candidate": "candidate-a.md",
+  "critic": "style-editor",
+  "verdict": "revise",
+  "confidence": 0.68,
+  "findings": [
+    {
+      "dimension": "named-then-paraphrased",
+      "severity": "minor",
+      "evidence": "And it was not a kind thought. It had no kindness in it at all.",
+      "diagnosis": "The second sentence restates the first (named-then-paraphrased applied to un-kindness); the debt/bribe reframe after is load-bearing, so the doubling is redundant and edges toward insisting.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "the-way-tic",
+      "severity": "minor",
+      "evidence": "the way nothing came at this hour",
+      "diagnosis": "Mild aphoristic 'the way...' construction; recast as a flat clause ('as nothing came at this hour').",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "sententious-narrator",
+      "severity": "minor",
+      "evidence": "A man who ran was one thing and a man who stood was another, and she did not know yet which he was.",
+      "diagnosis": "A general maxim, anchored to her uncertainty so mostly earned; borderline.",
+      "repair_layer": "discourse"
+    },
+    {
+      "dimension": "named-emotion",
+      "severity": "minor",
+      "evidence": "she was glad of the not being thanked",
+      "diagnosis": "'glad' states the feeling; the inversion mostly carries it but the tell remains.",
+      "repair_layer": "prose"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "057cfda828f68621f352919e07e51f3962dae756a6789a402ed8bca196986fca"
+}

@@ -1,0 +1,38 @@
+{
+  "candidate": "candidate-a.md",
+  "critic": "style-editor",
+  "verdict": "revise",
+  "confidence": 0.72,
+  "findings": [
+    {
+      "dimension": "the-way-tic-simile",
+      "severity": "material",
+      "evidence": "the night came back down over the forecourt the way water comes back over a dropped stone",
+      "diagnosis": "The banned 'the way...' construction plus a decorative nature-simile at the moment the officer leaves — lyric flourish where the scene wants cold subtraction.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "benedictory-polysyndeton",
+      "severity": "material",
+      "evidence": "and you did what there was to do in them, and somewhere her son was thirty-one and she did not know where, and the road stayed empty a long time",
+      "diagnosis": "The chained 'and... and... and' builds an incantatory, resigned cadence — the over-warm/benedictory risk; flat separate declaratives would land colder.",
+      "repair_layer": "discourse"
+    },
+    {
+      "dimension": "sententious",
+      "severity": "minor",
+      "evidence": "They were all young now.",
+      "diagnosis": "Gnomic aside stepping outside close-third watchfulness into narrator-wisdom.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "told-pointer",
+      "severity": "minor",
+      "evidence": "the thing she had not let herself think",
+      "diagnosis": "Points explicitly at a suppressed thought and 'thing' repeats; gestures at the feeling instead of letting the concrete list carry it.",
+      "repair_layer": "prose"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "f1aca497fce68b1eb4f03281b01844df179d672a71f8806e2287045b42dd6355"
+}

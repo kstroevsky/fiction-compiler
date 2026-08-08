@@ -1,0 +1,30 @@
+{
+  "characters": [
+    "char-jo",
+    "char-stranger",
+    "char-officer"
+  ],
+  "world_rules": [
+    "At night the shop is locked; the cashier serves through a night pay drawer in the glass and never opens the door — a rule for a woman working alone.",
+    "There is a panic button under the counter; pressing it calls it in and cannot be taken back.",
+    "Jo cannot know whether the man at the hatch is a victim in trouble or a danger to her; the night gives her no way to find out.",
+    "Jo's son Kieran has been in and out of trouble for years and she does not hear from him; every man in trouble at a window at night is, to her, somebody's boy."
+  ],
+  "locations": [
+    "the kiosk, behind the night glass",
+    "the forecourt, on the man's side of the glass",
+    "the road (offstage)"
+  ],
+  "objects": [
+    "the night pay drawer in the glass",
+    "the panic button under the counter",
+    "the first-aid kit",
+    "the key to the outside toilet, round the back, out of the cameras"
+  ],
+  "factions": [],
+  "accepted_state_deltas": [
+    "ch01-sc01",
+    "ch01-sc02",
+    "ch01-sc03"
+  ]
+}

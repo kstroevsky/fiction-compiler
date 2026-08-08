@@ -1,0 +1,34 @@
+{
+  "id": "forecourt",
+  "title": "Forecourt",
+  "form": "short-story",
+  "audience": "adult literary readers who like grounded, tense, character-driven realism",
+  "reader_contract": [
+    "6-9 pages, single sitting",
+    "close third person, one focalizer (Jo)",
+    "strictly linear: about twenty minutes of one night, one location (the kiosk behind the night glass); no flashback, no framing device",
+    "present, real danger, but the interior feeling is carried by the body, the glass, and the till, never named",
+    "the man stays genuinely ambiguous to the end: never confirmed victim or villain, no twist, no reveal",
+    "resolves ambiguous: Jo makes one small, concrete decision from behind the glass and is left not knowing; recognition without resolution"
+  ],
+  "theme_question": "When someone dangerous needs your help, what do you owe them, and what do you owe yourself?",
+  "desired_affect": [
+    "the pressure of a decision made under real fear and real doubt",
+    "the cost of choosing when you cannot know",
+    "recognition without relief"
+  ],
+  "constraints": [
+    "events happen in the order the reader receives them; no gimmick structure, no twist",
+    "the theme is NEVER spoken by a character or the narrator; it lives in the glass, the drawer, and one thing Jo does",
+    "the man is neither a monster nor a saint; the story refuses to confirm what he is",
+    "Jo's reason for what she does is tangled and un-saintly (fear, exhaustion, and a son-shaped recognition), never noble compassion stated aloud",
+    "prose earns feeling through concrete action; no told emotion, no cliche, no adverbial dialogue tags",
+    "no rescue, no violence climax, no tidy moral; the decision is small and its consequences uncertain"
+  ],
+  "human_gates": [
+    "premise",
+    "voice-profile",
+    "ending",
+    "final"
+  ]
+}

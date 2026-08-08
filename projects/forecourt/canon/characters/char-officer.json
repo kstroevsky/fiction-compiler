@@ -1,0 +1,29 @@
+{
+  "id": "char-officer",
+  "name": "the officer",
+  "desire": "find the man who is out here somewhere and move on to the next call",
+  "need": "to do the round and go home",
+  "values": [
+    "the job",
+    "getting through the shift"
+  ],
+  "beliefs": [
+    "people at petrol stations at 3am have usually seen something"
+  ],
+  "constraints": [
+    "tired, routine, one of a hundred nights"
+  ],
+  "voice": {
+    "lexicon": [
+      "procedural, courteous, tired"
+    ],
+    "syntax": [
+      "the flat questions of a man who has asked them a thousand times"
+    ],
+    "avoid": [
+      "menace",
+      "warmth",
+      "anything that makes him the point of the scene"
+    ]
+  }
+}

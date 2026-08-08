@@ -1,0 +1,24 @@
+{
+  "candidate": "candidate-b.md",
+  "critic": "style-editor",
+  "verdict": "revise",
+  "confidence": 0.6,
+  "findings": [
+    {
+      "dimension": "manner-tag",
+      "severity": "material",
+      "evidence": "He said it flat, a list.",
+      "diagnosis": "'flat' is an adverbial manner tag on the speech verb — a direct hit on 'NO manner tags', and it states the target voice instead of enacting it.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "stated-conclusion",
+      "severity": "minor",
+      "evidence": "and she had helped him either way",
+      "diagnosis": "A summarizing moral tag that resolves toward statement where the brief wants her left not knowing.",
+      "repair_layer": "discourse"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "5ef46f1e803ae5054baec9940fae1ad991793d9e04748f6f046bf0a6a24cc455"
+}

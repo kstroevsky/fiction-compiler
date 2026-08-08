@@ -1,0 +1,31 @@
+{
+  "candidate": "candidate-a-r1.md",
+  "critic": "adversarial-reader",
+  "verdict": "pass",
+  "confidence": 0.77,
+  "findings": [
+    {
+      "dimension": "son-seeding",
+      "severity": "minor",
+      "evidence": "Somewhere her son was thirty-one and she did not know where.",
+      "diagnosis": "A first mention here would risk an imported-mirror closing resonance, but the son is heavily seeded upstream (sc01: Kieran's knuckles/eye/neck, thirty-one, no idea where; sc02: Kieran at a glass), so the beat is earned — the verify's 'leave as is' condition is met.",
+      "repair_layer": "discourse"
+    },
+    {
+      "dimension": "polysyndeton-swell",
+      "severity": "minor",
+      "evidence": "and he went, and the car swung its stirred light once more round the concrete and pulled out onto the road and took the colour with it, and the night came back down over the forecourt",
+      "diagnosis": "The one lyrical swell, but subtractive (colour leaves, dark returns) and mid-scene, not at the close; a permitted sustained-action sentence.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "simile",
+      "severity": "minor",
+      "evidence": "like something being stirred",
+      "diagnosis": "Specific and load-bearing (paid off by 'swung its stirred light' and 'took the colour with it'); at the open, away from the ending discipline.",
+      "repair_layer": "prose"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "67a771f9897ef185f7db1c5ecb0624b363abb3e97abff19a33929bdcbc9f9cec"
+}

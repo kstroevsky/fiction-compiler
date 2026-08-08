@@ -1,0 +1,46 @@
+{
+  "id": "ch01-sc01",
+  "chapter": "1",
+  "narrative_mode": "linear",
+  "pov": "char-jo",
+  "participants": ["char-jo", "char-stranger"],
+  "purpose": [
+    "establish Jo, the dead middle of the night shift, the isolation, and the mechanics of the kiosk (glass, pay drawer, panic button, cameras, locked door)",
+    "the man arrives on foot with blood on him and asks for something small; from behind the glass Jo cannot tell what he is",
+    "plant her guarded stance and the son she cannot reach"
+  ],
+  "entry_state": [
+    "Jo is alone in the kiosk, hours to go",
+    "the shop is locked; she serves through the drawer",
+    "no one has come for a long while"
+  ],
+  "desire": "get through the shift without any trouble",
+  "conflict": "a bleeding stranger she cannot read is at her hatch, and nothing she can see tells her whether he is a danger or a man in trouble",
+  "turn": "she pushes the first-aid kit out through the drawer — a small thing given to someone she cannot vouch for",
+  "exit_state": [
+    "the man is on the forecourt, patched but not gone",
+    "the night is not over",
+    "her hand has been near the button"
+  ],
+  "required_events": ["evt-arrival"],
+  "knowledge_required": [
+    {"character": "char-jo", "fact": "fact-alone"}
+  ],
+  "forbidden_moves": [
+    "confirm the man as victim or villain",
+    "name Jo's fear",
+    "a staged flashback (the son is referenced, not shown)",
+    "thriller cliche",
+    "adverbial dialogue tags"
+  ],
+  "style_constraints": [
+    "close third on Jo",
+    "the glass and the drawer carry the tension",
+    "flat, watchful register",
+    "no filter words"
+  ],
+  "candidate_strategies": [
+    "A: the mechanics of the night and the read of the man through the glass",
+    "B: leaner, the pressure carried by her hand and what she will not do"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "candidate": "candidate-b.md",
+  "critic": "style-editor",
+  "verdict": "revise",
+  "confidence": 0.7,
+  "findings": [
+    {
+      "dimension": "stated-theme-insistence",
+      "severity": "material",
+      "evidence": "She wanted that understood, if only to herself: there was no kindness in it.",
+      "diagnosis": "'understood' is a banned filter word, and 'She wanted that understood' makes the character insist the no-kindness point be registered — tipping the de-valorizing into a stated-theme lecture at the crux.",
+      "repair_layer": "discourse"
+    },
+    {
+      "dimension": "filter-word",
+      "severity": "minor",
+      "evidence": "The man saw them the same second she did.",
+      "diagnosis": "'saw' is on the banned filter list; his noticing should ride the tap going off / his stillness.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "sententious-pov-break",
+      "severity": "minor",
+      "evidence": "There are two ways to take a man who says that with his hand on your glass",
+      "diagnosis": "Present-tense general maxim plus generalized second person steps out of close-third-on-Jo to lecture the reader.",
+      "repair_layer": "discourse"
+    },
+    {
+      "dimension": "the-way-tic",
+      "severity": "minor",
+      "evidence": "hated it the way you hate a tooth",
+      "diagnosis": "Textbook aphoristic 'the way you...' tic with second-person generalization.",
+      "repair_layer": "prose"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "25a0b994490da0acac1961b0b883e5236d4f86f16176561c09dbebcb2a8bf78b"
+}

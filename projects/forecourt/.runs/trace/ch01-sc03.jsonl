@@ -1,0 +1,12 @@
+{"ts": "2026-08-05T08:43:19.009224+00:00", "event": "critique", "scene_id": "ch01-sc03", "critic": "hard-audit", "verdict": "pass", "candidate": "ch01-sc03", "findings": 0}
+{"ts": "2026-08-05T08:43:22.325983+00:00", "event": "critique", "scene_id": "ch01-sc03", "critic": "defaultness-lint", "verdict": "pass", "candidate": "candidate-a.md", "findings": 0}
+{"ts": "2026-08-05T08:43:29.775240+00:00", "event": "critique", "scene_id": "ch01-sc03", "critic": "defaultness-lint", "verdict": "pass", "candidate": "candidate-b.md", "findings": 1}
+{"ts": "2026-08-05T08:43:34.846666+00:00", "event": "critique", "scene_id": "ch01-sc03", "critic": "adversarial-reader", "verdict": "pass", "candidate": "candidate-a.md", "findings": 2}
+{"ts": "2026-08-05T08:43:38.160760+00:00", "event": "critique", "scene_id": "ch01-sc03", "critic": "adversarial-reader", "verdict": "revise", "candidate": "candidate-b.md", "findings": 1}
+{"ts": "2026-08-05T08:43:57.546646+00:00", "event": "critique", "scene_id": "ch01-sc03", "critic": "style-editor", "verdict": "revise", "candidate": "candidate-a.md", "findings": 4}
+{"ts": "2026-08-05T08:44:01.302205+00:00", "event": "critique", "scene_id": "ch01-sc03", "critic": "style-editor", "verdict": "revise", "candidate": "candidate-b.md", "findings": 2}
+{"ts": "2026-08-05T08:44:05.957010+00:00", "event": "critique", "scene_id": "ch01-sc03", "critic": "character-simulator", "verdict": "revise", "candidate": "candidate-a.md", "findings": 3}
+{"ts": "2026-08-05T08:44:09.083767+00:00", "event": "critique", "scene_id": "ch01-sc03", "critic": "character-simulator", "verdict": "pass", "candidate": "candidate-b.md", "findings": 1}
+{"ts": "2026-08-05T08:44:16.817178+00:00", "event": "critique", "scene_id": "ch01-sc03", "critic": "defaultness-lint", "verdict": "pass", "candidate": "candidate-a-r1.md", "findings": 0}
+{"ts": "2026-08-05T08:46:44.811121+00:00", "event": "critique", "scene_id": "ch01-sc03", "critic": "adversarial-reader", "verdict": "pass", "candidate": "candidate-a-r1.md", "findings": 3}
+{"ts": "2026-08-05T08:47:08.511207+00:00", "event": "promote", "scene_id": "ch01-sc03", "candidate": "candidate-a-r1.md", "resulting_canon_hash": "9c71ad1b5c54d55bd0fb6a262875011f145279d2f2dc358512f67ff30befcef4"}

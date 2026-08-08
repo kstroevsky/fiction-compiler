@@ -1,0 +1,24 @@
+{
+  "candidate": "candidate-a.md",
+  "critic": "character-simulator",
+  "verdict": "pass",
+  "confidence": 0.75,
+  "findings": [
+    {
+      "dimension": "motive-ordering",
+      "severity": "minor",
+      "evidence": "She had not known she'd decided that either.",
+      "diagnosis": "The choice is framed as involuntary and the offer precedes the Kieran motive, risking a 'help first, reason after' read; mitigated by the strength of the son material and the pre-verbal compulsion it names.",
+      "repair_layer": "discourse"
+    },
+    {
+      "dimension": "narrator-signposting",
+      "severity": "minor",
+      "evidence": "A man who ran was one thing and a man who stood was another, and she did not know yet which he was.",
+      "diagnosis": "The narrator names the interpretive crux directly, slightly doing the reader's work; defensible as her real-time appraisal.",
+      "repair_layer": "discourse"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "057cfda828f68621f352919e07e51f3962dae756a6789a402ed8bca196986fca"
+}

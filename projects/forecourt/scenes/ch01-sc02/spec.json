@@ -1,0 +1,46 @@
+{
+  "id": "ch01-sc02",
+  "chapter": "1",
+  "narrative_mode": "linear",
+  "pov": "char-jo",
+  "participants": ["char-jo", "char-stranger"],
+  "purpose": [
+    "a car comes up the road and slows; the man does not want to be seen",
+    "Jo's hand goes to the panic button — the bind: press it (safe, condemn him) or not (risk, shield him), when she cannot know which is right",
+    "she does not press it, and pushes the back-toilet key out through the drawer; her reason is tangled and un-saintly (the son, fear, exhaustion), never noble"
+  ],
+  "entry_state": [
+    "the man is patched but still on the forecourt",
+    "Jo has already given him one small thing",
+    "a car is coming"
+  ],
+  "desire": "get him gone before the car, and decide what to do with her hand",
+  "conflict": "press the button and be safe and hand him over, or not press it and shield a man she cannot vouch for; she cannot resolve it because she cannot know him",
+  "turn": "her hand goes to the button and does not press it; she pushes the key to the back toilet out through the drawer",
+  "exit_state": [
+    "she has shielded him",
+    "the car is pulling onto the forecourt",
+    "she has chosen, and cannot take it back"
+  ],
+  "required_events": ["evt-choice"],
+  "knowledge_required": [
+    {"character": "char-jo", "fact": "fact-blood"}
+  ],
+  "forbidden_moves": [
+    "the theme spoken by anyone",
+    "Jo's compassion or fear named",
+    "confirm what the man is",
+    "a consoling or self-justifying speech",
+    "adverbial dialogue tags"
+  ],
+  "style_constraints": [
+    "close third on Jo",
+    "the withheld press is the pressure; her hand is the index of the choice",
+    "dialogue mundane and tense, over subtext",
+    "no filter words"
+  ],
+  "candidate_strategies": [
+    "A: the choice in near-silence, the hand and the button doing the work",
+    "B: sharper, the man's ask closer to a threat, the ambiguity harder to hold"
+  ]
+}

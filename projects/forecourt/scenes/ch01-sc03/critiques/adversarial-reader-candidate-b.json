@@ -1,0 +1,17 @@
+{
+  "candidate": "candidate-b.md",
+  "critic": "adversarial-reader",
+  "verdict": "revise",
+  "confidence": 0.68,
+  "findings": [
+    {
+      "dimension": "tidy-moral",
+      "severity": "material",
+      "evidence": "and she had helped him either way",
+      "diagnosis": "At the ending's fulcrum the draft appends a summary that names the ethical outcome ('she had helped') — the tidy moral the contract forbids; it collapses part of the not-knowing into a legible takeaway.",
+      "repair_layer": "discourse"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "5ef46f1e803ae5054baec9940fae1ad991793d9e04748f6f046bf0a6a24cc455"
+}

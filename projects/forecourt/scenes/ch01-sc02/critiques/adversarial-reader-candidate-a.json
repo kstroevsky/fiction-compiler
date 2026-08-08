@@ -1,0 +1,24 @@
+{
+  "candidate": "candidate-a.md",
+  "critic": "adversarial-reader",
+  "verdict": "pass",
+  "confidence": 0.78,
+  "findings": [
+    {
+      "dimension": "theme-leakage",
+      "severity": "minor",
+      "evidence": "It was closer to a debt, or a bribe she was paying to nobody, so that somebody far off might one day be paid it back.",
+      "diagnosis": "The transactional vocabulary edges toward articulating the owed-stranger theme, but is rendered as her private felt logic (the brief mandates explicit un-saintliness), not authorial statement.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "genre-marker",
+      "severity": "minor",
+      "evidence": "the blue of it woke up along the canopy struts, once",
+      "diagnosis": "A mild police-light signal, but environmental (fixes the car as police, raising her concrete legal risk) and never resolves what the man is.",
+      "repair_layer": "prose"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "057cfda828f68621f352919e07e51f3962dae756a6789a402ed8bca196986fca"
+}

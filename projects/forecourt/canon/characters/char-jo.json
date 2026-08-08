@@ -1,0 +1,48 @@
+{
+  "id": "char-jo",
+  "name": "Jo Brennan",
+  "desire": "get through the night shift and lock up at six without any trouble",
+  "need": "to act, once, for someone she cannot vouch for, and carry the not-knowing",
+  "values": [
+    "her own safety",
+    "the rules of the night: locked door, the drawer, don't open up",
+    "not getting involved"
+  ],
+  "fears": [
+    "being hurt on this shift, alone, again",
+    "that her son is out there somewhere being turned away from a window like this one"
+  ],
+  "contradictions": [
+    "keeps the glass between herself and everyone, and cannot stop seeing her son in the man on the other side of it"
+  ],
+  "beliefs": [
+    "you don't open the door at night for anyone",
+    "a woman on her own learns to be careful",
+    "somebody's boy, all of them"
+  ],
+  "knowledge": [
+    "the routine of the kiosk: the pay drawer, the panic button, the cameras, the locked door",
+    "that she is alone and help is a long way off",
+    "that her son Kieran is out there somewhere and she does not hear from him"
+  ],
+  "constraints": [
+    "alone; the shop locked till six",
+    "service only through the night pay drawer in the glass",
+    "the panic button calls it in and cannot be taken back"
+  ],
+  "voice": {
+    "lexicon": [
+      "flat, careful, working",
+      "the practical word before the felt one"
+    ],
+    "syntax": [
+      "short declaratives",
+      "watches more than she says"
+    ],
+    "avoid": [
+      "naming her feelings",
+      "compassion said out loud",
+      "rhetorical questions"
+    ]
+  }
+}

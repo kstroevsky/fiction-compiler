@@ -1,0 +1,24 @@
+{
+  "candidate": "candidate-b.md",
+  "critic": "character-simulator",
+  "verdict": "revise",
+  "confidence": 0.7,
+  "findings": [
+    {
+      "dimension": "man-dual-readability",
+      "severity": "material",
+      "evidence": "\"Say it,\" he said. \"You didn't see anyone.\"",
+      "diagnosis": "Demanding she verbally perform the denial is witness/consequence-management, not concealment — tips him toward the guilt reading and reads as coercion, narrowing the victim interpretation. The exact failure the brief flags.",
+      "repair_layer": "scene"
+    },
+    {
+      "dimension": "un-saintliness-told",
+      "severity": "minor",
+      "evidence": "She wanted that understood, if only to herself: there was no kindness in it.",
+      "diagnosis": "The not-kindness is insisted on rather than only enacted — a mild protest-too-much.",
+      "repair_layer": "discourse"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "25a0b994490da0acac1961b0b883e5236d4f86f16176561c09dbebcb2a8bf78b"
+}

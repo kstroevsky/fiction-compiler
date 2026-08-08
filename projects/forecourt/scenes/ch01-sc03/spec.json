@@ -1,0 +1,47 @@
+{
+  "id": "ch01-sc03",
+  "chapter": "1",
+  "narrative_mode": "linear",
+  "pov": "char-jo",
+  "participants": ["char-jo", "char-stranger", "char-officer"],
+  "purpose": [
+    "the car is a police car; the officer comes to the hatch and asks if she has seen a man",
+    "Jo says she has seen no one — the choice from behind the glass carried into a lie with teeth",
+    "end on a concrete image and the not-knowing; the man's nature is never confirmed"
+  ],
+  "entry_state": [
+    "the man is out of the light, round the back",
+    "the police car is on the forecourt",
+    "Jo has already chosen not to press the button"
+  ],
+  "desire": "get the officer gone and get to six o'clock",
+  "conflict": "tell the officer the truth, or lie and implicate herself to shield a man she cannot vouch for",
+  "turn": "she tells the officer she has seen no one",
+  "exit_state": [
+    "the officer goes",
+    "the man is gone into the dark",
+    "Jo is alone with what she did; nothing is confirmed and nothing is resolved"
+  ],
+  "required_events": ["evt-after"],
+  "knowledge_required": [
+    {"character": "char-jo", "fact": "fact-car"}
+  ],
+  "forbidden_moves": [
+    "confirm the man as victim or villain (no reveal)",
+    "a tidy moral or stated theme",
+    "name the feeling at the end",
+    "a flashback",
+    "a triumphant or redemptive beat",
+    "adverbial dialogue tags"
+  ],
+  "style_constraints": [
+    "close third on Jo",
+    "the lie handled in few words",
+    "end on a concrete image",
+    "dry, spare"
+  ],
+  "candidate_strategies": [
+    "A: the officer beat and the after — the drawer, the blood, the coming dawn",
+    "B: sparer, more white space around the final image"
+  ]
+}

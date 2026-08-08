@@ -1,0 +1,24 @@
+{
+  "candidate": "candidate-a.md",
+  "critic": "adversarial-reader",
+  "verdict": "pass",
+  "confidence": 0.82,
+  "findings": [
+    {
+      "dimension": "stated-moral-risk",
+      "severity": "minor",
+      "evidence": "she would be back on the right side of everything",
+      "diagnosis": "Value-laden but filtered as Jo's private read of the lie's cost and kept oblique to the theme; dramatizes cost, which the job wants. Borderline, not a breach.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "ornament",
+      "severity": "minor",
+      "evidence": "the way water comes back over a dropped stone",
+      "diagnosis": "One decorative simile plus a brief second-person aphorism ('you did what there was to do'); mostly earned but skirts model-favored lyricism in an otherwise concrete register.",
+      "repair_layer": "prose"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "f1aca497fce68b1eb4f03281b01844df179d672a71f8806e2287045b42dd6355"
+}

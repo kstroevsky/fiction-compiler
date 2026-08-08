@@ -1,0 +1,17 @@
+{
+  "candidate": "candidate-b.md",
+  "critic": "defaultness-lint",
+  "verdict": "pass",
+  "confidence": 0.7,
+  "findings": [
+    {
+      "dimension": "softener",
+      "severity": "minor",
+      "evidence": "she started to count the till",
+      "diagnosis": "'started to' softens the action into approximation; commit to the action.",
+      "repair_layer": "prose"
+    }
+  ],
+  "audit_class": "defaultness",
+  "candidate_sha256": "5ef46f1e803ae5054baec9940fae1ad991793d9e04748f6f046bf0a6a24cc455"
+}

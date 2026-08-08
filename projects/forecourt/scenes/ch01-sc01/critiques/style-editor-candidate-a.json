@@ -1,0 +1,38 @@
+{
+  "candidate": "candidate-a.md",
+  "critic": "style-editor",
+  "verdict": "revise",
+  "confidence": 0.7,
+  "findings": [
+    {
+      "dimension": "the-way-tic",
+      "severity": "material",
+      "evidence": "the way she said it forty times a night to drunks and truckers",
+      "diagnosis": "The profile bans this construction; it converts a clean action beat into a generalizing narrator aside.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "feeling-named-decorative",
+      "severity": "material",
+      "evidence": "the thing she was not going to let herself feel moved once, under everything, like a fish turning over deep down",
+      "diagnosis": "Emotion named as an abstract 'thing', gated, then handed to a decorative simile instead of carried by the body.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "filter-word",
+      "severity": "minor",
+      "evidence": "she understood he did not want to leave anything of himself on the wipes",
+      "diagnosis": "'understood' is a cognition filter; the gesture already carries the inference.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "opener-repetition",
+      "severity": "minor",
+      "evidence": "The man came from the road... He came up along the verge... He came to the glass.",
+      "diagnosis": "Three 'came' clause-heads in quick succession.",
+      "repair_layer": "prose"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "fd4ba9fd04a9f8292efe8cebee72470219fb5c4b68ac568fabd3d69afebb894f"
+}

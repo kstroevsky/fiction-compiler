@@ -1,0 +1,44 @@
+{
+  "id": "char-stranger",
+  "name": "the man at the hatch",
+  "desire": "get cleaned up and gone before whoever is coming comes; not to be seen",
+  "need": "someone to not turn him away",
+  "values": [
+    "getting out",
+    "not explaining himself"
+  ],
+  "fears": [
+    "whoever might be coming up the road",
+    "being seen and named"
+  ],
+  "contradictions": [
+    "needs her help and cannot afford to say why he needs it — which is exactly what makes him frightening"
+  ],
+  "beliefs": [
+    "the less he says, the safer he is"
+  ],
+  "knowledge": [
+    "that he is hurt and bleeding",
+    "that he does not want to be found here"
+  ],
+  "constraints": [
+    "bleeding",
+    "no time",
+    "on the wrong side of the glass"
+  ],
+  "voice": {
+    "lexicon": [
+      "clipped; polite in a way that reads as decent OR as calculated",
+      "the words of a man choosing each one"
+    ],
+    "syntax": [
+      "short, controlled",
+      "does not explain, does not finish the dangerous sentences"
+    ],
+    "avoid": [
+      "confession",
+      "threat made explicit",
+      "anything that would tell Jo, or the reader, what he is"
+    ]
+  }
+}

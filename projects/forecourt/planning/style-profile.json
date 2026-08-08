@@ -1,0 +1,44 @@
+{
+  "narrative_distance": "close third, level 3-4; flat, watchful, tense",
+  "voice_principles": [
+    "perception and action before interpretation",
+    "the glass and the pay drawer carry the fear; the hand near the button carries the choice",
+    "no emotion named that the body or a rule could imply"
+  ],
+  "diction": [
+    "plain, working nouns",
+    "the fittings of a night kiosk: the drawer, the glass, the button, the cameras, the strip light, the till",
+    "few adjectives, each earning its place"
+  ],
+  "syntax": [
+    "short flat declaratives under pressure",
+    "an occasional long sentence for one sustained action or held breath"
+  ],
+  "rhythm": [
+    "vary sentence openings",
+    "let a silence, or a hand not moving, be an action"
+  ],
+  "imagery": [
+    "blood on the sleeve, the drawer sliding, the strip light, the dark past the pumps, the empty road",
+    "her hand, and where it is, as the recurring index of the choice"
+  ],
+  "dialogue": [
+    "few words, both of them careful",
+    "the man never explains and Jo never names what she is afraid of; the theme is never spoken",
+    "no adverbial tags; distinct idiolects (Jo flat and practical; the man clipped and choosing each word)"
+  ],
+  "sentence_distribution": {
+    "short": 0.55,
+    "medium": 0.35,
+    "long": 0.1
+  },
+  "avoid": [
+    "thriller cliche (the twist, the reveal, the gun)",
+    "confirming the man as victim or villain",
+    "stated theme or moral",
+    "sentimental compassion or told fear",
+    "filter words (she felt / saw / realized / noticed / watched)",
+    "emotion named then paraphrased",
+    "adverbial dialogue tags"
+  ]
+}

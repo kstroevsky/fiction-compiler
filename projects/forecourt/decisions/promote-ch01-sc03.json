@@ -1,0 +1,52 @@
+{
+  "scene_id": "ch01-sc03",
+  "candidate": "scenes/ch01-sc03/candidates/candidate-a-r1.md",
+  "candidate_sha256": "67a771f9897ef185f7db1c5ecb0624b363abb3e97abff19a33929bdcbc9f9cec",
+  "promoted_to": "manuscript/chapters/ch01-sc03.md",
+  "promoted_at": "2026-08-05T08:47:08.509027+00:00",
+  "state_delta_sha256": "c032feda3b3647d5c21ae00a96ea81fe00a079f894860fc890d729f596259ccd",
+  "parent_canon_hash": "46c5004554c7fd872f30d817f4518bc99c64bac74a703c83b42248068914b2a1",
+  "resulting_canon_hash": "9c71ad1b5c54d55bd0fb6a262875011f145279d2f2dc358512f67ff30befcef4",
+  "rubric_version": null,
+  "human_gate": {
+    "required": false,
+    "approved": false,
+    "approver": null
+  },
+  "critique_files": [
+    "scenes/ch01-sc03/critiques/adversarial-reader-candidate-a-r1.json",
+    "scenes/ch01-sc03/critiques/adversarial-reader-candidate-a.json",
+    "scenes/ch01-sc03/critiques/adversarial-reader-candidate-b.json",
+    "scenes/ch01-sc03/critiques/character-simulator-candidate-a.json",
+    "scenes/ch01-sc03/critiques/character-simulator-candidate-b.json",
+    "scenes/ch01-sc03/critiques/defaultness-lint-candidate-a-r1.json",
+    "scenes/ch01-sc03/critiques/defaultness-lint-candidate-a.json",
+    "scenes/ch01-sc03/critiques/defaultness-lint-candidate-b.json",
+    "scenes/ch01-sc03/critiques/hard-audit-ch01-sc03.json",
+    "scenes/ch01-sc03/critiques/style-editor-candidate-a.json",
+    "scenes/ch01-sc03/critiques/style-editor-candidate-b.json"
+  ],
+  "binding_critiques": [
+    {
+      "file": "adversarial-reader-candidate-a-r1.json",
+      "critic": "adversarial-reader",
+      "audit_class": "literary",
+      "verdict": "pass",
+      "sha256": "576ccd4ff5c95b7fcf82b049e9bbcd3282952d4849d7c60053463e7abfc65953"
+    },
+    {
+      "file": "defaultness-lint-candidate-a-r1.json",
+      "critic": "defaultness-lint",
+      "audit_class": "defaultness",
+      "verdict": "pass",
+      "sha256": "5a2ceac0270e8288c59cff4e58590a3175696a0d8ac75f7b36dde8fb4b7d144a"
+    },
+    {
+      "file": "hard-audit-ch01-sc03.json",
+      "critic": "hard-audit",
+      "audit_class": "hard",
+      "verdict": "pass",
+      "sha256": "59b8fcffc323c200d33dd1c23f4bf123db1033b7359d0e226cb272dc474dd0dd"
+    }
+  ]
+}

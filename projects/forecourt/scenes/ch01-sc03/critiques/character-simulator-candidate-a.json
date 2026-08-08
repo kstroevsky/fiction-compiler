@@ -1,0 +1,31 @@
+{
+  "candidate": "candidate-a.md",
+  "critic": "character-simulator",
+  "verdict": "revise",
+  "confidence": 0.67,
+  "findings": [
+    {
+      "dimension": "saintly-drift",
+      "severity": "material",
+      "evidence": "she would be back on the right side of everything",
+      "diagnosis": "The narrator recasts her tangled un-saintly motive as a clean right/wrong axis she nobly declines — drifting toward the saintly framing the brief rules out, and over-narrating for a guarded, wordless woman.",
+      "repair_layer": "discourse"
+    },
+    {
+      "dimension": "melodrama-nudge",
+      "severity": "minor",
+      "evidence": "the other thing, the thing she had not let herself think",
+      "diagnosis": "Naming the suppression is more dramatic than flatter 'either way'; slightly relieves the ambiguity by dramatizing it.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "aphorism",
+      "severity": "minor",
+      "evidence": "They were all young now.",
+      "diagnosis": "An older-narrator aphorism asserting a worldview not established for Jo.",
+      "repair_layer": "prose"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "f1aca497fce68b1eb4f03281b01844df179d672a71f8806e2287045b42dd6355"
+}

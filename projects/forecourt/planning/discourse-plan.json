@@ -1,0 +1,43 @@
+{
+  "narrator": {
+    "person": "third",
+    "reliability": "reliable, limited to Jo's perception — and to what she cannot know"
+  },
+  "focalization": {
+    "mode": "fixed internal",
+    "focalizer": "char-jo"
+  },
+  "time": {
+    "order": "strictly chronological, one continuous twenty minutes",
+    "dominant_duration": "scene",
+    "tense": "past"
+  },
+  "revelations": [
+    {
+      "id": "rev-the-blood",
+      "scene": "ch01-sc01",
+      "to_reader": "with Jo, through the glass; the reader learns exactly what she can see and no more"
+    },
+    {
+      "id": "rev-the-choice",
+      "scene": "ch01-sc02",
+      "to_reader": "enacted, with Jo; she does not press the button"
+    },
+    {
+      "id": "rev-the-not-knowing",
+      "scene": "ch01-sc03",
+      "to_reader": "enacted, not explained; the man's nature is never confirmed"
+    }
+  ],
+  "chapter_map": [
+    {
+      "chapter": "1",
+      "scenes": [
+        "ch01-sc01",
+        "ch01-sc02",
+        "ch01-sc03"
+      ]
+    }
+  ],
+  "notes": "Dramatic irony is refused: the reader knows only what Jo can see. The man is never confirmed victim or villain. Linear throughout; every scene narrative_mode linear. The theme is never stated; it lives in the glass, the drawer, the button, and the son Jo cannot reach."
+}

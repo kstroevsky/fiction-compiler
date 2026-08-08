@@ -1,0 +1,31 @@
+{
+  "candidate": "candidate-b.md",
+  "critic": "style-editor",
+  "verdict": "revise",
+  "confidence": 0.7,
+  "findings": [
+    {
+      "dimension": "the-way-tic",
+      "severity": "material",
+      "evidence": "the way she sat every night at three",
+      "diagnosis": "Banned construction, in the first sentence, setting an explanatory rather than watchful tone.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "stated-significance",
+      "severity": "minor",
+      "evidence": "she was the only thing in it worth the drive",
+      "diagnosis": "Editorializes her significance; states meaning the fittings should carry.",
+      "repair_layer": "prose"
+    },
+    {
+      "dimension": "told-assessment",
+      "severity": "minor",
+      "evidence": "For a second there was nothing dangerous about him at all",
+      "diagnosis": "Names the threat-reading flatly rather than letting the released breath carry it.",
+      "repair_layer": "prose"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "1d42c9e0ab2d771fdb852187854fd236a3b7e0481e9aa5cd6de90d927771af0d"
+}

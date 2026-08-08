@@ -1,0 +1,9 @@
+{
+  "candidate": "candidate-a-r1.md",
+  "critic": "defaultness-lint",
+  "verdict": "pass",
+  "confidence": 0.7,
+  "findings": [],
+  "audit_class": "defaultness",
+  "candidate_sha256": "0601b3e9ca20b0996f69bd2a8ff59017bbbff2fa21d805d40e99865e374f0357"
+}

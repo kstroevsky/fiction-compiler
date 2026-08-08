@@ -1,0 +1,24 @@
+{
+  "scene_id": "ch01-sc01",
+  "time": 0,
+  "facts_added": [
+    {"id": "fact-blood", "text": "The man at the hatch has blood on his sleeve and hand; he is hurt."},
+    {"id": "fact-cant-tell", "text": "Jo cannot tell whether the man is a frightened man in trouble or a danger to her; nothing she can see settles it."}
+  ],
+  "facts_removed": [],
+  "knowledge_changes": [
+    {"character": "char-jo", "fact": "fact-blood"},
+    {"character": "char-jo", "fact": "fact-cant-tell"}
+  ],
+  "relationship_changes": [],
+  "relationship_edges": [
+    {"subject": "char-jo", "object": "char-stranger", "dimension": "stance", "value": "guarded"}
+  ],
+  "predicate_changes": [
+    {"op": "add", "predicate": "located_at", "subject": "char-stranger", "object": "loc-forecourt"}
+  ],
+  "promises_opened": [
+    {"id": "promise-decide", "text": "Will Jo decide, tonight, what she owes the man at the hatch?"}
+  ],
+  "promises_closed": []
+}

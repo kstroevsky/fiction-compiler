@@ -1,0 +1,8 @@
+{
+  "candidate": "ch01-sc01",
+  "critic": "hard-audit",
+  "verdict": "pass",
+  "confidence": 1,
+  "findings": [],
+  "audit_class": "hard"
+}

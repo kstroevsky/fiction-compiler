@@ -1,0 +1,24 @@
+{
+  "candidate": "candidate-b.md",
+  "critic": "character-simulator",
+  "verdict": "pass",
+  "confidence": 0.78,
+  "findings": [
+    {
+      "dimension": "motive-single-cause",
+      "severity": "minor",
+      "evidence": "she knew the answer, and she got the green box out from under the counter anyway",
+      "diagnosis": "Genuinely un-saintly, but the giving rests almost entirely on son-recognition; the exhaustion strand the brief wants is largely absent — single-cause where tangled is specified.",
+      "repair_layer": "character"
+    },
+    {
+      "dimension": "ambiguity-glove-lean",
+      "severity": "minor",
+      "evidence": "he did not mean to leave anything of himself behind, and she made herself not know what that meant",
+      "diagnosis": "Forensic gloves-first behavior held ambiguous by refused knowledge; acceptable.",
+      "repair_layer": "prose"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "1d42c9e0ab2d771fdb852187854fd236a3b7e0481e9aa5cd6de90d927771af0d"
+}

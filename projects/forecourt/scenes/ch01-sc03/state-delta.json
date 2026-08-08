@@ -1,0 +1,16 @@
+{
+  "scene_id": "ch01-sc03",
+  "time": 2,
+  "facts_added": [],
+  "facts_removed": [],
+  "knowledge_changes": [],
+  "relationship_changes": [],
+  "relationship_edges": [
+    {"subject": "char-jo", "object": "char-stranger", "dimension": "stance", "value": "chose"}
+  ],
+  "predicate_changes": [
+    {"op": "remove", "predicate": "located_at", "subject": "char-stranger", "object": "loc-forecourt"}
+  ],
+  "promises_opened": [],
+  "promises_closed": ["promise-decide"]
+}

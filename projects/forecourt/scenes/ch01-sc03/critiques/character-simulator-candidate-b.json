@@ -1,0 +1,17 @@
+{
+  "candidate": "candidate-b.md",
+  "critic": "character-simulator",
+  "verdict": "pass",
+  "confidence": 0.82,
+  "findings": [
+    {
+      "dimension": "theme-named",
+      "severity": "minor",
+      "evidence": "and she had helped him either way",
+      "diagnosis": "A clean two-term binary that borders on on-the-nose, but stays inside Jo's diction, keeps the man unconfirmed, and indicts her 'either way'; reads as her framing, not a tidy-up.",
+      "repair_layer": "prose"
+    }
+  ],
+  "audit_class": "literary",
+  "candidate_sha256": "5ef46f1e803ae5054baec9940fae1ad991793d9e04748f6f046bf0a6a24cc455"
+}
