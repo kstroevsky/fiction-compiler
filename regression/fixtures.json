@@ -188,6 +188,30 @@
       "input": {"detector": "injection",
                 "input": {"text": "He told her to ignore the noise from the yard and keep working."}},
       "expect": false
+    },
+    {
+      "name": "vendor output: a clean pass parses and is consistent (ADR 0020)",
+      "check": "vendor_output",
+      "input": {"raw": "{\"verdict\": \"pass\", \"confidence\": 0.9, \"findings\": []}"},
+      "expect": "pass:consistent"
+    },
+    {
+      "name": "vendor output: a pass carrying a material finding is flagged inconsistent, not recorded (ADR 0020)",
+      "check": "vendor_output",
+      "input": {"raw": "{\"verdict\": \"pass\", \"confidence\": 0.8, \"findings\": [{\"dimension\": \"cliche\", \"severity\": \"material\", \"evidence\": \"heart pounded\", \"diagnosis\": \"stock image\", \"repair_layer\": \"prose\"}]}"},
+      "expect": "pass:inconsistent"
+    },
+    {
+      "name": "vendor output: a ```json-fenced revise is unwrapped and parsed (ADR 0020)",
+      "check": "vendor_output",
+      "input": {"raw": "```json\n{\"verdict\": \"revise\", \"confidence\": 0.6, \"findings\": [{\"dimension\": \"agency\", \"severity\": \"material\", \"evidence\": \"she simply agreed\", \"diagnosis\": \"passive protagonist\", \"repair_layer\": \"scene\"}]}\n```"},
+      "expect": "revise:consistent"
+    },
+    {
+      "name": "vendor output: non-JSON prose is rejected at the untrusted boundary (ADR 0020)",
+      "check": "vendor_output",
+      "input": {"raw": "Sure! Overall this candidate reads well and I would pass it."},
+      "expect": "malformed"
     }
   ]
 }

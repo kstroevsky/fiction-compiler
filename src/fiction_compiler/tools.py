@@ -298,6 +298,42 @@ def scene_trace(project: str, scene_id: str) -> dict:
     return {"events": trace.read(project_dir(project), scene_id)}
 
 
+def role_prompt(project: str, scene_id: str, candidate: str, role: str,
+                roster: str | None = None) -> dict:
+    """The exact vendor-neutral (system, user) a judge role would be sent — DETERMINISTIC, no LLM call.
+
+    Builds the blind judge_bundle, resolves the role's persona (.claude/agents/<role>.md by default),
+    and composes the trusted system prompt + fenced-data user payload the external role-runner would
+    hand any vendor. This keeps the vendor-neutral seam legible from inside the server WITHOUT the
+    server ever calling a model: an external process (scripts/run_role.py) makes the actual call and
+    writes findings back via record_critique. Imported lazily to avoid an import cycle (role_runner
+    imports this module's judge_bundle).
+    """
+    from . import role_runner  # lazy: breaks the tools <-> role_runner cycle
+    try:
+        rst = role_runner.load_roster(roster)
+    except (FileNotFoundError, ValueError) as exc:
+        return {"error": str(exc)}
+    if role not in rst:
+        return {"error": f"role {role!r} not in roster; known: {sorted(rst)}"}
+    assignment = rst[role]
+    bundle = judge_bundle(project, scene_id, candidate)
+    if "error" in bundle:
+        return bundle
+    persona = role_runner.resolve_persona(assignment)
+    system, user = role_runner.build_messages(persona, bundle)
+    return {
+        "role": role,
+        "assignment": {"vendor": assignment.vendor, "model": assignment.model,
+                       "audit_class": assignment.audit_class},
+        "candidate": bundle["candidate"]["name"],
+        "candidate_sha256": bundle["candidate"]["sha256"],
+        "messages": {"system": system, "user": user},
+        "note": ("Deterministic preview: the server made NO model call. An external runner sends these "
+                 "messages to the assigned vendor and records the reply via record_critique."),
+    }
+
+
 def run_regression() -> dict:
     """Run the framework regression fixtures (the FRAMEWORK loop's deterministic CHECK).
 
@@ -459,6 +495,17 @@ TOOLS: list[dict] = [
           "(critiques recorded, revisions decided, promotion) with timestamps, from "
           ".runs/trace/<scene_id>.jsonl. Read-only; makes a run replayable and auditable.",
           {"project": {"type": "string"}, "scene_id": {"type": "string"}}, ["project", "scene_id"], scene_trace),
+    _tool("role_prompt",
+          "DETERMINISTIC preview (no LLM call) of the exact vendor-neutral (system, user) an external "
+          "multi-vendor runner would send a judge role: the blind judge_bundle as fenced DATA plus the "
+          "role's persona and the pinned critique-output contract as the trusted system prompt. Reads "
+          "role->vendor+model from config/model-roster.json (or 'roster'); returns the assigned "
+          "vendor/model/audit_class and the messages. The server never calls a vendor — scripts/"
+          "run_role.py does, then records the reply via record_critique. Use to inspect/port the judge "
+          "packet to any model family without leaving the deterministic layer.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"}, "candidate": {"type": "string"},
+           "role": {"type": "string"}, "roster": {"type": "string"}},
+          ["project", "scene_id", "candidate", "role"], role_prompt),
     _tool("run_regression",
           "Run the FRAMEWORK regression fixtures — the deterministic invariants the ADRs pinned "
           "(defaultness, revision identity, tournament selection, ontology). Returns pass/fail per "

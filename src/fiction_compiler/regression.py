@@ -68,6 +68,22 @@ def _critic_case(inp: dict) -> bool:
     return critic_eval.run_deterministic_case(inp)
 
 
+def _vendor_output(inp: dict) -> str:
+    """Untrusted multi-vendor-output boundary (ADR 0020): raw text -> 'malformed' or verdict:consistency.
+
+    Pins that an external vendor's reply is only allowed toward the gate when it is well-formed JSON
+    with a valid verdict, and that a 'pass' carrying a material/fatal finding is flagged inconsistent
+    (record_critique would refuse it) — the same rule the gate enforces, at the vendor seam.
+    """
+    from . import role_runner  # lazy: tools <-> regression <-> role_runner would cycle at import
+    try:
+        parsed = role_runner.parse_vendor_critique(inp["raw"])
+    except role_runner.MalformedVendorOutput:
+        return "malformed"
+    ok = critique.consistency_problem(parsed["verdict"], parsed["findings"]) is None
+    return f"{parsed['verdict']}:{'consistent' if ok else 'inconsistent'}"
+
+
 def _tournament_selected(inp: dict) -> str:
     result = tournament.run_tournament(inp["critiques"], seed=inp.get("seed", 0), judgments=inp.get("judgments"))
     rec = result["recommendation"]
@@ -84,6 +100,7 @@ CHECKS = {
     "premise_diversity": _premise_diversity,
     "critique_consistency": _critique_consistency,
     "critic_case": _critic_case,
+    "vendor_output": _vendor_output,
 }
 
 

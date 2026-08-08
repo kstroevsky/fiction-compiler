@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "notes": "role -> vendor + model. Decentralization by heterogeneity: give different judge roles different model families so no single LLM dominates the promotion gate. 'vendor' in {anthropic, openai, gemini}; 'model' is that vendor's exact model id (edit to what your account has). API keys come from the environment: ANTHROPIC_API_KEY / OPENAI_API_KEY / GEMINI_API_KEY. Each role's persona defaults to .claude/agents/<role>.md; override with 'persona' (inline) or 'persona_file'. 'params' is passed to the vendor (e.g. max_tokens, temperature). This file is human-owned policy — the runner never edits it. The openai/gemini model ids below are EXAMPLES; set them to real ids before a live run.",
+  "roles": {
+    "adversarial-reader": {
+      "vendor": "anthropic",
+      "model": "claude-opus-4-8",
+      "params": {"max_tokens": 2048}
+    },
+    "character-simulator": {
+      "vendor": "openai",
+      "model": "gpt-5.2",
+      "params": {"max_tokens": 2048}
+    },
+    "style-editor": {
+      "vendor": "gemini",
+      "model": "gemini-2.5-pro",
+      "params": {"max_tokens": 2048}
+    },
+    "continuity-auditor": {
+      "vendor": "anthropic",
+      "model": "claude-sonnet-5",
+      "params": {"max_tokens": 2048}
+    }
+  }
+}

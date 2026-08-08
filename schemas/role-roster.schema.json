@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "role-roster.schema.json",
+  "type": "object",
+  "required": ["roles"],
+  "properties": {
+    "version": {"type": "number"},
+    "notes": {"type": "string"},
+    "roles": {"type": "object"}
+  }
+}
