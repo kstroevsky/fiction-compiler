@@ -9,6 +9,10 @@
     "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
     "candidate": {"type": "string"},
     "candidate_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "spec_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "state_before_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "state_delta_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "audit_context_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "pov": {"type": "string"},
     "tense": {"enum": ["past", "present", "future", "mixed"]},
     "word_count": {"type": "integer", "minimum": 0},
@@ -23,6 +27,15 @@
           "id": {"type": "string", "pattern": "^observed-[a-z0-9-]+$"},
           "description": {"type": "string", "minLength": 1},
           "evidence": {"type": "string", "minLength": 1},
+          "evidence_span": {
+            "type": "object",
+            "required": ["start", "end"],
+            "additionalProperties": false,
+            "properties": {
+              "start": {"type": "integer", "minimum": 0},
+              "end": {"type": "integer", "minimum": 1}
+            }
+          },
           "consequential": {"type": "boolean"}
         }
       }
@@ -54,7 +67,16 @@
           "object": {"type": "string"},
           "ref": {"type": "string"},
           "value": {"type": "boolean"},
-          "evidence": {"type": "string", "minLength": 1}
+          "evidence": {"type": "string", "minLength": 1},
+          "evidence_span": {
+            "type": "object",
+            "required": ["start", "end"],
+            "additionalProperties": false,
+            "properties": {
+              "start": {"type": "integer", "minimum": 0},
+              "end": {"type": "integer", "minimum": 1}
+            }
+          }
         }
       }
     }

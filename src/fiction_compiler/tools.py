@@ -23,7 +23,7 @@ from . import (critic_calibration, defaultness, framework_change, hard_audit, in
 from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
-from .prose_audit import audit_prose as _audit_prose
+from .prose_audit import audit_prose as _audit_prose, prose_claim_bindings as _prose_claim_bindings
 from .state import StoryState, accepted_scene_ids, reconstruct_state_before, scene_sort_key
 from .tournament import run_tournament
 from .workspace import (confine_file, confine_project, project_dir, resolve_scene_candidate,
@@ -444,6 +444,11 @@ def prose_audit(project: str, scene_id: str, claims: dict) -> dict:
     contradiction, or an unrecorded promise closure is a material finding.
     """
     return _audit_prose(project_dir(project), scene_id, claims)
+
+
+def prose_claim_bindings(project: str, scene_id: str, candidate: str) -> dict:
+    """Return exact candidate/scene/context hashes required by candidate-bound prose-claims."""
+    return _prose_claim_bindings(project_dir(project), scene_id, candidate)
 
 
 def record_critique(project: str, scene_id: str, candidate: str, critic: str, verdict: str,
@@ -1118,6 +1123,13 @@ TOOLS: list[dict] = [
           "and promise closures the state delta never recorded. Returns a critique.schema critique.",
           {"project": {"type": "string"}, "scene_id": {"type": "string"}, "claims": {"type": "object"}},
           ["project", "scene_id", "claims"], prose_audit),
+    _tool("prose_claim_bindings",
+          "Return the deterministic hash bindings a candidate-bound prose-claims extraction must carry: "
+          "candidate bytes, scene spec, reconstructed pre-scene state, scene delta, and a semantic "
+          "digest of all verifier context including event/discourse plans and character identity.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "candidate": {"type": "string"}},
+          ["project", "scene_id", "candidate"], prose_claim_bindings),
     _tool("record_critique",
           "Write a schema-valid, candidate-BOUND critique into scenes/<scene_id>/critiques/. Stamps "
           "candidate_sha256 from the candidate file's ACTUAL bytes, derives audit_class from the "

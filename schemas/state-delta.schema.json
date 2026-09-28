@@ -39,7 +39,9 @@
         "properties": {
           "op": {"enum": ["add", "remove"]},
           "character": {"type": "string", "pattern": "^char-[a-z0-9-]+$"},
-          "fact": {"type": "string", "pattern": "^fact-[a-z0-9-]+$"}
+          "fact": {"type": "string", "pattern": "^fact-[a-z0-9-]+$"},
+          "event": {"type": "string", "pattern": "^evt-[a-z0-9-]+$", "comment": "Optional source/provenance event; does not imply execution timing."},
+          "at_event": {"type": "string", "pattern": "^evt-[a-z0-9-]+$", "comment": "Canonical event in this scene at which the state change becomes effective."}
         }
       }
     },
@@ -56,7 +58,8 @@
           "fact": {"type": "string", "pattern": "^fact-[a-z0-9-]+$"},
           "value": {"type": "boolean"},
           "source": {"enum": ["perception", "testimony", "inference", "correction", "forgetting", "unknown"]},
-          "event": {"type": "string", "pattern": "^evt-[a-z0-9-]+$"}
+          "event": {"type": "string", "pattern": "^evt-[a-z0-9-]+$", "comment": "Optional source/provenance event; does not imply execution timing."},
+          "at_event": {"type": "string", "pattern": "^evt-[a-z0-9-]+$", "comment": "Canonical event in this scene at which the state change becomes effective."}
         },
         "allOf": [
           {"if": {"properties": {"op": {"const": "set"}}}, "then": {"required": ["value", "source"]}},
@@ -103,7 +106,8 @@
           "predicate": {"type": "string", "minLength": 1},
           "subject": {"type": "string", "minLength": 1},
           "object": {"type": "string"},
-          "value": {}
+          "value": {},
+          "at_event": {"type": "string", "pattern": "^evt-[a-z0-9-]+$", "comment": "Canonical event in this scene at which the predicate change becomes effective."}
         }
       }
     },

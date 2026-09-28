@@ -30,7 +30,7 @@ mechanical validity, modeled/extracted consistency, and literary preference.
 | Scene-plan search | `plan_search.py`, `schemas/scene-plan*.json`, `generate-scene-plans` skill | **Implemented as experimental evidence workflow** | 3–4-plan divergence floor, typed feasibility, hash-bound plan review, explicit 1–2 selection; no automatic quality ranker |
 | Event-sourced canon / `reconstruct_state_before` | `src/fiction_compiler/state.py` | **Implemented** | Seed state + accepted deltas, typed values/relationships/knowledge, parsed chronology semantics |
 | Candidate promotion / backward revision | `promote.py`, `acceptance.py`, `integrity.py`, `dependencies.py` | **Implemented, downstream literary recheck remains manual** | Frozen candidate/spec/delta/review policy/evidence; immutable active/history chains, conservative read sets, rebasing + invalidation |
-| Hard/symbolic audit | `hard_audit.py`, `prose_audit.py` | **Implemented, extraction boundary remains empirical** | Code checks state/event constraints; extracted prose claims are judged deterministically |
+| Hard/symbolic audit | `hard_audit.py`, `prose_audit.py` | **Implemented, extraction boundary remains empirical** | Code checks state/event constraints; candidate/spec/state-bound prose claims use exact spans and ordered truth, belief and typed-predicate evidence |
 | Realization calibration | `realization_calibration.py`, planted controls, ADR 0030 | **Evidence infrastructure implemented; live calibration not yet run** | Plan-blind extraction and plan-aware alignment are measured separately; extractor misses cannot become proved omissions |
 | Literary review | `role_runner.py`, role personas, review policy | **Implemented as evidence-producing model review** | Role-specific blind packets, immutable attempts, provenance, issue applicability/resolution |
 | Defaultness/style heuristics | `defaultness.py`, catalog | **Advisory by default** | Contextual evidence; a project can explicitly opt into blocking mode |
@@ -212,14 +212,23 @@ test, not just a feature.
 > `the-overnight/ch01-sc02`) are added. Still ⬜ in P4: genre/period modules, a larger annotated
 > corpus (extract-not-copy, public-domain), semantic retrieval — depth first, never volume.
 >
-> **The hard audit now reads the prose (ADR 0014 + ADR 0024, review §§4, 6.3).** A `prose_audit` proves
+> **The hard audit now reads the prose (ADR 0014 + ADR 0024 + ADR 0036, review §§4, 6.3).** A `prose_audit` proves
 > an extraction agent's `prose-claims` (pov, tense, typed factual/epistemic claims with evidence) against
-> reconstructed state + the spec — a focalizer knowing an ungranted fact (knowledge leak), an
-> unplanned character, head-hopping, a tense break, a spatial contradiction, or a promise closed in
+> reconstructed state + the spec. Candidate/spec/pre-state/delta/context hashes and exact prose spans
+> make those claims stale-safe and occurrence-specific. Event-aligned replay now checks when world
+> facts, beliefs/knowledge, and typed predicates such as `located_at` become effective, so a later
+> fact/move cannot justify an earlier sentence and false-valued location predicates are not treated as
+> active. Fixed-internal head-hopping follows the discourse focalization policy instead of being
+> imposed on explicitly variable/omniscient modes. An unplanned character, tense break, spatial contradiction, or a promise closed in
 > prose but not in the delta are material findings. The realization prototype now separates
 > **plan-blind observed events** from a later plan-aware alignment: explicit required-event omission is
 > material, while missing/uncertain alignment stays `uncertain`; free-text turn/exit-state remain
-> unverified. **ADR 0030 now supplies the missing calibration harness:** frozen planted omission,
+> unverified. Candidate-bound claims now carry hashes for the candidate/spec/pre-scene state/delta,
+> a full verifier-context digest, and exact character spans. In-scene knowledge/belief can satisfy a
+> prose claim only after an aligned, effect-backed `at_event`; later learning is a material temporal
+> leak, earlier fact removal/correction invalidates stale entry-state knowledge/belief, and missing ordering stays
+> explicit uncertainty. Logical `consistency` and extractor `coverage` are reported separately, with
+> deterministic coverage remaining `unverified`. **ADR 0030 supplies the calibration harness:** frozen planted omission,
 > literal-realization and oblique-realization controls are presented first to a plan-blind extractor,
 > then to a separate plan-aware aligner with the frozen prose available for targeted re-inspection.
 > Reports distinguish extractor misses from alignment misses and never convert a missed extraction into
@@ -253,7 +262,7 @@ test, not just a feature.
 > `0031-post-revision-subjective-rechecks.md`,
 > `0032-provider-usage-provenance.md`, `0033-framework-change-transactions.md`,
 > `0034-epistemic-and-resource-state.md`,
-> `0035-ordered-event-execution.md`,
+> `0035-ordered-event-execution.md`, `0036-ordered-prose-evidence.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 

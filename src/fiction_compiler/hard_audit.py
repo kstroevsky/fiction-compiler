@@ -230,6 +230,29 @@ def _belief_effect_matches(required: dict, change: dict) -> bool:
     return required.get("value", True) == change.get("value")
 
 
+def _belief_change_supported_by_event(event: dict, change: dict) -> bool:
+    """Whether an event carries the effect that makes one belief change effective."""
+    for effect in event.get("effects", []):
+        if not isinstance(effect, dict):
+            continue
+        if _belief_effect_matches(effect, change):
+            return True
+        if (effect.get("predicate") == "knows"
+                and effect.get("subject") == change.get("character")
+                and effect.get("object") == change.get("fact")):
+            if effect.get("op") == "add" and change.get("op") == "set" and change.get("value") is True:
+                return True
+            if effect.get("op") == "remove" and change.get("op") in {"forget", "set"}:
+                return True
+    return False
+
+
+def _change_can_apply_at_event(change: dict, event_id: str | None) -> bool:
+    """Unbound legacy changes remain compatible; explicit at_event may satisfy only that beat."""
+    bound = change.get("at_event")
+    return bound is None or bound == event_id
+
+
 def _apply_belief_shadow(state, change: dict, *, legacy: bool = False) -> None:
     """Apply an already-validated epistemic delta to an audit-only working state."""
     character, fact_id = change["character"], change["fact"]
@@ -242,7 +265,8 @@ def _apply_belief_shadow(state, change: dict, *, legacy: bool = False) -> None:
     state.beliefs.setdefault(character, {})[fact_id] = True if legacy else change.get("value", True)
 
 
-def _match_and_apply_event_effect(state, effect: dict, scene_delta: dict) -> tuple[bool, str]:
+def _match_and_apply_event_effect(state, effect: dict, scene_delta: dict,
+                                  event_id: str | None = None) -> tuple[bool, str]:
     """Match one event effect to the aggregate scene delta, then apply only that beat's effect.
 
     This gives later required events a causally updated shadow state without applying unrelated
@@ -269,12 +293,14 @@ def _match_and_apply_event_effect(state, effect: dict, scene_delta: dict) -> tup
     if predicate == "knows":
         for change in knowledge_changes:
             truth_ok = effect.get("op") == "remove" or state.fact_exists(effect.get("object"))
-            if truth_ok and _knowledge_effect_matches(effect, change):
+            if truth_ok and _change_can_apply_at_event(change, event_id) and _knowledge_effect_matches(effect, change):
                 _apply_belief_shadow(state, change, legacy=True)
                 return True, ""
         fact_id = effect.get("object")
         if state.fact_exists(fact_id):
             for change in belief_changes:
+                if not _change_can_apply_at_event(change, event_id):
+                    continue
                 if change.get("character") != effect.get("subject") or change.get("fact") != fact_id:
                     continue
                 if effect.get("op") == "add" and change.get("op") == "set" and change.get("value") is True:
@@ -290,7 +316,7 @@ def _match_and_apply_event_effect(state, effect: dict, scene_delta: dict) -> tup
 
     if predicate == "believes":
         for change in belief_changes:
-            if _belief_effect_matches(effect, change):
+            if _change_can_apply_at_event(change, event_id) and _belief_effect_matches(effect, change):
                 _apply_belief_shadow(state, change)
                 return True, ""
         return False, "Event belief effect is not recorded in state-delta belief_changes."
@@ -299,7 +325,10 @@ def _match_and_apply_event_effect(state, effect: dict, scene_delta: dict) -> tup
         return False, "Memory changes must be expressed through knowledge_changes/belief_changes."
 
     declared = next(
-        (change for change in scene_delta.get("predicate_changes", []) if _effect_matches(effect, change)),
+        (
+            change for change in scene_delta.get("predicate_changes", [])
+            if _change_can_apply_at_event(change, event_id) and _effect_matches(effect, change)
+        ),
         None,
     )
     if declared is None:
@@ -399,6 +428,7 @@ def audit_scene(project: Path, scene_id: str) -> dict:
     scene_delta = _load_delta(project, scene_id) or {}
     knowledge_changes = scene_delta.get("knowledge_changes", [])
     belief_changes = scene_delta.get("belief_changes", [])
+    required_event_ids = set(spec.get("required_events", []))
 
     for change in scene_delta.get("predicate_changes", []):
         if change.get("predicate") in {"knows", "believes", "remembers"}:
@@ -406,6 +436,24 @@ def audit_scene(project: Path, scene_id: str) -> dict:
                 "causal", "material", f"{scene_id} predicate_changes contains {change.get('predicate')}",
                 "Epistemic state is stored in knowledge_changes/belief_changes; a generic predicate would not update it.",
                 "scene"))
+        at_event = change.get("at_event")
+        if at_event:
+            event = event_map.get(at_event)
+            if event is None:
+                findings.append(_finding(
+                    "causal", "material", f"{scene_id}: predicate at_event {at_event!r}",
+                    "Predicate execution event does not resolve to planning/event-graph.json.", "plot"))
+            elif at_event not in required_event_ids:
+                findings.append(_finding(
+                    "causal", "material", f"{scene_id}: predicate at_event {at_event!r}",
+                    "Predicate change is bound to an event this scene does not execute.", "scene"))
+            elif not any(
+                isinstance(effect, dict) and _effect_matches(effect, change)
+                for effect in event.get("effects", [])
+            ):
+                findings.append(_finding(
+                    "causal", "material", f"{scene_id}: predicate at_event {at_event!r}",
+                    "Predicate execution event does not carry the matching typed effect.", "plot"))
 
     declared_now: set[str] = set()
     for proposition in [*scene_delta.get("propositions_defined", []), *scene_delta.get("facts_added", [])]:
@@ -427,6 +475,30 @@ def audit_scene(project: Path, scene_id: str) -> dict:
                 "knowledge", "material", f"{scene_id}: {change.get('character')} learns {fact_id!r}",
                 "Legacy knowledge_changes may only learn a proposition that is true at this point; use belief_changes for possibly false belief.",
                 "scene"))
+        event_ref = change.get("event")
+        if event_ref:
+            if event_ref not in event_map:
+                findings.append(_finding(
+                    "knowledge", "material", f"{scene_id}: knowledge source event {event_ref!r}",
+                    "Knowledge provenance event does not resolve to planning/event-graph.json.", "plot"))
+        at_event = change.get("at_event")
+        if at_event:
+            event = event_map.get(at_event)
+            if event is None:
+                findings.append(_finding(
+                    "knowledge", "material", f"{scene_id}: knowledge at_event {at_event!r}",
+                    "Knowledge execution event does not resolve to planning/event-graph.json.", "plot"))
+            elif at_event not in required_event_ids:
+                findings.append(_finding(
+                    "knowledge", "material", f"{scene_id}: knowledge at_event {at_event!r}",
+                    "Knowledge change is bound to an event this scene does not execute.", "scene"))
+            elif not any(
+                isinstance(effect, dict) and _knowledge_effect_matches(effect, change)
+                for effect in event.get("effects", [])
+            ):
+                findings.append(_finding(
+                    "knowledge", "material", f"{scene_id}: knowledge at_event {at_event!r}",
+                    "Knowledge execution event does not carry the matching factive knowledge effect.", "plot"))
 
     defined = set(before.fact_definitions) | declared_now
     for change in belief_changes:
@@ -437,10 +509,26 @@ def audit_scene(project: Path, scene_id: str) -> dict:
                 "Belief updates must refer to a stable proposition definition, even when that proposition is false.",
                 "scene"))
         event_ref = change.get("event")
-        if event_ref and event_ref not in event_map:
-            findings.append(_finding(
-                "knowledge", "material", f"{scene_id}: belief source event {event_ref!r}",
-                "Belief provenance event does not resolve to planning/event-graph.json.", "plot"))
+        if event_ref:
+            if event_ref not in event_map:
+                findings.append(_finding(
+                    "knowledge", "material", f"{scene_id}: belief source event {event_ref!r}",
+                    "Belief provenance event does not resolve to planning/event-graph.json.", "plot"))
+        at_event = change.get("at_event")
+        if at_event:
+            event = event_map.get(at_event)
+            if event is None:
+                findings.append(_finding(
+                    "knowledge", "material", f"{scene_id}: belief at_event {at_event!r}",
+                    "Belief execution event does not resolve to planning/event-graph.json.", "plot"))
+            elif at_event not in required_event_ids:
+                findings.append(_finding(
+                    "knowledge", "material", f"{scene_id}: belief at_event {at_event!r}",
+                    "Belief change is bound to an event this scene does not execute.", "scene"))
+            elif not _belief_change_supported_by_event(event, change):
+                findings.append(_finding(
+                    "knowledge", "material", f"{scene_id}: belief at_event {at_event!r}",
+                    "Belief execution event does not carry a matching belief/knowledge effect.", "plot"))
 
     for error in resource_change_errors(before, scene_delta.get("resource_changes", [])):
         findings.append(_finding(
@@ -535,7 +623,7 @@ def audit_scene(project: Path, scene_id: str) -> dict:
                         "Precondition is unstructured prose; encode it as a typed atom to make it verifiable.", "plot"))
         for eff in event.get("effects", []):
             if isinstance(eff, dict):
-                matched, diagnosis = _match_and_apply_event_effect(event_state, eff, scene_delta)
+                matched, diagnosis = _match_and_apply_event_effect(event_state, eff, scene_delta, event_id)
                 if not matched:
                     findings.append(_finding(
                         "causal", "material", f"{event_id} effect {_atom_str(eff)}",
