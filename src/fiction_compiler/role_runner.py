@@ -361,7 +361,7 @@ def run_role(project: str, scene_id: str, candidate: str, role: str, *,
     assignment = roster[role]
 
     proj_path = project_dir(project)
-    bundle = judge_bundle(project, scene_id, candidate)
+    bundle = judge_bundle(project, scene_id, candidate, role=role)
     if "error" in bundle:
         return bundle
 

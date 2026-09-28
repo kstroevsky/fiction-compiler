@@ -143,6 +143,64 @@ class PersonaAndMessageTests(unittest.TestCase):
             self.assertNotIn("candidate-a.md", user)
             self.assertIn("UNTRUSTED", user)  # candidate is fenced as data
 
+    def test_role_specific_packets_separate_reader_plan_and_reviewer_evidence(self) -> None:
+        from fiction_compiler.tools import judge_bundle
+        with tempfile.TemporaryDirectory() as tmp:
+            root, _ = _scene(tmp)
+            (root / "brief").mkdir(parents=True)
+            (root / "brief" / "project.json").write_text(json.dumps({
+                "reader_contract": "Reader should experience uncertainty.",
+                "desired_affect": "dread",
+                "theme_question": "Who is responsible?",
+            }), encoding="utf-8")
+            (root / "planning").mkdir(parents=True)
+            (root / "planning" / "style-profile.json").write_text(json.dumps({"voice": "plain"}), encoding="utf-8")
+            (root / "planning" / "discourse-plan.json").write_text(json.dumps({"order": ["ch01-sc01"]}), encoding="utf-8")
+
+            reader = judge_bundle(str(root), "ch01-sc01", "candidate-a.md", role="adversarial-reader")
+            self.assertEqual(reader["view"], "experiential-reader")
+            self.assertNotIn("scene_brief", reader)
+            self.assertNotIn("desired_affect", reader["contract"])
+            self.assertNotIn("theme_question", reader["contract"])
+
+            style = judge_bundle(str(root), "ch01-sc01", "candidate-a.md", role="style-editor")
+            self.assertEqual(style["style_profile"], {"voice": "plain"})
+            self.assertNotIn("turn", style["scene_brief"])
+
+            architect = judge_bundle(str(root), "ch01-sc01", "candidate-a.md", role="narrative-architect")
+            self.assertIn("turn", architect["scene_brief"])
+            self.assertEqual(architect["discourse_plan"], {"order": ["ch01-sc01"]})
+
+            for packet in (reader, style, architect):
+                encoded = json.dumps(packet)
+                self.assertNotIn("SECRET A/B intent", encoded)
+                self.assertNotIn("candidate-a.md", encoded)
+
+    def test_continuity_and_character_packets_include_local_state(self) -> None:
+        from fiction_compiler.tools import judge_bundle
+        with tempfile.TemporaryDirectory() as tmp:
+            root, _ = _scene(tmp)
+            canon = root / "canon"
+            canon.mkdir(parents=True)
+            (canon / "index.json").write_text(json.dumps({"accepted_state_deltas": []}), encoding="utf-8")
+            (canon / "facts.jsonl").write_text("", encoding="utf-8")
+            (canon / "knowledge-state.jsonl").write_text("", encoding="utf-8")
+            (canon / "relationship-state.jsonl").write_text("", encoding="utf-8")
+            (canon / "promises.jsonl").write_text("", encoding="utf-8")
+            (canon / "timeline.jsonl").write_text("", encoding="utf-8")
+            (canon / "characters").mkdir()
+            (canon / "characters" / "jo.json").write_text(json.dumps({"id": "Jo", "values": ["duty"]}), encoding="utf-8")
+
+            continuity = judge_bundle(str(root), "ch01-sc01", "candidate-a.md", role="continuity-auditor")
+            self.assertEqual(continuity["view"], "canon-aware-continuity")
+            self.assertIn("state_before", continuity)
+            self.assertIn("participants", continuity)
+
+            character = judge_bundle(str(root), "ch01-sc01", "candidate-a.md", role="character-simulator")
+            self.assertEqual(character["view"], "character-local-state")
+            self.assertEqual(character["participants"][0]["id"], "Jo")
+            self.assertIn("participant_knowledge", character["state_before"])
+
     def test_explicit_persona_path_cannot_escape_repo(self) -> None:
         a = Assignment("style-editor", "gemini", "m", persona_file="/etc/passwd")
         with self.assertRaisesRegex(ValueError, "escapes"):
