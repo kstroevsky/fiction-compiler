@@ -1,11 +1,10 @@
-"""Critic calibration: measure whether critics catch KNOWN planted defects (agents-best-practices
-evals). The project's premise — *the LLM is a strong critic* — is otherwise an unmeasured assumption.
+"""Critic screening: measure whether critics catch planted diagnostic defects.
 
-A gold corpus (``evals/critic-cases.json``) pins planted defects and clean controls. Deterministic
+A diagnostic corpus (``evals/critic-cases.json``) pins planted defects and clean controls. Deterministic
 detectors (defaultness, prose knowledge-leak, ontology, injection) are scored here and pinned in the
-regression harness as recall/specificity invariants. LLM-persona cases carry the same gold labels and
-are scored with ``score_findings`` when a live critic's findings are supplied — turning a persona's
-calibration into a number instead of a hope.
+regression harness as recall/specificity invariants. LLM-persona cases carry provisional fixture
+expectations and are scored with ``score_findings`` when live findings are supplied. They are useful
+for screening but do not substitute for qualified human calibration; ADR 0029 owns that evidence.
 """
 from __future__ import annotations
 
@@ -118,6 +117,7 @@ def run_corpus(cases: list[dict] | None = None, live_findings: dict | None = Non
         expect = case.get("expect_caught", True)
         results.append({"id": case["id"], "critic": case.get("critic"), "kind": case.get("kind", "defect"),
                         "caught": caught, "status": status, "matched_signals": matched_signals,
+                        "label_source": case.get("label_source", "mechanical_fixture"),
                         "correct": None if caught is None else (caught == expect)})
 
     scored = [r for r in results if r["status"] == "scored"]

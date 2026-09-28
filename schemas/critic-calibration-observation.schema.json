@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "critic-calibration-observation.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "study_id", "observation_id", "case_id", "case_input_sha256",
+    "judge_family", "judge_id", "writer_family", "trial_index", "variant_id", "transform_kind",
+    "behavioral_expectation", "verdict", "confidence", "findings", "caught", "matched_signals", "recorded_at"
+  ],
+  "properties": {
+    "schema_version": {"type": "integer", "minimum": 1, "maximum": 1},
+    "study_id": {"type": "string", "pattern": "^critic-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"},
+    "observation_id": {"type": "string", "pattern": "^obs-[0-9a-f]{32}$"},
+    "case_id": {"type": "string", "minLength": 1},
+    "case_input_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "judge_family": {"type": "string", "minLength": 1},
+    "judge_id": {"type": "string", "minLength": 1},
+    "writer_family": {"type": "string", "minLength": 1},
+    "trial_index": {"type": "integer", "minimum": 1},
+    "variant_id": {"type": "string", "minLength": 1},
+    "transform_kind": {"enum": ["identity", "metadata_relabel", "presentation_order", "formatting", "directional_defect", "other"]},
+    "behavioral_expectation": {"enum": ["baseline", "invariant", "directional_worse"]},
+    "invariance_group": {"type": "string", "minLength": 1},
+    "verdict": {"enum": ["pass", "revise", "reject", "uncertain"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "findings": {"type": "array"},
+    "caught": {"type": "boolean"},
+    "matched_signals": {"type": "array", "items": {"type": "string"}},
+    "recorded_at": {"type": "string", "minLength": 1}
+  }
+}

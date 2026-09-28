@@ -35,6 +35,7 @@ mechanical validity, modeled/extracted consistency, and literary preference.
 | Defaultness/style heuristics | `defaultness.py`, catalog | **Advisory by default** | Contextual evidence; a project can explicitly opt into blocking mode |
 | Blind tournament / Pareto | `tournament.py`, `tools.tournament` | **Implemented** | Anonymization, order balancing, complete-matrix checks, eligibility floors, dissent preservation |
 | Selection-value measurement | `selection_eval.py`, `selection_experiment.py`, ADR 0028 | **Implemented as evidence infrastructure; study not yet run** | Frozen generation-order pools, independent pairwise labels, first/random/critic comparison, cost/failure missingness |
+| Critic calibration | `critic_calibration.py`, `critic_calibration.py` CLI, ADR 0029 | **Implemented as evidence infrastructure; calibrated study not yet run** | Frozen cases, repeated runs, conditional invariance/directional comparisons, crossed writer/judge families, joint-error bookkeeping, human-label disagreement preserved |
 | Anti-obviousness search | `avoid-defaults` skill, premise probes | **Partial/experimental** | Search prompts/probes exist; no validated continuation ensemble or universal originality metric |
 | Knowledge base | `kb/`, source register | **Starter set implemented** | Structured concept cards, conflicts/counterexamples, rights-aware provenance, one owned-scene annotation |
 | Framework regression | `regression.py`, fixtures, critic cases | **Implemented** | Closed checks plus fingerprint of code, schemas, KB, prompts/skills, roster/probes, eval data, scripts, runtime config |
@@ -163,6 +164,15 @@ test, not just a feature.
 > learn whether plan search actually improves reader preference versus spending the same budget on
 > additional prose realizations.
 >
+> **Critic calibration now has a separate evidence track (ADR 0029, review B2).** A study freezes the
+> exact diagnostic cases before live runs, with provisional corpus labels kept distinct from qualified
+> human labels. Repeated observations carry exact judge/writer-family provenance, trial index, and an
+> explicit behavioral-transform expectation; reports measure run-to-run repeatability, matched
+> invariance/directional behavior, crossed-family cells and joint-error counts without treating vendor
+> diversity as independence. Expert disagreement is preserved and excluded from human-agreement
+> estimates. This remains measurement infrastructure: no qualified human calibration study or repair-
+> benefit experiment has been run, and the report has no promotion-gate authority.
+>
 > **Revision loop now diffs by finding identity (ADR 0009, P3 slice 1).** `evaluate_revision` gives
 > each finding a fingerprint (dimension + normalized evidence) and classifies fixed / persisted /
 > worsened / newly-introduced, so a *new* material finding is rejected even when the raw count falls
@@ -216,6 +226,7 @@ test, not just a feature.
 > `0015-kb-structured-depth.md`, `0024-plan-to-prose-realization-evidence.md`,
 > `0025-typed-promise-obligations.md`, `0026-backward-revision-and-conservative-invalidation.md`,
 > `0027-plan-level-search-before-prose.md`, `0028-frozen-selection-measurement.md`,
+> `0029-critic-behavioral-calibration.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 

@@ -1,5 +1,5 @@
 {
-  "note": "Gold defect corpus for critic calibration (ADR 0019). Each case plants a KNOWN defect (kind=defect) or is a clean control (kind=control). Deterministic detectors are scored by critic_eval.run_deterministic_case and pinned in the regression harness; 'llm' cases carry the same gold labels and are scored against a live persona's findings via critic_eval.score_findings. expect_caught is what a correctly-calibrated critic should do. Add a case here whenever a real miss is observed (the retrospective loop), so critic recall becomes a measured, regression-guarded number.",
+  "note": "Diagnostic defect corpus for critic screening (ADR 0019/0029). Deterministic cases pin mechanical invariants. LLM cases are provisional fixtures, not objective literary gold labels; qualified human labels and disagreement belong in an ADR 0029 calibration study. expect_caught is the fixture expectation used for screening. Add regression cases for observed misses, but do not infer production critic authority from this file alone.",
   "cases": [
     {"id": "defaultness-cliche", "critic": "defaultness-lint", "detector": "defaultness", "kind": "defect",
      "input": {"text": "Her heart pounded and time stood still as little did she know."},
@@ -23,16 +23,16 @@
     {"id": "injection-clean", "critic": "safety", "detector": "injection", "kind": "control",
      "input": {"text": "He told her to ignore the noise from the yard and keep working."},
      "signals": [], "expect_caught": false},
-    {"id": "llm-told-emotion", "critic": "adversarial-reader", "detector": "llm", "kind": "defect",
+    {"id": "llm-told-emotion", "critic": "adversarial-reader", "detector": "llm", "kind": "defect", "label_source": "provisional_fixture", "source_kind": "local_control",
      "input": {"text": "She was overwhelmed by a profound and nameless sadness, a grief that consumed her utterly."},
      "signals": ["told", "emotion", "named", "abstract", "sentiment"], "expect_caught": true},
-    {"id": "llm-spoken-theme", "critic": "adversarial-reader", "detector": "llm", "kind": "defect",
+    {"id": "llm-spoken-theme", "critic": "adversarial-reader", "detector": "llm", "kind": "defect", "label_source": "provisional_fixture", "source_kind": "local_control",
      "input": {"text": "\"A kind lie,\" she said, \"is still a betrayal in the end, and we both know it.\""},
      "signals": ["theme", "stated", "on-the-nose", "spoken", "abstract"], "expect_caught": true},
-    {"id": "llm-physical-control", "critic": "adversarial-reader", "detector": "llm", "kind": "control",
+    {"id": "llm-physical-control", "critic": "adversarial-reader", "detector": "llm", "kind": "control", "label_source": "provisional_fixture", "source_kind": "local_control",
      "input": {"text": "She turned the cup until the chipped side faced the wall, then signed the receipt."},
      "signals": ["emotion", "theme", "abstract"], "expect_caught": false},
-    {"id": "llm-dialogue-control", "critic": "adversarial-reader", "detector": "llm", "kind": "control",
+    {"id": "llm-dialogue-control", "critic": "adversarial-reader", "detector": "llm", "kind": "control", "label_source": "provisional_fixture", "source_kind": "local_control",
      "input": {"text": "\"Three crates,\" he said. \"The invoice says four.\""},
      "signals": ["theme", "on-the-nose", "abstract"], "expect_caught": false}
   ]

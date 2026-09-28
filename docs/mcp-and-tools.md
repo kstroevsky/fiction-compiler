@@ -37,6 +37,11 @@ It runs anywhere `python3` runs — no install step.
 | `record_selector_choice` | Bind a critic/editor pick to the frozen pool before reader outcomes exist |
 | `record_selection_operation` | Record known cost/token/provider evidence and failures without converting missing usage to zero |
 | `selection_experiment_report` | Descriptively compare first/random/recorded selectors when independent pair/order coverage supports it |
+| `start_critic_calibration` | Freeze a B2 critic study and its provisional case labels before live runs |
+| `critic_calibration_packet` | Judge-safe frozen case input with the calibration label/signals withheld |
+| `record_critic_calibration_observation` | Persist repeat/family/transform-bound live critic evidence |
+| `record_critic_human_label` | Persist independent human labels while preserving disagreement |
+| `critic_calibration_report` | Report repeatability, conditional invariance, crossed families, joint errors, and human agreement without granting gate authority |
 | `hard_audit` | Deterministic Audit 1 (knowledge cutoff, causal refs, POV, chronology, promise ledger) |
 | `defaultness_lint` | Model-default tics in prose, with evidence |
 | `evaluate_revision` | Accept/stop decision for a revision (stateless; takes iteration/attempts to reach every branch) |

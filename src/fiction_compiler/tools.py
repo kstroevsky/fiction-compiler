@@ -17,7 +17,7 @@ from typing import Any, Callable
 
 from . import critic_eval as _critic_eval
 from . import critique as _critique
-from . import (defaultness, hard_audit, integrity, issue_resolution, kb, plan_search, reader,
+from . import (critic_calibration, defaultness, hard_audit, integrity, issue_resolution, kb, plan_search, reader,
                regression, revision, safety, schema, selection_eval, trace)
 from .assemble import assemble as _assemble
 from .context import compile_bundle
@@ -545,6 +545,41 @@ def critic_eval(live_findings: dict | None = None) -> dict:
     return _critic_eval.run_corpus(live_findings=live_findings)
 
 
+def start_critic_calibration(project: str, name: str, case_ids: list[str] | None = None,
+                             criteria: dict | None = None) -> dict:
+    return critic_calibration.start_study(project_dir(project), name, case_ids=case_ids, criteria=criteria)
+
+
+def critic_calibration_packet(project: str, study_id: str, case_id: str) -> dict:
+    return critic_calibration.judge_packet(project_dir(project), study_id, case_id)
+
+
+def record_critic_calibration_observation(
+    project: str, study_id: str, case_id: str, judge_family: str, judge_id: str,
+    writer_family: str, trial_index: int, variant_id: str, transform_kind: str,
+    behavioral_expectation: str, verdict: str, findings: list, confidence: float = 1.0,
+    invariance_group: str | None = None,
+) -> dict:
+    return critic_calibration.record_observation(
+        project_dir(project), study_id, case_id, judge_family, judge_id, writer_family, trial_index,
+        variant_id, transform_kind, behavioral_expectation, verdict, findings, confidence=confidence,
+        invariance_group=invariance_group,
+    )
+
+
+def record_critic_human_label(project: str, study_id: str, case_id: str, annotator_id: str,
+                              annotator_role: str, label: str, severity: str | None = None,
+                              signals: list[str] | None = None, notes: str | None = None) -> dict:
+    return critic_calibration.record_human_label(
+        project_dir(project), study_id, case_id, annotator_id, annotator_role, label,
+        severity=severity, signals=signals, notes=notes,
+    )
+
+
+def critic_calibration_report(project: str, study_id: str) -> dict:
+    return critic_calibration.report(project_dir(project), study_id)
+
+
 def scene_trace(project: str, scene_id: str) -> dict:
     """Read the append-only scene-loop trace (candidates, critiques, revisions, promotion)."""
     return {"events": trace.read(project_dir(project), scene_id)}
@@ -884,12 +919,54 @@ TOOLS: list[dict] = [
           {"project": {"type": "string"}, "scene_id": {"type": "string"}, "candidate": {"type": "string"}},
           ["project", "scene_id", "candidate"], judge_bundle),
     _tool("critic_eval",
-          "Score the critic-calibration corpus (evals/critic-cases.json): recall on planted defects, "
-          "specificity on clean controls, per critic. Deterministic detectors (defaultness, prose "
-          "knowledge-leak, ontology, injection) run now and are pinned in the regression harness; "
-          "pass live_findings (case_id -> an LLM persona's findings list) to score that persona's "
-          "calibration against the same gold labels — turning 'the LLM is a good critic' into a number.",
+          "Screen critics on evals/critic-cases.json: recall on planted defects and specificity on "
+          "clean controls. Deterministic cases pin mechanical regression invariants; LLM-case labels "
+          "are provisional fixtures only. Use the ADR 0029 critic-calibration tools for repeatability, "
+          "invariance, crossed-family and independent-human evidence.",
           {"live_findings": {"type": "object"}}, [], critic_eval),
+    _tool("start_critic_calibration",
+          "Freeze a B2 critic-calibration study before live runs. Defaults to the LLM cases in the "
+          "critic corpus and records any predeclared task-specific criteria without granting gate authority.",
+          {"project": {"type": "string"}, "name": {"type": "string", "minLength": 1},
+           "case_ids": {"type": "array", "uniqueItems": True, "items": {"type": "string"}},
+           "criteria": {"type": "object"}}, ["project", "name"], start_critic_calibration),
+    _tool("critic_calibration_packet",
+          "Return one frozen calibration input with its defect/control label, target signals and expected "
+          "outcome withheld from the judge.",
+          {"project": {"type": "string"}, "study_id": {"type": "string"},
+           "case_id": {"type": "string"}}, ["project", "study_id", "case_id"], critic_calibration_packet),
+    _tool("record_critic_calibration_observation",
+          "Record one immutable live critic run with judge/writer family, repeat index, and declared "
+          "behavioral transform. Invariance is only tested for explicitly meaning-preserving transforms.",
+          {"project": {"type": "string"}, "study_id": {"type": "string"}, "case_id": {"type": "string"},
+           "judge_family": {"type": "string", "minLength": 1}, "judge_id": {"type": "string", "minLength": 1},
+           "writer_family": {"type": "string", "minLength": 1}, "trial_index": {"type": "integer", "minimum": 1},
+           "variant_id": {"type": "string", "minLength": 1},
+           "transform_kind": {"type": "string", "enum": ["identity", "metadata_relabel", "presentation_order", "formatting", "directional_defect", "other"]},
+           "behavioral_expectation": {"type": "string", "enum": ["baseline", "invariant", "directional_worse"]},
+           "verdict": {"type": "string", "enum": ["pass", "revise", "reject", "uncertain"]},
+           "findings": {"type": "array"}, "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+           "invariance_group": {"type": "string", "minLength": 1}},
+          ["project", "study_id", "case_id", "judge_family", "judge_id", "writer_family", "trial_index",
+           "variant_id", "transform_kind", "behavioral_expectation", "verdict", "findings"],
+          record_critic_calibration_observation),
+    _tool("record_critic_human_label",
+          "Record one independent human calibration label. Expert disagreement remains explicit and "
+          "is excluded from model-vs-human agreement rather than averaged away.",
+          {"project": {"type": "string"}, "study_id": {"type": "string"}, "case_id": {"type": "string"},
+           "annotator_id": {"type": "string", "minLength": 1},
+           "annotator_role": {"type": "string", "enum": ["expert", "target_reader", "owner", "other"]},
+           "label": {"type": "string", "enum": ["defect", "control", "abstain", "disputed"]},
+           "severity": {"type": "string", "enum": ["minor", "material", "fatal"]},
+           "signals": {"type": "array", "items": {"type": "string"}}, "notes": {"type": "string"}},
+          ["project", "study_id", "case_id", "annotator_id", "annotator_role", "label"],
+          record_critic_human_label),
+    _tool("critic_calibration_report",
+          "Read-only B2 report: provisional fixture accuracy, repeatability, matched invariance/directional "
+          "tests, crossed writer/judge families, joint error evidence and separate human-label agreement. "
+          "Missing priority/repair/population evidence stays explicit; the report is never a promotion gate.",
+          {"project": {"type": "string"}, "study_id": {"type": "string"}},
+          ["project", "study_id"], critic_calibration_report),
     _tool("scene_trace",
           "Read the append-only scene-loop trace: the operational events of a scene's loop "
           "(critiques recorded, revisions decided, promotion) with timestamps, from "
