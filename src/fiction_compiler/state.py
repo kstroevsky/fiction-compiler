@@ -159,7 +159,11 @@ def _apply_delta(state: StoryState, delta: dict) -> None:
     for fact_id in delta.get("facts_removed", []):
         state.facts.pop(fact_id, None)
     for change in delta.get("knowledge_changes", []):
-        state.knowledge.setdefault(change["character"], set()).add(change["fact"])
+        known = state.knowledge.setdefault(change["character"], set())
+        if change.get("op", "add") == "remove":
+            known.discard(change["fact"])
+        else:
+            known.add(change["fact"])
     for change in delta.get("relationship_changes", []):  # legacy symmetric {pair, state}
         _apply_relationship_record(state, change)
     for edge in delta.get("relationship_edges", []):  # directional {subject, object, dimension}

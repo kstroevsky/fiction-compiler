@@ -182,6 +182,34 @@ class HardAuditExecutableEventTests(unittest.TestCase):
             self.assertIn("fact-never-established", evidence)
             self.assertIn("evt-does-not-exist", evidence)
 
+    def test_knows_effect_must_use_knowledge_changes_and_replays(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": [],
+                     "effects": [{"op": "add", "predicate": "knows", "subject": "char-mara",
+                                  "object": "fact-relay-cut"}]}
+            delta_extra = {
+                "facts_added": [{"id": "fact-relay-cut", "text": "Relay cut by hand."}],
+                "knowledge_changes": [{"character": "char-mara", "fact": "fact-relay-cut"}],
+            }
+            project = self._project(Path(tmp), event, delta_extra)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+            after = hard_audit.reconstruct_state_before(project, "ch01-sc99")
+            self.assertTrue(after.knows("char-mara", "fact-relay-cut"))
+
+    def test_knows_effect_written_as_generic_predicate_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": [],
+                     "effects": [{"op": "add", "predicate": "knows", "subject": "char-mara",
+                                  "object": "fact-relay-cut"}]}
+            delta_extra = {"predicate_changes": [
+                {"op": "add", "predicate": "knows", "subject": "char-mara", "object": "fact-relay-cut"},
+            ]}
+            project = self._project(Path(tmp), event, delta_extra)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any("knowledge_changes" in f["diagnosis"] for f in critique["findings"]))
+
     def test_prose_precondition_earns_migration_advisory(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             event = {"id": "evt-relay-cut", "preconditions": ["jonas is the station operator"], "effects": []}
@@ -307,6 +335,22 @@ class HardAuditCanonTests(unittest.TestCase):
             })  # no narrative_mode -> linear -> backward time is a contradiction
             critique = hard_audit.audit_canon(project)
             self.assertTrue(any(f["dimension"] == "temporal" for f in critique["findings"]))
+
+    def test_iso_times_compare_chronologically_across_separator_styles(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01", "ch01-sc02"])
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": "2026-09-28T09:00:00",
+                "facts_added": [], "facts_removed": [], "knowledge_changes": [],
+                "relationship_changes": [], "promises_opened": [], "promises_closed": [],
+            })
+            write_json(project / "scenes" / "ch01-sc02" / "state-delta.json", {
+                "scene_id": "ch01-sc02", "time": "2026-09-28 10:00:00",
+                "facts_added": [], "facts_removed": [], "knowledge_changes": [],
+                "relationship_changes": [], "promises_opened": [], "promises_closed": [],
+            })
+            critique = hard_audit.audit_canon(project)
+            self.assertFalse(any(f["dimension"] == "temporal" for f in critique["findings"]), critique["findings"])
 
     def test_open_promise_reported_as_minor(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

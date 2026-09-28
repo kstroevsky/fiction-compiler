@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import json
 import re
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -59,16 +60,18 @@ def _as_number(value: Any) -> float | None:
     return None
 
 
-_ISO = re.compile(r"^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?)?$")
-
-
 def _compare_time(a: Any, b: Any) -> int | None:
     """-1 if a<b, 0 if equal, 1 if a>b, None if not comparable."""
     na, nb = _as_number(a), _as_number(b)
     if na is not None and nb is not None:
         return (na > nb) - (na < nb)
-    if isinstance(a, str) and isinstance(b, str) and _ISO.match(a) and _ISO.match(b):
-        return (a > b) - (a < b)
+    if isinstance(a, str) and isinstance(b, str):
+        try:
+            da = datetime.fromisoformat(a[:-1] + "+00:00" if a.endswith("Z") else a)
+            db = datetime.fromisoformat(b[:-1] + "+00:00" if b.endswith("Z") else b)
+            return (da > db) - (da < db)
+        except (TypeError, ValueError):
+            return None
     return None
 
 
@@ -127,6 +130,19 @@ def _effect_matches(required: dict, declared: dict) -> bool:
     if required.get("op") == "remove":
         return True
     return required.get("value", True) == declared.get("value", True)
+
+
+def _knowledge_effect_matches(required: dict, change: dict) -> bool:
+    if required.get("predicate") != "knows":
+        return False
+    if required.get("subject") != change.get("character") or required.get("object") != change.get("fact"):
+        return False
+    op = required.get("op")
+    if op != change.get("op", "add"):
+        return False
+    if op == "remove":
+        return True
+    return required.get("value", True) is True
 
 
 def _ontology_findings(ontology: dict, spec: dict, event_map: dict, scene_delta: dict) -> list[dict]:
@@ -193,7 +209,17 @@ def audit_scene(project: Path, scene_id: str) -> dict:
 
     event_map = _events(project)
     scene_delta = _load_delta(project, scene_id) or {}
-    declared_effects = scene_delta.get("predicate_changes", [])
+    declared_effects = [
+        change for change in scene_delta.get("predicate_changes", []) if change.get("predicate") != "knows"
+    ]
+    knowledge_changes = scene_delta.get("knowledge_changes", [])
+
+    for change in scene_delta.get("predicate_changes", []):
+        if change.get("predicate") == "knows":
+            findings.append(_finding(
+                "causal", "material", f"{scene_id} predicate_changes contains knows",
+                "Knowledge is stored in knowledge_changes; a generic knows predicate would not change what a character knows.",
+                "scene"))
 
     for fact in scene_delta.get("facts_added", []):
         previous = before.fact_definitions.get(fact.get("id"))
@@ -238,10 +264,16 @@ def audit_scene(project: Path, scene_id: str) -> dict:
                         "Precondition is unstructured prose; encode it as a typed atom to make it verifiable.", "plot"))
         for eff in event.get("effects", []):
             if isinstance(eff, dict):
-                if not any(_effect_matches(eff, declared) for declared in declared_effects):
+                if eff.get("predicate") == "knows":
+                    matched = any(_knowledge_effect_matches(eff, change) for change in knowledge_changes)
+                    diagnosis = "Event knowledge effect is declared but not recorded in state-delta knowledge_changes."
+                else:
+                    matched = any(_effect_matches(eff, declared) for declared in declared_effects)
+                    diagnosis = "Event effect is declared but not recorded in this scene's state-delta predicate_changes."
+                if not matched:
                     findings.append(_finding(
                         "causal", "material", f"{event_id} effect {_atom_str(eff)}",
-                        "Event effect is declared but not recorded in this scene's state-delta predicate_changes.", "scene"))
+                        diagnosis, "scene"))
 
     ontology = load_ontology(project)
     if ontology is not None:

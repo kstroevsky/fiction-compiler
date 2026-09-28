@@ -147,6 +147,18 @@ class TypedIRStateTests(unittest.TestCase):
             before = state.reconstruct_state_before(project, "ch01-sc02")
             self.assertTrue(before.holds("knows", "char-mara", "fact-relay-cut"))
             self.assertFalse(before.holds("knows", "char-mara", "fact-jonas-confesses"))
+            self.assertTrue(before.holds("knows", "char-mara", "fact-jonas-confesses", value=False))
+
+    def test_knowledge_change_can_explicitly_remove_knowledge(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build_project(Path(tmp))
+            delta = json.loads((project / "scenes" / "ch01-sc02" / "state-delta.json").read_text())
+            delta["knowledge_changes"].append(
+                {"op": "remove", "character": "char-mara", "fact": "fact-relay-cut"}
+            )
+            write_delta(project, "ch01-sc02", delta)
+            final = state.reconstruct(project)
+            self.assertFalse(final.knows("char-mara", "fact-relay-cut"))
 
 
 if __name__ == "__main__":

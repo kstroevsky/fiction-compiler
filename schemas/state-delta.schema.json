@@ -24,6 +24,7 @@
         "type": "object",
         "required": ["character", "fact"],
         "properties": {
+          "op": {"enum": ["add", "remove"]},
           "character": {"type": "string", "pattern": "^char-[a-z0-9-]+$"},
           "fact": {"type": "string", "pattern": "^fact-[a-z0-9-]+$"}
         }
