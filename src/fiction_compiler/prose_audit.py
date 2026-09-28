@@ -49,7 +49,13 @@ def is_knowledge_leak(pov_knows_before: bool, granted_this_scene: bool) -> bool:
 
 
 def audit_prose(project: Path, scene_id: str, claims: dict) -> dict:
-    """Prove one candidate's extracted prose-claims against state-before + the scene spec."""
+    """Prove extracted claims and report plan-to-prose realization with explicit unknown states.
+
+    ``observed_events`` must be extracted without the plan.  ``event_alignment`` is a separate,
+    plan-aware pass that maps those observations to canonical event ids.  Missing alignment is
+    uncertainty, not evidence of omission; an explicit ``omitted`` assessment is a material defect.
+    Free-text turn and exit-state realization remain literary questions and are reported unverified.
+    """
     project = Path(project).resolve()
     validate_scene_id(scene_id)
     errors = schema.validate_named(claims, "prose-claims")
@@ -79,7 +85,8 @@ def audit_prose(project: Path, scene_id: str, claims: dict) -> dict:
                     f"candidate word count {actual_words}"
                 )
             }
-        for claim in claims.get("claims", []):
+        evidence_items = [*claims.get("claims", []), *claims.get("observed_events", [])]
+        for claim in evidence_items:
             evidence = claim.get("evidence", "")
             if evidence and evidence not in candidate_text:
                 return {"error": f"prose-claims evidence is not present in candidate: {evidence!r}"}
@@ -102,6 +109,70 @@ def audit_prose(project: Path, scene_id: str, claims: dict) -> dict:
     closed_here = set(delta.get("promises_closed", []))
 
     findings: list[dict] = []
+
+    observed = claims.get("observed_events", [])
+    observed_by_id: dict[str, dict] = {}
+    for item in observed:
+        observed_id = item["id"]
+        if observed_id in observed_by_id:
+            return {"error": f"duplicate observed event id: {observed_id}"}
+        observed_by_id[observed_id] = item
+
+    alignments = claims.get("event_alignment", [])
+    alignment_by_event: dict[str, dict] = {}
+    for alignment in alignments:
+        event_id = alignment["event_id"]
+        if event_id in alignment_by_event:
+            return {"error": f"duplicate event alignment: {event_id}"}
+        status = alignment["status"]
+        observed_id = alignment.get("observed_id")
+        if status == "realized":
+            if not observed_id:
+                return {"error": f"realized event alignment {event_id!r} requires observed_id"}
+            if observed_id not in observed_by_id:
+                return {"error": f"event alignment {event_id!r} references unknown observed event {observed_id!r}"}
+        elif observed_id:
+            return {"error": f"{status} event alignment {event_id!r} must not claim observed_id"}
+        alignment_by_event[event_id] = alignment
+
+    required_events = list(spec.get("required_events", []))
+    realization_events: list[dict] = []
+    used_observations: set[str] = set()
+    realization_uncertain = False
+    for event_id in required_events:
+        alignment = alignment_by_event.get(event_id)
+        if alignment is None:
+            realization_events.append({"event_id": event_id, "status": "unverified"})
+            realization_uncertain = True
+            continue
+        status = alignment["status"]
+        item = {"event_id": event_id, "status": status}
+        if alignment.get("observed_id"):
+            item["observed_id"] = alignment["observed_id"]
+            used_observations.add(alignment["observed_id"])
+        realization_events.append(item)
+        if status == "omitted":
+            findings.append(_finding(
+                "realization", "material", f"required event {event_id} assessed omitted",
+                "Plan-to-prose alignment explicitly found that a required event is absent from the candidate.",
+                "prose"))
+        elif status == "unverified":
+            realization_uncertain = True
+
+    # Alignments to non-required events are allowed for diagnosis, but they cannot satisfy a required
+    # event. Consequential extracted events with no realized alignment are routed back to plan/delta.
+    for alignment in alignments:
+        if alignment.get("status") == "realized" and alignment.get("observed_id"):
+            used_observations.add(alignment["observed_id"])
+    unplanned_consequential = [
+        item["id"] for item in observed
+        if item.get("consequential") and item["id"] not in used_observations
+    ]
+    for observed_id in unplanned_consequential:
+        findings.append(_finding(
+            "realization", "minor", observed_by_id[observed_id]["evidence"],
+            "A consequential prose event has no canonical event alignment; route it to the scene plan/state delta or mark it non-consequential.",
+            "scene"))
 
     # POV / tense / length are whole-candidate properties.
     if claims.get("pov") and pov and claims["pov"] != pov:
@@ -150,13 +221,22 @@ def audit_prose(project: Path, scene_id: str, claims: dict) -> dict:
                 findings.append(_finding("factual", "material", ev,
                     f"Prose states fact {ref!r}, which is not established in canon and not added by this scene.", "scene"))
 
+    verdict = _verdict(findings)
+    if verdict == "pass" and realization_uncertain:
+        verdict = "uncertain"
     critique = {
         "candidate": claims.get("candidate", scene_id),
         "critic": "prose-audit",
         "audit_class": "hard",
-        "verdict": _verdict(findings),
+        "verdict": verdict,
         "confidence": 1.0,
         "findings": findings,
+        "realization": {
+            "required_events": realization_events,
+            "unplanned_consequential": unplanned_consequential,
+            "turn": "unverified",
+            "exit_state": "unverified",
+        },
     }
     if claims.get("candidate_sha256"):  # keep the critique schema-valid when the hash is absent
         critique["candidate_sha256"] = claims["candidate_sha256"]

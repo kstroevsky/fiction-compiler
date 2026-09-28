@@ -10,6 +10,29 @@
     "audit_class": {"enum": ["hard", "literary", "defaultness"]},
     "verdict": {"enum": ["pass", "revise", "reject", "uncertain"]},
     "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "realization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_events", "unplanned_consequential", "turn", "exit_state"],
+      "properties": {
+        "required_events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["event_id", "status"],
+            "additionalProperties": false,
+            "properties": {
+              "event_id": {"type": "string"},
+              "status": {"enum": ["realized", "omitted", "unverified"]},
+              "observed_id": {"type": "string"}
+            }
+          }
+        },
+        "unplanned_consequential": {"type": "array", "items": {"type": "string"}},
+        "turn": {"enum": ["unverified"]},
+        "exit_state": {"enum": ["unverified"]}
+      }
+    },
     "provenance": {
       "type": "object",
       "additionalProperties": false,

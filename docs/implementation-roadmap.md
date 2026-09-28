@@ -153,14 +153,15 @@ test, not just a feature.
 > `the-overnight/ch01-sc02`) are added. Still ⬜ in P4: genre/period modules, a larger annotated
 > corpus (extract-not-copy, public-domain), semantic retrieval — depth first, never volume.
 >
-> **The hard audit now reads the prose (ADR 0014, review §4).** A `prose_audit` proves an extraction
-> agent's `prose-claims` (pov, tense, typed factual/epistemic claims with evidence) against
+> **The hard audit now reads the prose (ADR 0014 + ADR 0024, review §§4, 6.3).** A `prose_audit` proves
+> an extraction agent's `prose-claims` (pov, tense, typed factual/epistemic claims with evidence) against
 > reconstructed state + the spec — a focalizer knowing an ungranted fact (knowledge leak), an
 > unplanned character, head-hopping, a tense break, a spatial contradiction, or a promise closed in
-> prose but not in the delta are material findings. LLM extracts, code judges (same split as the
-> tournament). Demonstrated on `the-overnight/ch01-sc01`: honest claims pass; an injected future-fact
-> leak is caught. Still ⬜: making `prose_audit` a *required* gate class, and auto-rerunning it (with
-> the other prose-reading audits) after every revision.
+> prose but not in the delta are material findings. The realization prototype now separates
+> **plan-blind observed events** from a later plan-aware alignment: explicit required-event omission is
+> material, while missing/uncertain alignment stays `uncertain`; free-text turn/exit-state remain
+> unverified. Still ⬜: calibrating extraction/alignment on planted omissions + oblique controls before
+> making `prose_audit` a required gate, and auto-rerunning calibrated prose-reading audits after revision.
 >
 > **Framework loop now has a regression harness (ADR 0011, P5 slice 1).** `scripts/run_regression.py`
 > + the `run_regression` tool run fixed fixtures (`regression/fixtures.json`) that pin the invariants

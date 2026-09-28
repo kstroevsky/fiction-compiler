@@ -12,6 +12,36 @@
     "pov": {"type": "string"},
     "tense": {"enum": ["past", "present", "future", "mixed"]},
     "word_count": {"type": "integer", "minimum": 0},
+    "observed_events": {
+      "type": "array",
+      "comment": "Plan-blind extraction: events observed in the candidate, before seeing canonical event IDs.",
+      "items": {
+        "type": "object",
+        "required": ["id", "description", "evidence", "consequential"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^observed-[a-z0-9-]+$"},
+          "description": {"type": "string", "minLength": 1},
+          "evidence": {"type": "string", "minLength": 1},
+          "consequential": {"type": "boolean"}
+        }
+      }
+    },
+    "event_alignment": {
+      "type": "array",
+      "comment": "Plan-aware second pass: maps required canonical events to observed extraction, or records omitted/unverified.",
+      "items": {
+        "type": "object",
+        "required": ["event_id", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "event_id": {"type": "string", "pattern": "^evt-[a-z0-9-]+$"},
+          "status": {"enum": ["realized", "omitted", "unverified"]},
+          "observed_id": {"type": "string", "pattern": "^observed-[a-z0-9-]+$"},
+          "note": {"type": "string"}
+        }
+      }
+    },
     "claims": {
       "type": "array",
       "items": {

@@ -95,6 +95,82 @@ class ProseAuditTests(unittest.TestCase):
             critique = self._audit(tmp, claims(c("closes_promise", ref="promise-p")))
             self.assertIn("promise", dims(critique))
 
+    def test_missing_event_alignment_is_uncertain_not_omission(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp))
+            spec_path = project / "scenes" / "ch01-sc01" / "spec.json"
+            spec = json.loads(spec_path.read_text())
+            spec["required_events"] = ["evt-turn"]
+            spec_path.write_text(json.dumps(spec))
+            critique = audit_prose(project, "ch01-sc01", claims())
+            self.assertEqual(critique["verdict"], "uncertain")
+            self.assertEqual(critique["realization"]["required_events"], [
+                {"event_id": "evt-turn", "status": "unverified"}
+            ])
+            self.assertNotIn("realization", dims(critique))
+
+    def test_explicit_omission_is_material(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp))
+            spec_path = project / "scenes" / "ch01-sc01" / "spec.json"
+            spec = json.loads(spec_path.read_text())
+            spec["required_events"] = ["evt-turn"]
+            spec_path.write_text(json.dumps(spec))
+            cl = claims()
+            cl["event_alignment"] = [{"event_id": "evt-turn", "status": "omitted",
+                                      "note": "No corresponding action in extraction."}]
+            critique = audit_prose(project, "ch01-sc01", cl)
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertIn("realization", dims(critique))
+
+    def test_oblique_realization_passes_when_alignment_is_evidence_bound(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp))
+            candidate = project / "scenes" / "ch01-sc01" / "candidates" / "candidate-a.md"
+            candidate.parent.mkdir()
+            candidate.write_text("She turned the cup upside down and left it there.", encoding="utf-8")
+            spec_path = project / "scenes" / "ch01-sc01" / "spec.json"
+            spec = json.loads(spec_path.read_text())
+            spec["required_events"] = ["evt-refusal"]
+            spec_path.write_text(json.dumps(spec))
+            text = candidate.read_text(encoding="utf-8")
+            import hashlib
+            cl = claims(wc=len(text.split()))
+            cl["candidate"] = "candidate-a.md"
+            cl["candidate_sha256"] = hashlib.sha256(text.encode()).hexdigest()
+            cl["observed_events"] = [{
+                "id": "observed-cup", "description": "She refuses by inverting the cup.",
+                "evidence": "She turned the cup upside down", "consequential": True,
+            }]
+            cl["event_alignment"] = [{
+                "event_id": "evt-refusal", "status": "realized", "observed_id": "observed-cup",
+            }]
+            critique = audit_prose(project, "ch01-sc01", cl)
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+            self.assertEqual(critique["realization"]["required_events"][0]["status"], "realized")
+
+    def test_unaligned_consequential_event_is_advisory(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            cl = claims()
+            cl["observed_events"] = [{
+                "id": "observed-breaks-door", "description": "A door is broken.",
+                "evidence": "prose evidence", "consequential": True,
+            }]
+            critique = self._audit(tmp, cl)
+            self.assertEqual(critique["verdict"], "pass")
+            self.assertIn("observed-breaks-door", critique["realization"]["unplanned_consequential"])
+            self.assertTrue(any(f["dimension"] == "realization" and f["severity"] == "minor"
+                                for f in critique["findings"]))
+
+    def test_realized_alignment_must_resolve_to_observed_event(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            cl = claims()
+            cl["event_alignment"] = [{
+                "event_id": "evt-turn", "status": "realized", "observed_id": "observed-missing",
+            }]
+            result = self._audit(tmp, cl)
+            self.assertIn("unknown observed event", result["error"])
+
 
 if __name__ == "__main__":
     unittest.main()
