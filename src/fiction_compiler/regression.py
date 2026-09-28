@@ -15,12 +15,13 @@ the runner fails and the framework change must be rejected or rolled back.
 from __future__ import annotations
 
 import json
+import platform
 from datetime import datetime, timezone
 from pathlib import Path
 
 from . import (critic_eval, critique, defaultness, integrity, ontology, premise, prose_audit,
                revision, tournament)
-from .workspace import KB, ROOT, SCHEMAS
+from .workspace import ROOT
 
 FIXTURES = ROOT / "regression" / "fixtures.json"
 
@@ -106,30 +107,56 @@ CHECKS = {
 
 # --- provenance -------------------------------------------------------------------------------
 
-def _hash_dir(paths) -> str:
+def _hash_paths(root: Path, paths) -> str:
     combined = []
-    for path in sorted(paths, key=lambda p: p.name):
+    for path in sorted(paths, key=lambda p: p.relative_to(root).as_posix()):
         if path.is_file():
-            combined.append(f"{path.name}:{integrity.sha256_file(path)}")
+            rel = path.relative_to(root).as_posix()
+            combined.append(f"{rel}:{integrity.sha256_file(path)}")
     return integrity.sha256_bytes("\n".join(combined).encode("utf-8"))
 
 
-def framework_manifest() -> dict:
-    """A content fingerprint of the deterministic framework (schemas + KB index + package source).
+def framework_manifest(root: Path | None = None) -> dict:
+    """Fingerprint every repository artifact that can change framework behavior.
 
-    Changes whenever any pinned component changes, so a regression run is anchored to *what* was
-    running. This is the "record versions / context hashes" the review asked for, deterministically.
+    The fingerprint includes deterministic code plus the external policy/prompt/configuration files
+    that steer generation and evaluation. ``root`` is injectable so tests can prove that each class
+    of external artifact participates without mutating the checked-out repository.
     """
-    schemas = _hash_dir(SCHEMAS.glob("*.json"))
-    kb_index_path = KB / "index.json"
-    kb_index = integrity.sha256_file(kb_index_path) if kb_index_path.exists() else ""
-    source = _hash_dir((ROOT / "src" / "fiction_compiler").glob("*.py"))
-    combined = integrity.sha256_bytes(f"{schemas}:{kb_index}:{source}".encode("utf-8"))
+    root = root or ROOT
+    groups = {
+        "schemas": list((root / "schemas").glob("*.json")),
+        "knowledge_base": [
+            path for path in (root / "kb").rglob("*") if path.suffix in {".json", ".md"}
+        ],
+        "source": list((root / "src" / "fiction_compiler").rglob("*.py")),
+        "scripts": list((root / "scripts").rglob("*.py")),
+        "configuration": [
+            *list((root / "config").rglob("*.json")),
+            root / "premise-probes.json",
+        ],
+        "evaluation_data": [
+            *list((root / "evals").rglob("*.json")),
+            *list((root / "regression").rglob("*.json")),
+        ],
+        "agent_instructions": [
+            *list((root / ".claude" / "agents").rglob("*.md")),
+            *list((root / ".agents" / "skills").glob("*/SKILL.md")),
+            root / "AGENTS.md",
+            root / "CLAUDE.md",
+            *list((root / "constitution").rglob("*.md")),
+        ],
+        "runtime_config": [root / "pyproject.toml"],
+    }
+    hashes = {name: _hash_paths(root, paths) for name, paths in groups.items()}
+    runtime = f"{platform.python_implementation()} {platform.python_version()}"
+    combined_input = "\n".join([*(f"{name}:{hashes[name]}" for name in sorted(hashes)),
+                                  f"python_runtime:{runtime}"])
+    combined = integrity.sha256_bytes(combined_input.encode("utf-8"))
     return {
         "framework_fingerprint": combined,
-        "schemas_sha256": schemas,
-        "kb_index_sha256": kb_index,
-        "source_sha256": source,
+        **{f"{name}_sha256": digest for name, digest in hashes.items()},
+        "python_runtime": runtime,
         "generated_at": datetime.now(timezone.utc).isoformat(),
     }
 
