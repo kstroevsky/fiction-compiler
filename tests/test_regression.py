@@ -4,6 +4,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -91,6 +92,19 @@ class FrameworkRegressionTests(unittest.TestCase):
         out = tools.call_tool("run_regression", {})
         self.assertTrue(out["ok"])
         self.assertIn("framework_fingerprint", out["manifest"])
+
+    def test_framework_path_classifier_covers_current_and_new_behavior_files(self) -> None:
+        self.assertTrue(regression.is_framework_path("src/fiction_compiler/new_check.py"))
+        self.assertTrue(regression.is_framework_path("config/new-policy.json"))
+        self.assertTrue(regression.is_framework_path(".agents/skills/new-skill/SKILL.md"))
+        self.assertFalse(regression.is_framework_path("docs/decisions/proposal.md"))
+        self.assertFalse(regression.is_framework_path("projects/demo/manuscript.md"))
+
+    def test_runtime_source_status_detects_stale_imported_code(self) -> None:
+        with mock.patch.object(regression, "_RUNTIME_SOURCE_SHA256", "0" * 64):
+            status = regression.runtime_source_status()
+        self.assertTrue(status["checked"])
+        self.assertFalse(status["fresh"])
 
 
 if __name__ == "__main__":

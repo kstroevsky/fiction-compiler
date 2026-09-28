@@ -54,9 +54,10 @@ manifest yields a 64-hex framework fingerprint; the MCP tool runs the fixtures.
   this harness pins the deterministic floor beneath them.
 - The manifest fingerprints schemas + KB index + package source, not prompt/agent files or model
   parameters; extending it to those (and recording token/cost) is a later slice.
-- The runner reports regressions; the *acceptance/rollback* workflow (thresholds, human approval,
-  reverting the change) still lives in `change-policy.md` + the `retrospective` skill and is not
-  automated end-to-end.
+- The original runner only reported regressions. ADR 0033 now supplies the separate
+  *acceptance/rollback* transaction (declared scope, blind before/after evidence, predeclared
+  thresholds, explicit human decision, and stale-safe restoration). The regression harness remains
+  the deterministic floor inside that broader transaction; it is not promoted into a literary judge.
 
 ## 8. Human approval status
 Authorized as the user-directed "do P5" step. The constitution (`AGENTS.md`) is unchanged. Revert

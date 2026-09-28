@@ -311,11 +311,22 @@ class AtomicBatch:
     def write(self, target: Path, data: bytes) -> None:
         target = Path(target)
         prior = target.read_bytes() if target.exists() else None
-        self._ops.append({"target": target, "data": data, "prior": prior, "committed": False})
+        self._ops.append({"target": target, "data": data, "prior": prior,
+                          "delete": False, "committed": False})
+
+    def delete(self, target: Path) -> None:
+        """Stage deletion of one file, restoring its prior bytes if a later batch op fails."""
+        target = Path(target)
+        prior = target.read_bytes() if target.exists() else None
+        self._ops.append({"target": target, "data": None, "prior": prior,
+                          "delete": True, "committed": False})
 
     def commit(self) -> None:
         for op in self._ops:
-            acceptance.atomic_write(op["target"], op["data"])
+            if op["delete"]:
+                Path(op["target"]).unlink(missing_ok=True)
+            else:
+                acceptance.atomic_write(op["target"], op["data"])
             op["committed"] = True
 
     def rollback(self) -> None:

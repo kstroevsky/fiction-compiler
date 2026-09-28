@@ -58,6 +58,15 @@ It runs anywhere `python3` runs — no install step.
 | `post_revision_recheck_packet` | Build exact active-acceptance prose context for a pending subjective scope; reader packets are prefix-only and whole-work is global |
 | `record_post_revision_evidence` | Persist packet-bound reviewer/reader evidence without automatically clearing the scope |
 | `resolve_post_revision_scope` | Explicitly clear a still-current scope from clean pass evidence while recording who decided and why |
+| `run_regression` | Run the deterministic framework regression floor and fingerprint the exact behavior-relevant framework |
+| `start_framework_change` | Freeze a clean framework baseline, the eight-field process-change proposal, declared scope, rollback bytes, and blind-comparison thresholds |
+| `evaluate_framework_change` | Bind the edited framework, rerun regression, and detect undeclared behavior-relevant edits |
+| `prepare_framework_comparison` | Freeze a before/after output pair and expose randomized A/B labels without the reveal map |
+| `framework_comparison_packet` | Reopen a frozen comparison as a blind evaluator packet |
+| `record_framework_comparison` | Record A/B/tie/abstain evidence; an agent proposer's own model vote is excluded from approval thresholds |
+| `framework_change_status` | Show evaluation freshness, scope/regression status, comparison threshold evidence, human decision, and rollback state |
+| `decide_framework_change` | **State-changing authority record, gated by `confirm`** — record explicit human approve/reject after fresh required evidence |
+| `rollback_framework_change` | **State-changing, human-decider + `confirm` gated** — restore exact declared pre-change bytes only while the evaluated state is still current |
 
 The write path now supports both forward acceptance and explicit backward correction: an agent driving
 purely over MCP can persist revision history (`record_revision`), reach the full stop-condition logic,

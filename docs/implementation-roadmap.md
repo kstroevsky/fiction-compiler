@@ -92,11 +92,12 @@ test, not just a feature.
 > **Two self-improvement loops** (see `docs/self-improvement-loops.md`): the **story** PDCA loop's
 > deterministic CHECK/ACT is built (`src/fiction_compiler/revision.py`, `scripts/revise_scene.py`,
 > per-scene `revision-log.jsonl`) — this is the manuscript's own improvement loop. The **framework**
-> PDCA loop (Stage 5) now has a regression-fixture runner, critic-calibration corpus and broad
-> framework fingerprint. Automated before/after policy transactions, threshold/approval/rollback
-> orchestration and complete experiment-wide cost manifests remain ⬜. Role-runner provider usage
-> capture is implemented (ADR 0032); generation/revision paths still need the same accounting before
-> a matched-cost study can claim complete expenditure. Stage 6 (GUI) ⬜.
+> PDCA loop (Stage 5) now has a regression-fixture runner, critic-calibration corpus, broad framework
+> fingerprint, and an evidence-bound change transaction (ADR 0033): clean baseline + declared scope,
+> exact rollback snapshots, blind before/after evidence, predeclared thresholds, explicit human
+> approval, and stale-safe restoration. Complete experiment-wide cost manifests remain ⬜.
+> Role-runner provider usage capture is implemented (ADR 0032); generation/revision paths still need
+> the same accounting before a matched-cost study can claim complete expenditure. Stage 6 (GUI) ⬜.
 > **Tools for the author.** The deterministic engine is exposed to the LLM as callable tools via
 > a dependency-free MCP server (`scripts/fiction_mcp.py`, wired in `.mcp.json` and `.codex/config.toml`):
 > `kb_search`/`kb_get`, `state_before`, `compile_context`, `hard_audit`, `defaultness_lint`,
@@ -216,15 +217,18 @@ test, not just a feature.
 > proof of omission. Still ⬜: run the live/hidden-set calibration and adopt predeclared tolerances before
 > making `prose_audit` a required gate; auto-rerun calibrated prose-reading audits after revision.
 >
-> **Framework loop now has a regression harness (ADR 0011, P5 slice 1).** `scripts/run_regression.py`
+> **Framework loop now has an executable change transaction (ADR 0011 + ADR 0033, P5).** `scripts/run_regression.py`
 > + the `run_regression` tool run fixed fixtures (`regression/fixtures.json`) that pin the invariants
 > the ADRs established — defaultness, the revision traps + waiver, tournament select/defer, ontology
 > typo — through a closed check whitelist, and report a **framework fingerprint** covering package
 > source, schemas, full KB/defaultness content, scripts, model roster/premise probes, eval/regression
 > corpora, personas/skills/governance text and runtime configuration. A change that regresses an
-> invariant fails the run (non-zero exit). Still ⬜ in P5: automating the before/after
-> threshold/approval/rollback workflow and extending ADR 0032's provider-usage provenance across the
-> remaining generation/revision paths so experiment-wide matched-cost accounting is complete.
+> invariant fails the run (non-zero exit). `framework_change.py` wraps that floor in a clean-baseline,
+> declared-scope transaction with exact pre-change snapshots, randomized blind A/B output evidence,
+> predeclared evidence thresholds, independent-of-agent-proposer accounting, a separate confirmed
+> human approve/reject decision, and rollback that refuses to clobber post-evaluation edits. Still ⬜
+> in P5: extend ADR 0032's provider-usage provenance across the remaining generation/revision paths so
+> experiment-wide matched-cost accounting is complete, and actually run the independent human studies.
 >
 > See `docs/decisions/0001-structured-state-delta.md`, `0002-promotion-audit-gate.md`,
 > `0003-tamper-evident-promotion.md`, `0004-executable-story-ir.md`, `0005-predicate-ontology.md`,
@@ -238,6 +242,7 @@ test, not just a feature.
 > `0029-critic-behavioral-calibration.md`,
 > `0030-realization-calibration-evidence.md`,
 > `0031-post-revision-subjective-rechecks.md`,
+> `0032-provider-usage-provenance.md`, `0033-framework-change-transactions.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 
@@ -295,11 +300,13 @@ test, not just a feature.
 
 ### Stage 5 — Self-improvement & regression harness
 **Goal:** make `retrospective` executable, not aspirational.
-- Improvement-transaction record + `evals/regression/` fixture runner + before/after blind
-  harness; prompt/rubric versioning.
-- Run manifests in `.runs/` with model, prompt version, token, and cost provenance.
-- **Exit:** a proposed prompt change is accepted only if it fixes its regression fixture
-  without regressing others — enforced by the runner, not by an LLM's say-so.
+- ✅ Improvement-transaction record + regression fixture runner + blind before/after harness with
+  declared file scope, frozen rollback bytes, predeclared thresholds, and human approval authority.
+- 🟡 Run manifests in `.runs/` carry exact framework fingerprints and role-runner provider usage;
+  generation/revision token and cost provenance is still incomplete.
+- **Exit status:** mechanical and governance acceptance is implemented; empirical process changes
+  still require their actual independent blind evidence rather than infrastructure being counted as
+  a positive result.
 
 ### Stage 6 — Author-facing surfaces (deferred)
 Context viewer, event-graph and knowledge-state visualization, promise dashboard, GUI.

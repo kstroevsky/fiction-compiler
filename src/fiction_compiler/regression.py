@@ -116,15 +116,8 @@ def _hash_paths(root: Path, paths) -> str:
     return integrity.sha256_bytes("\n".join(combined).encode("utf-8"))
 
 
-def framework_manifest(root: Path | None = None) -> dict:
-    """Fingerprint every repository artifact that can change framework behavior.
-
-    The fingerprint includes deterministic code plus the external policy/prompt/configuration files
-    that steer generation and evaluation. ``root`` is injectable so tests can prove that each class
-    of external artifact participates without mutating the checked-out repository.
-    """
-    root = root or ROOT
-    groups = {
+def _framework_groups(root: Path) -> dict[str, list[Path]]:
+    return {
         "schemas": list((root / "schemas").glob("*.json")),
         "knowledge_base": [
             path for path in (root / "kb").rglob("*") if path.suffix in {".json", ".md"}
@@ -148,6 +141,88 @@ def framework_manifest(root: Path | None = None) -> dict:
         ],
         "runtime_config": [root / "pyproject.toml"],
     }
+
+
+def is_framework_path(relative_path: str) -> bool:
+    """Whether a repository-relative path belongs to the behavior-relevant framework surface.
+
+    This mirrors ``_framework_groups`` lexically so a transaction can declare a file that does not
+    exist yet without allowing unrelated documentation or arbitrary workspace files into scope.
+    """
+    path = Path(relative_path)
+    parts = path.parts
+    if not parts or path.is_absolute() or ".." in parts:
+        return False
+    posix = path.as_posix()
+    if len(parts) == 2 and parts[0] == "schemas" and path.suffix == ".json":
+        return True
+    if parts[0] == "kb" and path.suffix in {".json", ".md"}:
+        return True
+    if len(parts) >= 3 and parts[:2] == ("src", "fiction_compiler") and path.suffix == ".py":
+        return True
+    if parts[0] == "scripts" and path.suffix == ".py":
+        return True
+    if parts[0] == "config" and path.suffix == ".json":
+        return True
+    if posix == "premise-probes.json":
+        return True
+    if parts[0] in {"evals", "regression"} and path.suffix == ".json":
+        return True
+    if len(parts) >= 3 and parts[:2] == (".claude", "agents") and path.suffix == ".md":
+        return True
+    if len(parts) == 4 and parts[:2] == (".agents", "skills") and parts[-1] == "SKILL.md":
+        return True
+    if posix in {"AGENTS.md", "CLAUDE.md", "pyproject.toml"}:
+        return True
+    if parts[0] == "constitution" and path.suffix == ".md":
+        return True
+    return False
+
+
+def framework_file_manifest(root: Path | None = None) -> dict[str, str]:
+    """Return the exact behavior-relevant files behind the aggregate framework fingerprint."""
+    root = (root or ROOT).resolve()
+    files: dict[str, str] = {}
+    for paths in _framework_groups(root).values():
+        for path in paths:
+            if path.is_file():
+                files[path.relative_to(root).as_posix()] = integrity.sha256_file(path)
+    return dict(sorted(files.items()))
+
+
+# Captured once when this Python process imports the regression module. A long-lived MCP server may
+# otherwise read a new source fingerprint from disk while still executing old imported functions.
+_RUNTIME_SOURCE_SHA256 = _hash_paths(
+    ROOT.resolve(), _framework_groups(ROOT.resolve())["source"]
+)
+
+
+def runtime_source_status(root: Path | None = None) -> dict:
+    root = (root or ROOT).resolve()
+    if root != ROOT.resolve():
+        return {
+            "checked": False,
+            "fresh": None,
+            "reason": "alternate test root does not correspond to this interpreter's imported package",
+        }
+    disk_sha256 = _hash_paths(root, _framework_groups(root)["source"])
+    return {
+        "checked": True,
+        "fresh": disk_sha256 == _RUNTIME_SOURCE_SHA256,
+        "imported_source_sha256": _RUNTIME_SOURCE_SHA256,
+        "disk_source_sha256": disk_sha256,
+    }
+
+
+def framework_manifest(root: Path | None = None) -> dict:
+    """Fingerprint every repository artifact that can change framework behavior.
+
+    The fingerprint includes deterministic code plus the external policy/prompt/configuration files
+    that steer generation and evaluation. ``root`` is injectable so tests can prove that each class
+    of external artifact participates without mutating the checked-out repository.
+    """
+    root = (root or ROOT).resolve()
+    groups = _framework_groups(root)
     hashes = {name: _hash_paths(root, paths) for name, paths in groups.items()}
     runtime = f"{platform.python_implementation()} {platform.python_version()}"
     combined_input = "\n".join([*(f"{name}:{hashes[name]}" for name in sorted(hashes)),
@@ -163,8 +238,8 @@ def framework_manifest(root: Path | None = None) -> dict:
 
 # --- runner -----------------------------------------------------------------------------------
 
-def load_fixtures(path: Path | None = None) -> list[dict]:
-    path = path or FIXTURES
+def load_fixtures(path: Path | None = None, root: Path | None = None) -> list[dict]:
+    path = path or ((root or ROOT) / "regression" / "fixtures.json")
     if not path.exists():
         return []
     return json.loads(path.read_text(encoding="utf-8")).get("fixtures", [])
@@ -183,13 +258,14 @@ def run_fixture(fixture: dict) -> dict:
     return {"name": name, "check": check, "expected": expected, "actual": actual, "passed": actual == expected}
 
 
-def run_regressions(fixtures: list[dict] | None = None) -> dict:
+def run_regressions(fixtures: list[dict] | None = None, root: Path | None = None) -> dict:
     """Run every fixture and report pass/fail against the current framework fingerprint."""
-    fixtures = load_fixtures() if fixtures is None else fixtures
+    fixtures = load_fixtures(root=root) if fixtures is None else fixtures
     results = [run_fixture(f) for f in fixtures]
     passed = sum(1 for r in results if r["passed"])
     return {
-        "manifest": framework_manifest(),
+        "manifest": framework_manifest(root),
+        "runtime_source": runtime_source_status(root),
         "total": len(results),
         "passed": passed,
         "failed": len(results) - passed,

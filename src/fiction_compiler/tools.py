@@ -17,9 +17,9 @@ from typing import Any, Callable
 
 from . import critic_eval as _critic_eval
 from . import critique as _critique
-from . import (critic_calibration, defaultness, hard_audit, integrity, issue_resolution, kb, plan_search,
-               post_revision, reader, realization_calibration, regression, revision, safety, schema,
-               selection_eval, trace)
+from . import (critic_calibration, defaultness, framework_change, hard_audit, integrity,
+               issue_resolution, kb, plan_search, post_revision, reader, realization_calibration,
+               regression, revision, safety, schema, selection_eval, trace)
 from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
@@ -687,6 +687,109 @@ def run_regression() -> dict:
     return regression.run_regressions()
 
 
+def start_framework_change(project: str, title: str, failure_observed: str, evidence: list[str],
+                           root_layer: str, minimal_change: str, regression_case: str,
+                           blind_comparison_plan: str, tradeoffs: list[str], changed_paths: list[str],
+                           proposed_by: str, proposer_kind: str, minimum_observations: int,
+                           minimum_after_wins: int, maximum_before_wins: int) -> dict:
+    """Freeze a clean framework baseline, declared scope, and exact rollback bytes before editing."""
+    try:
+        project_path = confine_project(project)
+    except ValueError as exc:
+        return {"error": str(exc)}
+    return framework_change.start(
+        project_path,
+        title=title,
+        failure_observed=failure_observed,
+        evidence=evidence,
+        root_layer=root_layer,
+        minimal_change=minimal_change,
+        regression_case=regression_case,
+        blind_comparison_plan=blind_comparison_plan,
+        tradeoffs=tradeoffs,
+        changed_paths=changed_paths,
+        proposed_by=proposed_by,
+        proposer_kind=proposer_kind,
+        minimum_observations=minimum_observations,
+        minimum_after_wins=minimum_after_wins,
+        maximum_before_wins=maximum_before_wins,
+    )
+
+
+def evaluate_framework_change(project: str, change_id: str) -> dict:
+    try:
+        return framework_change.evaluate(confine_project(project), change_id)
+    except ValueError as exc:
+        return {"error": str(exc)}
+
+
+def prepare_framework_comparison(project: str, change_id: str, objective: str,
+                                 before_output: str, after_output: str, prepared_by: str) -> dict:
+    try:
+        return framework_change.prepare_comparison(
+            confine_project(project), change_id, objective=objective,
+            before_output=before_output, after_output=after_output, prepared_by=prepared_by,
+        )
+    except ValueError as exc:
+        return {"error": str(exc)}
+
+
+def framework_comparison_packet(project: str, change_id: str, comparison_id: str) -> dict:
+    try:
+        return framework_change.comparison_packet(confine_project(project), change_id, comparison_id)
+    except ValueError as exc:
+        return {"error": str(exc)}
+
+
+def record_framework_comparison(project: str, change_id: str, comparison_id: str,
+                                evaluator_kind: str, evaluator_id: str, preferred: str,
+                                rationale: str) -> dict:
+    try:
+        return framework_change.record_comparison(
+            confine_project(project), change_id, comparison_id,
+            evaluator_kind=evaluator_kind, evaluator_id=evaluator_id,
+            preferred=preferred, rationale=rationale,
+        )
+    except ValueError as exc:
+        return {"error": str(exc)}
+
+
+def framework_change_status(project: str, change_id: str) -> dict:
+    try:
+        return framework_change.status(confine_project(project), change_id)
+    except ValueError as exc:
+        return {"error": str(exc)}
+
+
+def decide_framework_change(project: str, change_id: str, decision: str, decided_by: str,
+                            decider_kind: str, reason: str, confirm: bool = False) -> dict:
+    """Record the human framework decision. Confirmation prevents accidental authority records."""
+    if not confirm:
+        return {
+            "error": "framework decision records human authority; call again with confirm=true to proceed"
+        }
+    try:
+        return framework_change.decide(
+            confine_project(project), change_id, decision=decision, decided_by=decided_by,
+            decider_kind=decider_kind, reason=reason,
+        )
+    except ValueError as exc:
+        return {"error": str(exc)}
+
+
+def rollback_framework_change(project: str, change_id: str, decided_by: str, decider_kind: str,
+                              reason: str, confirm: bool = False) -> dict:
+    """Restore declared pre-change bytes only if the evaluated framework is still current."""
+    try:
+        return framework_change.rollback(
+            confine_project(project), change_id, decided_by=decided_by,
+            decider_kind=decider_kind, reason=reason,
+            confirm=confirm,
+        )
+    except ValueError as exc:
+        return {"error": str(exc)}
+
+
 def assemble(project: str) -> dict:
     """Stitch the accepted scenes into one manuscript.md and return its path + word count."""
     return _assemble(project_dir(project))
@@ -1122,6 +1225,84 @@ TOOLS: list[dict] = [
           "fixture plus a framework fingerprint. Run before/after changing a prompt, rubric, schema, "
           "or the deterministic code; any failure means an invariant regressed.",
           {}, [], run_regression),
+    _tool("start_framework_change",
+          "Start an evidence-bound FRAMEWORK change transaction before editing behavior-relevant "
+          "files. Requires the eight change-policy fields, a declared file scope, a clean regression "
+          "baseline, exact rollback snapshots, and predeclared blind-comparison thresholds.",
+          {"project": {"type": "string"}, "title": {"type": "string", "minLength": 1},
+           "failure_observed": {"type": "string", "minLength": 1},
+           "evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+           "root_layer": {"type": "string", "minLength": 1},
+           "minimal_change": {"type": "string", "minLength": 1},
+           "regression_case": {"type": "string", "minLength": 1},
+           "blind_comparison_plan": {"type": "string", "minLength": 1},
+           "tradeoffs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+           "changed_paths": {"type": "array", "minItems": 1, "uniqueItems": True,
+                             "items": {"type": "string", "minLength": 1}},
+           "proposed_by": {"type": "string", "minLength": 1},
+           "proposer_kind": {"type": "string", "enum": ["human", "agent"]},
+           "minimum_observations": {"type": "integer", "minimum": 1},
+           "minimum_after_wins": {"type": "integer", "minimum": 0},
+           "maximum_before_wins": {"type": "integer", "minimum": 0}},
+          ["project", "title", "failure_observed", "evidence", "root_layer", "minimal_change",
+           "regression_case", "blind_comparison_plan", "tradeoffs", "changed_paths", "proposed_by",
+           "proposer_kind", "minimum_observations", "minimum_after_wins", "maximum_before_wins"],
+          start_framework_change),
+    _tool("evaluate_framework_change",
+          "Evaluate the current edited framework against its frozen baseline. Runs regression fixtures, "
+          "checks that only declared behavior-relevant files changed, and binds the exact after fingerprint.",
+          {"project": {"type": "string"}, "change_id": {"type": "string"}},
+          ["project", "change_id"], evaluate_framework_change),
+    _tool("prepare_framework_comparison",
+          "Freeze one before/after output pair against a mechanically-ready framework change and return "
+          "only randomized blind labels A/B. The reveal map remains private in the transaction.",
+          {"project": {"type": "string"}, "change_id": {"type": "string"},
+           "objective": {"type": "string", "minLength": 1}, "before_output": {"type": "string"},
+           "after_output": {"type": "string"}, "prepared_by": {"type": "string", "minLength": 1}},
+          ["project", "change_id", "objective", "before_output", "after_output", "prepared_by"],
+          prepare_framework_comparison),
+    _tool("framework_comparison_packet",
+          "Read one previously frozen framework comparison as blind A/B outputs without revealing "
+          "which output came from before or after the change.",
+          {"project": {"type": "string"}, "change_id": {"type": "string"},
+           "comparison_id": {"type": "string"}},
+          ["project", "change_id", "comparison_id"], framework_comparison_packet),
+    _tool("record_framework_comparison",
+          "Record A/B/tie/abstain evidence for a frozen framework comparison. A model proposer judging "
+          "its own change is preserved but excluded from approval-threshold evidence.",
+          {"project": {"type": "string"}, "change_id": {"type": "string"},
+           "comparison_id": {"type": "string"},
+           "evaluator_kind": {"type": "string", "enum": ["human", "model"]},
+           "evaluator_id": {"type": "string", "minLength": 1},
+           "preferred": {"type": "string", "enum": ["A", "B", "tie", "abstain"]},
+           "rationale": {"type": "string", "minLength": 1}},
+          ["project", "change_id", "comparison_id", "evaluator_kind", "evaluator_id", "preferred", "rationale"],
+          record_framework_comparison),
+    _tool("framework_change_status",
+          "Read framework-change regression/scope freshness, blind-comparison threshold evidence, human "
+          "decision state, and rollback state. No literary-quality conclusion is inferred by this tool.",
+          {"project": {"type": "string"}, "change_id": {"type": "string"}},
+          ["project", "change_id"], framework_change_status),
+    _tool("decide_framework_change",
+          "Record an explicit human approve/reject decision for a framework change. Approval requires "
+          "fresh clean regression/scope evidence plus the predeclared blind-comparison threshold. "
+          "State-changing authority record: requires confirm=true.",
+          {"project": {"type": "string"}, "change_id": {"type": "string"},
+           "decision": {"type": "string", "enum": ["approve", "reject"]},
+           "decided_by": {"type": "string", "minLength": 1},
+           "decider_kind": {"type": "string", "enum": ["human"]},
+           "reason": {"type": "string", "minLength": 1}, "confirm": {"type": "boolean"}},
+          ["project", "change_id", "decision", "decided_by", "decider_kind", "reason"],
+          decide_framework_change),
+    _tool("rollback_framework_change",
+          "Restore the exact declared pre-change file bytes (and remove declared newly-created files) "
+          "only while the evaluated state is still fresh. Refuses to overwrite later edits and reruns "
+          "regression after restoration. Requires confirm=true.",
+          {"project": {"type": "string"}, "change_id": {"type": "string"},
+           "decided_by": {"type": "string", "minLength": 1},
+           "decider_kind": {"type": "string", "enum": ["human"]},
+           "reason": {"type": "string", "minLength": 1}, "confirm": {"type": "boolean"}},
+          ["project", "change_id", "decided_by", "decider_kind", "reason"], rollback_framework_change),
 ]
 
 _BY_NAME: dict[str, dict] = {t["name"]: t for t in TOOLS}
