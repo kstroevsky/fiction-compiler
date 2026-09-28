@@ -162,5 +162,83 @@ class TypedIRStateTests(unittest.TestCase):
             self.assertFalse(final.knows("char-mara", "fact-relay-cut"))
 
 
+    def test_removed_truth_remains_memory_and_belief_but_not_knowledge(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build_project(Path(tmp))
+            delta = json.loads((project / "scenes" / "ch01-sc02" / "state-delta.json").read_text())
+            delta["facts_removed"] = ["fact-relay-cut"]
+            write_delta(project, "ch01-sc02", delta)
+            final = state.reconstruct(project)
+            self.assertFalse(final.fact_exists("fact-relay-cut"))
+            self.assertTrue(final.remembers("char-mara", "fact-relay-cut"))
+            self.assertTrue(final.believes("char-mara", "fact-relay-cut"))
+            self.assertFalse(final.knows("char-mara", "fact-relay-cut"))
+
+    def test_false_belief_can_be_corrected_then_forgotten(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build_project(Path(tmp))
+            canon = project / "canon"
+            write(canon / "propositions.jsonl", json.dumps({
+                "id": "fact-door-open", "text": "The east door is open."
+            }) + "\n")
+            write(canon / "belief-state.jsonl", json.dumps({
+                "op": "set", "character": "char-mara", "fact": "fact-door-open",
+                "value": True, "source": "testimony"
+            }) + "\n")
+
+            seed = state.reconstruct_state_before(project, "ch01-sc01")
+            self.assertFalse(seed.fact_exists("fact-door-open"))
+            self.assertTrue(seed.remembers("char-mara", "fact-door-open"))
+            self.assertTrue(seed.believes("char-mara", "fact-door-open", True))
+            self.assertFalse(seed.knows("char-mara", "fact-door-open"))
+
+            first = json.loads((project / "scenes" / "ch01-sc01" / "state-delta.json").read_text())
+            first["belief_changes"] = [{
+                "op": "set", "character": "char-mara", "fact": "fact-door-open",
+                "value": False, "source": "correction"
+            }]
+            write_delta(project, "ch01-sc01", first)
+            corrected = state.reconstruct_state_before(project, "ch01-sc02")
+            self.assertTrue(corrected.remembers("char-mara", "fact-door-open"))
+            self.assertTrue(corrected.believes("char-mara", "fact-door-open", False))
+            self.assertFalse(corrected.holds("believes", "char-mara", "fact-door-open", value=True))
+            self.assertTrue(corrected.holds("believes", "char-mara", "fact-door-open", value=False))
+
+            second = json.loads((project / "scenes" / "ch01-sc02" / "state-delta.json").read_text())
+            second["belief_changes"] = [{
+                "op": "forget", "character": "char-mara", "fact": "fact-door-open",
+                "source": "forgetting"
+            }]
+            write_delta(project, "ch01-sc02", second)
+            final = state.reconstruct(project)
+            self.assertFalse(final.remembers("char-mara", "fact-door-open"))
+            self.assertIsNone(final.belief("char-mara", "fact-door-open"))
+
+    def test_resource_transfers_conserve_and_ordered_use_checks_underflow(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build_project(Path(tmp))
+            write(project / "canon" / "resources.jsonl", json.dumps({
+                "id": "res-loaf", "holder": "char-mara", "quantity": 12, "unit": "loaf"
+            }) + "\n")
+            first = json.loads((project / "scenes" / "ch01-sc01" / "state-delta.json").read_text())
+            first["resource_changes"] = [{
+                "op": "transfer", "resource": "res-loaf", "from": "char-mara",
+                "to": "customer", "quantity": 11, "unit": "loaf"
+            }]
+            write_delta(project, "ch01-sc01", first)
+            before_second = state.reconstruct_state_before(project, "ch01-sc02")
+            self.assertEqual(before_second.resource_quantity("res-loaf", "char-mara"), 1)
+            self.assertEqual(before_second.resource_quantity("res-loaf", "customer"), 11)
+            self.assertEqual(sum(q for (resource, _), q in before_second.resources.items() if resource == "res-loaf"), 12)
+            self.assertEqual(state.resource_change_errors(before_second, [
+                {"op": "acquire", "resource": "res-loaf", "holder": "char-mara", "quantity": 1},
+                {"op": "consume", "resource": "res-loaf", "holder": "char-mara", "quantity": 2},
+            ]), [])
+            errors = state.resource_change_errors(before_second, [
+                {"op": "consume", "resource": "res-loaf", "holder": "char-mara", "quantity": 2}
+            ])
+            self.assertTrue(any("underflows" in error for error in errors), errors)
+
+
 if __name__ == "__main__":
     unittest.main()

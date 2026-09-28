@@ -132,7 +132,12 @@ test, not just a feature.
 > unsatisfiable predicate. Fabula vs discourse are now distinct (ADR 0006): scene id is discourse
 > (reading) order, `delta.time` is fabula (event) time, and a scene's optional `narrative_mode`
 > (analepsis/prolepsis) marks a deliberate divergence so a flashback is no longer flagged as "time
-> runs backward". Still ⬜ in P1: richer resource/physical state, a real entity type system, and
+> runs backward". **Track-E epistemic/resource semantics are now executable (ADR 0034):** current
+> world truth is separate from retained memory and possibly false per-character belief; stable
+> propositions may be defined without being asserted true; `knows` is factive; and opt-in,
+> load-bearing resource balances support acquire/consume/transfer with underflow, unit and scene
+> quantity checks. Context packets and backward-revision dependencies carry those distinctions.
+> Still ⬜ in P1: ordered within-scene event/beat execution, a fuller entity type system, and
 > fabula-**ordered** state reconstruction (a flashback still replays in discourse order today).
 > Promise obligations now optionally carry typed `trigger_event` / `payoff_event` references
 > (ADR 0025): triggered-but-unpaid promises and payoff events without closure are material, while
@@ -243,6 +248,7 @@ test, not just a feature.
 > `0030-realization-calibration-evidence.md`,
 > `0031-post-revision-subjective-rechecks.md`,
 > `0032-provider-usage-provenance.md`, `0033-framework-change-transactions.md`,
+> `0034-epistemic-and-resource-state.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 

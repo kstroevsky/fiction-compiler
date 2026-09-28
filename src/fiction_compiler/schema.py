@@ -53,6 +53,35 @@ def _type_ok(instance: Any, expected: str) -> bool:
 
 
 def _validate(instance: Any, schema: dict, path: str, errors: list[str]) -> None:
+    if "const" in schema and instance != schema["const"]:
+        errors.append(f"{path}: {instance!r} does not equal const {schema['const']!r}")
+
+    for subschema in schema.get("allOf", []):
+        _validate(instance, subschema, path, errors)
+
+    if "oneOf" in schema:
+        matches = 0
+        for subschema in schema["oneOf"]:
+            branch_errors: list[str] = []
+            _validate(instance, subschema, path, branch_errors)
+            if not branch_errors:
+                matches += 1
+        if matches != 1:
+            errors.append(f"{path}: expected exactly one oneOf schema to match, got {matches}")
+
+    if "not" in schema:
+        not_errors: list[str] = []
+        _validate(instance, schema["not"], path, not_errors)
+        if not not_errors:
+            errors.append(f"{path}: instance matches forbidden 'not' schema")
+
+    if "if" in schema:
+        condition_errors: list[str] = []
+        _validate(instance, schema["if"], path, condition_errors)
+        branch = schema.get("then") if not condition_errors else schema.get("else")
+        if isinstance(branch, dict):
+            _validate(instance, branch, path, errors)
+
     expected = schema.get("type")
     if expected is not None:
         options = expected if isinstance(expected, list) else [expected]
@@ -81,9 +110,15 @@ def _validate(instance: Any, schema: dict, path: str, errors: list[str]) -> None
         minimum = schema.get("minimum")
         if minimum is not None and instance < minimum:
             errors.append(f"{path}: {instance} < minimum {minimum}")
+        exclusive_minimum = schema.get("exclusiveMinimum")
+        if exclusive_minimum is not None and instance <= exclusive_minimum:
+            errors.append(f"{path}: {instance} <= exclusiveMinimum {exclusive_minimum}")
         maximum = schema.get("maximum")
         if maximum is not None and instance > maximum:
             errors.append(f"{path}: {instance} > maximum {maximum}")
+        exclusive_maximum = schema.get("exclusiveMaximum")
+        if exclusive_maximum is not None and instance >= exclusive_maximum:
+            errors.append(f"{path}: {instance} >= exclusiveMaximum {exclusive_maximum}")
 
     if isinstance(instance, dict):
         properties = schema.get("properties", {})

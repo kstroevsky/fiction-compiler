@@ -49,10 +49,11 @@
         "required": ["type", "evidence"],
         "additionalProperties": false,
         "properties": {
-          "type": {"enum": ["character_present", "focalizer_knows", "interiority_of", "located_at", "closes_promise", "states_fact"]},
+          "type": {"enum": ["character_present", "focalizer_knows", "focalizer_believes", "interiority_of", "located_at", "closes_promise", "states_fact"]},
           "subject": {"type": "string"},
           "object": {"type": "string"},
           "ref": {"type": "string"},
+          "value": {"type": "boolean"},
           "evidence": {"type": "string", "minLength": 1}
         }
       }

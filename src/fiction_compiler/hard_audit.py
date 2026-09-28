@@ -26,7 +26,7 @@ from pathlib import Path
 from typing import Any
 
 from .ontology import check_atom, load_ontology
-from .state import accepted_scene_ids, reconstruct_state_before, seed_state
+from .state import accepted_scene_ids, reconstruct_state_before, resource_change_errors, seed_state
 
 CHAR_ID = re.compile(r"^char-[a-z0-9-]+$")
 EVENT_ID = re.compile(r"^evt-[a-z0-9-]+$")
@@ -145,6 +145,19 @@ def _knowledge_effect_matches(required: dict, change: dict) -> bool:
     return required.get("value", True) is True
 
 
+def _belief_effect_matches(required: dict, change: dict) -> bool:
+    if required.get("predicate") != "believes":
+        return False
+    if required.get("subject") != change.get("character") or required.get("object") != change.get("fact"):
+        return False
+    op = required.get("op")
+    if op == "remove":
+        return change.get("op") == "forget"
+    if op != "add" or change.get("op") != "set":
+        return False
+    return required.get("value", True) == change.get("value")
+
+
 def _ontology_findings(ontology: dict, spec: dict, event_map: dict, scene_delta: dict) -> list[dict]:
     """Every typed atom the scene touches must use a declared predicate at the right arity/type."""
     findings: list[dict] = []
@@ -207,27 +220,83 @@ def audit_scene(project: Path, scene_id: str) -> dict:
                 f"{character} does not know {fact!r} at this point; knowledge would leak from the future.",
                 "plot"))
 
+    for requirement in spec.get("resource_requirements", []):
+        resource = requirement.get("resource")
+        holder = requirement.get("holder")
+        expected = requirement.get("quantity")
+        actual = before.resource_quantity(resource, holder)
+        unit = requirement.get("unit")
+        known_unit = before.resource_units.get(resource)
+        if unit and known_unit and unit != known_unit:
+            findings.append(_finding(
+                "resource", "material", f"{scene_id}: {resource} unit {unit!r} != {known_unit!r}",
+                "Scene resource requirement uses a different unit than the reconstructed resource ledger.",
+                "scene"))
+            continue
+        comparison = requirement.get("comparison")
+        satisfied = actual == expected if comparison == "exactly" else actual >= expected
+        if not satisfied:
+            findings.append(_finding(
+                "resource", "material",
+                f"{scene_id}: {resource} at {holder!r} is {actual}, requires {comparison} {expected}",
+                "A load-bearing scene quantity is unavailable before the scene begins.", "plot"))
+
     event_map = _events(project)
     scene_delta = _load_delta(project, scene_id) or {}
     declared_effects = [
-        change for change in scene_delta.get("predicate_changes", []) if change.get("predicate") != "knows"
+        change for change in scene_delta.get("predicate_changes", [])
+        if change.get("predicate") not in {"knows", "believes", "remembers"}
     ]
     knowledge_changes = scene_delta.get("knowledge_changes", [])
+    belief_changes = scene_delta.get("belief_changes", [])
 
     for change in scene_delta.get("predicate_changes", []):
-        if change.get("predicate") == "knows":
+        if change.get("predicate") in {"knows", "believes", "remembers"}:
             findings.append(_finding(
-                "causal", "material", f"{scene_id} predicate_changes contains knows",
-                "Knowledge is stored in knowledge_changes; a generic knows predicate would not change what a character knows.",
+                "causal", "material", f"{scene_id} predicate_changes contains {change.get('predicate')}",
+                "Epistemic state is stored in knowledge_changes/belief_changes; a generic predicate would not update it.",
                 "scene"))
 
-    for fact in scene_delta.get("facts_added", []):
-        previous = before.fact_definitions.get(fact.get("id"))
-        if previous is not None and previous != fact.get("text"):
+    declared_now: set[str] = set()
+    for proposition in [*scene_delta.get("propositions_defined", []), *scene_delta.get("facts_added", [])]:
+        fact_id = proposition.get("id")
+        previous = before.fact_definitions.get(fact_id)
+        if previous is not None and previous != proposition.get("text"):
             findings.append(_finding(
-                "factual", "material", f"{scene_id} redefines {fact.get('id')!r}",
-                "A fact id already denotes a different proposition; create a new fact id for the changed truth.",
+                "factual", "material", f"{scene_id} redefines {fact_id!r}",
+                "A proposition id already denotes different text; create a new id for a changed proposition.",
                 "world"))
+        else:
+            declared_now.add(fact_id)
+
+    added_now = {fact.get("id") for fact in scene_delta.get("facts_added", [])}
+    for change in knowledge_changes:
+        fact_id = change.get("fact")
+        if change.get("op", "add") != "remove" and not before.fact_exists(fact_id) and fact_id not in added_now:
+            findings.append(_finding(
+                "knowledge", "material", f"{scene_id}: {change.get('character')} learns {fact_id!r}",
+                "Legacy knowledge_changes may only learn a proposition that is true at this point; use belief_changes for possibly false belief.",
+                "scene"))
+
+    defined = set(before.fact_definitions) | declared_now
+    for change in belief_changes:
+        fact_id = change.get("fact")
+        if fact_id not in defined:
+            findings.append(_finding(
+                "knowledge", "material", f"{scene_id}: belief update references {fact_id!r}",
+                "Belief updates must refer to a stable proposition definition, even when that proposition is false.",
+                "scene"))
+        event_ref = change.get("event")
+        if event_ref and event_ref not in event_map:
+            findings.append(_finding(
+                "knowledge", "material", f"{scene_id}: belief source event {event_ref!r}",
+                "Belief provenance event does not resolve to planning/event-graph.json.", "plot"))
+
+    for error in resource_change_errors(before, scene_delta.get("resource_changes", [])):
+        findings.append(_finding(
+            "resource", "material", f"{scene_id}: {error}",
+            "Ordered resource operations would consume or transfer unavailable quantity, use an invalid quantity, or change units.",
+            "scene"))
 
     for event_id in spec.get("required_events", []):
         if not EVENT_ID.match(event_id):
@@ -266,7 +335,28 @@ def audit_scene(project: Path, scene_id: str) -> dict:
             if isinstance(eff, dict):
                 if eff.get("predicate") == "knows":
                     matched = any(_knowledge_effect_matches(eff, change) for change in knowledge_changes)
-                    diagnosis = "Event knowledge effect is declared but not recorded in state-delta knowledge_changes."
+                    fact_id = eff.get("object")
+                    fact_true = before.fact_exists(fact_id) or fact_id in added_now
+                    if not matched and fact_true:
+                        for change in belief_changes:
+                            if change.get("character") != eff.get("subject") or change.get("fact") != fact_id:
+                                continue
+                            if eff.get("op") == "add" and change.get("op") == "set" and change.get("value") is True:
+                                matched = True
+                                break
+                            if eff.get("op") == "remove" and (
+                                change.get("op") == "forget"
+                                or (change.get("op") == "set" and change.get("value") is False)
+                            ):
+                                matched = True
+                                break
+                    diagnosis = "Event knowledge effect is declared but not recorded by a factive knowledge/belief update."
+                elif eff.get("predicate") == "believes":
+                    matched = any(_belief_effect_matches(eff, change) for change in belief_changes)
+                    diagnosis = "Event belief effect is declared but not recorded in state-delta belief_changes."
+                elif eff.get("predicate") == "remembers":
+                    matched = False
+                    diagnosis = "Memory changes must be expressed through knowledge_changes/belief_changes, not a generic remembers effect."
                 else:
                     matched = any(_effect_matches(eff, declared) for declared in declared_effects)
                     diagnosis = "Event effect is declared but not recorded in this scene's state-delta predicate_changes."
@@ -294,7 +384,6 @@ def audit_canon(project: Path) -> dict:
     before = seed_state(project)  # replay starts from the initial canon
     facts = dict(before.facts)
     fact_definitions = dict(before.fact_definitions)
-    knowledge = {c: set(v) for c, v in before.knowledge.items()}
     open_promises = dict(before.open_promises)
     promise_definitions = {pid: dict(value) for pid, value in before.promise_definitions.items()}
     event_map = _events(project)
@@ -311,28 +400,35 @@ def audit_canon(project: Path) -> dict:
         spec = _load_json(project / "scenes" / scene_id / "spec.json", {})
         scene_events = set(spec.get("required_events", []))
 
-        valid_added_ids: set[str] = set()
-        for fact in delta.get("facts_added", []):
-            fact_id, text = fact["id"], fact["text"]
+        valid_defined_ids: set[str] = set()
+        for proposition in [*delta.get("propositions_defined", []), *delta.get("facts_added", [])]:
+            fact_id, text = proposition["id"], proposition["text"]
             previous = fact_definitions.get(fact_id)
             if previous is not None and previous != text:
                 findings.append(_finding(
                     "factual", "material", f"{scene_id} redefines {fact_id!r}",
-                    "A fact id already denotes a different proposition; changing its text would alias existing knowledge.",
+                    "A proposition id already denotes different text; changing it would alias retained epistemic state.",
                     "world"))
             else:
-                valid_added_ids.add(fact_id)
+                valid_defined_ids.add(fact_id)
+        valid_added_ids = {fact["id"] for fact in delta.get("facts_added", []) if fact["id"] in valid_defined_ids}
         for fact_id in delta.get("facts_removed", []):
             if fact_id not in facts:
                 findings.append(_finding("factual", "minor", f"{scene_id} removes {fact_id!r}",
                                          "Delta removes a fact that is not currently established.", "scene"))
         for change in delta.get("knowledge_changes", []):
             fact_id = change.get("fact")
-            if fact_id not in facts and fact_id not in valid_added_ids:
+            if change.get("op", "add") != "remove" and fact_id not in facts and fact_id not in valid_added_ids:
                 findings.append(_finding(
                     "knowledge", "material",
                     f"{scene_id}: {change.get('character')} learns {fact_id!r}",
                     "Character learns a fact that does not exist at this point in the story.", "scene"))
+        for change in delta.get("belief_changes", []):
+            fact_id = change.get("fact")
+            if fact_id not in fact_definitions and fact_id not in valid_defined_ids:
+                findings.append(_finding(
+                    "knowledge", "material", f"{scene_id}: belief update references {fact_id!r}",
+                    "Belief update references a proposition that has never been defined.", "scene"))
         for promise_id in delta.get("promises_closed", []):
             if promise_id not in open_promises:
                 findings.append(_finding("promise", "material", f"{scene_id} closes {promise_id!r}",
@@ -380,6 +476,10 @@ def audit_canon(project: Path) -> dict:
                         "with narrative_mode 'analepsis'.", "plot"))
 
         # Apply the delta to the running shadow state.
+        for proposition in delta.get("propositions_defined", []):
+            fact_id, text = proposition["id"], proposition["text"]
+            if fact_id not in fact_definitions:
+                fact_definitions[fact_id] = text
         for fact in delta.get("facts_added", []):
             fact_id, text = fact["id"], fact["text"]
             previous = fact_definitions.get(fact_id)
@@ -390,8 +490,6 @@ def audit_canon(project: Path) -> dict:
                 facts[fact_id] = text
         for fact_id in delta.get("facts_removed", []):
             facts.pop(fact_id, None)
-        for change in delta.get("knowledge_changes", []):
-            knowledge.setdefault(change["character"], set()).add(change["fact"])
         for promise in delta.get("promises_opened", []):
             open_promises[promise["id"]] = promise["text"]
             promise_definitions.setdefault(promise["id"], dict(promise))

@@ -19,11 +19,13 @@ only what was true at its earlier fabula time — remains a deferred refinement 
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 from . import acceptance
+
 
 # A scene id like "ch03-sc02" -> sort key (3, 2). Anything malformed sorts last.
 def scene_sort_key(scene_id: str) -> tuple[int, int]:
@@ -53,24 +55,30 @@ def _read_json(path: Path, default: Any) -> Any:
 # (predicate, subject, object) with object optional (None for unary state like offline(obj)).
 RelKey = tuple[str, str]
 PredKey = tuple[str, str, str | None]
+ResourceKey = tuple[str, str]
 _MISSING = object()
 
 
 @dataclass
 class StoryState:
-    """Immutable snapshot of story state at one point in the fabula."""
+    """Reconstructed story state at one point in the fabula/discourse history."""
 
     time: Any = None
-    facts: dict[str, str] = field(default_factory=dict)  # fact id -> text
-    # Immutable proposition identity. ``facts`` is the currently established subset; this ledger
-    # retains definitions even after removal so a fact id cannot later be reused for new text.
+    facts: dict[str, str] = field(default_factory=dict)  # currently true proposition id -> text
+    # Stable proposition identity survives truth changes, so an id cannot silently acquire new text.
     fact_definitions: dict[str, str] = field(default_factory=dict)
-    knowledge: dict[str, set[str]] = field(default_factory=dict)  # char id -> {fact id}
+    # Epistemic state is split from world truth. Memory survives world changes; belief may be wrong.
+    memory: dict[str, set[str]] = field(default_factory=dict)
+    beliefs: dict[str, dict[str, bool]] = field(default_factory=dict)
+    belief_sources: dict[str, dict[str, dict[str, Any]]] = field(default_factory=dict)
     # Directional: (subject, object) -> {dimension: value}. A legacy symmetric relationship is
     # stored in BOTH directions under the "state" dimension (see _apply_relationship_record).
     relationships: dict[RelKey, dict[str, Any]] = field(default_factory=dict)
     # Typed world/spatial/object predicates: (predicate, subject, object) -> value (default True).
     predicates: dict[PredKey, Any] = field(default_factory=dict)
+    # Only declared load-bearing quantities live here. Keys are (resource, holder/location).
+    resources: dict[ResourceKey, float | int] = field(default_factory=dict)
+    resource_units: dict[str, str] = field(default_factory=dict)
     open_promises: dict[str, str] = field(default_factory=dict)  # promise id -> text
     # Full promise declarations survive closure so audits can retain trigger/payoff semantics while
     # ``open_promises`` stays backward-compatible as id -> display text.
@@ -81,8 +89,38 @@ class StoryState:
     def fact_exists(self, fact_id: str) -> bool:
         return fact_id in self.facts
 
+    @property
+    def knowledge(self) -> dict[str, set[str]]:
+        """Backward-compatible view of *current factive* knowledge.
+
+        A proposition can stay remembered and believed after the world changes, but it is no
+        longer knowledge once it is not currently true. Use ``remembers`` / ``believes`` when
+        historical or possibly mistaken epistemic state is the intended query.
+        """
+        characters = set(self.memory) | set(self.beliefs)
+        return {
+            character: {
+                fact_id
+                for fact_id, stance in self.beliefs.get(character, {}).items()
+                if stance is True and fact_id in self.facts
+            }
+            for character in characters
+        }
+
+    def remembers(self, character: str, fact_id: str) -> bool:
+        return fact_id in self.memory.get(character, set())
+
+    def belief(self, character: str, fact_id: str) -> bool | None:
+        return self.beliefs.get(character, {}).get(fact_id)
+
+    def believes(self, character: str, fact_id: str, value: bool = True) -> bool:
+        return self.belief(character, fact_id) is value
+
     def knows(self, character: str, fact_id: str) -> bool:
-        return fact_id in self.knowledge.get(character, set())
+        return self.fact_exists(fact_id) and self.believes(character, fact_id, True)
+
+    def resource_quantity(self, resource: str, holder: str) -> float | int:
+        return self.resources.get((resource, holder), 0)
 
     def relationship(self, a: str, b: str) -> str | None:
         """The descriptive 'state' of the a/b relationship, order-independent (back-compat)."""
@@ -99,14 +137,24 @@ class StoryState:
     def holds(self, predicate: str, subject: str, object: str | None = None, *, value: Any = _MISSING) -> bool:
         """Whether a typed atom holds — the query event preconditions are evaluated against.
 
-        Bridges the existing stores: ``knows`` consults per-character knowledge, a relationship
-        verb consults the directional relationship dimensions, and everything else consults the
-        typed predicate store. When ``value`` is supplied, the stored value must match exactly;
-        omitting it preserves the legacy truthiness/presence query.
+        ``knows`` is current factive knowledge, ``believes`` may be mistaken, and ``remembers``
+        records retained proposition memory. Relationship verbs consult directional dimensions;
+        everything else consults the typed predicate store. When ``value`` is supplied, the stored
+        value must match exactly; omitting it preserves the legacy truthiness/presence query.
         """
         if predicate == "knows":
             actual = object is not None and self.knows(subject, object)
             return actual if value is _MISSING else actual == value
+        if predicate == "remembers":
+            actual = object is not None and self.remembers(subject, object)
+            return actual if value is _MISSING else actual == value
+        if predicate == "believes":
+            if object is None:
+                return False
+            actual = self.belief(subject, object)
+            if actual is None:
+                return False
+            return bool(actual) if value is _MISSING else actual == value
         if (predicate, subject, object) in self.predicates:
             actual = self.predicates[(predicate, subject, object)]
             return bool(actual) if value is _MISSING else actual == value
@@ -141,38 +189,128 @@ def _apply_predicate_record(state: StoryState, record: dict) -> None:
         state.predicates[key] = record.get("value", True)
 
 
+def _define_proposition(state: StoryState, proposition: dict) -> bool:
+    """Define a stable proposition without asserting that it is currently true."""
+    fact_id, text = proposition["id"], proposition["text"]
+    previous = state.fact_definitions.get(fact_id)
+    if previous is not None and previous != text:
+        return False
+    state.fact_definitions.setdefault(fact_id, text)
+    return True
+
+
 def _apply_fact_record(state: StoryState, fact: dict) -> bool:
     """Define/establish one fact without allowing its id to acquire a new meaning.
 
     Returns ``False`` for a conflicting redefinition. Replay preserves the original proposition;
     hard-audit reports the conflict as a material integrity error.
     """
-    fact_id, text = fact["id"], fact["text"]
-    previous = state.fact_definitions.get(fact_id)
-    if previous is not None and previous != text:
+    if not _define_proposition(state, fact):
         return False
-    state.fact_definitions.setdefault(fact_id, text)
-    state.facts[fact_id] = text
+    state.facts[fact["id"]] = fact["text"]
     return True
 
 
+def _set_belief(state: StoryState, change: dict, *, legacy: bool = False) -> None:
+    character, fact_id = change["character"], change["fact"]
+    op = change.get("op", "add" if legacy else "set")
+    if op in ("remove", "forget"):
+        state.memory.setdefault(character, set()).discard(fact_id)
+        state.beliefs.setdefault(character, {}).pop(fact_id, None)
+        state.belief_sources.setdefault(character, {}).pop(fact_id, None)
+        return
+
+    value = True if legacy else bool(change.get("value", True))
+    state.memory.setdefault(character, set()).add(fact_id)
+    state.beliefs.setdefault(character, {})[fact_id] = value
+    metadata = {
+        key: change[key]
+        for key in ("source", "event")
+        if change.get(key) is not None
+    }
+    if legacy:
+        metadata.setdefault("source", "legacy_knowledge")
+    state.belief_sources.setdefault(character, {})[fact_id] = metadata
+
+
+def _apply_resource_seed(state: StoryState, record: dict) -> None:
+    resource, holder = record["id"], record["holder"]
+    unit = record.get("unit")
+    if unit:
+        state.resource_units.setdefault(resource, unit)
+    state.resources[(resource, holder)] = record["quantity"]
+
+
+def apply_resource_change(state: StoryState, change: dict) -> str | None:
+    """Apply one quantity operation, returning a semantic error without partial mutation."""
+    resource = change.get("resource")
+    quantity = change.get("quantity")
+    if not isinstance(quantity, (int, float)) or isinstance(quantity, bool) or quantity <= 0:
+        return f"resource {resource!r} quantity must be a positive number"
+
+    unit = change.get("unit")
+    known_unit = state.resource_units.get(resource)
+    if unit and known_unit and unit != known_unit:
+        return f"resource {resource!r} uses unit {unit!r}, expected {known_unit!r}"
+    if unit and not known_unit:
+        state.resource_units[resource] = unit
+
+    op = change.get("op")
+    if op == "acquire":
+        holder = change.get("holder")
+        key = (resource, holder)
+        state.resources[key] = state.resources.get(key, 0) + quantity
+        return None
+    if op == "consume":
+        holder = change.get("holder")
+        key = (resource, holder)
+        available = state.resources.get(key, 0)
+        if available < quantity:
+            return f"resource {resource!r} at {holder!r} underflows: {available} < {quantity}"
+        state.resources[key] = available - quantity
+        return None
+    if op == "transfer":
+        source, destination = change.get("from"), change.get("to")
+        source_key, destination_key = (resource, source), (resource, destination)
+        available = state.resources.get(source_key, 0)
+        if available < quantity:
+            return f"resource {resource!r} at {source!r} underflows: {available} < {quantity}"
+        state.resources[source_key] = available - quantity
+        state.resources[destination_key] = state.resources.get(destination_key, 0) + quantity
+        return None
+    return f"unknown resource operation {op!r}"
+
+
+def resource_change_errors(state: StoryState, changes: list[dict]) -> list[str]:
+    """Validate ordered resource operations against a copy of the supplied state."""
+    working = deepcopy(state)
+    errors: list[str] = []
+    for index, change in enumerate(changes):
+        error = apply_resource_change(working, change)
+        if error:
+            errors.append(f"resource_changes[{index}]: {error}")
+    return errors
+
+
 def _apply_delta(state: StoryState, delta: dict) -> None:
+    for proposition in delta.get("propositions_defined", []):
+        _define_proposition(state, proposition)
     for fact in delta.get("facts_added", []):
         _apply_fact_record(state, fact)
     for fact_id in delta.get("facts_removed", []):
         state.facts.pop(fact_id, None)
     for change in delta.get("knowledge_changes", []):
-        known = state.knowledge.setdefault(change["character"], set())
-        if change.get("op", "add") == "remove":
-            known.discard(change["fact"])
-        else:
-            known.add(change["fact"])
+        _set_belief(state, change, legacy=True)
+    for change in delta.get("belief_changes", []):
+        _set_belief(state, change)
     for change in delta.get("relationship_changes", []):  # legacy symmetric {pair, state}
         _apply_relationship_record(state, change)
     for edge in delta.get("relationship_edges", []):  # directional {subject, object, dimension}
         _apply_relationship_record(state, edge)
     for predicate in delta.get("predicate_changes", []):  # typed world/spatial/object atoms
         _apply_predicate_record(state, predicate)
+    for change in delta.get("resource_changes", []):
+        apply_resource_change(state, change)
     for promise in delta.get("promises_opened", []):
         state.open_promises[promise["id"]] = promise["text"]
         state.promise_definitions.setdefault(promise["id"], dict(promise))
@@ -187,14 +325,20 @@ def seed_state(project: Path) -> StoryState:
     """Story state at t0 — the initial canon, before any scene has run."""
     canon = project / "canon"
     state = StoryState()
+    for proposition in _read_jsonl(canon / "propositions.jsonl"):
+        _define_proposition(state, proposition)
     for fact in _read_jsonl(canon / "facts.jsonl"):
         _apply_fact_record(state, fact)
     for record in _read_jsonl(canon / "knowledge-state.jsonl"):
-        state.knowledge.setdefault(record["character"], set()).add(record["fact"])
+        _set_belief(state, record, legacy=True)
+    for record in _read_jsonl(canon / "belief-state.jsonl"):
+        _set_belief(state, record)
     for record in _read_jsonl(canon / "relationship-state.jsonl"):  # legacy or directional
         _apply_relationship_record(state, record)
     for record in _read_jsonl(canon / "world-state.jsonl"):  # typed predicates (optional ledger)
         _apply_predicate_record(state, record)
+    for record in _read_jsonl(canon / "resources.jsonl"):
+        _apply_resource_seed(state, record)
     for record in _read_jsonl(canon / "promises.jsonl"):
         state.open_promises[record["id"]] = record["text"]
         state.promise_definitions.setdefault(record["id"], dict(record))
@@ -206,7 +350,7 @@ def seed_state(project: Path) -> StoryState:
 
 
 def accepted_scene_ids(project: Path) -> list[str]:
-    """Accepted (promoted) scene ids in fabula order."""
+    """Accepted (promoted) scene ids in discourse/repository order."""
     index = _read_json(project / "canon" / "index.json", {})
     ids = list(index.get("accepted_state_deltas", []))
     return sorted(ids, key=scene_sort_key)

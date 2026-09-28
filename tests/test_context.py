@@ -22,6 +22,14 @@ def build(root: Path) -> Path:
         + json.dumps({"id": "fact-bg", "text": "background"}) + "\n", encoding="utf-8")
     (canon / "knowledge-state.jsonl").write_text(
         json.dumps({"character": "char-x", "fact": "fact-known"}) + "\n", encoding="utf-8")
+    (canon / "propositions.jsonl").write_text(
+        json.dumps({"id": "fact-door-open", "text": "The door is open."}) + "\n", encoding="utf-8")
+    (canon / "belief-state.jsonl").write_text(
+        json.dumps({"op": "set", "character": "char-x", "fact": "fact-door-open",
+                    "value": True, "source": "testimony"}) + "\n", encoding="utf-8")
+    (canon / "resources.jsonl").write_text(
+        json.dumps({"id": "res-loaf", "holder": "char-x", "quantity": 12, "unit": "loaf"}) + "\n",
+        encoding="utf-8")
     (canon / "index.json").write_text(json.dumps({"accepted_state_deltas": [], "world_rules": ["a world rule"]}), encoding="utf-8")
     scene = project / "scenes" / "ch01-sc01"
     scene.mkdir(parents=True)
@@ -42,6 +50,25 @@ class ContextManifestTests(unittest.TestCase):
             self.assertEqual(manifest[("world_rule", "a world rule")]["priority"], "reference")
             # every entry carries a reason + a source
             self.assertTrue(all(m.get("reason") and m.get("source") for m in bundle["context_manifest"]))
+
+    def test_bundle_separates_truth_memory_belief_and_resources(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            bundle = compile_bundle(build(Path(tmp)), "ch01-sc01")
+            before = bundle["state_before"]
+            self.assertEqual(before["participant_knowledge"]["char-x"], ["fact-known"])
+            self.assertIn("fact-door-open", before["participant_memory"]["char-x"])
+            belief = next(item for item in before["participant_beliefs"]["char-x"]
+                          if item["fact"] == "fact-door-open")
+            self.assertEqual(belief["value"], True)
+            self.assertEqual(belief["source"], "testimony")
+            self.assertNotIn("fact-door-open", before["facts"])
+            self.assertEqual(before["resources"], [{
+                "resource": "res-loaf", "holder": "char-x",
+                "quantity": 12, "unit": "loaf"
+            }])
+            kinds = {item["kind"] for item in bundle["context_manifest"]}
+            self.assertIn("belief", kinds)
+            self.assertIn("resource", kinds)
 
     def test_persisted_bundles_are_project_local_and_collision_safe(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

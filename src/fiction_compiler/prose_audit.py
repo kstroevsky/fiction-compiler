@@ -103,9 +103,22 @@ def audit_prose(project: Path, scene_id: str, claims: dict) -> dict:
         for data in [_load(path, {})]
         if isinstance(data, dict) and data.get("id")
     }
-    # Facts the pov legitimately gains this scene: what they learn, plus what the scene introduces.
+    # Epistemic grants must be explicit. A world fact becoming true does not by itself tell the POV.
     added_ids = {f["id"] for f in delta.get("facts_added", [])}
-    pov_granted = {kc["fact"] for kc in delta.get("knowledge_changes", []) if kc.get("character") == pov} | added_ids
+    legacy_grants = {
+        kc["fact"] for kc in delta.get("knowledge_changes", [])
+        if kc.get("character") == pov and kc.get("op", "add") != "remove"
+    }
+    belief_grants = {
+        bc["fact"]: bc.get("value")
+        for bc in delta.get("belief_changes", [])
+        if bc.get("character") == pov and bc.get("op") == "set"
+    }
+    true_during_scene = lambda fact_id: before.fact_exists(fact_id) or fact_id in added_ids
+    pov_granted = {fact_id for fact_id in legacy_grants if true_during_scene(fact_id)} | {
+        fact_id for fact_id, value in belief_grants.items()
+        if value is True and true_during_scene(fact_id)
+    }
     closed_here = set(delta.get("promises_closed", []))
 
     findings: list[dict] = []
@@ -203,6 +216,13 @@ def audit_prose(project: Path, scene_id: str, claims: dict) -> dict:
                 findings.append(_finding("knowledge", "material", ev,
                     f"The focalizer knows/reveals {obj!r}, which they have not learned by this scene "
                     "(nor does it record learning it) — knowledge leaks from the future or another mind.", "plot"))
+        elif ctype == "focalizer_believes":
+            expected = claim.get("value", True)
+            granted = belief_grants.get(obj) is expected or (expected is True and obj in legacy_grants)
+            if subject == pov and obj and not (before.believes(pov, obj, expected) or granted):
+                findings.append(_finding("knowledge", "material", ev,
+                    f"The focalizer is represented as believing {obj!r}={expected}, but that stance is not in their prior or in-scene belief state.",
+                    "plot"))
         elif ctype == "interiority_of":
             if subject and pov and subject != pov:
                 findings.append(_finding("pov", "material", ev,

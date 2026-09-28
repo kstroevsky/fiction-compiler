@@ -35,10 +35,23 @@ def _state_json(state: StoryState) -> dict:
         "time": state.time,
         "facts": state.facts,
         "knowledge": {c: sorted(v) for c, v in state.knowledge.items()},
+        "memory": {c: sorted(v) for c, v in state.memory.items()},
+        "beliefs": {
+            c: [
+                {"fact": fact_id, "value": value, **state.belief_sources.get(c, {}).get(fact_id, {})}
+                for fact_id, value in sorted(items.items())
+            ]
+            for c, items in state.beliefs.items()
+        },
         "relationships": [{"subject": s, "object": o, "dimensions": dims}
                           for (s, o), dims in state.relationships.items()],
         "predicates": [{"predicate": p, "subject": s, "object": o, "value": v}
                        for (p, s, o), v in state.predicates.items()],
+        "resources": [
+            {"resource": resource, "holder": holder, "quantity": quantity,
+             **({"unit": state.resource_units[resource]} if resource in state.resource_units else {})}
+            for (resource, holder), quantity in sorted(state.resources.items())
+        ],
         "open_promises": state.open_promises,
         "promise_definitions": state.promise_definitions,
         "closed_promises": sorted(state.closed_promises),
@@ -571,7 +584,8 @@ def judge_bundle(project: str, scene_id: str, candidate: str, role: str | None =
             "participants": compiled["participants"],
             "state_before": {
                 key: compiled["state_before"].get(key)
-                for key in ("participant_knowledge", "relationships", "predicates")
+                for key in ("participant_knowledge", "participant_memory", "participant_beliefs",
+                            "relationships", "predicates", "resources")
             },
         }
     if role == "narrative-architect":

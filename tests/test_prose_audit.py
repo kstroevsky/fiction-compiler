@@ -64,6 +64,43 @@ class ProseAuditTests(unittest.TestCase):
             critique = self._audit(tmp, claims(c("focalizer_knows", subject="char-x", object="fact-future")))
             self.assertIn("knowledge", dims(critique))
 
+    def test_world_fact_added_this_scene_is_not_automatic_pov_knowledge(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp))
+            delta_path = project / "scenes" / "ch01-sc01" / "state-delta.json"
+            delta = json.loads(delta_path.read_text())
+            delta["facts_added"] = [{"id": "fact-new", "text": "The relay is broken."}]
+            delta_path.write_text(json.dumps(delta), encoding="utf-8")
+            critique = audit_prose(
+                project, "ch01-sc01",
+                claims(c("focalizer_knows", subject="char-x", object="fact-new")),
+            )
+            self.assertIn("knowledge", dims(critique))
+
+    def test_false_belief_can_be_represented_without_becoming_knowledge(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp))
+            delta_path = project / "scenes" / "ch01-sc01" / "state-delta.json"
+            delta = json.loads(delta_path.read_text())
+            delta["propositions_defined"] = [{"id": "fact-door-open", "text": "The door is open."}]
+            delta["belief_changes"] = [{
+                "op": "set", "character": "char-x", "fact": "fact-door-open",
+                "value": True, "source": "testimony"
+            }]
+            delta_path.write_text(json.dumps(delta), encoding="utf-8")
+
+            belief = audit_prose(
+                project, "ch01-sc01",
+                claims(c("focalizer_believes", subject="char-x", object="fact-door-open", value=True)),
+            )
+            self.assertEqual(belief["verdict"], "pass", belief["findings"])
+
+            knowledge = audit_prose(
+                project, "ch01-sc01",
+                claims(c("focalizer_knows", subject="char-x", object="fact-door-open")),
+            )
+            self.assertIn("knowledge", dims(knowledge))
+
     def test_unplanned_character_is_material(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             critique = self._audit(tmp, claims(c("character_present", subject="char-z")))  # not in canon

@@ -24,6 +24,7 @@ from . import acceptance
 
 _SEED_LEDGERS = ("facts.jsonl", "knowledge-state.jsonl", "relationship-state.jsonl",
                  "world-state.jsonl", "promises.jsonl", "timeline.jsonl")
+_OPTIONAL_SEED_LEDGERS = ("propositions.jsonl", "belief-state.jsonl", "resources.jsonl")
 
 
 def _scene_sort_key(scene_id: str) -> tuple[int, int]:
@@ -50,8 +51,9 @@ def sha256_file(path: Path) -> str:
 def seed_hash(project: Path) -> str:
     """Hash of the initial-condition ledgers, so edits to seed canon are detectable."""
     canon = project / "canon"
+    names = [*_SEED_LEDGERS, *(name for name in _OPTIONAL_SEED_LEDGERS if (canon / name).exists())]
     parts = [f"{name}:{sha256_file(canon / name) if (canon / name).exists() else ''}"
-             for name in _SEED_LEDGERS]
+             for name in names]
     return sha256_bytes("\n".join(parts).encode("utf-8"))
 
 

@@ -42,6 +42,28 @@ class ValidatorKeywordTests(unittest.TestCase):
         self.assertEqual(schema.validate({"a": "ok"}, s), [])
         self.assertTrue(any("additional property 'b'" in e for e in schema.validate({"a": "ok", "b": 1}, s)))
 
+    def test_composition_conditionals_const_and_exclusive_bounds(self) -> None:
+        s = {
+            "type": "object",
+            "required": ["kind", "value"],
+            "properties": {
+                "kind": {"type": "string"},
+                "value": {"type": "number", "exclusiveMinimum": 0},
+            },
+            "allOf": [{
+                "if": {"properties": {"kind": {"const": "fixed"}}},
+                "then": {"properties": {"value": {"const": 1}}},
+            }],
+        }
+        self.assertEqual(schema.validate({"kind": "fixed", "value": 1}, s), [])
+        self.assertTrue(schema.validate({"kind": "fixed", "value": 2}, s))
+        self.assertTrue(any("exclusiveMinimum" in e for e in schema.validate({"kind": "other", "value": 0}, s)))
+        one_of = {"oneOf": [{"const": "a"}, {"const": "b"}]}
+        self.assertEqual(schema.validate("a", one_of), [])
+        self.assertTrue(any("oneOf" in e for e in schema.validate("c", one_of)))
+        self.assertEqual(schema.validate({}, {"not": {"required": ["x"]}}), [])
+        self.assertTrue(schema.validate({"x": 1}, {"not": {"required": ["x"]}}))
+
     def test_state_delta_relationship_pair_must_be_two_distinct_chars(self) -> None:
         # The review's concrete example: a relationship pair of length != 2 (or a self-pair) is now caught.
         base = {"scene_id": "ch01-sc01", "facts_added": [], "facts_removed": [], "knowledge_changes": [],
@@ -50,6 +72,30 @@ class ValidatorKeywordTests(unittest.TestCase):
         self.assertTrue(any("unique" in e for e in schema.validate_named(base, "state-delta")))
         base["relationship_changes"] = [{"pair": ["char-a"], "state": "x"}]
         self.assertTrue(any("minItems" in e for e in schema.validate_named(base, "state-delta")))
+
+    def test_state_delta_belief_and_resource_shapes_are_enforced(self) -> None:
+        base = {"scene_id": "ch01-sc01", "facts_added": [], "facts_removed": [],
+                "knowledge_changes": [], "relationship_changes": [],
+                "promises_opened": [], "promises_closed": []}
+        valid = dict(base, belief_changes=[{
+            "op": "set", "character": "char-a", "fact": "fact-door-open",
+            "value": False, "source": "correction",
+        }], resource_changes=[{
+            "op": "transfer", "resource": "res-loaf", "from": "char-a", "to": "customer",
+            "quantity": 1,
+        }])
+        self.assertEqual(schema.validate_named(valid, "state-delta"), [])
+
+        missing_source = dict(base, belief_changes=[{
+            "op": "set", "character": "char-a", "fact": "fact-door-open", "value": True,
+        }])
+        self.assertTrue(any("source" in e for e in schema.validate_named(missing_source, "state-delta")))
+
+        zero_quantity = dict(base, resource_changes=[{
+            "op": "consume", "resource": "res-loaf", "holder": "char-a", "quantity": 0,
+        }])
+        self.assertTrue(any("exclusiveMinimum" in e or "oneOf" in e
+                            for e in schema.validate_named(zero_quantity, "state-delta")))
 
 
 class SchemaValidatorTests(unittest.TestCase):

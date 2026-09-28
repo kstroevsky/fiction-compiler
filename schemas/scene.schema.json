@@ -29,6 +29,22 @@
           "fact": {"type": "string", "pattern": "^fact-[a-z0-9-]+$"}
         }
       }
+    },
+    "resource_requirements": {
+      "type": "array",
+      "comment": "Declare only quantities whose availability is load-bearing for the scene's action or turn.",
+      "items": {
+        "type": "object",
+        "required": ["resource", "holder", "comparison", "quantity"],
+        "additionalProperties": false,
+        "properties": {
+          "resource": {"type": "string", "pattern": "^res-[a-z0-9-]+$"},
+          "holder": {"type": "string", "minLength": 1},
+          "comparison": {"enum": ["at_least", "exactly"]},
+          "quantity": {"type": "number", "minimum": 0},
+          "unit": {"type": "string", "minLength": 1}
+        }
+      }
     }
   }
 }

@@ -6,6 +6,18 @@
   "properties": {
     "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
     "time": {"type": ["string", "number"]},
+    "propositions_defined": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "text"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^fact-[a-z0-9-]+$"},
+          "text": {"type": "string", "minLength": 1}
+        }
+      }
+    },
     "facts_added": {
       "type": "array",
       "items": {
@@ -20,6 +32,7 @@
     "facts_removed": {"type": "array", "items": {"type": "string", "pattern": "^fact-[a-z0-9-]+$"}},
     "knowledge_changes": {
       "type": "array",
+      "comment": "Backward-compatible factive learning/forgetting. New work that needs mistaken belief, correction, provenance, or retained memory should use belief_changes.",
       "items": {
         "type": "object",
         "required": ["character", "fact"],
@@ -28,6 +41,27 @@
           "character": {"type": "string", "pattern": "^char-[a-z0-9-]+$"},
           "fact": {"type": "string", "pattern": "^fact-[a-z0-9-]+$"}
         }
+      }
+    },
+    "belief_changes": {
+      "type": "array",
+      "comment": "Per-character belief updates over stable proposition IDs. 'set' records a true/false stance and source; 'forget' removes retained memory and stance.",
+      "items": {
+        "type": "object",
+        "required": ["op", "character", "fact"],
+        "additionalProperties": false,
+        "properties": {
+          "op": {"enum": ["set", "forget"]},
+          "character": {"type": "string", "pattern": "^char-[a-z0-9-]+$"},
+          "fact": {"type": "string", "pattern": "^fact-[a-z0-9-]+$"},
+          "value": {"type": "boolean"},
+          "source": {"enum": ["perception", "testimony", "inference", "correction", "forgetting", "unknown"]},
+          "event": {"type": "string", "pattern": "^evt-[a-z0-9-]+$"}
+        },
+        "allOf": [
+          {"if": {"properties": {"op": {"const": "set"}}}, "then": {"required": ["value", "source"]}},
+          {"if": {"properties": {"op": {"const": "forget"}}}, "then": {"not": {"required": ["value"]}}}
+        ]
       }
     },
     "relationship_changes": {
@@ -71,6 +105,39 @@
           "object": {"type": "string"},
           "value": {}
         }
+      }
+    },
+    "resource_changes": {
+      "type": "array",
+      "comment": "Ordered changes for explicitly load-bearing countable resources. Transfer conserves tracked quantity; acquire/consume are explicit source/sink boundaries.",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["op", "resource", "holder", "quantity"],
+            "additionalProperties": false,
+            "properties": {
+              "op": {"enum": ["acquire", "consume"]},
+              "resource": {"type": "string", "pattern": "^res-[a-z0-9-]+$"},
+              "holder": {"type": "string", "minLength": 1},
+              "quantity": {"type": "number", "exclusiveMinimum": 0},
+              "unit": {"type": "string", "minLength": 1}
+            }
+          },
+          {
+            "type": "object",
+            "required": ["op", "resource", "from", "to", "quantity"],
+            "additionalProperties": false,
+            "properties": {
+              "op": {"const": "transfer"},
+              "resource": {"type": "string", "pattern": "^res-[a-z0-9-]+$"},
+              "from": {"type": "string", "minLength": 1},
+              "to": {"type": "string", "minLength": 1},
+              "quantity": {"type": "number", "exclusiveMinimum": 0},
+              "unit": {"type": "string", "minLength": 1}
+            }
+          }
+        ]
       }
     },
     "promises_opened": {
