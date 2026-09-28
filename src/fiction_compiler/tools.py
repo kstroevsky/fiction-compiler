@@ -17,8 +17,8 @@ from typing import Any, Callable
 
 from . import critic_eval as _critic_eval
 from . import critique as _critique
-from . import (defaultness, hard_audit, integrity, issue_resolution, kb, reader, regression,
-               revision, safety, schema, trace)
+from . import (defaultness, hard_audit, integrity, issue_resolution, kb, plan_search, reader,
+               regression, revision, safety, schema, trace)
 from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
@@ -66,6 +66,55 @@ def state_before(project: str, scene_id: str) -> dict:
 
 def compile_context(project: str, scene_id: str) -> dict:
     return compile_bundle(project_dir(project), scene_id)
+
+
+def record_scene_plan(project: str, scene_id: str, plan: dict) -> dict:
+    """Persist one immutable, spec-bound alternative scene plan."""
+    result = plan_search.record_plan(project_dir(project), scene_id, plan)
+    if "error" not in result:
+        trace.log(project_dir(project), scene_id, "scene_plan_recorded", plan_id=result.get("plan_id"),
+                  sha256=result.get("sha256"))
+    return result
+
+
+def scene_plan_search(project: str, scene_id: str) -> dict:
+    """Inspect plan-search width, hard feasibility, reviewer coverage, and explicit selection."""
+    return plan_search.search_status(project_dir(project), scene_id)
+
+
+def plan_review_packet(project: str, scene_id: str, plan_id: str) -> dict:
+    """Build a plan-aware feasibility/intentionality packet without candidate prose."""
+    proj = project_dir(project)
+    bundle = compile_bundle(proj, scene_id)
+    # Selection is a later decision and must not contaminate review of the alternatives.
+    bundle.pop("selected_scene_plans", None)
+    return plan_search.review_packet(proj, scene_id, plan_id, bundle)
+
+
+def record_plan_review(project: str, scene_id: str, plan_id: str, reviewer: str, verdict: str,
+                       findings: list | None = None, confidence: float = 1.0,
+                       easy_solution_assessments: list | None = None) -> dict:
+    """Persist hash-bound plan-aware reviewer evidence."""
+    result = plan_search.record_review(
+        project_dir(project), scene_id, plan_id, reviewer, verdict,
+        findings=findings, confidence=confidence,
+        easy_solution_assessments=easy_solution_assessments,
+    )
+    if "error" not in result:
+        trace.log(project_dir(project), scene_id, "plan_review_recorded", plan_id=plan_id,
+                  reviewer=reviewer, verdict=verdict, plan_sha256=result.get("plan_sha256"))
+    return result
+
+
+def select_scene_plans(project: str, scene_id: str, plan_ids: list[str], decided_by: str,
+                       reason: str) -> dict:
+    """Record an explicit reviewed-plan choice; deterministic code does not rank the options."""
+    result = plan_search.select_plans(project_dir(project), scene_id, plan_ids, decided_by, reason)
+    if "error" not in result:
+        trace.log(project_dir(project), scene_id, "scene_plans_selected",
+                  selection_id=result.get("selection_id"), plan_ids=plan_ids,
+                  decided_by=decided_by)
+    return result
 
 
 def contract_coverage(project: str) -> dict:
@@ -538,8 +587,50 @@ TOOLS: list[dict] = [
           {"project": {"type": "string"}, "scene_id": {"type": "string"}}, ["project", "scene_id"], state_before),
     _tool("compile_context",
           "Assemble the minimal, leak-free drafting bundle for a scene (spec, participating "
-          "characters, state_before, relevant world rules, discourse + style constraints).",
+          "characters, state_before, relevant world rules, discourse + style constraints, and any "
+          "explicitly reviewed/selected scene plans).",
           {"project": {"type": "string"}, "scene_id": {"type": "string"}}, ["project", "scene_id"], compile_context),
+    _tool("record_scene_plan",
+          "Persist one immutable alternative scene plan bound to the current spec bytes. A plan "
+          "declares its tactic, turn, cost, reader disclosure, required events/knowledge, forbidden "
+          "moves, and explicit 'why don't they just...?' checks. Does not rank or select plans.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "plan": {"type": "object"}},
+          ["project", "scene_id", "plan"], record_scene_plan),
+    _tool("scene_plan_search",
+          "Read-only plan-search report: requires 3-4 hard-feasible alternatives with real variation "
+          "across tactic, turn, cost, and reader disclosure; reports typed feasibility, hash-bound "
+          "plan-review coverage, and the latest explicit selection. Never computes a best-plan score.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"}},
+          ["project", "scene_id"], scene_plan_search),
+    _tool("plan_review_packet",
+          "Build a plan-aware reviewer packet for one scene plan: leak-free context, the exact "
+          "versioned plan, feasibility/intentionality questions, and 'why don't they just...?' "
+          "checks. Contains no candidate prose or prefix-reader judgment.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "plan_id": {"type": "string", "pattern": "^plan-[a-z0-9][a-z0-9-]*$"}},
+          ["project", "scene_id", "plan_id"], plan_review_packet),
+    _tool("record_plan_review",
+          "Persist a plan-aware feasibility/intentionality review bound to the exact plan hash. "
+          "A pass carrying a material/fatal finding is refused. The reviewer should assess apparent "
+          "easy solutions against information, capability, cost, and motive.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "plan_id": {"type": "string", "pattern": "^plan-[a-z0-9][a-z0-9-]*$"},
+           "reviewer": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+           "verdict": {"type": "string", "enum": ["pass", "revise", "reject", "uncertain"]},
+           "findings": {"type": "array"}, "confidence": {"type": "number"},
+           "easy_solution_assessments": {"type": "array"}},
+          ["project", "scene_id", "plan_id", "reviewer", "verdict"], record_plan_review),
+    _tool("select_scene_plans",
+          "Record the explicit choice of one or two plans after the 3-4-plan diversity floor and "
+          "plan-aware review are complete. Requires each chosen plan to pass hard feasibility and "
+          "have a current passing review; records who chose and why. It never ranks plans itself.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "plan_ids": {"type": "array", "minItems": 1, "maxItems": 2, "uniqueItems": True,
+                        "items": {"type": "string", "pattern": "^plan-[a-z0-9][a-z0-9-]*$"}},
+           "decided_by": {"type": "string", "minLength": 1},
+           "reason": {"type": "string", "minLength": 1}},
+          ["project", "scene_id", "plan_ids", "decided_by", "reason"], select_scene_plans),
     _tool("contract_coverage",
           "Report how each project reader-contract clause is mapped to a deterministic check, critic "
           "question, reader question, human review, or explicit untested state. Mapping is not proof "

@@ -11,6 +11,7 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
+from . import plan_search
 from .state import reconstruct_state_before
 
 _PROJECT_KEEP = ["id", "title", "form", "audience", "reader_contract", "theme_question", "constraints", "desired_affect"]
@@ -91,10 +92,12 @@ def compile_bundle(project: Path, scene_id: str) -> dict:
         "context_manifest": context_manifest,
         "discourse_plan": _load(project / "planning" / "discourse-plan.json", {}),
         "style_profile": _load(project / "planning" / "style-profile.json", {}),
+        "selected_scene_plans": plan_search.selected_plans(project, scene_id),
         "note": (
             "state_before is reconstructed from seed canon + accepted deltas only; it cannot "
             "contain anything a later scene introduces. Add targeted missing canon if needed; "
-            "never paste the whole project."
+            "never paste the whole project. selected_scene_plans contains only an explicitly "
+            "reviewed/selected plan set when this project uses plan-level search."
         ),
         "generated_at": datetime.now(timezone.utc).isoformat(),
     }

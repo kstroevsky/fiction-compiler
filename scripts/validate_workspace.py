@@ -85,6 +85,25 @@ def validate_scenes(errors: list[str], project: Path) -> list[str]:
         for critique in sorted((scene_dir / "critiques").glob("*.json")):
             check_schema(errors, critique, read_json(critique), "critique")
 
+        plans_dir = scene_dir / "plans"
+        for plan_path in sorted((plans_dir / "candidates").glob("*.json")):
+            check_schema(errors, plan_path, read_json(plan_path), "scene-plan")
+        for review_path in sorted((plans_dir / "reviews").glob("*.json")):
+            check_schema(errors, review_path, read_json(review_path), "plan-review")
+        selection_paths = sorted((plans_dir / "selections").glob("*.json"))
+        if selection_paths:
+            # Lazy import keeps the legacy JSON/workspace validator startable under older system
+            # Pythons when no plan-search artifacts exist. Plan-search itself requires the project's
+            # declared Python >=3.11 runtime because it imports typed story-state machinery.
+            from fiction_compiler import plan_search  # noqa: E402
+        for selection_path in selection_paths:
+            selection = read_json(selection_path)
+            check_schema(errors, selection_path, selection, "plan-selection")
+            for message in plan_search.selection_errors(project, scene_dir.name, selection):
+                errors.append(
+                    f"{project.name}/{scene_dir.name}: plan selection {selection_path.name} — {message}"
+                )
+
         manuscript = project / "manuscript" / "chapters" / f"{scene_dir.name}.md"
         if manuscript.exists() and not delta_path.exists():
             errors.append(f"{project.name}/{scene_dir.name}: promoted scene lacks state-delta.json")

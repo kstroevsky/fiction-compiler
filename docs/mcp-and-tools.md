@@ -26,6 +26,11 @@ It runs anywhere `python3` runs — no install step.
 | `kb_sources` | Registered sources (craft-instruction / fiction-corpus / reference) with copyright notes |
 | `state_before` | Event-sourced story state before a scene (facts, per-character knowledge, promises, time) |
 | `compile_context` | The minimal, leak-free drafting bundle for a scene |
+| `record_scene_plan` | Persist one immutable alternative scene plan bound to the current scene-spec hash |
+| `scene_plan_search` | Inspect 3–4-plan search width, deterministic feasibility, review coverage, and explicit selection without ranking plans |
+| `plan_review_packet` | Build a plan-aware feasibility/intentionality packet with no candidate prose |
+| `record_plan_review` | Persist plan-review evidence bound to the exact plan hash, including “why don't they just…?” assessments |
+| `select_scene_plans` | Explicitly select 1–2 reviewed plans, recording who chose and why; deterministic code does not choose the winner |
 | `hard_audit` | Deterministic Audit 1 (knowledge cutoff, causal refs, POV, chronology, promise ledger) |
 | `defaultness_lint` | Model-default tics in prose, with evidence |
 | `evaluate_revision` | Accept/stop decision for a revision (stateless; takes iteration/attempts to reach every branch) |

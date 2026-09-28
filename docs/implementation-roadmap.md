@@ -27,6 +27,7 @@ mechanical validity, modeled/extracted consistency, and literary preference.
 | Schemas | `schemas/*.json` | **Enforced** | Workspace, critique, policy, premise, ontology, claims, judgment and state payloads are validated |
 | Workspace validation | `scripts/validate_workspace.py` | **Implemented** | Schema/integrity checks plus canon verification; maintained tests exercise failures |
 | Minimal context compilation | `src/fiction_compiler/context.py` | **Implemented, coarse relevance** | Replays state-before, filters to participants/required facts, writes collision-safe project-local evidence |
+| Scene-plan search | `plan_search.py`, `schemas/scene-plan*.json`, `generate-scene-plans` skill | **Implemented as experimental evidence workflow** | 3–4-plan divergence floor, typed feasibility, hash-bound plan review, explicit 1–2 selection; no automatic quality ranker |
 | Event-sourced canon / `reconstruct_state_before` | `src/fiction_compiler/state.py` | **Implemented** | Seed state + accepted deltas, typed values/relationships/knowledge, parsed chronology semantics |
 | Candidate promotion / backward revision | `promote.py`, `acceptance.py`, `integrity.py`, `dependencies.py` | **Implemented, downstream literary recheck remains manual** | Frozen candidate/spec/delta/review policy/evidence; immutable active/history chains, conservative read sets, rebasing + invalidation |
 | Hard/symbolic audit | `hard_audit.py`, `prose_audit.py` | **Implemented, extraction boundary remains empirical** | Code checks state/event constraints; extracted prose claims are judged deterministically |
@@ -94,7 +95,8 @@ test, not just a feature.
 > **Tools for the author.** The deterministic engine is exposed to the LLM as callable tools via
 > a dependency-free MCP server (`scripts/fiction_mcp.py`, wired in `.mcp.json` and `.codex/config.toml`):
 > `kb_search`/`kb_get`, `state_before`, `compile_context`, `hard_audit`, `defaultness_lint`,
-> `evaluate_revision`, `revise_acceptance`, and `revision_status`. Plus the `avoid-defaults`
+> `record_scene_plan`/`scene_plan_search`/`plan_review_packet`/`record_plan_review`/
+> `select_scene_plans`, `evaluate_revision`, `revise_acceptance`, and `revision_status`. Plus the `avoid-defaults`
 > anti-obviousness skill (LLM-facing craft, not code).
 > The engine equips the author; it does not replace the creative act. See `docs/mcp-and-tools.md`.
 >
@@ -142,6 +144,16 @@ test, not just a feature.
 > uses role-specific evidence views (experiential reader, canon-aware continuity, style/profile,
 > character-local state, plan-aware architecture) while withholding candidate strategy identity.
 > Still ⬜ in P2: a first-class live pairwise-judgment transport and signed/external judgments.
+>
+> **Scene-level composition now has an explicit search layer (ADR 0027, review §6.1).** The compiler
+> stores 3–4 immutable scene-plan alternatives bound to the current spec, requires real batch variation
+> across tactic/turn/cost/reader disclosure, hard-checks knowledge/event feasibility, records plan-aware
+> reviewer evidence including easy-solution analysis, and permits an explicitly reasoned 1–2-plan
+> selection only from current reviewed plans. Selected plans flow into drafting context; stale plan
+> evidence is exposed and omitted. There is deliberately no deterministic best-plan score. Still ⬜:
+> automate live plan-review transport if warranted, and run the audit's equal-cost blind experiment to
+> learn whether plan search actually improves reader preference versus spending the same budget on
+> additional prose realizations.
 >
 > **Revision loop now diffs by finding identity (ADR 0009, P3 slice 1).** `evaluate_revision` gives
 > each finding a fingerprint (dimension + normalized evidence) and classifies fixed / persisted /
@@ -195,6 +207,7 @@ test, not just a feature.
 > `0012-human-gate-and-rubric.md`, `0013-operational-cleanups.md`, `0014-prose-audit.md`,
 > `0015-kb-structured-depth.md`, `0024-plan-to-prose-realization-evidence.md`,
 > `0025-typed-promise-obligations.md`, `0026-backward-revision-and-conservative-invalidation.md`,
+> `0027-plan-level-search-before-prose.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 
