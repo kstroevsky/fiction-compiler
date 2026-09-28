@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from fiction_compiler.context import compile_bundle  # noqa: E402
+from fiction_compiler.context import compile_bundle, write_bundle  # noqa: E402
 
 
 def build(root: Path) -> Path:
@@ -42,6 +42,19 @@ class ContextManifestTests(unittest.TestCase):
             self.assertEqual(manifest[("world_rule", "a world rule")]["priority"], "reference")
             # every entry carries a reason + a source
             self.assertTrue(all(m.get("reason") and m.get("source") for m in bundle["context_manifest"]))
+
+    def test_persisted_bundles_are_project_local_and_collision_safe(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp))
+            bundle = compile_bundle(project, "ch01-sc01")
+            first = write_bundle(bundle, project, "ch01-sc01")
+            second = write_bundle(bundle, project, "ch01-sc01")
+            self.assertNotEqual(first, second)
+            self.assertTrue(first.exists())
+            self.assertTrue(second.exists())
+            expected_root = project / ".runs" / "context" / "ch01-sc01"
+            self.assertTrue(first.is_relative_to(expected_root))
+            self.assertTrue(second.is_relative_to(expected_root))
 
 
 if __name__ == "__main__":

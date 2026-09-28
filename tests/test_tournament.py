@@ -134,6 +134,20 @@ class JudgeAndPersistenceTests(unittest.TestCase):
             for md in blind.glob("*.md"):
                 self.assertNotIn("candidate-", md.read_text())
 
+    def test_persisted_tournaments_do_not_overwrite_same_moment_runs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            scene = Path(tmp) / "scenes" / "ch01-sc01"
+            (scene / "candidates").mkdir(parents=True)
+            (scene / "critiques").mkdir(parents=True)
+            (scene / "candidates" / "candidate-a.md").write_text("Clean prose.")
+            (scene / "critiques" / "a.json").write_text(json.dumps(
+                {"candidate": "candidate-a.md", "findings": []}))
+            first = tools.tournament(str(Path(tmp)), "ch01-sc01", persist=True)
+            second = tools.tournament(str(Path(tmp)), "ch01-sc01", persist=True)
+            self.assertNotEqual(first["persisted_to"], second["persisted_to"])
+            self.assertTrue((Path(tmp) / first["persisted_to"] / "record.json").exists())
+            self.assertTrue((Path(tmp) / second["persisted_to"] / "record.json").exists())
+
 
 class CriticDrivesSelectionTests(unittest.TestCase):
     """The strong LLM critic drives selection, behind the deterministic floor (ADR 0016)."""

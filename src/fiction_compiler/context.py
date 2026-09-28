@@ -7,11 +7,11 @@ the reconstructed state *before* the scene, so it can never contain what a later
 from __future__ import annotations
 
 import json
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
 from .state import reconstruct_state_before
-from .workspace import RUNS
 
 _PROJECT_KEEP = ["id", "title", "form", "audience", "reader_contract", "theme_question", "constraints", "desired_affect"]
 
@@ -96,9 +96,10 @@ def compile_bundle(project: Path, scene_id: str) -> dict:
     }
 
 
-def write_bundle(bundle: dict, scene_id: str) -> Path:
-    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    out_dir = RUNS / run_id / scene_id
+def write_bundle(bundle: dict, project: Path, scene_id: str) -> Path:
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
+    run_id = f"{stamp}-{uuid.uuid4().hex[:12]}"
+    out_dir = project / ".runs" / "context" / scene_id / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
     out = out_dir / "context-bundle.json"
     out.write_text(json.dumps(bundle, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

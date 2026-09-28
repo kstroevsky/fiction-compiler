@@ -10,6 +10,7 @@ Every handler returns a JSON-serialisable dict. Keep them pure and cheap.
 from __future__ import annotations
 
 import json
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
@@ -211,8 +212,9 @@ def tournament(project: str, scene_id: str, seed: int = 0, persist: bool = False
     record = run_tournament(critiques, seed=seed, judges=judges, judgments=judgments,
                             judge_rankings=judge_rankings)
     if persist and record.get("candidates"):
-        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        run_dir = proj / ".runs" / "tournament" / scene_id / stamp
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
+        run_id = f"{stamp}-{uuid.uuid4().hex[:12]}"
+        run_dir = proj / ".runs" / "tournament" / scene_id / run_id
         blind = run_dir / "blind"
         blind.mkdir(parents=True, exist_ok=True)
         for candidate_id, label in record["blind_labels"].items():
