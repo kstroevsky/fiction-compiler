@@ -117,7 +117,7 @@ class PromoteTests(unittest.TestCase):
             snapshot = acceptance.load_object(project, result["acceptance_object"])
             self.assertEqual(acceptance.frozen_bytes(snapshot, "candidate"), PROSE.encode())
             self.assertEqual(snapshot["candidate"]["sha256"], PROSE_SHA)
-            self.assertEqual(snapshot["review_policy"]["id"], "review-policy@1")
+            self.assertEqual(snapshot["review_policy"]["id"], "review-policy@2")
             self.assertTrue(snapshot["binding_critiques"])
             self.assertEqual(integrity.verify_report(project)["status"], "verified")
 
@@ -287,6 +287,41 @@ class AcceptanceIntegrityTests(unittest.TestCase):
             snapshot = acceptance.load_object(project, result["acceptance_object"])
             self.assertEqual(snapshot["review_policy"]["id"], "project-review@7")
             self.assertEqual(snapshot["review_policy"]["artifact"]["sha256"], integrity.sha256_file(path))
+
+    def test_builtin_policy_treats_defaultness_as_advisory(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp))
+            candidate = project / "scenes" / "ch01-sc01" / "candidates" / "c.md"
+            candidate.write_text("Her heart pounded in her chest.", encoding="utf-8")
+            sha = hashlib.sha256(candidate.read_bytes()).hexdigest()
+            write_review_set(project / "scenes" / "ch01-sc01", sha=sha)
+            result = promote_candidate(project, "ch01-sc01", "c.md")
+            snapshot = acceptance.load_object(project, result["acceptance_object"])
+            runtime = snapshot["runtime_checks"]["defaultness"]
+            self.assertEqual(runtime["verdict"], "revise")
+            self.assertEqual(snapshot["review_policy"]["id"], "review-policy@2")
+
+    def test_project_can_explicitly_opt_into_blocking_defaultness(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp))
+            candidate = project / "scenes" / "ch01-sc01" / "candidates" / "c.md"
+            candidate.write_text("Her heart pounded in her chest.", encoding="utf-8")
+            sha = hashlib.sha256(candidate.read_bytes()).hexdigest()
+            write_review_set(project / "scenes" / "ch01-sc01", sha=sha)
+            policy = {
+                "id": "project-review@blocking-style",
+                "minimum_literary_reviews": 1,
+                "required_literary_roles": [],
+                "require_runtime_provenance": True,
+                "require_issue_resolutions": True,
+                "defaultness_mode": "blocking",
+                "require_prose_audit": False,
+            }
+            path = project / "brief" / "review-policy.json"
+            path.parent.mkdir(parents=True)
+            path.write_text(json.dumps(policy), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "runtime defaultness check"):
+                promote_candidate(project, "ch01-sc01", "c.md")
 
     def test_flock_is_released_after_process_death(self) -> None:
         if not hasattr(os, "fork"):

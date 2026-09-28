@@ -30,7 +30,7 @@
       "a sense of \\w+ (washed|settled|crept|descended)",
       "couldn'?t help but",
       "overcome with \\w+",
-      "filled with (a )?(sense of )?\\w+"
+      "filled with (a )?(sense of )?(fear|dread|anger|rage|grief|sadness|sorrow|joy|relief|shame|guilt|anxiety|panic|hope|wonder|awe|longing|regret|resentment|unease|tension|anticipation)"
     ]
   },
   "filter_perception": {

@@ -14,12 +14,12 @@ from . import acceptance, schema
 
 
 DEFAULT_POLICY = {
-    "id": "review-policy@1",
+    "id": "review-policy@2",
     "minimum_literary_reviews": 1,
     "required_literary_roles": [],
     "require_runtime_provenance": True,
     "require_issue_resolutions": True,
-    "defaultness_mode": "blocking",
+    "defaultness_mode": "advisory",
     "require_prose_audit": False,
 }
 

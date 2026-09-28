@@ -126,10 +126,11 @@ def scores_from_critiques(critiques: list[dict]) -> dict[str, dict[str, float]]:
     return scores
 
 
-# Code audits form the DETERMINISTIC FLOOR: a candidate with a material/fatal finding from one of
-# these cannot be selected, however much a critic prefers it. This is the guard that lets us lean on
-# the (strong) LLM critic for selection without it choosing fluent prose past a hard failure.
-DETERMINISTIC_CRITICS = frozenset({"hard-audit", "defaultness-lint", "prose-audit"})
+# Hard/consistency code audits form the DETERMINISTIC FLOOR. Generic defaultness/style heuristics
+# remain scored evidence but are not a veto: the audit demonstrated literal, quoted, and deliberate
+# uses that regexes cannot adjudicate reliably. A project may still opt into blocking defaultness at
+# promotion time through its frozen review policy.
+DETERMINISTIC_CRITICS = frozenset({"hard-audit", "prose-audit"})
 
 
 def floor_eligible(critiques: list[dict]) -> set[str]:

@@ -162,8 +162,8 @@ class CriticDrivesSelectionTests(unittest.TestCase):
 
     def test_floor_excludes_a_candidate_even_if_the_critic_prefers_it(self) -> None:
         critiques = [
-            {"candidate": "candidate-a.md", "critic": "defaultness-lint", "findings": []},
-            {"candidate": "candidate-b.md", "critic": "defaultness-lint",
+            {"candidate": "candidate-a.md", "critic": "prose-audit", "findings": []},
+            {"candidate": "candidate-b.md", "critic": "prose-audit",
              "findings": [{"dimension": "cliche", "severity": "material"}]}]  # B fails the floor
         labels = tournament.run_tournament(critiques, seed=0)["blind_labels"]
         judgment = {"scene_id": "ch01-sc01", "judge": "x", "scores": {
@@ -172,9 +172,19 @@ class CriticDrivesSelectionTests(unittest.TestCase):
         self.assertIn("candidate-b.md", r["floor_failed"])
         self.assertEqual(r["recommendation"]["candidate"], "candidate-a.md")  # B excluded despite the critic
 
+    def test_generic_defaultness_finding_is_penalty_not_floor_veto(self) -> None:
+        critiques = [
+            {"candidate": "candidate-a.md", "critic": "defaultness-lint", "findings": []},
+            {"candidate": "candidate-b.md", "critic": "defaultness-lint",
+             "findings": [{"dimension": "defaultness", "severity": "material"}]},
+        ]
+        r = tournament.run_tournament(critiques, seed=0)
+        self.assertEqual(r["floor_failed"], [])
+        self.assertEqual(r["recommendation"]["candidate"], "candidate-a.md")
+
     def test_all_candidates_failing_the_floor_yields_no_eligible(self) -> None:
         critiques = [
-            {"candidate": "candidate-a.md", "critic": "defaultness-lint",
+            {"candidate": "candidate-a.md", "critic": "prose-audit",
              "findings": [{"dimension": "cliche", "severity": "material"}]},
             {"candidate": "candidate-b.md", "critic": "prose-audit",
              "findings": [{"dimension": "knowledge", "severity": "fatal"}]}]

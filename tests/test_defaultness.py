@@ -50,6 +50,17 @@ class DefaultnessTests(unittest.TestCase):
         self.assertIn("cliches", catalog)
         self.assertIn("patterns", catalog["cliches"])
 
+    def test_literal_container_phrase_is_not_treated_as_emotion(self) -> None:
+        self.assertEqual(defaultness.lint_text("The tank was filled with water."), [])
+
+    def test_quoted_cliche_is_contextual_advisory(self) -> None:
+        findings = defaultness.lint_text(
+            'The label read: "deafening silence" — a phrase she hated.'
+        )
+        self.assertTrue(findings)
+        self.assertTrue(all(f["severity"] == "minor" for f in findings), findings)
+        self.assertTrue(any("quoted" in f["diagnosis"].lower() for f in findings))
+
 
 if __name__ == "__main__":
     unittest.main()
