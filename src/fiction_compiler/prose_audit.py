@@ -17,7 +17,9 @@ import json
 from pathlib import Path
 from typing import Any
 
+from . import integrity, schema
 from .state import reconstruct_state_before
+from .workspace import resolve_scene_candidate, validate_scene_id
 
 _SEVERITY_RANK = {"minor": 0, "material": 1, "fatal": 2}
 
@@ -48,6 +50,39 @@ def is_knowledge_leak(pov_knows_before: bool, granted_this_scene: bool) -> bool:
 
 def audit_prose(project: Path, scene_id: str, claims: dict) -> dict:
     """Prove one candidate's extracted prose-claims against state-before + the scene spec."""
+    project = Path(project).resolve()
+    validate_scene_id(scene_id)
+    errors = schema.validate_named(claims, "prose-claims")
+    if errors:
+        return {"error": "invalid prose-claims: " + "; ".join(errors)}
+    if claims.get("scene_id") != scene_id:
+        return {"error": f"claims scene_id {claims.get('scene_id')!r} != {scene_id!r}"}
+
+    candidate_text: str | None = None
+    if claims.get("candidate"):
+        try:
+            candidate_path = resolve_scene_candidate(project, scene_id, str(claims["candidate"]))
+        except ValueError as exc:
+            return {"error": str(exc)}
+        if not candidate_path.exists():
+            return {"error": f"candidate not found: {claims['candidate']}"}
+        raw = candidate_path.read_bytes()
+        actual_sha = integrity.sha256_bytes(raw)
+        if claims.get("candidate_sha256") != actual_sha:
+            return {"error": "prose-claims candidate_sha256 does not match the candidate bytes"}
+        candidate_text = raw.decode("utf-8")
+        actual_words = len(candidate_text.split())
+        if claims.get("word_count") != actual_words:
+            return {
+                "error": (
+                    f"prose-claims word_count {claims.get('word_count')} does not match "
+                    f"candidate word count {actual_words}"
+                )
+            }
+        for claim in claims.get("claims", []):
+            evidence = claim.get("evidence", "")
+            if evidence and evidence not in candidate_text:
+                return {"error": f"prose-claims evidence is not present in candidate: {evidence!r}"}
     spec = _load(project / "scenes" / scene_id / "spec.json", {})
     delta = _load(project / "scenes" / scene_id / "state-delta.json", {})
     discourse = _load(project / "planning" / "discourse-plan.json", {})
@@ -55,7 +90,12 @@ def audit_prose(project: Path, scene_id: str, claims: dict) -> dict:
 
     pov = spec.get("pov")
     participants = {p for p in [pov, *spec.get("participants", [])] if p}
-    canon_chars = {p.stem for p in (project / "canon" / "characters").glob("*.json")}
+    canon_chars = {
+        data.get("id")
+        for path in (project / "canon" / "characters").glob("*.json")
+        for data in [_load(path, {})]
+        if isinstance(data, dict) and data.get("id")
+    }
     # Facts the pov legitimately gains this scene: what they learn, plus what the scene introduces.
     added_ids = {f["id"] for f in delta.get("facts_added", [])}
     pov_granted = {kc["fact"] for kc in delta.get("knowledge_changes", []) if kc.get("character") == pov} | added_ids

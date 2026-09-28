@@ -10,6 +10,21 @@
     "audit_class": {"enum": ["hard", "literary", "defaultness"]},
     "verdict": {"enum": ["pass", "revise", "reject", "uncertain"]},
     "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "run_id", "role", "vendor", "model", "candidate_sha256", "packet_sha256"],
+      "properties": {
+        "source": {"enum": ["role_runner"]},
+        "run_id": {"type": "string", "minLength": 1},
+        "role": {"type": "string", "minLength": 1},
+        "vendor": {"type": "string", "minLength": 1},
+        "model": {"type": "string", "minLength": 1},
+        "candidate_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "packet_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "attempt_artifact": {"type": "string", "minLength": 1}
+      }
+    },
     "findings": {
       "type": "array",
       "items": {

@@ -75,6 +75,10 @@ class ToolDispatchTests(unittest.TestCase):
     def test_unknown_tool_returns_error(self) -> None:
         self.assertIn("error", tools.call_tool("nope", {}))
 
+    def test_call_tool_rejects_unknown_arguments(self) -> None:
+        out = tools.call_tool("kb_get", {"concept_id": "defaultness", "surprise": True})
+        self.assertIn("additional property", out["error"])
+
     def test_promote_requires_confirm(self) -> None:
         out = tools.call_tool("promote", {"project": "salt-in-the-wire", "scene_id": "ch01-sc01",
                                           "candidate_file": "candidate-a.md"})
@@ -93,6 +97,24 @@ class ToolDispatchTests(unittest.TestCase):
     def test_call_tool_rejects_file_path_escape(self) -> None:
         out = tools.call_tool("defaultness_lint", {"path": "/etc/passwd"})
         self.assertIn("error", out)
+
+    def test_call_tool_rejects_scene_and_nested_path_escape(self) -> None:
+        bad_scene = tools.call_tool(
+            "scene_status", {"project": "salt-in-the-wire", "scene_id": "../canon",
+                             "candidate": "candidate-a.md"})
+        self.assertIn("invalid scene_id", bad_scene["error"])
+        bad_candidate = tools.call_tool(
+            "scene_status", {"project": "salt-in-the-wire", "scene_id": "ch01-sc01",
+                             "candidate": "../../canon/index.json"})
+        self.assertIn("traversal", bad_candidate["error"])
+
+    def test_call_tool_rejects_critique_filename_escape(self) -> None:
+        out = tools.call_tool("record_critique", {
+            "project": "salt-in-the-wire", "scene_id": "ch01-sc01",
+            "candidate": "candidate-a.md", "critic": "style-editor", "verdict": "pass",
+            "filename": "../escaped",
+        })
+        self.assertIn("single path component", out["error"])
 
     def test_evaluate_revision_reaches_escalate_via_params(self) -> None:
         no_progress = [{"findings": [{"dimension": "defaultness", "severity": "material"}]}]

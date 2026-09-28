@@ -23,6 +23,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from . import acceptance
+
 # A scene id like "ch03-sc02" -> sort key (3, 2). Anything malformed sorts last.
 def scene_sort_key(scene_id: str) -> tuple[int, int]:
     try:
@@ -179,6 +181,10 @@ def accepted_scene_ids(project: Path) -> list[str]:
 
 
 def _load_delta(project: Path, scene_id: str) -> dict | None:
+    frozen = acceptance.load_scene_snapshot(project, scene_id)
+    if frozen is not None:
+        _, snapshot = frozen
+        return acceptance.frozen_json(snapshot, "state_delta")
     path = project / "scenes" / scene_id / "state-delta.json"
     return _read_json(path, None) if path.exists() else None
 

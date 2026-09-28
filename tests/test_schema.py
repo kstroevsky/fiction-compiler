@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import sys
 import unittest
 from pathlib import Path
@@ -112,6 +113,12 @@ class SchemaValidatorTests(unittest.TestCase):
         self.assertTrue(any("maximum" in e for e in errors))
         self.assertTrue(any("severity" in e for e in errors))
         self.assertTrue(any("repair_layer" in e for e in errors))
+
+    def test_non_finite_numbers_are_rejected(self) -> None:
+        for value in (math.nan, math.inf, -math.inf):
+            with self.subTest(value=value):
+                errors = schema.validate(value, {"type": "number", "minimum": 0, "maximum": 1})
+                self.assertTrue(any("finite" in e for e in errors), errors)
 
 
 if __name__ == "__main__":

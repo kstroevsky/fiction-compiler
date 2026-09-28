@@ -33,14 +33,17 @@ Boundaries kept (agents-best-practices — untrusted content, no hidden dictator
 from __future__ import annotations
 
 import json
+import math
 import os
 import urllib.error
+import urllib.parse
 import urllib.request
+import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
 
-from . import critique as _critique
+from . import acceptance, critique as _critique
 from . import schema, trace
 from .promote import AUDIT_CLASS_BY_CRITIC
 from .tools import judge_bundle
@@ -146,6 +149,9 @@ def resolve_persona(assignment: Assignment, agents_dir: Path = AGENTS_DIR) -> st
     path = Path(ref) if ref else agents_dir / f"{assignment.role}.md"
     if not path.is_absolute():
         path = ROOT / path
+    path = path.resolve()
+    if ref is not None and not path.is_relative_to(ROOT.resolve()):
+        raise ValueError(f"persona path escapes the repository root: {path}")
     if path.exists():
         return _strip_frontmatter(path.read_text(encoding="utf-8"))
     raise ValueError(
@@ -198,9 +204,11 @@ def _http_post_json(url: str, headers: dict, payload: dict, timeout: float = 60.
             return json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8", "replace")[:500]
-        raise VendorUnavailable(f"{url} -> HTTP {exc.code}: {detail}") from exc
+        safe_url = urllib.parse.urlunsplit((*urllib.parse.urlsplit(url)[:3], "", ""))
+        raise VendorUnavailable(f"{safe_url} -> HTTP {exc.code}: {detail}") from exc
     except urllib.error.URLError as exc:
-        raise VendorUnavailable(f"{url} unreachable: {exc.reason}") from exc
+        safe_url = urllib.parse.urlunsplit((*urllib.parse.urlsplit(url)[:3], "", ""))
+        raise VendorUnavailable(f"{safe_url} unreachable: {exc.reason}") from exc
 
 
 class AnthropicHTTP:
@@ -319,6 +327,18 @@ def parse_vendor_critique(raw: str) -> dict:
         confidence = float(confidence)
     except (TypeError, ValueError) as exc:
         raise MalformedVendorOutput("'confidence' must be a number") from exc
+    if not math.isfinite(confidence) or not 0 <= confidence <= 1:
+        raise MalformedVendorOutput("'confidence' must be a finite number between 0 and 1")
+    probe = {
+        "candidate": "submission.md",
+        "critic": "vendor-output",
+        "verdict": verdict,
+        "confidence": confidence,
+        "findings": findings,
+    }
+    errors = schema.validate_named(probe, "critique")
+    if errors:
+        raise MalformedVendorOutput("invalid critique payload: " + "; ".join(errors))
     return {"verdict": verdict, "confidence": confidence, "findings": findings}
 
 
@@ -340,31 +360,71 @@ def run_role(project: str, scene_id: str, candidate: str, role: str, *,
         return {"error": f"role {role!r} not in roster; known: {sorted(roster)}"}
     assignment = roster[role]
 
+    proj_path = project_dir(project)
     bundle = judge_bundle(project, scene_id, candidate)
     if "error" in bundle:
         return bundle
 
     persona = resolve_persona(assignment, agents_dir)
     system, user = build_messages(persona, bundle)
+    run_id = uuid.uuid4().hex
+    cand = bundle["candidate"]
+    packet = {
+        "run_id": run_id,
+        "scene_id": scene_id,
+        "role": role,
+        "vendor": assignment.vendor,
+        "model": assignment.model,
+        "params": assignment.params,
+        "candidate": {"name": cand["name"], "sha256": cand["sha256"]},
+        "messages": {"system": system, "user": user},
+    }
+    packet_sha256 = acceptance.sha256_bytes(acceptance.canonical_json_bytes(packet))
     tp = transport if transport is not None else make_transport(assignment.vendor)
     raw = tp.complete(system, user, assignment.model, **assignment.params)
-    parsed = parse_vendor_critique(raw)
+    try:
+        parsed = parse_vendor_critique(raw)
+        validation = {"status": "valid"}
+    except MalformedVendorOutput as exc:
+        validation = {"status": "invalid", "error": str(exc)}
+        attempt = {"packet": packet, "packet_sha256": packet_sha256,
+                   "raw_response": raw, "validation": validation}
+        attempt_path = proj_path / ".runs" / "reviews" / scene_id / f"{run_id}.json"
+        acceptance.atomic_write(
+            attempt_path,
+            (json.dumps(attempt, indent=2, ensure_ascii=False) + "\n").encode("utf-8"),
+        )
+        raise
+
+    attempt = {"packet": packet, "packet_sha256": packet_sha256,
+               "raw_response": raw, "parsed": parsed, "validation": validation}
+    attempt_path = proj_path / ".runs" / "reviews" / scene_id / f"{run_id}.json"
+    acceptance.atomic_write(
+        attempt_path,
+        (json.dumps(attempt, indent=2, ensure_ascii=False) + "\n").encode("utf-8"),
+    )
 
     consistency = _critique.consistency_problem(parsed["verdict"], parsed["findings"])
-    cand = bundle["candidate"]
-    provenance = {"role": role, "vendor": assignment.vendor, "model": assignment.model,
-                  "candidate": cand["name"], "candidate_sha256": cand["sha256"],
-                  "audit_class": assignment.audit_class}
+    provenance = {
+        "source": "role_runner",
+        "run_id": run_id,
+        "role": role,
+        "vendor": assignment.vendor,
+        "model": assignment.model,
+        "candidate_sha256": cand["sha256"],
+        "packet_sha256": packet_sha256,
+        "attempt_artifact": str(attempt_path.relative_to(proj_path)),
+    }
     result: dict = {"role": role, "verdict": parsed["verdict"], "confidence": parsed["confidence"],
                     "findings": parsed["findings"], "consistency_problem": consistency,
                     "provenance": provenance, "recorded": None}
 
     if record:
-        proj_path = project_dir(project)
         recorded = _critique.record_critique(
-            proj_path, scene_id, cand["name"], critic=role, verdict=parsed["verdict"],
+            proj_path, scene_id, candidate, critic=role, verdict=parsed["verdict"],
             findings=parsed["findings"], confidence=parsed["confidence"],
-            audit_class=assignment.audit_class)
+            audit_class=assignment.audit_class, _provenance=provenance,
+            _bound_candidate_sha256=cand["sha256"])
         result["recorded"] = recorded
         if "error" not in recorded:
             trace.log(proj_path, scene_id, "vendor_critique", role=role, vendor=assignment.vendor,
@@ -394,6 +454,7 @@ def run_panel(project: str, scene_id: str, candidate: str, roles: list[str], *,
 
     verdicts = {r["role"]: r["verdict"] for r in per_role if "verdict" in r}
     distinct = sorted(set(verdicts.values()))
+    failed_roles = [r["role"] for r in per_role if "verdict" not in r]
     dissenting = [r["role"] for r in per_role
                   if r.get("verdict") in {"revise", "reject"} or r.get("consistency_problem")]
     return {
@@ -401,9 +462,15 @@ def run_panel(project: str, scene_id: str, candidate: str, roles: list[str], *,
         "candidate": candidate,
         "roles": per_role,
         "verdicts": verdicts,
+        "completion": {
+            "requested": len(roles),
+            "completed": len(verdicts),
+            "failed_roles": failed_roles,
+            "complete": len(verdicts) == len(roles),
+        },
         "disagreement": {
             "distinct_verdicts": distinct,
-            "unanimous": len(distinct) <= 1,
+            "unanimous": bool(verdicts) and len(distinct) <= 1,
             "dissenting_roles": dissenting,
         },
         "note": ("Disagreement is information — recorded per role, never collapsed into an average or "

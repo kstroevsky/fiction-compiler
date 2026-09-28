@@ -5,7 +5,9 @@ import os
 import sys
 import tempfile
 import unittest
+import urllib.error
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -75,6 +77,16 @@ class ParseTests(unittest.TestCase):
         with self.assertRaises(MalformedVendorOutput):
             role_runner.parse_vendor_critique("   ")
 
+    def test_rejects_non_finite_confidence_and_incomplete_findings(self) -> None:
+        with self.assertRaises(MalformedVendorOutput):
+            role_runner.parse_vendor_critique(
+                '{"verdict":"pass","confidence":NaN,"findings":[]}'
+            )
+        with self.assertRaises(MalformedVendorOutput):
+            role_runner.parse_vendor_critique(
+                '{"verdict":"revise","confidence":0.5,"findings":[{"severity":"material"}]}'
+            )
+
 
 class RosterTests(unittest.TestCase):
     def test_loads_repo_roster_with_derived_audit_class(self) -> None:
@@ -127,7 +139,14 @@ class PersonaAndMessageTests(unittest.TestCase):
             # candidate_strategies must not survive as a data key in the brief the judge is handed
             self.assertNotIn("SECRET A/B intent", user)
             self.assertNotIn("candidate_strategies", json.loads(user)["scene_brief"])
+            self.assertEqual(json.loads(user)["candidate"]["name"], "submission.md")
+            self.assertNotIn("candidate-a.md", user)
             self.assertIn("UNTRUSTED", user)  # candidate is fenced as data
+
+    def test_explicit_persona_path_cannot_escape_repo(self) -> None:
+        a = Assignment("style-editor", "gemini", "m", persona_file="/etc/passwd")
+        with self.assertRaisesRegex(ValueError, "escapes"):
+            role_runner.resolve_persona(a)
 
 
 class RunRoleTests(unittest.TestCase):
@@ -207,6 +226,32 @@ class RunRoleTests(unittest.TestCase):
                                      roster=_roster(), transport=OfflineTransport(responder={"*": "{}"}))
             self.assertIn("error", r)
 
+    def test_candidate_replaced_during_vendor_call_remains_bound_to_sent_bytes(self) -> None:
+        class MutatingTransport:
+            def __init__(self, path: Path):
+                self.path = path
+
+            def complete(self, system: str, user: str, model: str, **params: object) -> str:
+                self.path.write_text("Replacement prose.", encoding="utf-8")
+                return '{"verdict":"pass","confidence":0.9,"findings":[]}'
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root, scene = _scene(tmp)
+            candidate = scene / "candidates" / "candidate-a.md"
+            sent_sha = integrity.sha256_file(candidate)
+            result = role_runner.run_role(
+                str(root), "ch01-sc01", "candidate-a.md", "adversarial-reader",
+                roster=_roster(), transport=MutatingTransport(candidate), record=True)
+            self.assertEqual(result["provenance"]["candidate_sha256"], sent_sha)
+            self.assertTrue(result["recorded"]["stale_input"])
+            recorded = json.loads((root / result["recorded"]["written"]).read_text())
+            self.assertEqual(recorded["candidate_sha256"], sent_sha)
+            self.assertNotEqual(recorded["candidate_sha256"], integrity.sha256_file(candidate))
+            self.assertTrue((root / result["provenance"]["attempt_artifact"]).exists())
+            from fiction_compiler import critique
+            status = critique.scene_status(root, "ch01-sc01", "candidate-a.md")
+            self.assertFalse(status["audit_gate"]["ready"])
+
 
 class PanelTests(unittest.TestCase):
     def test_disagreement_is_reported_not_averaged(self) -> None:
@@ -242,6 +287,17 @@ class PanelTests(unittest.TestCase):
             self.assertEqual(len(errored), 1)
             self.assertIn("VendorUnavailable", errored[0]["error"])
             self.assertEqual(panel["verdicts"], {"style-editor": "pass"})
+            self.assertFalse(panel["completion"]["complete"])
+
+    def test_total_panel_failure_is_incomplete_not_unanimous(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root, _ = _scene(tmp)
+            panel = role_runner.run_panel(
+                str(root), "ch01-sc01", "candidate-a.md", ["adversarial-reader", "style-editor"],
+                roster=_roster(), transport_for=lambda role: _BoomTransport())
+            self.assertEqual(panel["completion"]["completed"], 0)
+            self.assertFalse(panel["completion"]["complete"])
+            self.assertFalse(panel["disagreement"]["unanimous"])
 
 
 class _BoomTransport:
@@ -270,6 +326,13 @@ class TransportTests(unittest.TestCase):
         self.assertEqual(tp.complete("s", "u", "other"), "DEFAULT")
         with self.assertRaises(VendorUnavailable):
             OfflineTransport(responder={"model-x": "X"}).complete("s", "u", "no-match")
+
+    def test_http_errors_redact_query_credentials(self) -> None:
+        with mock.patch("urllib.request.urlopen", side_effect=urllib.error.URLError("offline")):
+            with self.assertRaises(VendorUnavailable) as ctx:
+                role_runner._http_post_json(
+                    "https://example.invalid/path?key=super-secret", {}, {"x": 1})
+        self.assertNotIn("super-secret", str(ctx.exception))
 
 
 if __name__ == "__main__":

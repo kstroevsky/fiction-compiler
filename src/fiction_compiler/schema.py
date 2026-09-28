@@ -15,6 +15,7 @@ findings; ``validate_named`` loads a schema from ``schemas/`` by its stem.
 from __future__ import annotations
 
 import json
+import math
 import re
 from functools import lru_cache
 from typing import Any
@@ -74,6 +75,9 @@ def _validate(instance: Any, schema: dict, path: str, errors: list[str]) -> None
             errors.append(f"{path}: {instance!r} does not match pattern {pattern!r}")
 
     if isinstance(instance, (int, float)) and not isinstance(instance, bool):
+        if isinstance(instance, float) and not math.isfinite(instance):
+            errors.append(f"{path}: number must be finite")
+            return
         minimum = schema.get("minimum")
         if minimum is not None and instance < minimum:
             errors.append(f"{path}: {instance} < minimum {minimum}")

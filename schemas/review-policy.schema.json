@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "review-policy.schema.json",
+  "type": "object",
+  "required": ["id", "minimum_literary_reviews", "required_literary_roles", "require_runtime_provenance", "defaultness_mode", "require_prose_audit"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {"type": "string", "minLength": 1},
+    "minimum_literary_reviews": {"type": "integer", "minimum": 0},
+    "required_literary_roles": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "require_runtime_provenance": {"type": "boolean"},
+    "defaultness_mode": {"enum": ["blocking", "advisory"]},
+    "require_prose_audit": {"type": "boolean"}
+  }
+}
