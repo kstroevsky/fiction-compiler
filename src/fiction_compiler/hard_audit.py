@@ -113,7 +113,20 @@ _REF_ID = re.compile(r"^(fact|char|obj|loc|evt|promise)-[a-z0-9-]+$")
 def _atom_str(atom: dict) -> str:
     obj = atom.get("object")
     inside = f"{atom.get('subject', '?')}" + (f", {obj}" if obj else "")
-    return f"{atom.get('predicate', '?')}({inside})"
+    rendered = f"{atom.get('predicate', '?')}({inside})"
+    if "value" in atom:
+        rendered += f" == {atom['value']!r}"
+    return rendered
+
+
+def _effect_matches(required: dict, declared: dict) -> bool:
+    """Compare an event effect with one state-delta predicate change semantically."""
+    fields = ("op", "predicate", "subject", "object")
+    if any(required.get(field) != declared.get(field) for field in fields):
+        return False
+    if required.get("op") == "remove":
+        return True
+    return required.get("value", True) == declared.get("value", True)
 
 
 def _ontology_findings(ontology: dict, spec: dict, event_map: dict, scene_delta: dict) -> list[dict]:
@@ -180,10 +193,16 @@ def audit_scene(project: Path, scene_id: str) -> dict:
 
     event_map = _events(project)
     scene_delta = _load_delta(project, scene_id) or {}
-    declared_effects = {
-        (p.get("op"), p.get("predicate"), p.get("subject"), p.get("object"))
-        for p in scene_delta.get("predicate_changes", [])
-    }
+    declared_effects = scene_delta.get("predicate_changes", [])
+
+    for fact in scene_delta.get("facts_added", []):
+        previous = before.fact_definitions.get(fact.get("id"))
+        if previous is not None and previous != fact.get("text"):
+            findings.append(_finding(
+                "factual", "material", f"{scene_id} redefines {fact.get('id')!r}",
+                "A fact id already denotes a different proposition; create a new fact id for the changed truth.",
+                "world"))
+
     for event_id in spec.get("required_events", []):
         if not EVENT_ID.match(event_id):
             continue
@@ -192,20 +211,34 @@ def audit_scene(project: Path, scene_id: str) -> dict:
                                      "Required event is not present in planning/event-graph.json.", "plot"))
             continue
         event = event_map[event_id]
+        for cause in event.get("causes", []):
+            if cause not in event_map:
+                findings.append(_finding(
+                    "causal", "material", f"{event_id} cause {cause!r}",
+                    "Event cause does not resolve to an event in planning/event-graph.json.", "plot"))
         for pre in event.get("preconditions", []):
             if isinstance(pre, dict):
-                if not before.holds(pre.get("predicate"), pre.get("subject"), pre.get("object")):
+                kwargs = {"value": pre["value"]} if "value" in pre else {}
+                if not before.holds(pre.get("predicate"), pre.get("subject"), pre.get("object"), **kwargs):
                     findings.append(_finding(
                         "causal", "material", f"{event_id} precondition {_atom_str(pre)}",
                         "Event precondition does not hold in the state reconstructed before this scene.", "plot"))
-            elif isinstance(pre, str) and not _REF_ID.match(pre):
-                findings.append(_finding(
-                    "causal", "minor", f"{event_id} precondition {pre!r}",
-                    "Precondition is unstructured prose; encode it as a typed atom to make it verifiable.", "plot"))
+            elif isinstance(pre, str):
+                if pre.startswith("fact-") and not before.fact_exists(pre):
+                    findings.append(_finding(
+                        "causal", "material", f"{event_id} precondition {pre!r}",
+                        "Fact precondition does not resolve to a currently established fact.", "plot"))
+                elif pre.startswith("evt-") and pre not in event_map:
+                    findings.append(_finding(
+                        "causal", "material", f"{event_id} precondition {pre!r}",
+                        "Event precondition does not resolve to an event in planning/event-graph.json.", "plot"))
+                elif not _REF_ID.match(pre):
+                    findings.append(_finding(
+                        "causal", "minor", f"{event_id} precondition {pre!r}",
+                        "Precondition is unstructured prose; encode it as a typed atom to make it verifiable.", "plot"))
         for eff in event.get("effects", []):
             if isinstance(eff, dict):
-                key = (eff.get("op"), eff.get("predicate"), eff.get("subject"), eff.get("object"))
-                if key not in declared_effects:
+                if not any(_effect_matches(eff, declared) for declared in declared_effects):
                     findings.append(_finding(
                         "causal", "material", f"{event_id} effect {_atom_str(eff)}",
                         "Event effect is declared but not recorded in this scene's state-delta predicate_changes.", "scene"))
@@ -228,6 +261,7 @@ def audit_canon(project: Path) -> dict:
     findings: list[dict] = []
     before = seed_state(project)  # replay starts from the initial canon
     facts = dict(before.facts)
+    fact_definitions = dict(before.fact_definitions)
     knowledge = {c: set(v) for c, v in before.knowledge.items()}
     open_promises = dict(before.open_promises)
     prev_time: Any = before.time
@@ -239,14 +273,24 @@ def audit_canon(project: Path) -> dict:
                                      "Accepted scene has no state-delta.json.", "process"))
             continue
 
-        added_ids = {f["id"] for f in delta.get("facts_added", [])}
+        valid_added_ids: set[str] = set()
+        for fact in delta.get("facts_added", []):
+            fact_id, text = fact["id"], fact["text"]
+            previous = fact_definitions.get(fact_id)
+            if previous is not None and previous != text:
+                findings.append(_finding(
+                    "factual", "material", f"{scene_id} redefines {fact_id!r}",
+                    "A fact id already denotes a different proposition; changing its text would alias existing knowledge.",
+                    "world"))
+            else:
+                valid_added_ids.add(fact_id)
         for fact_id in delta.get("facts_removed", []):
             if fact_id not in facts:
                 findings.append(_finding("factual", "minor", f"{scene_id} removes {fact_id!r}",
                                          "Delta removes a fact that is not currently established.", "scene"))
         for change in delta.get("knowledge_changes", []):
             fact_id = change.get("fact")
-            if fact_id not in facts and fact_id not in added_ids:
+            if fact_id not in facts and fact_id not in valid_added_ids:
                 findings.append(_finding(
                     "knowledge", "material",
                     f"{scene_id}: {change.get('character')} learns {fact_id!r}",
@@ -273,7 +317,13 @@ def audit_canon(project: Path) -> dict:
 
         # Apply the delta to the running shadow state.
         for fact in delta.get("facts_added", []):
-            facts[fact["id"]] = fact["text"]
+            fact_id, text = fact["id"], fact["text"]
+            previous = fact_definitions.get(fact_id)
+            if previous is None:
+                fact_definitions[fact_id] = text
+                facts[fact_id] = text
+            elif previous == text:
+                facts[fact_id] = text
         for fact_id in delta.get("facts_removed", []):
             facts.pop(fact_id, None)
         for change in delta.get("knowledge_changes", []):

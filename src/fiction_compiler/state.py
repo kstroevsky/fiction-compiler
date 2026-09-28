@@ -53,6 +53,7 @@ def _read_json(path: Path, default: Any) -> Any:
 # (predicate, subject, object) with object optional (None for unary state like offline(obj)).
 RelKey = tuple[str, str]
 PredKey = tuple[str, str, str | None]
+_MISSING = object()
 
 
 @dataclass
@@ -61,6 +62,9 @@ class StoryState:
 
     time: Any = None
     facts: dict[str, str] = field(default_factory=dict)  # fact id -> text
+    # Immutable proposition identity. ``facts`` is the currently established subset; this ledger
+    # retains definitions even after removal so a fact id cannot later be reused for new text.
+    fact_definitions: dict[str, str] = field(default_factory=dict)
     knowledge: dict[str, set[str]] = field(default_factory=dict)  # char id -> {fact id}
     # Directional: (subject, object) -> {dimension: value}. A legacy symmetric relationship is
     # stored in BOTH directions under the "state" dimension (see _apply_relationship_record).
@@ -89,21 +93,25 @@ class StoryState:
         """A directional relationship dimension (e.g. trusts/fears/owes) from subject to object."""
         return self.relationships.get((subject, object), {}).get(dimension)
 
-    def holds(self, predicate: str, subject: str, object: str | None = None) -> bool:
+    def holds(self, predicate: str, subject: str, object: str | None = None, *, value: Any = _MISSING) -> bool:
         """Whether a typed atom holds — the query event preconditions are evaluated against.
 
         Bridges the existing stores: ``knows`` consults per-character knowledge, a relationship
         verb consults the directional relationship dimensions, and everything else consults the
-        typed predicate store.
+        typed predicate store. When ``value`` is supplied, the stored value must match exactly;
+        omitting it preserves the legacy truthiness/presence query.
         """
         if predicate == "knows":
-            return object is not None and self.knows(subject, object)
+            actual = object is not None and self.knows(subject, object)
+            return actual if value is _MISSING else actual == value
         if (predicate, subject, object) in self.predicates:
-            return bool(self.predicates[(predicate, subject, object)])
+            actual = self.predicates[(predicate, subject, object)]
+            return bool(actual) if value is _MISSING else actual == value
         if object is not None:
             dims = self.relationships.get((subject, object))
             if dims is not None and predicate in dims:
-                return bool(dims[predicate])
+                actual = dims[predicate]
+                return bool(actual) if value is _MISSING else actual == value
         return False
 
     def promise_is_open(self, promise_id: str) -> bool:
@@ -130,9 +138,24 @@ def _apply_predicate_record(state: StoryState, record: dict) -> None:
         state.predicates[key] = record.get("value", True)
 
 
+def _apply_fact_record(state: StoryState, fact: dict) -> bool:
+    """Define/establish one fact without allowing its id to acquire a new meaning.
+
+    Returns ``False`` for a conflicting redefinition. Replay preserves the original proposition;
+    hard-audit reports the conflict as a material integrity error.
+    """
+    fact_id, text = fact["id"], fact["text"]
+    previous = state.fact_definitions.get(fact_id)
+    if previous is not None and previous != text:
+        return False
+    state.fact_definitions.setdefault(fact_id, text)
+    state.facts[fact_id] = text
+    return True
+
+
 def _apply_delta(state: StoryState, delta: dict) -> None:
     for fact in delta.get("facts_added", []):
-        state.facts[fact["id"]] = fact["text"]
+        _apply_fact_record(state, fact)
     for fact_id in delta.get("facts_removed", []):
         state.facts.pop(fact_id, None)
     for change in delta.get("knowledge_changes", []):
@@ -157,7 +180,7 @@ def seed_state(project: Path) -> StoryState:
     canon = project / "canon"
     state = StoryState()
     for fact in _read_jsonl(canon / "facts.jsonl"):
-        state.facts[fact["id"]] = fact["text"]
+        _apply_fact_record(state, fact)
     for record in _read_jsonl(canon / "knowledge-state.jsonl"):
         state.knowledge.setdefault(record["character"], set()).add(record["fact"])
     for record in _read_jsonl(canon / "relationship-state.jsonl"):  # legacy or directional

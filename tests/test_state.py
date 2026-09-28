@@ -126,7 +126,11 @@ class TypedIRStateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             before = state.reconstruct_state_before(build_typed_project(Path(tmp)), "ch01-sc01")
             self.assertTrue(before.holds("located_at", "char-jonas", "loc-station"))
+            self.assertTrue(before.holds("located_at", "char-jonas", "loc-station", value=True))
+            self.assertFalse(before.holds("located_at", "char-jonas", "loc-station", value=False))
             self.assertEqual(before.relationship_directed("char-mara", "char-jonas", "trusts"), "high")
+            self.assertTrue(before.holds("trusts", "char-mara", "char-jonas", value="high"))
+            self.assertFalse(before.holds("trusts", "char-mara", "char-jonas", value="broken"))
             # Directional: trust does not imply the reverse edge exists.
             self.assertIsNone(before.relationship_directed("char-jonas", "char-mara", "trusts"))
 

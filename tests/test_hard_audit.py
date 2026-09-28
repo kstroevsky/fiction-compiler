@@ -144,6 +144,44 @@ class HardAuditExecutableEventTests(unittest.TestCase):
             self.assertTrue(any(f["dimension"] == "causal" and f["severity"] == "material"
                                 and "effect" in f["evidence"] for f in critique["findings"]))
 
+    def test_typed_precondition_compares_declared_value(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut",
+                     "preconditions": [{"predicate": "trusts", "subject": "char-mara",
+                                        "object": "char-jonas", "value": "total"}],
+                     "effects": []}
+            world = json.dumps({"predicate": "trusts", "subject": "char-mara",
+                                "object": "char-jonas", "value": "none"}) + "\n"
+            project = self._project(Path(tmp), event, {}, world_state=world)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any("precondition" in f["evidence"] for f in critique["findings"]))
+
+    def test_typed_effect_compares_declared_value(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": [],
+                     "effects": [{"op": "add", "predicate": "trusts", "subject": "char-mara",
+                                  "object": "char-jonas", "value": True}]}
+            delta_extra = {"predicate_changes": [
+                {"op": "add", "predicate": "trusts", "subject": "char-mara",
+                 "object": "char-jonas", "value": False},
+            ]}
+            project = self._project(Path(tmp), event, delta_extra)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any("effect" in f["evidence"] for f in critique["findings"]))
+
+    def test_unresolved_fact_precondition_and_event_cause_are_material(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": ["fact-never-established"],
+                     "effects": [], "causes": ["evt-does-not-exist"]}
+            project = self._project(Path(tmp), event, {})
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            evidence = "\n".join(f["evidence"] for f in critique["findings"])
+            self.assertIn("fact-never-established", evidence)
+            self.assertIn("evt-does-not-exist", evidence)
+
     def test_prose_precondition_earns_migration_advisory(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             event = {"id": "evt-relay-cut", "preconditions": ["jonas is the station operator"], "effects": []}
@@ -282,6 +320,34 @@ class HardAuditCanonTests(unittest.TestCase):
             critique = hard_audit.audit_canon(project)
             self.assertTrue(any(f["dimension"] == "promise" and f["severity"] == "minor"
                                 for f in critique["findings"]))
+
+    def test_fact_id_cannot_change_meaning(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01", "ch01-sc02"])
+            write(project / "canon" / "facts.jsonl",
+                  json.dumps({"id": "fact-code", "text": "Door code is 1111"}) + "\n")
+            write(project / "canon" / "knowledge-state.jsonl",
+                  json.dumps({"character": "char-mara", "fact": "fact-code"}) + "\n")
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": 1,
+                "facts_added": [{"id": "fact-code", "text": "Door code is 2222"}],
+                "facts_removed": [], "knowledge_changes": [], "relationship_changes": [],
+                "promises_opened": [], "promises_closed": [],
+            })
+            write_json(project / "scenes" / "ch01-sc02" / "state-delta.json", {
+                "scene_id": "ch01-sc02", "time": 2,
+                "facts_added": [], "facts_removed": [], "knowledge_changes": [],
+                "relationship_changes": [], "promises_opened": [], "promises_closed": [],
+            })
+
+            critique = hard_audit.audit_canon(project)
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any(f["dimension"] == "factual" and "fact-code" in f["evidence"]
+                                for f in critique["findings"]))
+
+            before_second = hard_audit.reconstruct_state_before(project, "ch01-sc02")
+            self.assertEqual(before_second.facts["fact-code"], "Door code is 1111")
+            self.assertTrue(before_second.knows("char-mara", "fact-code"))
 
 
 if __name__ == "__main__":
