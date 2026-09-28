@@ -59,6 +59,7 @@ The compiler can now revise backwards without silently mutating accepted history
 chain. It can identify concrete state dependents while conservatively exposing the larger literary
 blast radius.
 
-This does **not** complete whole-work literary review. Pending reader/voice/whole-work scopes are
-deliberately left open until fresh evidence is produced, and exact drafting-context provenance remains
-unverified unless a future drafting runner records it directly.
+ADR 0031 now provides the provenance-bearing workflow for fresh literary/reader/voice/whole-work
+evidence and explicit scope resolution. It does not fabricate those subjective outcomes: pending scopes
+remain open until evidence is actually recorded and separately resolved. Exact drafting-context
+provenance remains unverified unless a drafting runner records it directly.

@@ -55,6 +55,9 @@ It runs anywhere `python3` runs — no install step.
 | `promote` | **State-changing, gated by `confirm`** — copies a reviewed candidate into the manuscript and folds its delta into canon |
 | `revise_acceptance` | **State-changing, gated by `confirm`** — replace an accepted scene, preserve superseded acceptance objects, rebase downstream canon, rerun hard checks, and invalidate downstream literary/reader/voice evidence |
 | `revision_status` | Read-only view of pending downstream rechecks and the preserved backward-revision event ledger |
+| `post_revision_recheck_packet` | Build exact active-acceptance prose context for a pending subjective scope; reader packets are prefix-only and whole-work is global |
+| `record_post_revision_evidence` | Persist packet-bound reviewer/reader evidence without automatically clearing the scope |
+| `resolve_post_revision_scope` | Explicitly clear a still-current scope from clean pass evidence while recording who decided and why |
 
 The write path now supports both forward acceptance and explicit backward correction: an agent driving
 purely over MCP can persist revision history (`record_revision`), reach the full stop-condition logic,

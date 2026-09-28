@@ -17,8 +17,9 @@ from typing import Any, Callable
 
 from . import critic_eval as _critic_eval
 from . import critique as _critique
-from . import (critic_calibration, defaultness, hard_audit, integrity, issue_resolution, kb, plan_search, reader,
-               realization_calibration, regression, revision, safety, schema, selection_eval, trace)
+from . import (critic_calibration, defaultness, hard_audit, integrity, issue_resolution, kb, plan_search,
+               post_revision, reader, realization_calibration, regression, revision, safety, schema,
+               selection_eval, trace)
 from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
@@ -271,12 +272,25 @@ def revise_acceptance(project: str, scene_id: str, candidate_file: str, confirm:
 
 def revision_status(project: str) -> dict:
     """Return pending downstream rechecks and preserved backward-revision history."""
-    report = integrity.verify_report(project_dir(project))
-    return {
-        "canon_status": report["status"],
-        "rechecks_required": report.get("rechecks_required", {}),
-        "revision_events": report.get("revision_events", []),
-    }
+    return post_revision.status(project_dir(project))
+
+
+def post_revision_recheck_packet(project: str, scope: str, scene_id: str | None = None) -> dict:
+    return post_revision.packet(project_dir(project), scope, scene_id)
+
+
+def record_post_revision_evidence(project: str, scope: str, packet_sha256: str,
+                                  evaluator_kind: str, evaluator_id: str, cohort_kind: str,
+                                  verdict: str, findings: list[dict], provenance: dict | None = None,
+                                  scene_id: str | None = None) -> dict:
+    return post_revision.record_evidence(
+        project_dir(project), scope, packet_sha256, evaluator_kind, evaluator_id, cohort_kind,
+        verdict, findings, provenance=provenance, scene_id=scene_id,
+    )
+
+
+def resolve_post_revision_scope(project: str, evidence_id: str, decided_by: str, reason: str) -> dict:
+    return post_revision.resolve_scope(project_dir(project), evidence_id, decided_by, reason)
 
 
 def tournament(project: str, scene_id: str, seed: int = 0, persist: bool = False,
@@ -815,6 +829,38 @@ TOOLS: list[dict] = [
           "Read-only status for backward revision: canonical integrity plus pending downstream "
           "literary/reader/voice/whole-work rechecks and the preserved revision-event ledger.",
           {"project": {"type": "string"}}, ["project"], revision_status),
+    _tool("post_revision_recheck_packet",
+          "Build an exact packet for one pending subjective post-revision recheck. Reader packets "
+          "contain only the accepted prefix; whole_work packets bind the full active manuscript. "
+          "Packets are bound to immutable acceptance objects and the current canon head.",
+          {"project": {"type": "string"},
+           "scope": {"type": "string", "enum": ["literary", "reader", "voice", "whole_work"]},
+           "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"}},
+          ["project", "scope"], post_revision_recheck_packet),
+    _tool("record_post_revision_evidence",
+          "Persist append-only evidence against an exact post-revision packet. Recording evidence "
+          "never clears a pending scope; stale packet hashes are refused and pass verdicts cannot "
+          "carry material/fatal findings.",
+          {"project": {"type": "string"},
+           "scope": {"type": "string", "enum": ["literary", "reader", "voice", "whole_work"]},
+           "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+           "packet_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+           "evaluator_kind": {"type": "string", "enum": ["human", "role_runner", "model_probe"]},
+           "evaluator_id": {"type": "string", "minLength": 1},
+           "cohort_kind": {"type": "string", "enum": ["target_reader", "expert_reader", "owner", "other"]},
+           "verdict": {"type": "string", "enum": ["pass", "revise", "reject", "uncertain"]},
+           "findings": {"type": "array"}, "provenance": {"type": "object"}},
+          ["project", "scope", "packet_sha256", "evaluator_kind", "evaluator_id", "cohort_kind",
+           "verdict", "findings"], record_post_revision_evidence),
+    _tool("resolve_post_revision_scope",
+          "Explicitly resolve a still-pending subjective recheck using clean pass evidence that is "
+          "still bound to the current acceptance head. Records who resolved it and why. A global "
+          "whole-work resolution clears only the pending scenes in that exact packet.",
+          {"project": {"type": "string"},
+           "evidence_id": {"type": "string", "pattern": "^recheck-[0-9a-f]{64}$"},
+           "decided_by": {"type": "string", "minLength": 1},
+           "reason": {"type": "string", "minLength": 1}},
+          ["project", "evidence_id", "decided_by", "reason"], resolve_post_revision_scope),
     _tool("tournament",
           "Run a blind, Pareto-scored tournament over a scene's candidates from their critiques. "
           "Returns blinded labels + reveal map, forward/reversed presentation orders, per-candidate "

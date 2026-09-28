@@ -185,11 +185,12 @@ test, not just a feature.
 > onto the new canon hash while retaining superseded objects as verified history. New acceptances carry
 > a conservative fact/predicate/promise read set. Changed typed state marks known dependents, while
 > every downstream scene is still invalidated for literary/reader/voice/whole-work review because the
-> typed read set is not complete for literary effects. Deterministic hard audits rerun immediately;
-> remaining scopes stay explicitly pending. A reconstructed context basis is frozen without claiming
-> it was the exact drafting prompt; exact role-runner packets are frozen when their provenance is
-> available. Still ⬜: a first-class whole-work literary pass and a provenance-bearing mechanism that
-> closes pending reader/voice scopes with fresh post-revision evidence.
+> typed read set is not complete for literary effects. Deterministic hard audits rerun immediately.
+> **ADR 0031 now makes the subjective closure path first-class:** literary/voice packets bind the exact
+> active acceptances, reader packets expose only the accepted prefix, and one global whole-work packet
+> binds the complete active manuscript. Evidence is append-only and cannot clear a scope by itself;
+> explicit resolution rechecks freshness and records who decided and why. A reconstructed context basis
+> remains labeled reconstructed rather than claimed as the original drafting prompt.
 >
 > **KB now has enforced structured depth (ADR 0015, P4 slice 1).** Every concept carries a `claim`, an
 > `evidence_strength` grade, `dangerous_when` conditions, `counterexamples`, and resolvable
@@ -233,6 +234,7 @@ test, not just a feature.
 > `0027-plan-level-search-before-prose.md`, `0028-frozen-selection-measurement.md`,
 > `0029-critic-behavioral-calibration.md`,
 > `0030-realization-calibration-evidence.md`,
+> `0031-post-revision-subjective-rechecks.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 
