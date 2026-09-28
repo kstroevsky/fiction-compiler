@@ -218,6 +218,8 @@ class RunRoleTests(unittest.TestCase):
             self.assertIsNone(r["consistency_problem"])
             self.assertEqual(r["provenance"]["vendor"], "anthropic")
             self.assertEqual(r["provenance"]["model"], "claude-opus-4-8")
+            self.assertEqual(r["provenance"]["provider_response"]["usage"], {})
+            self.assertGreaterEqual(r["provenance"]["provider_response"]["latency_ms"], 0)
             self.assertEqual(r["provenance"]["candidate_sha256"],
                              integrity.sha256_file(scene / "candidates" / "candidate-a.md"))
             self.assertIsNone(r["recorded"])
@@ -310,6 +312,64 @@ class RunRoleTests(unittest.TestCase):
             status = critique.scene_status(root, "ch01-sc01", "candidate-a.md")
             self.assertFalse(status["audit_gate"]["ready"])
 
+    def test_completion_usage_is_preserved_in_attempt_and_recorded_provenance(self) -> None:
+        class MeteredTransport:
+            def complete(self, system: str, user: str, model: str, **params: object):
+                return role_runner.CompletionResult(
+                    text='{"verdict":"pass","confidence":0.9,"findings":[]}',
+                    input_tokens=120,
+                    output_tokens=30,
+                    total_tokens=150,
+                    provider_request_id="req-test",
+                    response_model="provider-model-version",
+                    finish_reason="stop",
+                )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root, _ = _scene(tmp)
+            result = role_runner.run_role(
+                str(root), "ch01-sc01", "candidate-a.md", "adversarial-reader",
+                roster=_roster(), transport=MeteredTransport(), record=True)
+            provider = result["provenance"]["provider_response"]
+            self.assertEqual(provider["usage"], {
+                "input_tokens": 120, "output_tokens": 30, "total_tokens": 150,
+            })
+            self.assertEqual(provider["provider_request_id"], "req-test")
+            attempt = json.loads((root / result["provenance"]["attempt_artifact"]).read_text())
+            self.assertEqual(attempt["provider_response"]["usage"]["total_tokens"], 150)
+            recorded = json.loads((root / result["recorded"]["written"]).read_text())
+            self.assertEqual(recorded["provenance"]["provider_response"]["usage"], provider["usage"])
+
+    def test_malformed_output_still_preserves_provider_usage(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root, _ = _scene(tmp)
+            tp = OfflineTransport(responder=lambda *args: role_runner.CompletionResult(
+                text="not json", input_tokens=17, output_tokens=3))
+            with self.assertRaises(MalformedVendorOutput):
+                role_runner.run_role(
+                    str(root), "ch01-sc01", "candidate-a.md", "adversarial-reader",
+                    roster=_roster(), transport=tp)
+            attempts = list((root / ".runs" / "reviews" / "ch01-sc01").glob("*.json"))
+            self.assertEqual(len(attempts), 1)
+            attempt = json.loads(attempts[0].read_text())
+            self.assertEqual(attempt["validation"]["status"], "invalid")
+            self.assertEqual(attempt["provider_response"]["usage"], {
+                "input_tokens": 17, "output_tokens": 3, "total_tokens": 20,
+            })
+
+    def test_transport_failure_records_attempt_without_invented_usage(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root, _ = _scene(tmp)
+            with self.assertRaises(VendorUnavailable):
+                role_runner.run_role(
+                    str(root), "ch01-sc01", "candidate-a.md", "adversarial-reader",
+                    roster=_roster(), transport=_BoomTransport())
+            attempts = list((root / ".runs" / "reviews" / "ch01-sc01").glob("*.json"))
+            self.assertEqual(len(attempts), 1)
+            attempt = json.loads(attempts[0].read_text())
+            self.assertEqual(attempt["validation"]["status"], "transport_error")
+            self.assertEqual(attempt["provider_response"]["usage"], {})
+
 
 class PanelTests(unittest.TestCase):
     def test_disagreement_is_reported_not_averaged(self) -> None:
@@ -391,6 +451,54 @@ class TransportTests(unittest.TestCase):
                 role_runner._http_post_json(
                     "https://example.invalid/path?key=super-secret", {}, {"x": 1})
         self.assertNotIn("super-secret", str(ctx.exception))
+
+    def test_anthropic_normalizes_usage_and_response_metadata(self) -> None:
+        payload = {
+            "id": "msg_123", "model": "claude-test", "stop_reason": "end_turn",
+            "content": [{"type": "text", "text": "ok"}],
+            "usage": {"input_tokens": 11, "output_tokens": 7},
+        }
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test"}), \
+                mock.patch.object(role_runner, "_http_post_json", return_value=payload):
+            result = role_runner.AnthropicHTTP().complete("s", "u", "claude-test")
+        self.assertEqual(result.text, "ok")
+        self.assertEqual((result.input_tokens, result.output_tokens, result.total_tokens), (11, 7, 18))
+        self.assertEqual(result.provider_request_id, "msg_123")
+        self.assertEqual(result.finish_reason, "end_turn")
+
+    def test_openai_normalizes_usage_without_coercing_invalid_counts(self) -> None:
+        payload = {
+            "id": "chatcmpl_123", "model": "gpt-test",
+            "choices": [{"message": {"content": "ok"}, "finish_reason": "stop"}],
+            "usage": {"prompt_tokens": 9, "completion_tokens": True, "total_tokens": "10"},
+        }
+        with mock.patch.dict(os.environ, {"OPENAI_API_KEY": "test"}), \
+                mock.patch.object(role_runner, "_http_post_json", return_value=payload):
+            result = role_runner.OpenAIHTTP().complete("s", "u", "gpt-test")
+        self.assertEqual(result.input_tokens, 9)
+        self.assertIsNone(result.output_tokens)
+        self.assertIsNone(result.total_tokens)
+        self.assertEqual(result.response_model, "gpt-test")
+
+    def test_gemini_normalizes_usage_and_metadata(self) -> None:
+        payload = {
+            "responseId": "resp-123", "modelVersion": "gemini-test-001",
+            "candidates": [{
+                "content": {"parts": [{"text": "o"}, {"text": "k"}]},
+                "finishReason": "STOP",
+            }],
+            "usageMetadata": {
+                "promptTokenCount": 8, "candidatesTokenCount": 4, "totalTokenCount": 12,
+            },
+        }
+        with mock.patch.dict(os.environ, {"GEMINI_API_KEY": "test"}), \
+                mock.patch.object(role_runner, "_http_post_json", return_value=payload):
+            result = role_runner.GeminiHTTP().complete("s", "u", "gemini-test")
+        self.assertEqual(result.text, "ok")
+        self.assertEqual((result.input_tokens, result.output_tokens, result.total_tokens), (8, 4, 12))
+        self.assertEqual(result.provider_request_id, "resp-123")
+        self.assertEqual(result.response_model, "gemini-test-001")
+        self.assertEqual(result.finish_reason, "STOP")
 
 
 if __name__ == "__main__":

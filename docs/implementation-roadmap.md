@@ -40,7 +40,7 @@ mechanical validity, modeled/extracted consistency, and literary preference.
 | Anti-obviousness search | `avoid-defaults` skill, premise probes | **Partial/experimental** | Search prompts/probes exist; no validated continuation ensemble or universal originality metric |
 | Knowledge base | `kb/`, source register | **Starter set implemented** | Structured concept cards, conflicts/counterexamples, rights-aware provenance, one owned-scene annotation |
 | Framework regression | `regression.py`, fixtures, critic cases | **Implemented** | Closed checks plus fingerprint of code, schemas, KB, prompts/skills, roster/probes, eval data, scripts, runtime config |
-| Observability | project `.runs/`, trace, review attempts | **Substantial but incomplete** | Candidate-bound packets and collision-safe runs; selection experiments can account for known/missing usage, but live transports do not yet capture provider usage automatically |
+| Observability | project `.runs/`, trace, review attempts | **Substantial** | Candidate-bound packets and collision-safe runs; live role transports preserve provider token metadata/latency when available, and selection experiments keep unknown usage distinct from zero |
 | End-to-end projects | `projects/*` | **Present** | Multiple worked projects exercise promotion, state, audits and manuscript assembly |
 
 ---
@@ -94,7 +94,9 @@ test, not just a feature.
 > per-scene `revision-log.jsonl`) — this is the manuscript's own improvement loop. The **framework**
 > PDCA loop (Stage 5) now has a regression-fixture runner, critic-calibration corpus and broad
 > framework fingerprint. Automated before/after policy transactions, threshold/approval/rollback
-> orchestration and complete token/cost manifests remain ⬜. Stage 6 (GUI) ⬜.
+> orchestration and complete experiment-wide cost manifests remain ⬜. Role-runner provider usage
+> capture is implemented (ADR 0032); generation/revision paths still need the same accounting before
+> a matched-cost study can claim complete expenditure. Stage 6 (GUI) ⬜.
 > **Tools for the author.** The deterministic engine is exposed to the LLM as callable tools via
 > a dependency-free MCP server (`scripts/fiction_mcp.py`, wired in `.mcp.json` and `.codex/config.toml`):
 > `kb_search`/`kb_get`, `state_before`, `compile_context`, `hard_audit`, `defaultness_lint`,
@@ -221,7 +223,8 @@ test, not just a feature.
 > source, schemas, full KB/defaultness content, scripts, model roster/premise probes, eval/regression
 > corpora, personas/skills/governance text and runtime configuration. A change that regresses an
 > invariant fails the run (non-zero exit). Still ⬜ in P5: automating the before/after
-> threshold/approval/rollback workflow and recording complete live token/cost/provider metadata.
+> threshold/approval/rollback workflow and extending ADR 0032's provider-usage provenance across the
+> remaining generation/revision paths so experiment-wide matched-cost accounting is complete.
 >
 > See `docs/decisions/0001-structured-state-delta.md`, `0002-promotion-audit-gate.md`,
 > `0003-tamper-evident-promotion.md`, `0004-executable-story-ir.md`, `0005-predicate-ontology.md`,

@@ -74,10 +74,11 @@ network I/O.
   `validate_workspace` passes.
 
 ## 7. Known trade-offs
-- **The live vendor HTTP paths are unexercised in this environment** (no keys, sandboxed network).
-  They are dependency-free and key-gated, and the whole runner is tested through the offline
-  transport; the request/response shapes should be confirmed against each vendor's current API before
-  first production use, and the openai/gemini model ids in the roster are examples to edit.
+- **The live vendor HTTP paths are unexercised in this environment** (no keys). They are
+  dependency-free and key-gated, and the whole runner is tested through the offline transport plus
+  mocked provider payloads. ADR 0032 adds normalized usage/request metadata parsing for the three
+  response shapes, but first production use should still confirm current live API compatibility; the
+  openai/gemini model ids in the roster are examples to edit.
 - Cross-vendor judging is **outside Claude Code's subagent dispatch** (which is Claude-family only) —
   it is a separate process, by design, to keep the server deterministic.
 - Vendor output is deliberately **not** injection-scanned: a `evidence` field legitimately quotes the
