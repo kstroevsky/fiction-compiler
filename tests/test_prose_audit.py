@@ -160,6 +160,27 @@ class ProseAuditTests(unittest.TestCase):
             self.assertEqual(critique["verdict"], "revise")
             self.assertIn("realization", dims(critique))
 
+    def test_discourse_event_reference_has_separate_realization_status(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp))
+            spec_path = project / "scenes" / "ch01-sc01" / "spec.json"
+            spec = json.loads(spec_path.read_text())
+            spec["event_references"] = ["evt-memory"]
+            spec_path.write_text(json.dumps(spec))
+            cl = claims()
+            cl["observed_events"] = [{
+                "id": "observed-memory", "description": "A prior event is recalled.",
+                "evidence": "prose evidence", "consequential": False,
+            }]
+            cl["event_alignment"] = [{
+                "event_id": "evt-memory", "status": "realized", "observed_id": "observed-memory",
+            }]
+            critique = audit_prose(project, "ch01-sc01", cl)
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+            self.assertEqual(critique["realization"]["event_references"], [
+                {"event_id": "evt-memory", "status": "realized", "observed_id": "observed-memory"}
+            ])
+
     def test_oblique_realization_passes_when_alignment_is_evidence_bound(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project = build(Path(tmp))

@@ -137,7 +137,11 @@ test, not just a feature.
 > propositions may be defined without being asserted true; `knows` is factive; and opt-in,
 > load-bearing resource balances support acquire/consume/transfer with underflow, unit and scene
 > quantity checks. Context packets and backward-revision dependencies carry those distinctions.
-> Still ⬜ in P1: ordered within-scene event/beat execution, a fuller entity type system, and
+> **Linear event execution is now ordered (ADR 0035):** each required event checks causes and
+> preconditions against a beat-level shadow state, matched effects advance that state, fact effects
+> may establish later preconditions, graph cycles/unresolved endpoints are material, and
+> `event_references` separates discourse reappearance from executing a canonical world event twice.
+> Still ⬜ in P1: a fuller entity type system and
 > fabula-**ordered** state reconstruction (a flashback still replays in discourse order today).
 > Promise obligations now optionally carry typed `trigger_event` / `payoff_event` references
 > (ADR 0025): triggered-but-unpaid promises and payoff events without closure are material, while
@@ -249,6 +253,7 @@ test, not just a feature.
 > `0031-post-revision-subjective-rechecks.md`,
 > `0032-provider-usage-provenance.md`, `0033-framework-change-transactions.md`,
 > `0034-epistemic-and-resource-state.md`,
+> `0035-ordered-event-execution.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 

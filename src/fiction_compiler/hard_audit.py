@@ -21,12 +21,14 @@ from __future__ import annotations
 
 import json
 import re
+from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from .ontology import check_atom, load_ontology
-from .state import accepted_scene_ids, reconstruct_state_before, resource_change_errors, seed_state
+from .state import (accepted_scene_ids, reconstruct_state_before, resource_change_errors,
+                    scene_sort_key, seed_state)
 
 CHAR_ID = re.compile(r"^char-[a-z0-9-]+$")
 EVENT_ID = re.compile(r"^evt-[a-z0-9-]+$")
@@ -108,6 +110,76 @@ def _events(project: Path) -> dict[str, dict]:
     return {e["id"]: e for e in graph.get("events", []) if e.get("id")}
 
 
+def _event_graph_findings(project: Path) -> list[dict]:
+    """Validate canonical event identity, directed references, and acyclicity."""
+    graph = _load_json(project / "planning" / "event-graph.json", {})
+    events = [e for e in graph.get("events", []) if isinstance(e, dict) and e.get("id")]
+    ids = [str(e["id"]) for e in events]
+    id_set = set(ids)
+    findings: list[dict] = []
+    for event_id in sorted({event_id for event_id in ids if ids.count(event_id) > 1}):
+        findings.append(_finding(
+            "causal", "material", f"duplicate event id {event_id!r}",
+            "Canonical event identity must be unique.", "plot"))
+
+    edges: set[tuple[str, str]] = set()
+    for event in events:
+        target = str(event["id"])
+        for cause in event.get("causes", []):
+            if isinstance(cause, str) and cause.startswith("evt-"):
+                if cause in id_set:
+                    edges.add((cause, target))
+                else:
+                    findings.append(_finding(
+                        "causal", "material", f"{target} cause {cause!r}",
+                        "Event cause does not resolve to a canonical event.", "plot"))
+    for edge in graph.get("edges", []):
+        if not isinstance(edge, dict):
+            continue
+        source, target = edge.get("from"), edge.get("to")
+        if source in id_set and target in id_set:
+            edges.add((str(source), str(target)))
+        else:
+            findings.append(_finding(
+                "causal", "material", f"event edge {source!r} -> {target!r}",
+                "Event-graph edge endpoint does not resolve to a canonical event.", "plot"))
+
+    indegree = {event_id: 0 for event_id in id_set}
+    successors = {event_id: set() for event_id in id_set}
+    for source, target in edges:
+        if target not in successors[source]:
+            successors[source].add(target)
+            indegree[target] += 1
+    ready = sorted(event_id for event_id, degree in indegree.items() if degree == 0)
+    visited = 0
+    while ready:
+        current = ready.pop(0)
+        visited += 1
+        for target in sorted(successors[current]):
+            indegree[target] -= 1
+            if indegree[target] == 0:
+                ready.append(target)
+    if visited != len(id_set):
+        cyclic = sorted(event_id for event_id, degree in indegree.items() if degree > 0)
+        findings.append(_finding(
+            "causal", "material", f"event cycle involves {cyclic}",
+            "Event graph contains a directed causal cycle; no linear execution order can satisfy it.",
+            "plot"))
+    return findings
+
+
+def _occurred_events_before(project: Path, scene_id: str) -> set[str]:
+    """World events executed by earlier accepted scenes in discourse order."""
+    target = scene_sort_key(scene_id)
+    occurred: set[str] = set()
+    for prior_scene in accepted_scene_ids(project):
+        if scene_sort_key(prior_scene) >= target:
+            continue
+        prior_spec = _load_json(project / "scenes" / prior_scene / "spec.json", {})
+        occurred.update(prior_spec.get("required_events", []))
+    return occurred
+
+
 # A precondition/effect string that already names a canon id is a reference we tolerate; a bare
 # prose string is what earns the "migrate to a typed atom" advisory.
 _REF_ID = re.compile(r"^(fact|char|obj|loc|evt|promise)-[a-z0-9-]+$")
@@ -158,6 +230,88 @@ def _belief_effect_matches(required: dict, change: dict) -> bool:
     return required.get("value", True) == change.get("value")
 
 
+def _apply_belief_shadow(state, change: dict, *, legacy: bool = False) -> None:
+    """Apply an already-validated epistemic delta to an audit-only working state."""
+    character, fact_id = change["character"], change["fact"]
+    op = change.get("op", "add" if legacy else "set")
+    if op in ("remove", "forget"):
+        state.memory.setdefault(character, set()).discard(fact_id)
+        state.beliefs.setdefault(character, {}).pop(fact_id, None)
+        return
+    state.memory.setdefault(character, set()).add(fact_id)
+    state.beliefs.setdefault(character, {})[fact_id] = True if legacy else change.get("value", True)
+
+
+def _match_and_apply_event_effect(state, effect: dict, scene_delta: dict) -> tuple[bool, str]:
+    """Match one event effect to the aggregate scene delta, then apply only that beat's effect.
+
+    This gives later required events a causally updated shadow state without applying unrelated
+    end-of-scene changes early. The canonical state is never mutated here.
+    """
+    if effect.get("fact"):
+        fact_id = effect["fact"]
+        if effect.get("op") == "remove":
+            matched = fact_id in scene_delta.get("facts_removed", [])
+            if matched:
+                state.facts.pop(fact_id, None)
+            return matched, "Event fact removal is not recorded in state-delta facts_removed."
+        record = next((item for item in scene_delta.get("facts_added", []) if item.get("id") == fact_id), None)
+        if record is not None:
+            previous = state.fact_definitions.get(fact_id)
+            if previous is None or previous == record.get("text"):
+                state.fact_definitions.setdefault(fact_id, record.get("text"))
+                state.facts[fact_id] = record.get("text")
+        return record is not None, "Event fact addition is not recorded in state-delta facts_added."
+
+    predicate = effect.get("predicate")
+    knowledge_changes = scene_delta.get("knowledge_changes", [])
+    belief_changes = scene_delta.get("belief_changes", [])
+    if predicate == "knows":
+        for change in knowledge_changes:
+            truth_ok = effect.get("op") == "remove" or state.fact_exists(effect.get("object"))
+            if truth_ok and _knowledge_effect_matches(effect, change):
+                _apply_belief_shadow(state, change, legacy=True)
+                return True, ""
+        fact_id = effect.get("object")
+        if state.fact_exists(fact_id):
+            for change in belief_changes:
+                if change.get("character") != effect.get("subject") or change.get("fact") != fact_id:
+                    continue
+                if effect.get("op") == "add" and change.get("op") == "set" and change.get("value") is True:
+                    _apply_belief_shadow(state, change)
+                    return True, ""
+                if effect.get("op") == "remove" and (
+                    change.get("op") == "forget"
+                    or (change.get("op") == "set" and change.get("value") is False)
+                ):
+                    _apply_belief_shadow(state, change)
+                    return True, ""
+        return False, "Event knowledge effect is not recorded by a factive knowledge/belief update."
+
+    if predicate == "believes":
+        for change in belief_changes:
+            if _belief_effect_matches(effect, change):
+                _apply_belief_shadow(state, change)
+                return True, ""
+        return False, "Event belief effect is not recorded in state-delta belief_changes."
+
+    if predicate == "remembers":
+        return False, "Memory changes must be expressed through knowledge_changes/belief_changes."
+
+    declared = next(
+        (change for change in scene_delta.get("predicate_changes", []) if _effect_matches(effect, change)),
+        None,
+    )
+    if declared is None:
+        return False, "Event effect is not recorded in this scene's state-delta predicate_changes."
+    key = (declared["predicate"], declared["subject"], declared.get("object"))
+    if declared.get("op") == "remove":
+        state.predicates.pop(key, None)
+    else:
+        state.predicates[key] = declared.get("value", True)
+    return True, ""
+
+
 def _ontology_findings(ontology: dict, spec: dict, event_map: dict, scene_delta: dict) -> list[dict]:
     """Every typed atom the scene touches must use a declared predicate at the right arity/type."""
     findings: list[dict] = []
@@ -175,7 +329,7 @@ def _ontology_findings(ontology: dict, spec: dict, event_map: dict, scene_delta:
             if isinstance(pre, dict):
                 check(f"{event_id} precondition", pre.get("predicate"), pre.get("subject"), pre.get("object"))
         for eff in event.get("effects", []):
-            if isinstance(eff, dict):
+            if isinstance(eff, dict) and eff.get("predicate"):
                 check(f"{event_id} effect", eff.get("predicate"), eff.get("subject"), eff.get("object"))
     for change in scene_delta.get("predicate_changes", []):
         check("delta predicate_changes", change.get("predicate"), change.get("subject"), change.get("object"))
@@ -243,10 +397,6 @@ def audit_scene(project: Path, scene_id: str) -> dict:
 
     event_map = _events(project)
     scene_delta = _load_delta(project, scene_id) or {}
-    declared_effects = [
-        change for change in scene_delta.get("predicate_changes", [])
-        if change.get("predicate") not in {"knows", "believes", "remembers"}
-    ]
     knowledge_changes = scene_delta.get("knowledge_changes", [])
     belief_changes = scene_delta.get("belief_changes", [])
 
@@ -298,6 +448,32 @@ def audit_scene(project: Path, scene_id: str) -> dict:
             "Ordered resource operations would consume or transfer unavailable quantity, use an invalid quantity, or change units.",
             "scene"))
 
+    ordered_events = spec.get("narrative_mode", "linear") == "linear"
+    event_state = deepcopy(before)
+    # Non-linear scenes are still validated against one pre-scene snapshot until fabula-ordered
+    # reconstruction lands. Preload end-of-scene facts only for effect/delta matching, never for
+    # their preconditions.
+    if not ordered_events:
+        for fact in scene_delta.get("facts_added", []):
+            previous = event_state.fact_definitions.get(fact.get("id"))
+            if previous is None or previous == fact.get("text"):
+                event_state.fact_definitions.setdefault(fact.get("id"), fact.get("text"))
+                event_state.facts[fact.get("id")] = fact.get("text")
+    occurred_before = _occurred_events_before(project, scene_id)
+    executed_here: set[str] = set()
+    event_references = set(spec.get("event_references", []))
+    overlap = event_references & set(spec.get("required_events", []))
+    for event_id in sorted(overlap):
+        findings.append(_finding(
+            "causal", "material", f"{scene_id}: {event_id!r} is both required and referenced",
+            "One scene cannot both execute a canonical event and treat the same event as discourse-only; choose the intended identity role.",
+            "scene"))
+    for event_id in sorted(event_references):
+        if event_id not in event_map:
+            findings.append(_finding(
+                "causal", "material", f"event_references includes {event_id!r}",
+                "Discourse event reference does not resolve to planning/event-graph.json.", "plot"))
+
     for event_id in spec.get("required_events", []):
         if not EVENT_ID.match(event_id):
             continue
@@ -305,65 +481,67 @@ def audit_scene(project: Path, scene_id: str) -> dict:
             findings.append(_finding("causal", "material", f"required_events includes {event_id!r}",
                                      "Required event is not present in planning/event-graph.json.", "plot"))
             continue
+        if event_id in occurred_before:
+            findings.append(_finding(
+                "causal", "material", f"{scene_id} executes {event_id!r} again",
+                "A canonical world event already executed in an earlier scene; use event_references for a discourse reappearance instead of applying its world effects twice.",
+                "plot"))
         event = event_map[event_id]
         for cause in event.get("causes", []):
-            if cause not in event_map:
+            if isinstance(cause, str) and cause.startswith("evt-"):
+                if cause not in event_map:
+                    findings.append(_finding(
+                        "causal", "material", f"{event_id} cause {cause!r}",
+                        "Event cause does not resolve to an event in planning/event-graph.json.", "plot"))
+                elif ordered_events and cause not in occurred_before | executed_here:
+                    findings.append(_finding(
+                        "causal", "material", f"{event_id} cause {cause!r}",
+                        "Causal predecessor has not executed before this event in the linear event order.", "plot"))
+            elif isinstance(cause, str) and cause.startswith("fact-"):
+                cause_state = event_state if ordered_events else before
+                if not cause_state.fact_exists(cause):
+                    findings.append(_finding(
+                        "causal", "material", f"{event_id} cause {cause!r}",
+                        "Fact cause is not true when this event executes.", "plot"))
+            elif isinstance(cause, str) and not _REF_ID.match(cause):
                 findings.append(_finding(
-                    "causal", "material", f"{event_id} cause {cause!r}",
-                    "Event cause does not resolve to an event in planning/event-graph.json.", "plot"))
+                    "causal", "minor", f"{event_id} cause {cause!r}",
+                    "Cause is unstructured prose; use a fact-* or evt-* reference to make it executable.", "plot"))
         for pre in event.get("preconditions", []):
+            pre_state = event_state if ordered_events else before
             if isinstance(pre, dict):
                 kwargs = {"value": pre["value"]} if "value" in pre else {}
-                if not before.holds(pre.get("predicate"), pre.get("subject"), pre.get("object"), **kwargs):
+                if not pre_state.holds(pre.get("predicate"), pre.get("subject"), pre.get("object"), **kwargs):
                     findings.append(_finding(
                         "causal", "material", f"{event_id} precondition {_atom_str(pre)}",
-                        "Event precondition does not hold in the state reconstructed before this scene.", "plot"))
+                        "Event precondition does not hold immediately before this event executes.", "plot"))
             elif isinstance(pre, str):
-                if pre.startswith("fact-") and not before.fact_exists(pre):
+                if pre.startswith("fact-") and not pre_state.fact_exists(pre):
                     findings.append(_finding(
                         "causal", "material", f"{event_id} precondition {pre!r}",
-                        "Fact precondition does not resolve to a currently established fact.", "plot"))
-                elif pre.startswith("evt-") and pre not in event_map:
-                    findings.append(_finding(
-                        "causal", "material", f"{event_id} precondition {pre!r}",
-                        "Event precondition does not resolve to an event in planning/event-graph.json.", "plot"))
+                        "Fact precondition is not true immediately before this event executes.", "plot"))
+                elif pre.startswith("evt-"):
+                    if pre not in event_map:
+                        findings.append(_finding(
+                            "causal", "material", f"{event_id} precondition {pre!r}",
+                            "Event precondition does not resolve to an event in planning/event-graph.json.", "plot"))
+                    elif ordered_events and pre not in occurred_before | executed_here:
+                        findings.append(_finding(
+                            "causal", "material", f"{event_id} precondition {pre!r}",
+                            "Event precondition has not executed before this beat.", "plot"))
                 elif not _REF_ID.match(pre):
                     findings.append(_finding(
                         "causal", "minor", f"{event_id} precondition {pre!r}",
                         "Precondition is unstructured prose; encode it as a typed atom to make it verifiable.", "plot"))
         for eff in event.get("effects", []):
             if isinstance(eff, dict):
-                if eff.get("predicate") == "knows":
-                    matched = any(_knowledge_effect_matches(eff, change) for change in knowledge_changes)
-                    fact_id = eff.get("object")
-                    fact_true = before.fact_exists(fact_id) or fact_id in added_now
-                    if not matched and fact_true:
-                        for change in belief_changes:
-                            if change.get("character") != eff.get("subject") or change.get("fact") != fact_id:
-                                continue
-                            if eff.get("op") == "add" and change.get("op") == "set" and change.get("value") is True:
-                                matched = True
-                                break
-                            if eff.get("op") == "remove" and (
-                                change.get("op") == "forget"
-                                or (change.get("op") == "set" and change.get("value") is False)
-                            ):
-                                matched = True
-                                break
-                    diagnosis = "Event knowledge effect is declared but not recorded by a factive knowledge/belief update."
-                elif eff.get("predicate") == "believes":
-                    matched = any(_belief_effect_matches(eff, change) for change in belief_changes)
-                    diagnosis = "Event belief effect is declared but not recorded in state-delta belief_changes."
-                elif eff.get("predicate") == "remembers":
-                    matched = False
-                    diagnosis = "Memory changes must be expressed through knowledge_changes/belief_changes, not a generic remembers effect."
-                else:
-                    matched = any(_effect_matches(eff, declared) for declared in declared_effects)
-                    diagnosis = "Event effect is declared but not recorded in this scene's state-delta predicate_changes."
+                matched, diagnosis = _match_and_apply_event_effect(event_state, eff, scene_delta)
                 if not matched:
                     findings.append(_finding(
                         "causal", "material", f"{event_id} effect {_atom_str(eff)}",
                         diagnosis, "scene"))
+        if ordered_events:
+            executed_here.add(event_id)
 
     ontology = load_ontology(project)
     if ontology is not None:
@@ -380,7 +558,7 @@ def audit_scene(project: Path, scene_id: str) -> dict:
 
 def audit_canon(project: Path) -> dict:
     """Cross-scene referential integrity, chronology, and the promise ledger."""
-    findings: list[dict] = []
+    findings: list[dict] = _event_graph_findings(project)
     before = seed_state(project)  # replay starts from the initial canon
     facts = dict(before.facts)
     fact_definitions = dict(before.fact_definitions)

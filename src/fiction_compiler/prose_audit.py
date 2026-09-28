@@ -172,6 +172,28 @@ def audit_prose(project: Path, scene_id: str, claims: dict) -> dict:
         elif status == "unverified":
             realization_uncertain = True
 
+    reference_events = list(spec.get("event_references", []))
+    realization_references: list[dict] = []
+    for event_id in reference_events:
+        alignment = alignment_by_event.get(event_id)
+        if alignment is None:
+            realization_references.append({"event_id": event_id, "status": "unverified"})
+            realization_uncertain = True
+            continue
+        status = alignment["status"]
+        item = {"event_id": event_id, "status": status}
+        if alignment.get("observed_id"):
+            item["observed_id"] = alignment["observed_id"]
+            used_observations.add(alignment["observed_id"])
+        realization_references.append(item)
+        if status == "omitted":
+            findings.append(_finding(
+                "realization", "material", f"event reference {event_id} assessed omitted",
+                "Plan-to-prose alignment explicitly found that a required discourse event reference is absent from the candidate.",
+                "prose"))
+        elif status == "unverified":
+            realization_uncertain = True
+
     # Alignments to non-required events are allowed for diagnosis, but they cannot satisfy a required
     # event. Consequential extracted events with no realized alignment are routed back to plan/delta.
     for alignment in alignments:
@@ -253,6 +275,7 @@ def audit_prose(project: Path, scene_id: str, claims: dict) -> dict:
         "findings": findings,
         "realization": {
             "required_events": realization_events,
+            "event_references": realization_references,
             "unplanned_consequential": unplanned_consequential,
             "turn": "unverified",
             "exit_state": "unverified",

@@ -24,17 +24,30 @@
     "action": {"type": "string"},
     "effects": {
       "type": "array",
-      "comment": "An effect is a legacy prose string OR a typed op {op, predicate, subject, object?}. Typed effects must appear in the scene's state-delta predicate_changes.",
+      "comment": "An effect is legacy prose, a typed predicate op, or a fact add/remove. Typed effects must be represented by the matching scene state-delta change and are executed in required_events order for linear scenes.",
       "items": {
-        "type": ["string", "object"],
-        "required": ["op", "predicate", "subject"],
-        "properties": {
-          "op": {"enum": ["add", "remove"]},
-          "predicate": {"type": "string", "minLength": 1},
-          "subject": {"type": "string", "minLength": 1},
-          "object": {"type": "string"},
-          "value": {}
-        }
+        "oneOf": [
+          {"type": "string"},
+          {
+            "type": "object",
+            "required": ["op", "predicate", "subject"],
+            "properties": {
+              "op": {"enum": ["add", "remove"]},
+              "predicate": {"type": "string", "minLength": 1},
+              "subject": {"type": "string", "minLength": 1},
+              "object": {"type": "string"},
+              "value": {}
+            }
+          },
+          {
+            "type": "object",
+            "required": ["op", "fact"],
+            "properties": {
+              "op": {"enum": ["add", "remove"]},
+              "fact": {"type": "string", "pattern": "^fact-[a-z0-9-]+$"}
+            }
+          }
+        ]
       }
     },
     "causes": {"type": "array", "items": {"type": "string"}},

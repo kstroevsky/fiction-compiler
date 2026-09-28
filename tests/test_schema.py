@@ -138,6 +138,16 @@ class SchemaValidatorTests(unittest.TestCase):
         event["time"] = True  # bool is not a valid number here
         self.assertTrue(schema.validate_named(event, "event"))
 
+    def test_event_schema_accepts_fact_effect_and_rejects_shape_without_target(self) -> None:
+        event = {
+            "id": "evt-x", "time": 1, "actors": ["char-a"], "preconditions": [],
+            "action": "discover", "effects": [{"op": "add", "fact": "fact-code-known"}],
+            "causes": [],
+        }
+        self.assertEqual(schema.validate_named(event, "event"), [])
+        event["effects"] = [{"op": "add"}]
+        self.assertTrue(any("oneOf" in error for error in schema.validate_named(event, "event")))
+
     def test_nested_findings_and_numeric_range(self) -> None:
         critique = {
             "candidate": "c",

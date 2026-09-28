@@ -16,6 +16,11 @@
     "turn": {"type": "string"},
     "exit_state": {"type": "array", "items": {"type": "string"}},
     "required_events": {"type": "array", "items": {"type": "string"}},
+    "event_references": {
+      "type": "array",
+      "comment": "Discourse-only appearances of canonical events whose world effects do not execute in this scene (for recollection, flashback replay, anticipation, summary, etc.).",
+      "items": {"type": "string", "pattern": "^evt-[a-z0-9-]+$"}
+    },
     "forbidden_moves": {"type": "array", "items": {"type": "string"}},
     "style_constraints": {"type": "array", "items": {"type": "string"}},
     "candidate_strategies": {"type": "array", "items": {"type": "string"}},
