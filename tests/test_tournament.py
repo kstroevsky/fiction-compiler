@@ -181,6 +181,16 @@ class CriticDrivesSelectionTests(unittest.TestCase):
         r = tournament.run_tournament(critiques, seed=0)
         self.assertEqual(r["recommendation"]["decision"], "no_eligible_candidates")
 
+    def test_scene_level_hard_failure_blocks_every_candidate(self) -> None:
+        critiques = self._clean("candidate-a.md", "candidate-b.md") + [
+            {"candidate": "ch01-sc01", "critic": "hard-audit", "verdict": "reject",
+             "findings": [{"dimension": "knowledge", "severity": "fatal"}]},
+        ]
+        r = tournament.run_tournament(critiques, seed=0)
+        self.assertEqual(r["floor_eligible"], [])
+        self.assertTrue(r["scene_hard_failed"])
+        self.assertEqual(r["recommendation"]["decision"], "no_eligible_candidates")
+
     def test_judges_split_forces_human_decision(self) -> None:
         critiques = self._clean("candidate-a.md", "candidate-b.md")
         labels = tournament.run_tournament(critiques, seed=0)["blind_labels"]
@@ -190,6 +200,28 @@ class CriticDrivesSelectionTests(unittest.TestCase):
         r = tournament.run_tournament(critiques, seed=0, judgments=judgments)
         self.assertTrue(r["disagreement"])
         self.assertFalse(r["judge_disagreement"]["agree_on_winner"])
+        self.assertEqual(r["recommendation"]["decision"], "human_decision_required")
+
+    def test_asymmetric_judge_split_does_not_auto_select_mean_winner(self) -> None:
+        critiques = self._clean("candidate-a.md", "candidate-b.md")
+        labels = tournament.run_tournament(critiques, seed=0)["blind_labels"]
+        a, b = labels["candidate-a.md"], labels["candidate-b.md"]
+        judgments = [
+            {"judge": "j1", "scores": {a: {"q": 5}, b: {"q": 1}}},
+            {"judge": "j2", "scores": {a: {"q": 2}, b: {"q": 3}}},
+        ]
+        r = tournament.run_tournament(critiques, seed=0, judgments=judgments)
+        self.assertEqual(r["pareto_front"], ["candidate-a.md"])
+        self.assertFalse(r["judge_disagreement"]["agree_on_winner"])
+        self.assertEqual(r["recommendation"]["decision"], "human_decision_required")
+
+    def test_partial_judgment_matrix_cannot_select_only_scored_candidate(self) -> None:
+        critiques = self._clean("candidate-a.md", "candidate-b.md")
+        labels = tournament.run_tournament(critiques, seed=0)["blind_labels"]
+        judgment = {"judge": "j1", "scores": {labels["candidate-a.md"]: {"q": 5}}}
+        r = tournament.run_tournament(critiques, seed=0, judgments=[judgment])
+        self.assertTrue(r["judgment_matrix_problems"])
+        self.assertEqual(r["recommendation"]["decision"], "human_decision_required")
 
 
 if __name__ == "__main__":

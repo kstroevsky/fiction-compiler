@@ -136,15 +136,51 @@ def floor_eligible(critiques: list[dict]) -> set[str]:
     """Candidates that clear the deterministic floor — no material/fatal finding from a code audit."""
     candidates: set[str] = set()
     disqualified: set[str] = set()
+    scene_hard_failed = False
     for critique in critiques:
         name = Path(str(critique.get("candidate", ""))).name
+        serious = any(f.get("severity") in ("material", "fatal") for f in critique.get("findings", []))
         if not name.endswith(".md"):
+            if critique.get("critic") == "hard-audit" and serious:
+                scene_hard_failed = True
             continue
         candidates.add(name)
         if critique.get("critic") in DETERMINISTIC_CRITICS and \
-                any(f.get("severity") in ("material", "fatal") for f in critique.get("findings", [])):
+                serious:
             disqualified.add(name)
+    if scene_hard_failed:
+        return set()
     return candidates - disqualified
+
+
+def judgment_matrix_problems(judgments: list[dict], reveal_map: dict[str, str],
+                             eligible: set[str]) -> list[str]:
+    """Return completeness problems that make aggregate judge scores unsafe to select from."""
+    problems: list[str] = []
+    expected_dimensions: set[str] | None = None
+    for index, judgment in enumerate(judgments):
+        rows: dict[str, set[str]] = {}
+        for label, dim_scores in (judgment.get("scores") or {}).items():
+            candidate = reveal_map.get(label)
+            if candidate in eligible and isinstance(dim_scores, dict):
+                rows[candidate] = set(dim_scores)
+        missing = sorted(eligible - set(rows))
+        if missing:
+            problems.append(f"judge {index + 1} omitted eligible candidate(s): {missing}")
+            continue
+        if not rows:
+            problems.append(f"judge {index + 1} supplied no usable scores")
+            continue
+        dimensions = list(rows.values())
+        first = dimensions[0]
+        if any(item != first for item in dimensions[1:]):
+            problems.append(f"judge {index + 1} used different dimensions across candidates")
+            continue
+        if expected_dimensions is None:
+            expected_dimensions = first
+        elif first != expected_dimensions:
+            problems.append(f"judge {index + 1} used a different dimension set from earlier judges")
+    return problems
 
 
 def scores_from_judgments(judgments: list[dict], reveal_map: dict[str, str]) -> dict[str, dict[str, float]]:
@@ -200,8 +236,16 @@ def run_tournament(critiques: list[dict], *, seed: int = 0, judges: list[str] | 
     label_by_id, id_by_label = anonymize(candidate_ids, seed=seed)
     orders = presentation_orders(list(label_by_id.values()), seed=seed)
     eligible = floor_eligible(critiques)
+    scene_hard_failed = any(
+        critique.get("critic") == "hard-audit"
+        and not Path(str(critique.get("candidate", ""))).name.endswith(".md")
+        and any(f.get("severity") in ("material", "fatal") for f in critique.get("findings", []))
+        for critique in critiques
+    )
+    matrix_problems: list[str] = []
 
     if judgments:
+        matrix_problems = judgment_matrix_problems(judgments, id_by_label, eligible)
         judged = scores_from_judgments(judgments, id_by_label)
         scores = {c: judged[c] for c in candidate_ids if c in eligible and c in judged}
         basis = "critic-judgments"
@@ -210,7 +254,14 @@ def run_tournament(critiques: list[dict], *, seed: int = 0, judges: list[str] | 
         basis = "deterministic-findings"
 
     front = pareto_front(scores)
-    if not scores:
+    if scene_hard_failed:
+        recommendation = {"decision": "no_eligible_candidates",
+                          "reason": "scene-level hard audit has a material/fatal finding"}
+    elif judgments and matrix_problems:
+        recommendation = {"decision": "human_decision_required",
+                          "reason": "judge score matrix is incomplete or inconsistent",
+                          "problems": matrix_problems}
+    elif not scores:
         recommendation = {"decision": "no_eligible_candidates",
                           "reason": "no candidate cleared the deterministic floor (or was scored)"}
     elif len(front) == 1:
@@ -224,6 +275,7 @@ def run_tournament(critiques: list[dict], *, seed: int = 0, judges: list[str] | 
         "candidates": candidate_ids,
         "floor_eligible": sorted(eligible),
         "floor_failed": sorted(set(candidate_ids) - eligible),
+        "scene_hard_failed": scene_hard_failed,
         "selection_basis": basis,
         "blind_labels": label_by_id,          # id -> blinded label (what a judge may see)
         "reveal_map": id_by_label,            # label -> id (keep OUT of the judges' view)
@@ -231,6 +283,7 @@ def run_tournament(critiques: list[dict], *, seed: int = 0, judges: list[str] | 
         "scores": scores,
         "pareto_front": sorted(front),
         "dimension_winners": dimension_winners(scores),
+        "judgment_matrix_problems": matrix_problems,
         "recommendation": recommendation,
     }
     if judges:
@@ -240,5 +293,12 @@ def run_tournament(critiques: list[dict], *, seed: int = 0, judges: list[str] | 
         judge_disagreement = disagreement_from_rankings(rankings)
         record["judge_disagreement"] = judge_disagreement
         disagreement = disagreement or not judge_disagreement["agree_on_winner"]
+        if not judge_disagreement["agree_on_winner"] and recommendation.get("decision") == "select":
+            recommendation = {
+                "decision": "human_decision_required",
+                "reason": "judges disagree on the top candidate; preserve dissent instead of averaging it away",
+                "top_picks": judge_disagreement["distinct_top_picks"],
+            }
+            record["recommendation"] = recommendation
     record["disagreement"] = disagreement
     return record
