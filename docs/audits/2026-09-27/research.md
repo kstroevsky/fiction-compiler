@@ -1,5 +1,10 @@
 # Research synthesis: useful mechanisms, limits and transfer tests
 
+> **Update, 28 September 2026.** See the follow-up [review](../2026-09-28/review.md):
+> - Item 1: the "over 40%" is Tian et al.'s own abstract claim (review §2.4).
+> - Item 12 omits 100-Endings' headline result: rubric-based LLM judges rank AI stories above New Yorker stories (§2.5).
+> - Research this synthesis did not cover is in review §5 and §6, registered as `review28-*` in `kb/source-register.json`. Topics: judge self-inconsistency, correlated errors across vendors, self-preference, story-evaluation benchmark ceilings, discourse-level signatures of AI fiction (StoryScope), data-derived slop catalogs, professional-edit taxonomies, plot-hole and point-in-time-knowledge benchmarks, belief-aware planning, foreshadow–trigger–payoff codification, and the Generative AI Paradox.
+
 Research accessed 26–27 September 2026. This is a targeted interdisciplinary review, not a systematic review with exhaustive database screening. Thirty-two references are registered in `kb/source-register.json`; the catalog below distinguishes inspected full-text sections, abstracts, and located publication records. Primary sources support the conclusions. Secondary search summaries were used for discovery, not as evidence.
 
 Coverage included narratology, reading cognition, writing processes, stylistics, human–AI writing, narrative planning, long-form consistency, creative diversity, multi-agent revision, critic calibration, and engineering provenance. Searches followed references and explicitly sought counterevidence to the supplied audit. I did not read entire in-copyright craft books, survey every language/tradition, commission experts, or run these papers' experiments. No credible finite search can establish that it has found everything useful.

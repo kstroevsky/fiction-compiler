@@ -1,0 +1,77 @@
+[
+ {
+  "probe": "knows-effect-split-store",
+  "sc01_audit": "pass",
+  "holds_knows_after": false,
+  "stored_as_predicate": true,
+  "sc02_audit": [
+   "char-a does not know 'fact-x' at this point; knowledge would leak from the future."
+  ]
+ },
+ {
+  "probe": "removed-fact-still-known",
+  "fact_exists": false,
+  "knows": true,
+  "prose_audit_verdict": "pass"
+ },
+ {
+  "probe": "time-separator-false-backward",
+  "findings": [
+   "ch01-sc02: time '2026-01-01 10:00' precedes previous '2026-01-01T09:00'"
+  ]
+ },
+ {
+  "probe": "pareto-no-indifference-threshold",
+  "recommendation": {
+   "decision": "select",
+   "candidate": "a.md"
+  },
+  "disagreement": false
+ },
+ {
+  "probe": "predictable-blind-labels",
+  "mappings": [
+   {
+    "candidate-a.md": "A",
+    "candidate-b.md": "B"
+   },
+   {
+    "candidate-a.md": "A",
+    "candidate-b.md": "B"
+   },
+   {
+    "candidate-a.md": "A",
+    "candidate-b.md": "B"
+   }
+  ],
+  "three": {
+   "candidate-a.md": "A",
+   "candidate-c.md": "B",
+   "candidate-b.md": "C"
+  }
+ },
+ {
+  "probe": "dialogue-linted-as-narration",
+  "text": "\"Time stood still,\" he said, reading the brochure aloud in his flattest voice.",
+  "findings": [
+   [
+    "material",
+    "L1: 'Time stood still' in \u201c\"Time stood still,\" he said, reading the brochure aloud in his flattest voice.\u201d"
+   ]
+  ]
+ },
+ {
+  "probe": "stale-lock-after-kill",
+  "child_exit": 9,
+  "lock_left": true,
+  "lock_bytes": "",
+  "next_promotion": "another promotion is in progress (.promote.lock present); remove it only if you "
+ },
+ {
+  "probe": "negated-knows-precondition",
+  "char_knows_secret": false,
+  "findings": [
+   "Event precondition does not hold in the state reconstructed before this scene."
+  ]
+ }
+]

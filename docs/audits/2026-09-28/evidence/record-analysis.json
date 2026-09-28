@@ -1,0 +1,549 @@
+{
+  "summary": {
+    "accepted_scenes": 17,
+    "accepted_but_failing_current_gate": [
+      "salt-in-the-wire/ch01-sc01",
+      "salt-in-the-wire/ch01-sc02",
+      "verbatim/ch01-sc01",
+      "verbatim/ch01-sc02",
+      "verbatim/ch01-sc03"
+    ],
+    "gate_era_promotions": 12,
+    "gate_era_with_one_literary_critic_on_promoted_bytes": 9,
+    "gate_era_with_unreviewed_parent_dissent": 7,
+    "gate_era_with_unreviewed_sibling_dissent": 9,
+    "scenes_with_prose_audit": 1,
+    "scenes_with_revision_log": 4,
+    "promoted_candidates_that_are_revisions": 10,
+    "manifests_requiring_human_gate": 0
+  },
+  "scenes": [
+    {
+      "project": "forecourt",
+      "scene": "ch01-sc01",
+      "promoted": "candidate-a-r1.md",
+      "gate_era_manifest": true,
+      "passes_current_gate": true,
+      "current_gate_reasons": [],
+      "literary_critics_on_promoted_bytes": [
+        "adversarial-reader"
+      ],
+      "unreviewed_parent_dissent": [
+        "style-editor"
+      ],
+      "unreviewed_sibling_dissent": [
+        "style-editor"
+      ],
+      "prose_audit_present": false,
+      "revision_log_present": false,
+      "human_gate_required": false
+    },
+    {
+      "project": "forecourt",
+      "scene": "ch01-sc02",
+      "promoted": "candidate-a-r1.md",
+      "gate_era_manifest": true,
+      "passes_current_gate": true,
+      "current_gate_reasons": [],
+      "literary_critics_on_promoted_bytes": [
+        "adversarial-reader"
+      ],
+      "unreviewed_parent_dissent": [
+        "style-editor"
+      ],
+      "unreviewed_sibling_dissent": [
+        "character-simulator",
+        "style-editor"
+      ],
+      "prose_audit_present": false,
+      "revision_log_present": false,
+      "human_gate_required": false
+    },
+    {
+      "project": "forecourt",
+      "scene": "ch01-sc03",
+      "promoted": "candidate-a-r1.md",
+      "gate_era_manifest": true,
+      "passes_current_gate": true,
+      "current_gate_reasons": [],
+      "literary_critics_on_promoted_bytes": [
+        "adversarial-reader"
+      ],
+      "unreviewed_parent_dissent": [
+        "character-simulator",
+        "style-editor"
+      ],
+      "unreviewed_sibling_dissent": [
+        "style-editor"
+      ],
+      "prose_audit_present": false,
+      "revision_log_present": false,
+      "human_gate_required": false
+    },
+    {
+      "project": "salt-in-the-wire",
+      "scene": "ch01-sc01",
+      "promoted": "candidate-a.md",
+      "gate_era_manifest": false,
+      "passes_current_gate": false,
+      "current_gate_reasons": [
+        "no clean, candidate-bound literary audit found for 'candidate-a.md'",
+        "no clean, candidate-bound defaultness audit found for 'candidate-a.md'"
+      ],
+      "literary_critics_on_promoted_bytes": [],
+      "unreviewed_parent_dissent": [],
+      "unreviewed_sibling_dissent": [],
+      "prose_audit_present": false,
+      "revision_log_present": true,
+      "human_gate_required": null
+    },
+    {
+      "project": "salt-in-the-wire",
+      "scene": "ch01-sc02",
+      "promoted": "candidate-b.md",
+      "gate_era_manifest": false,
+      "passes_current_gate": false,
+      "current_gate_reasons": [
+        "no clean, candidate-bound hard audit found for 'candidate-b.md'",
+        "no clean, candidate-bound literary audit found for 'candidate-b.md'",
+        "no clean, candidate-bound defaultness audit found for 'candidate-b.md'"
+      ],
+      "literary_critics_on_promoted_bytes": [
+        "adversarial-reader"
+      ],
+      "unreviewed_parent_dissent": [],
+      "unreviewed_sibling_dissent": [
+        "character-simulator"
+      ],
+      "prose_audit_present": false,
+      "revision_log_present": false,
+      "human_gate_required": null
+    },
+    {
+      "project": "slack-water",
+      "scene": "ch01-sc01",
+      "promoted": "candidate-b-r2.md",
+      "gate_era_manifest": true,
+      "passes_current_gate": true,
+      "current_gate_reasons": [],
+      "literary_critics_on_promoted_bytes": [
+        "adversarial-reader"
+      ],
+      "unreviewed_parent_dissent": [
+        "style-editor"
+      ],
+      "unreviewed_sibling_dissent": [
+        "character-simulator",
+        "style-editor"
+      ],
+      "prose_audit_present": false,
+      "revision_log_present": false,
+      "human_gate_required": null
+    },
+    {
+      "project": "slack-water",
+      "scene": "ch01-sc02",
+      "promoted": "candidate-b-r2.md",
+      "gate_era_manifest": true,
+      "passes_current_gate": true,
+      "current_gate_reasons": [],
+      "literary_critics_on_promoted_bytes": [
+        "adversarial-reader"
+      ],
+      "unreviewed_parent_dissent": [
+        "style-editor"
+      ],
+      "unreviewed_sibling_dissent": [
+        "character-simulator",
+        "style-editor"
+      ],
+      "prose_audit_present": false,
+      "revision_log_present": false,
+      "human_gate_required": null
+    },
+    {
+      "project": "slack-water",
+      "scene": "ch01-sc03",
+      "promoted": "candidate-b-r1.md",
+      "gate_era_manifest": true,
+      "passes_current_gate": true,
+      "current_gate_reasons": [],
+      "literary_critics_on_promoted_bytes": [
+        "adversarial-reader"
+      ],
+      "unreviewed_parent_dissent": [],
+      "unreviewed_sibling_dissent": [
+        "character-simulator",
+        "style-editor"
+      ],
+      "prose_audit_present": false,
+      "revision_log_present": false,
+      "human_gate_required": null
+    },
+    {
+      "project": "the-overnight",
+      "scene": "ch01-sc01",
+      "promoted": "candidate-a-r1.md",
+      "gate_era_manifest": true,
+      "passes_current_gate": true,
+      "current_gate_reasons": [],
+      "literary_critics_on_promoted_bytes": [
+        "adversarial-reader",
+        "character-simulator",
+        "style-editor"
+      ],
+      "unreviewed_parent_dissent": [],
+      "unreviewed_sibling_dissent": [],
+      "prose_audit_present": true,
+      "revision_log_present": true,
+      "human_gate_required": null
+    },
+    {
+      "project": "the-overnight",
+      "scene": "ch01-sc02",
+      "promoted": "candidate-a.md",
+      "gate_era_manifest": true,
+      "passes_current_gate": true,
+      "current_gate_reasons": [],
+      "literary_critics_on_promoted_bytes": [
+        "adversarial-reader",
+        "character-simulator",
+        "style-editor"
+      ],
+      "unreviewed_parent_dissent": [],
+      "unreviewed_sibling_dissent": [],
+      "prose_audit_present": false,
+      "revision_log_present": false,
+      "human_gate_required": null
+    },
+    {
+      "project": "the-overnight",
+      "scene": "ch01-sc03",
+      "promoted": "candidate-a.md",
+      "gate_era_manifest": true,
+      "passes_current_gate": true,
+      "current_gate_reasons": [],
+      "literary_critics_on_promoted_bytes": [
+        "adversarial-reader",
+        "character-simulator",
+        "style-editor"
+      ],
+      "unreviewed_parent_dissent": [],
+      "unreviewed_sibling_dissent": [],
+      "prose_audit_present": false,
+      "revision_log_present": false,
+      "human_gate_required": null
+    },
+    {
+      "project": "verbatim",
+      "scene": "ch01-sc01",
+      "promoted": "candidate-a.md",
+      "gate_era_manifest": false,
+      "passes_current_gate": false,
+      "current_gate_reasons": [
+        "no clean, candidate-bound literary audit found for 'candidate-a.md'",
+        "no clean, candidate-bound defaultness audit found for 'candidate-a.md'"
+      ],
+      "literary_critics_on_promoted_bytes": [],
+      "unreviewed_parent_dissent": [],
+      "unreviewed_sibling_dissent": [],
+      "prose_audit_present": false,
+      "revision_log_present": true,
+      "human_gate_required": null
+    },
+    {
+      "project": "verbatim",
+      "scene": "ch01-sc02",
+      "promoted": "candidate-a.md",
+      "gate_era_manifest": false,
+      "passes_current_gate": false,
+      "current_gate_reasons": [
+        "no clean, candidate-bound literary audit found for 'candidate-a.md'",
+        "no clean, candidate-bound defaultness audit found for 'candidate-a.md'"
+      ],
+      "literary_critics_on_promoted_bytes": [],
+      "unreviewed_parent_dissent": [],
+      "unreviewed_sibling_dissent": [],
+      "prose_audit_present": false,
+      "revision_log_present": false,
+      "human_gate_required": null
+    },
+    {
+      "project": "verbatim",
+      "scene": "ch01-sc03",
+      "promoted": "candidate-b.md",
+      "gate_era_manifest": false,
+      "passes_current_gate": false,
+      "current_gate_reasons": [
+        "no clean, candidate-bound literary audit found for 'candidate-b.md'",
+        "no clean, candidate-bound defaultness audit found for 'candidate-b.md'"
+      ],
+      "literary_critics_on_promoted_bytes": [],
+      "unreviewed_parent_dissent": [],
+      "unreviewed_sibling_dissent": [
+        "character-simulator",
+        "style-editor"
+      ],
+      "prose_audit_present": false,
+      "revision_log_present": true,
+      "human_gate_required": null
+    },
+    {
+      "project": "visiting-order",
+      "scene": "ch01-sc01",
+      "promoted": "candidate-a-r1.md",
+      "gate_era_manifest": true,
+      "passes_current_gate": true,
+      "current_gate_reasons": [],
+      "literary_critics_on_promoted_bytes": [
+        "adversarial-reader"
+      ],
+      "unreviewed_parent_dissent": [
+        "character-simulator"
+      ],
+      "unreviewed_sibling_dissent": [
+        "style-editor"
+      ],
+      "prose_audit_present": false,
+      "revision_log_present": false,
+      "human_gate_required": null
+    },
+    {
+      "project": "visiting-order",
+      "scene": "ch01-sc02",
+      "promoted": "candidate-b-r1.md",
+      "gate_era_manifest": true,
+      "passes_current_gate": true,
+      "current_gate_reasons": [],
+      "literary_critics_on_promoted_bytes": [
+        "adversarial-reader"
+      ],
+      "unreviewed_parent_dissent": [],
+      "unreviewed_sibling_dissent": [
+        "character-simulator",
+        "style-editor"
+      ],
+      "prose_audit_present": false,
+      "revision_log_present": false,
+      "human_gate_required": null
+    },
+    {
+      "project": "visiting-order",
+      "scene": "ch01-sc03",
+      "promoted": "candidate-a-r1.md",
+      "gate_era_manifest": true,
+      "passes_current_gate": true,
+      "current_gate_reasons": [],
+      "literary_critics_on_promoted_bytes": [
+        "adversarial-reader"
+      ],
+      "unreviewed_parent_dissent": [
+        "character-simulator"
+      ],
+      "unreviewed_sibling_dissent": [
+        "style-editor"
+      ],
+      "prose_audit_present": false,
+      "revision_log_present": false,
+      "human_gate_required": null
+    }
+  ],
+  "tournaments": [
+    {
+      "record": "projects/slack-water/.runs/tournament/ch01-sc01/20260730T193426Z/record.json",
+      "selection_basis": null,
+      "blind_labels": {
+        "candidate-a.md": "A",
+        "candidate-b.md": "B"
+      },
+      "labels_equal_filename_letter": true,
+      "recommendation": {
+        "decision": "human_decision_required",
+        "pareto_front": [
+          "candidate-a.md",
+          "candidate-b.md"
+        ],
+        "reason": "multiple non-dominated candidates — a genuine tradeoff; do not average it away"
+      }
+    },
+    {
+      "record": "projects/the-overnight/.runs/tournament/ch01-sc01/20260729T210850Z/record.json",
+      "selection_basis": null,
+      "blind_labels": {
+        "candidate-a.md": "A",
+        "ch01-sc01": "B",
+        "candidate-b.md": "C"
+      },
+      "labels_equal_filename_letter": false,
+      "recommendation": {
+        "decision": "select",
+        "candidate": "ch01-sc01"
+      }
+    },
+    {
+      "record": "projects/the-overnight/.runs/tournament/ch01-sc01/20260729T210955Z/record.json",
+      "selection_basis": null,
+      "blind_labels": {
+        "candidate-a.md": "A",
+        "candidate-b.md": "B"
+      },
+      "labels_equal_filename_letter": true,
+      "recommendation": {
+        "decision": "human_decision_required",
+        "pareto_front": [
+          "candidate-a.md",
+          "candidate-b.md"
+        ],
+        "reason": "multiple non-dominated candidates — a genuine tradeoff; do not average it away"
+      }
+    }
+  ],
+  "traces": {
+    "event_counts": {
+      "critique": 33,
+      "promote": 3
+    },
+    "vendor_critique_events": 0,
+    "literary_record_timing": [
+      {
+        "trace": "projects/forecourt/.runs/trace/ch01-sc01.jsonl",
+        "first_six_literary_records_span_s": 32.8,
+        "gaps_s": [
+          4.2,
+          16.7,
+          3.9,
+          4.1,
+          3.8
+        ]
+      },
+      {
+        "trace": "projects/forecourt/.runs/trace/ch01-sc02.jsonl",
+        "first_six_literary_records_span_s": 44.7,
+        "gaps_s": [
+          2.5,
+          24.2,
+          9.7,
+          5.5,
+          2.9
+        ]
+      },
+      {
+        "trace": "projects/forecourt/.runs/trace/ch01-sc03.jsonl",
+        "first_six_literary_records_span_s": 34.2,
+        "gaps_s": [
+          3.3,
+          19.4,
+          3.8,
+          4.7,
+          3.1
+        ]
+      }
+    ]
+  },
+  "briefs": [
+    {
+      "project": "forecourt",
+      "premise_probe_vocabulary": [
+        "transforming consciousness",
+        "resolved by proof",
+        "probe's flagged risk"
+      ],
+      "lint_category_constraints": [
+        "told emotion",
+        "no cliche",
+        "adverbial dialogue",
+        "never named"
+      ]
+    },
+    {
+      "project": "salt-in-the-wire",
+      "premise_probe_vocabulary": [],
+      "lint_category_constraints": []
+    },
+    {
+      "project": "slack-water",
+      "premise_probe_vocabulary": [],
+      "lint_category_constraints": [
+        "told emotion",
+        "no cliche",
+        "adverbial dialogue",
+        "never named"
+      ]
+    },
+    {
+      "project": "the-overnight",
+      "premise_probe_vocabulary": [],
+      "lint_category_constraints": [
+        "told emotion",
+        "no cliche",
+        "adverbial dialogue"
+      ]
+    },
+    {
+      "project": "verbatim",
+      "premise_probe_vocabulary": [],
+      "lint_category_constraints": [
+        "emotion earned through behavior",
+        "never named"
+      ]
+    },
+    {
+      "project": "visiting-order",
+      "premise_probe_vocabulary": [
+        "transforming consciousness",
+        "proof can settle",
+        "premise probe"
+      ],
+      "lint_category_constraints": [
+        "told emotion",
+        "no cliche",
+        "adverbial dialogue",
+        "never named"
+      ]
+    }
+  ],
+  "endings": [
+    {
+      "project": "forecourt",
+      "scene": "ch01-sc03",
+      "complete": true,
+      "final_paragraph": "She picked up the fob. It was still warm, or she thought it was. She put it in her pocket and went back in and locked the door. Behind the glass she started the count of the till she had already counted twice. There were two hours of dark left. Somewhere her son was thirty-one and she did not know where. The road stayed empty a long time."
+    },
+    {
+      "project": "salt-in-the-wire",
+      "scene": "ch01-sc02",
+      "complete": false,
+      "final_paragraph": "She did not answer. She had the chart in her eye now, and could not put it down."
+    },
+    {
+      "project": "slack-water",
+      "scene": "ch01-sc03",
+      "complete": true,
+      "final_paragraph": "She left the cover off. The boat could dry."
+    },
+    {
+      "project": "the-overnight",
+      "scene": "ch01-sc03",
+      "complete": true,
+      "final_paragraph": "The recipe box lived by the till. She found a blank card and Esther's pen and wrote it out in her own hand — the milk scalded and cooled, the extra yeast, the warm rise at the oven, the tin, the heat, the time. At the top she wrote milk loaf, quick. Under it, small, she wrote her own name. Then she set the card in the box behind Esther's, where whoever kept the next overnight alone would find it, and she started the mixer for the morning bake."
+    },
+    {
+      "project": "verbatim",
+      "scene": "ch01-sc03",
+      "complete": true,
+      "final_paragraph": "She drank the water at her elbow; she had not touched it all day. Across the chamber the old man turned his face back to the middle distance, to the valley, to the lamp he had carried down all this way and could set now in no hand but his own. The panel leaned together to confer. In the next hour they would weigh a word she had refused to halve, and a man would go out into the morning or he would not, and the record would carry her words where the word should have stood — in her own voice, which the record had never before had reason to name."
+    },
+    {
+      "project": "visiting-order",
+      "scene": "ch01-sc03",
+      "complete": true,
+      "final_paragraph": "She turned the key. Three hours back if the roads were with her, and they wouldn't be."
+    }
+  ],
+  "plan_layer": {
+    "scene_specs": 18,
+    "alternative_plans_per_scene": "none: the scene schema holds exactly one spec per scene",
+    "specs_with_candidate_strategies": 18,
+    "note": "candidate_strategies vary prose realization of the single plan, not the plan itself"
+  }
+}

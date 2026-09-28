@@ -1,5 +1,16 @@
 # Proposed validation program and bounded improvement transactions
 
+> **Update, 28 September 2026.** The follow-up [review](../2026-09-28/review.md) proposes these changes to this plan:
+> - **Phase 1:**
+>   - Run it without waiting for the trust repairs, on frozen snapshots (review §2.7).
+>   - Plan statistical power by the number of briefs, not raters (§5.6).
+>   - Name the deciding reader population in advance and use validated instruments (§5.6).
+>   - Add one 8–12k-word condition (§6.10) and a multi-family-writer arm (§6.11).
+> - **Phase 2:**
+>   - First test the thesis itself: critic's pick vs the writer's first draft vs random, on human-labelled pairs (§6.7).
+>   - Then add CheckList-style invariance and directional tests, k-sample stability, a per-dimension alternative-annotator test, and public-domain literature as controls (§5.1, §6.9).
+> - **Phase 3, new hypotheses:** plan-level search (§6.1), a plan-to-prose realization check (§6.3), a reader-disclosure ledger (§6.4), whole-work revision with dependency invalidation (§6.2), and a cross-project repetition check (§6.8).
+
 This is a proposal. No new prompt, rubric, schema or process rule has been adopted. No paid model runs or reader recruitment were performed. The purpose is to turn the audit into falsifiable decisions while preserving the user's objective of strong LLM-generated prose.
 
 ## Separate the claims

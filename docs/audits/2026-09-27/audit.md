@@ -1,5 +1,15 @@
 # Fiction Compiler: independently rechecked audit and improvement proposal
 
+> **Update, 28 September 2026.** A follow-up [review](../2026-09-28/review.md) rechecked this audit and reproduced all 24 probes; the engineering findings stand. Corrections and additions, with evidence, are in the review:
+> - **House style:** the *Forecourt* and *Visiting Order* briefs quote the premise-probe rubric, so the briefs are partly pipeline outputs. The cause is partly established, not merely plausible (review §2.1).
+> - ***Slack Water*:** its critics did flag the problems ADR 0017 later attributed to the premise; the one-literary-critic gate dropped them (§2.2).
+> - ***The Overnight*'s loaf count:** the defect originates in the scene plan, not only the prose (§2.3).
+> - **Tian et al.:** the figure cited here as "overall diversity preference of 23% versus 68%" is the character-diversity row, and the "over 40%" is the authors' own abstract claim (§2.4).
+> - **What the stored record shows:** full literary coverage in 3 of 17 accepted scenes; 5 of 17 fail today's gate; unreviewed dissent on the promoted text's own earlier draft in 7 of 12 gate-era promotions (§3).
+> - **Eight further reproduced defects,** N1–N8 (§4).
+> - **Gaps in the core design:** search over plans, backward revision, a plan-to-prose check, the reader model, and the untested "strong critic, weak writer" thesis (§6).
+> - **Priorities re-ranked,** with workstream B decoupled from workstream A (§7, §2.7).
+
 Assessment date: 27 September 2026. Repository: `310e50cfe9b8087c8a2af64e6e74f098548e6824`. This is an audit and a proposal, not an implemented redesign or a certification of literary quality.
 
 **The repository has a useful foundation, but neither its acceptance guarantees nor its contribution to prose quality have been demonstrated. Fix the trust failures and establish a literary experiment at the same time. Do not make a comprehensive narrative simulator the prerequisite for discovering whether the approach works.**
