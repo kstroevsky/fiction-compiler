@@ -1,0 +1,35 @@
+{
+  "project_id": "slack-water",
+  "clauses": [
+    {
+      "text": "6-8 pages, single sitting",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "close third person, one focalizer (Rennie)",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "strictly linear: one morning, first light to the top of the tide; no flashback, no framing device",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "a concrete problem with a clear physical cause and a clear, earned turn",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "sensory, plainspoken prose; feeling is carried by the work of the hands and the read of the wood, not named",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "a quiet, legible ending: recognition, not triumph; the customer does not hand over tidy thanks",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    }
+  ]
+}

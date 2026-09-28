@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "contract-coverage.schema.json",
+  "type": "object",
+  "required": ["project_id", "clauses"],
+  "additionalProperties": false,
+  "properties": {
+    "project_id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "clauses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["text", "coverage"],
+        "additionalProperties": false,
+        "properties": {
+          "text": {"type": "string", "minLength": 1},
+          "coverage": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["kind", "ref"],
+              "additionalProperties": false,
+              "properties": {
+                "kind": {"enum": ["deterministic-check", "critic-question", "reader-question", "human-review"]},
+                "ref": {"type": "string", "minLength": 1},
+                "note": {"type": "string"}
+              }
+            }
+          },
+          "untested_reason": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

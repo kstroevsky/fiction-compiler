@@ -111,6 +111,13 @@ def validate_projects(errors: list[str]) -> None:
         if data.get("id") != project.name:
             errors.append(f"{project.name}: project id must equal directory name")
 
+        coverage_path = project / "brief" / "contract-coverage.json"
+        if coverage_path.exists():
+            check_schema(errors, coverage_path, read_json(coverage_path), "contract-coverage")
+        disclosure_path = project / "planning" / "reader-disclosure.json"
+        if disclosure_path.exists():
+            check_schema(errors, disclosure_path, read_json(disclosure_path), "reader-disclosure")
+
         ontology_path = project / "canon" / "ontology.json"
         if ontology_path.exists():
             check_schema(errors, ontology_path, read_json(ontology_path), "ontology")

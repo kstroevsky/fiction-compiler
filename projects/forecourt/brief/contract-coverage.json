@@ -1,0 +1,35 @@
+{
+  "project_id": "forecourt",
+  "clauses": [
+    {
+      "text": "6-9 pages, single sitting",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "close third person, one focalizer (Jo)",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "strictly linear: about twenty minutes of one night, one location (the kiosk behind the night glass); no flashback, no framing device",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "present, real danger, but the interior feeling is carried by the body, the glass, and the till, never named",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "the man stays genuinely ambiguous to the end: never confirmed victim or villain, no twist, no reveal",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "resolves ambiguous: Jo makes one small, concrete decision from behind the glass and is left not knowing; recognition without resolution",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    }
+  ]
+}

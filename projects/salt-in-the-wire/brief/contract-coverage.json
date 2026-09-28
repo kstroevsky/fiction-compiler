@@ -1,0 +1,30 @@
+{
+  "project_id": "salt-in-the-wire",
+  "clauses": [
+    {
+      "text": "5-15 pages, single sitting",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "close third person, one focalizer (Mara)",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "a concrete central question with no clean answer",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "the ending withholds comfort; ambiguity is intended, not evasive",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "no supernatural element; the strangeness is moral, not physical",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    }
+  ]
+}

@@ -17,8 +17,8 @@ from typing import Any, Callable
 
 from . import critic_eval as _critic_eval
 from . import critique as _critique
-from . import (defaultness, hard_audit, integrity, issue_resolution, kb, regression, revision,
-               safety, schema, trace)
+from . import (defaultness, hard_audit, integrity, issue_resolution, kb, reader, regression,
+               revision, safety, schema, trace)
 from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
@@ -65,6 +65,16 @@ def state_before(project: str, scene_id: str) -> dict:
 
 def compile_context(project: str, scene_id: str) -> dict:
     return compile_bundle(project_dir(project), scene_id)
+
+
+def contract_coverage(project: str) -> dict:
+    """Report how every reader-contract clause is mapped, including explicit untested clauses."""
+    return reader.contract_coverage(project_dir(project))
+
+
+def reader_disclosure(project: str) -> dict:
+    """Validate structural reader-disclosure/fair-play annotations without inferring comprehension."""
+    return reader.disclosure_report(project_dir(project))
 
 
 def audit(project: str, scene_id: str | None = None) -> dict:
@@ -497,6 +507,15 @@ TOOLS: list[dict] = [
           "Assemble the minimal, leak-free drafting bundle for a scene (spec, participating "
           "characters, state_before, relevant world rules, discourse + style constraints).",
           {"project": {"type": "string"}, "scene_id": {"type": "string"}}, ["project", "scene_id"], compile_context),
+    _tool("contract_coverage",
+          "Report how each project reader-contract clause is mapped to a deterministic check, critic "
+          "question, reader question, human review, or explicit untested state. Mapping is not proof "
+          "that the clause succeeded.",
+          {"project": {"type": "string"}}, ["project"], contract_coverage),
+    _tool("reader_disclosure",
+          "Validate reader-disclosure annotations, curiosity-gap ordering, and declared surprise setup. "
+          "This is structural evidence only; it does not infer reader comprehension.",
+          {"project": {"type": "string"}}, ["project"], reader_disclosure),
     _tool("hard_audit",
           "Run the deterministic hard audit (Audit 1). With scene_id: audit one scene (knowledge "
           "cutoff, causal refs, POV). Without: audit canon + accepted scenes (chronology, promise "
