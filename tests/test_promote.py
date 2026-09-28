@@ -118,6 +118,7 @@ class PromoteTests(unittest.TestCase):
             self.assertEqual(acceptance.frozen_bytes(snapshot, "candidate"), PROSE.encode())
             self.assertEqual(snapshot["candidate"]["sha256"], PROSE_SHA)
             self.assertEqual(snapshot["review_policy"]["id"], "review-policy@2")
+            self.assertEqual(snapshot["review_policy"]["artifact"]["path"], "builtin:review-policy@2")
             self.assertTrue(snapshot["binding_critiques"])
             self.assertEqual(integrity.verify_report(project)["status"], "verified")
 

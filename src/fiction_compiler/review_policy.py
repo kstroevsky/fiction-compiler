@@ -34,7 +34,7 @@ def load(project: Path) -> tuple[dict, dict]:
     else:
         value = dict(DEFAULT_POLICY)
         raw = acceptance.canonical_json_bytes(value)
-        source = "builtin:review-policy@1"
+        source = f"builtin:{value['id']}"
     errors = schema.validate_named(value, "review-policy")
     if errors:
         raise ValueError("review policy is invalid: " + "; ".join(errors))

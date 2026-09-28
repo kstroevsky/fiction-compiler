@@ -3,67 +3,55 @@
 Status assessment and staged plan, measured against `docs/original-design-brief.md`.
 The brief is treated as **product vision**, not a binding spec — deviations are called out explicitly.
 
-Ground-truth snapshot: `make validate` and `make test` both pass, but they assert almost
-nothing (see below). Passing checks here are not evidence of a working compiler.
+Ground-truth snapshot (2026-09-28): the repository has a working deterministic compiler kernel,
+acceptance/provenance layer, review runner, selection harness, and regression suite. Passing checks
+establish the encoded invariants; they do **not** establish literary quality or the untested empirical
+claims in the audit. Those require independent reader/critic measurement.
 
 ---
 
 ## 1. What this repository actually is today
 
-A **constitution, an operating manual, and a directory skeleton** — plus a structural
-JSON linter. It is a well-designed *contract* for a fiction compiler. It is **not yet a
-compiler**: the deterministic machinery that the brief's entire thesis depends on
-(external, code-level feedback that "rejects malformed output") is the part that is unbuilt.
-
-Everything currently load-bearing is either prose the LLM is asked to follow (skills,
-agents, docs) or JSON that nothing enforces. The brief's argument is that fiction quality
-should be shifted *off* free LLM judgment and *onto* code wherever possible; right now the
-code carries almost none of that load.
+It is a **working fiction-compiler kernel plus an evidence harness**, with important research and
+authoring surfaces still unfinished. Deterministic code now owns schema validation, state replay,
+hard constraints, acceptance binding, evidence integrity, selection mechanics, issue-resolution
+coverage, and regression checks. LLMs remain responsible for extraction and literary judgment where
+the project has no sound deterministic oracle. The active architecture deliberately distinguishes
+mechanical validity, modeled/extracted consistency, and literary preference.
 
 ### Component status (vision → reality)
 
 | Brief component | Artifact present | Actually implemented? | Evidence |
 |---|---|---|---|
 | Constitution / reader contract | `constitution/`, `AGENTS.md`, `CLAUDE.md` | **Yes** (as prose) | Complete and coherent |
-| 6 typed schemas | `schemas/*.json` | **Decorative** — never enforced | No `jsonschema` in repo; `validate_workspace.py` only parses JSON + matches ids to dir names |
-| Workspace validation | `scripts/validate_workspace.py` (90 lines) | **Structural only** | Checks id↔dirname, dup ids, delta-exists-if-promoted. No schema, no narrative constraints |
-| Minimal context compilation | `scripts/compile_scene_context.py` (56 lines) | **No** — it's a file concatenator | Statically dumps planning files; no state replay, no relevance filter, no knowledge cutoff |
-| Event-sourced canon / `reconstruct_state_before` | `canon/*.jsonl` templates | **No** — the keystone primitive is absent | No code folds deltas/ledgers into a point-in-time state |
-| Candidate promotion + `append_state_delta` | `src/fiction_compiler/promote.py`, `integrity.py` | **Yes**, gate **enforced** (ADR 0002) and promotion **tamper-evident + atomic + confined** (ADR 0003) — candidate-bound hashes, an acceptance manifest with a canon hash chain, `os.replace` under a lock with rollback, and MCP path confinement | `evaluate_audit_gate` + `verify_canon`; committed examples retained as negative fixtures. Immutable *acceptance signatures* / human-gate identity still ⬜ |
-| Audit 1 — hard/symbolic (as code) | `triple-audit` skill | **No** — delegated to an LLM subagent | Skill step 2 hands continuity to `continuity-auditor` agent; brief says this must be code |
-| Audit 2/3 — literary + defaultness | 5 agent defs + skill | **As prose** (LLM personas) | `.claude/agents/*.md`, `.codex/agents/*.toml` — reasonable, but unverified by code |
-| Blind tournament / judge-bias mitigation | described in skill | **No code** | Anonymization/order-reversal/disagreement are instructions, not a harness |
-| Quality vector Q + Pareto selection | described in brief §1 | **No** | No representation, no scoring, no Pareto logic anywhere |
-| Anti-obviousness (continuation ensemble, Originality\*) | brief §5 | **No** | Not present in any form |
-| Knowledge base (Tiers 0–4) | `kb/` dirs + `source-register.json` | **Empty** — see §2 | 6 empty dirs; `sources: []` |
-| Self-improvement + regression harness | `retrospective` skill, `evals/` dirs | **No** — no fixtures, no runner | `evals/regression/` and `evals/reports/` are empty template dirs |
-| `src/fiction_compiler/` library | package dir | **Empty** | `__init__.py` is 1 line; all logic lives in 4 standalone scripts |
-| Observability / run manifests / cost | `.runs/` | **Minimal** | Only a timestamped context bundle; no model/prompt-version/token provenance |
-| End-to-end example project | `projects/_template/` | **No real project** | Nothing exercises the pipeline; validation passes because there is nothing to validate |
+| Schemas | `schemas/*.json` | **Enforced** | Workspace, critique, policy, premise, ontology, claims, judgment and state payloads are validated |
+| Workspace validation | `scripts/validate_workspace.py` | **Implemented** | Schema/integrity checks plus canon verification; maintained tests exercise failures |
+| Minimal context compilation | `src/fiction_compiler/context.py` | **Implemented, coarse relevance** | Replays state-before, filters to participants/required facts, writes collision-safe project-local evidence |
+| Event-sourced canon / `reconstruct_state_before` | `src/fiction_compiler/state.py` | **Implemented** | Seed state + accepted deltas, typed values/relationships/knowledge, parsed chronology semantics |
+| Candidate promotion | `promote.py`, `acceptance.py`, `integrity.py` | **Implemented** | Frozen candidate/spec/delta/review policy/evidence; atomic idempotent acceptance chain and verifier |
+| Hard/symbolic audit | `hard_audit.py`, `prose_audit.py` | **Implemented, extraction boundary remains empirical** | Code checks state/event constraints; extracted prose claims are judged deterministically |
+| Literary review | `role_runner.py`, role personas, review policy | **Implemented as evidence-producing model review** | Role-specific blind packets, immutable attempts, provenance, issue applicability/resolution |
+| Defaultness/style heuristics | `defaultness.py`, catalog | **Advisory by default** | Contextual evidence; a project can explicitly opt into blocking mode |
+| Blind tournament / Pareto | `tournament.py`, `tools.tournament` | **Implemented** | Anonymization, order balancing, complete-matrix checks, eligibility floors, dissent preservation |
+| Anti-obviousness search | `avoid-defaults` skill, premise probes | **Partial/experimental** | Search prompts/probes exist; no validated continuation ensemble or universal originality metric |
+| Knowledge base | `kb/`, source register | **Starter set implemented** | Structured concept cards, conflicts/counterexamples, rights-aware provenance, one owned-scene annotation |
+| Framework regression | `regression.py`, fixtures, critic cases | **Implemented** | Closed checks plus fingerprint of code, schemas, KB, prompts/skills, roster/probes, eval data, scripts, runtime config |
+| Observability | project `.runs/`, trace, review attempts | **Substantial but incomplete** | Candidate-bound request/response packets and collision-safe runs; full token/cost accounting still missing |
+| End-to-end projects | `projects/*` | **Present** | Multiple worked projects exercise promotion, state, audits and manuscript assembly |
 
 ---
 
-## 2. The knowledge base is a set of empty folders
+## 2. Knowledge-base status
 
-Called out separately because directory structure is the easiest thing to mistake for
-completion.
+The KB is no longer empty. It contains structured narratology/craft/style cards, a defaultness
+catalog, a source register with evidence/right-status metadata, conflicting-theory links, and the first
+repository-owned corpus annotation. Validation checks card depth and dangling references; tools expose
+targeted retrieval.
 
-- `kb/narratology/`, `kb/craft/`, `kb/genre/`, `kb/style/`, `kb/research/`,
-  `kb/corpus-notes/` — **all empty**.
-- `kb/source-register.json` — a schema stub with `"sources": []`. Zero registered sources.
-- `docs/knowledge-base.md` describes Tiers 0–4 (constitution → indexes → operational notes
-  → deep references → corpora). **Tiers 1–4 contain no content.**
-
-The brief's design (§6) requires Level-0 concept index, Level-1 concept cards (YAML with
-`definition / use_when / diagnostic_questions / failure_modes / conflicts_with / sources /
-confidence`), Level-2 analytical notes, and Level-3 sources. **None of these exist.** The
-craft seed list (Le Guin, Gardner, Prose, Wood, Egri, McKee, Swain) and the Living Handbook
-of Narratology are named in the brief but not registered, summarized, or encoded.
-
-**Do not build KB content first.** Inert concept cards that no audit or skill retrieves are
-exactly the "folder full of PDFs injected into every prompt" the brief warns against. KB
-content is only worth writing once the retrieval machinery that consumes it exists — hence
-it lands in Stage 3, after the context compiler and hard audits that reference it.
+The remaining work is evidence-driven expansion: genre/period modules only when a project needs them,
+more rights-cleared or repository-owned annotated controls, and retrieval experiments that show a
+larger KB improves decisions. The original caution still applies: do not grow a library merely because
+storage is available, and do not turn one successful sample into a global stylistic rule.
 
 ---
 
@@ -91,28 +79,30 @@ Ordering principle: build the primitive everything else depends on first
 and only write KB prose once code consumes it. Every stage ends green and adds a regression
 test, not just a feature.
 
-> **Build status (updated).** Stage 0 ✅, Stage 1 ✅, Stage 2 ✅ are implemented and tested.
-> Stage 3 🟡 has a starter KB — 16 concept cards across two source streams (craft-instruction,
-> many public-domain classics + fiction-corpus), a defaultness catalog, and a source register
-> with EU/DE copyright notes, all integrity-checked by `validate_workspace`. Stage 4 🟡 has the
-> deterministic defaultness linter; the Pareto/tournament/continuation-ensemble pieces remain.
+> **Build status (updated 2026-09-28).** Stage 0 ✅, Stage 1 ✅, Stage 2 ✅ are implemented and tested.
+> Stage 3 🟡 has a structured starter KB, rights-aware source register, defaultness catalog and one
+> repository-owned annotation. Stage 4 🟡 has advisory defaultness diagnostics plus deterministic
+> blind-label/order/Pareto tournament mechanics; continuation-prediction/originality experiments
+> remain unvalidated research work.
 >
 > **Two self-improvement loops** (see `docs/self-improvement-loops.md`): the **story** PDCA loop's
 > deterministic CHECK/ACT is built (`src/fiction_compiler/revision.py`, `scripts/revise_scene.py`,
 > per-scene `revision-log.jsonl`) — this is the manuscript's own improvement loop. The **framework**
-> PDCA loop (Stage 5) still has only the `retrospective` skill + `change-policy`; its
-> regression-fixture runner and run-manifest observability remain ⬜. Stage 6 (GUI) ⬜.
+> PDCA loop (Stage 5) now has a regression-fixture runner, critic-calibration corpus and broad
+> framework fingerprint. Automated before/after policy transactions, threshold/approval/rollback
+> orchestration and complete token/cost manifests remain ⬜. Stage 6 (GUI) ⬜.
 > **Tools for the author.** The deterministic engine is exposed to the LLM as callable tools via
 > a dependency-free MCP server (`scripts/fiction_mcp.py`, wired in `.mcp.json` and `.codex/config.toml`):
 > `kb_search`/`kb_get`, `state_before`, `compile_context`, `hard_audit`, `defaultness_lint`,
 > `evaluate_revision`. Plus the `avoid-defaults` anti-obviousness skill (LLM-facing craft, not code).
 > The engine equips the author; it does not replace the creative act. See `docs/mcp-and-tools.md`.
 >
-> **Promotion is now gated (ADR 0002) and tamper-evident (ADR 0003).** The triple-audit protocol is
-> *enforced* in code: a candidate promotes only when clean hard, literary, and defaultness critiques
-> that judge *that exact candidate* (bound by `candidate_sha256`) exist; a non-`pass` verdict, a
-> `material`/`fatal` finding, a wrong/absent hash, or evidence judging a different candidate blocks it,
-> before any write. Promotion writes an acceptance manifest with a canon hash chain (`parent`→
+> **Promotion is now gated (ADR 0002) and tamper-evident (ADR 0003).** The versioned review policy is
+> *enforced* in code: hard failures block; required literary reviews must bind to the exact candidate
+> and runtime provenance; predecessor issues require resolution coverage; defaultness is advisory by
+> default and blocks only when a project explicitly selects blocking mode; prose audit can likewise be
+> required by policy. A non-`pass` required review, a `material`/`fatal` blocking finding, a wrong/absent
+> hash, or stale evidence blocks before any write. Promotion writes an acceptance manifest with a canon hash chain (`parent`→
 > `resulting`), so editing an accepted delta is detected by `verify_canon` (run in `validate_workspace`);
 > the three writes commit atomically under a project lock with rollback; and MCP-supplied paths are
 > confined to approved roots. The committed `salt-in-the-wire` and `verbatim` examples predate this and
@@ -143,8 +133,10 @@ test, not just a feature.
 > and a disagreement flag. It recommends `select` only when one candidate dominates, else
 > `human_decision_required` over the tradeoff. Slice 2 (ADR 0008) adds a per-judge isolation ledger,
 > ingestion of LLM judges' rankings (a split among judges flips `disagreement`, never averaged), and
-> `persist=true` writing blinded candidate copies + the record to `.runs/`. Still ⬜ in P2: enforcing
-> the blind/ boundary at transport, and signed judgments.
+> `persist=true` writing blinded candidate copies + the record to `.runs/`. Role-runner transport now
+> uses role-specific evidence views (experiential reader, canon-aware continuity, style/profile,
+> character-local state, plan-aware architecture) while withholding candidate strategy identity.
+> Still ⬜ in P2: a first-class live pairwise-judgment transport and signed/external judgments.
 >
 > **Revision loop now diffs by finding identity (ADR 0009, P3 slice 1).** `evaluate_revision` gives
 > each finding a fingerprint (dimension + normalized evidence) and classifies fixed / persisted /
@@ -173,10 +165,11 @@ test, not just a feature.
 > **Framework loop now has a regression harness (ADR 0011, P5 slice 1).** `scripts/run_regression.py`
 > + the `run_regression` tool run fixed fixtures (`regression/fixtures.json`) that pin the invariants
 > the ADRs established — defaultness, the revision traps + waiver, tournament select/defer, ontology
-> typo — through a closed check whitelist, and report a **framework fingerprint** (schemas + KB index
-> + package source). A change to a prompt/rubric/schema/code that regresses an invariant fails the
-> run (non-zero exit). Still ⬜ in P5: fingerprinting prompt/agent files + model params, and
-> automating the threshold/approval/rollback workflow around the runner.
+> typo — through a closed check whitelist, and report a **framework fingerprint** covering package
+> source, schemas, full KB/defaultness content, scripts, model roster/premise probes, eval/regression
+> corpora, personas/skills/governance text and runtime configuration. A change that regresses an
+> invariant fails the run (non-zero exit). Still ⬜ in P5: automating the before/after
+> threshold/approval/rollback workflow and recording complete live token/cost/provider metadata.
 >
 > See `docs/decisions/0001-structured-state-delta.md`, `0002-promotion-audit-gate.md`,
 > `0003-tamper-evident-promotion.md`, `0004-executable-story-ir.md`, `0005-predicate-ontology.md`,
