@@ -25,6 +25,7 @@ from pathlib import Path
 from typing import Any
 
 from . import acceptance
+from .ontology import typed_equal
 
 
 # A scene id like "ch03-sc02" -> sort key (3, 2). Anything malformed sorts last.
@@ -57,6 +58,24 @@ RelKey = tuple[str, str]
 PredKey = tuple[str, str, str | None]
 ResourceKey = tuple[str, str]
 _MISSING = object()
+
+
+def _compare_value(actual: Any, expected: Any, comparison: str) -> bool:
+    if comparison == "eq":
+        return typed_equal(actual, expected)
+    if comparison == "ne":
+        return not typed_equal(actual, expected)
+    if (isinstance(actual, (int, float)) and not isinstance(actual, bool)
+            and isinstance(expected, (int, float)) and not isinstance(expected, bool)):
+        if comparison == "lt":
+            return actual < expected
+        if comparison == "lte":
+            return actual <= expected
+        if comparison == "gt":
+            return actual > expected
+        if comparison == "gte":
+            return actual >= expected
+    return False
 
 
 @dataclass
@@ -134,35 +153,39 @@ class StoryState:
         """A directional relationship dimension (e.g. trusts/fears/owes) from subject to object."""
         return self.relationships.get((subject, object), {}).get(dimension)
 
-    def holds(self, predicate: str, subject: str, object: str | None = None, *, value: Any = _MISSING) -> bool:
+    def holds(self, predicate: str, subject: str, object: str | None = None, *,
+              value: Any = _MISSING, comparison: str = "eq") -> bool:
         """Whether a typed atom holds — the query event preconditions are evaluated against.
 
         ``knows`` is current factive knowledge, ``believes`` may be mistaken, and ``remembers``
         records retained proposition memory. Relationship verbs consult directional dimensions;
-        everything else consults the typed predicate store. When ``value`` is supplied, the stored
-        value must match exactly; omitting it preserves the legacy truthiness/presence query.
+        everything else consults the typed predicate store. When ``value`` is supplied, comparison is
+        explicit and type-aware (so boolean false is not numeric zero). Ordered comparisons are only
+        defined for numbers. Omitting ``value`` preserves the legacy truthiness/presence query.
         """
+        if value is _MISSING and comparison != "eq":
+            return False
         if predicate == "knows":
             actual = object is not None and self.knows(subject, object)
-            return actual if value is _MISSING else actual == value
+            return actual if value is _MISSING else _compare_value(actual, value, comparison)
         if predicate == "remembers":
             actual = object is not None and self.remembers(subject, object)
-            return actual if value is _MISSING else actual == value
+            return actual if value is _MISSING else _compare_value(actual, value, comparison)
         if predicate == "believes":
             if object is None:
                 return False
             actual = self.belief(subject, object)
             if actual is None:
                 return False
-            return bool(actual) if value is _MISSING else actual == value
+            return bool(actual) if value is _MISSING else _compare_value(actual, value, comparison)
         if (predicate, subject, object) in self.predicates:
             actual = self.predicates[(predicate, subject, object)]
-            return bool(actual) if value is _MISSING else actual == value
+            return bool(actual) if value is _MISSING else _compare_value(actual, value, comparison)
         if object is not None:
             dims = self.relationships.get((subject, object))
             if dims is not None and predicate in dims:
                 actual = dims[predicate]
-                return bool(actual) if value is _MISSING else actual == value
+                return bool(actual) if value is _MISSING else _compare_value(actual, value, comparison)
         return False
 
     def promise_is_open(self, promise_id: str) -> bool:

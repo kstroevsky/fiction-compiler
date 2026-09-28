@@ -28,7 +28,7 @@ mechanical validity, modeled/extracted consistency, and literary preference.
 | Workspace validation | `scripts/validate_workspace.py` | **Implemented** | Schema/integrity checks plus canon verification; maintained tests exercise failures |
 | Minimal context compilation | `src/fiction_compiler/context.py` | **Implemented, coarse relevance** | Replays state-before, filters to participants/required facts, writes collision-safe project-local evidence |
 | Scene-plan search | `plan_search.py`, `schemas/scene-plan*.json`, `generate-scene-plans` skill | **Implemented as experimental evidence workflow** | 3–4-plan divergence floor, typed feasibility, hash-bound plan review, explicit 1–2 selection; no automatic quality ranker |
-| Event-sourced canon / `reconstruct_state_before` | `src/fiction_compiler/state.py` | **Implemented** | Seed state + accepted deltas, typed values/relationships/knowledge, parsed chronology semantics |
+| Event-sourced canon / `reconstruct_state_before` | `src/fiction_compiler/state.py` | **Implemented** | Seed state + accepted deltas, typed comparisons/relationships/knowledge, declared value/entity domains, parsed chronology semantics |
 | Candidate promotion / backward revision | `promote.py`, `acceptance.py`, `integrity.py`, `dependencies.py` | **Implemented, downstream literary recheck remains manual** | Frozen candidate/spec/delta/review policy/evidence; immutable active/history chains, conservative read sets, rebasing + invalidation |
 | Hard/symbolic audit | `hard_audit.py`, `prose_audit.py` | **Implemented, extraction boundary remains empirical** | Code checks state/event constraints; candidate/spec/state-bound prose claims use exact spans and ordered truth, belief and typed-predicate evidence |
 | Realization calibration | `realization_calibration.py`, planted controls, ADR 0030 | **Evidence infrastructure implemented; live calibration not yet run** | Plan-blind extraction and plan-aware alignment are measured separately; extractor misses cannot become proved omissions |
@@ -141,8 +141,14 @@ test, not just a feature.
 > preconditions against a beat-level shadow state, matched effects advance that state, fact effects
 > may establish later preconditions, graph cycles/unresolved endpoints are material, and
 > `event_references` separates discourse reappearance from executing a canonical world event twice.
-> Still ⬜ in P1: a fuller entity type system and
-> fabula-**ordered** state reconstruction (a flashback still replays in discourse order today).
+> **Declared story domains are now enforceable (ADR 0037):** JSON-like equality does not coerce
+> booleans into numeric zero/one; event preconditions support explicit numeric comparisons; predicate
+> declarations may constrain value type/enumeration/range; optional closed entity registries validate
+> only explicitly closed types; and predicate-specific exclusivity checks domain invariants such as
+> one active location without imposing that physics globally. Plan feasibility, hard audit,
+> critic-eval and regression use the same semantics. Still ⬜ in P1: richer domain modeling only when
+> a story requires it, and fabula-**ordered** state reconstruction (a flashback still replays in
+> discourse order today).
 > Promise obligations now optionally carry typed `trigger_event` / `payoff_event` references
 > (ADR 0025): triggered-but-unpaid promises and payoff events without closure are material, while
 > legacy/untriggered open promises remain advisory. Prose-level payoff legibility is still a reader/

@@ -28,6 +28,23 @@ class DeterministicCaseTests(unittest.TestCase):
         self.assertTrue(critic_eval.run_deterministic_case(
             {"detector": "prose_knowledge_leak", "input": {"pov_knows_before": False, "granted_this_scene": False}}))
 
+    def test_ontology_detector_uses_typed_value_and_closed_entity_semantics(self) -> None:
+        case = {
+            "detector": "ontology",
+            "input": {
+                "ontology": {"predicates": [{
+                    "name": "enabled", "arity": "unary", "subject_types": ["obj"],
+                    "value_type": "boolean",
+                }]},
+                "entity_registry": {
+                    "closed_types": ["obj"],
+                    "entities": [{"id": "obj-relay", "type": "obj"}],
+                },
+                "atom": {"predicate": "enabled", "subject": "obj-ghost", "value": 0},
+            },
+        }
+        self.assertTrue(critic_eval.run_deterministic_case(case))
+
     def test_llm_detector_is_not_deterministic(self) -> None:
         with self.assertRaises(ValueError):
             critic_eval.run_deterministic_case({"detector": "llm", "input": {"text": "x"}})

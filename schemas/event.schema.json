@@ -17,7 +17,8 @@
           "predicate": {"type": "string", "minLength": 1},
           "subject": {"type": "string", "minLength": 1},
           "object": {"type": "string"},
-          "value": {}
+          "value": {},
+          "comparison": {"enum": ["eq", "ne", "lt", "lte", "gt", "gte"]}
         }
       }
     },

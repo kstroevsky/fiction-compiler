@@ -91,6 +91,34 @@
       "expect": true
     },
     {
+      "name": "ontology rejects boolean zero as a numeric predicate value (ADR 0037)",
+      "check": "ontology_valid",
+      "input": {
+        "ontology": {"predicates": [{"name": "temperature", "arity": "unary", "subject_types": ["obj"], "value_type": "number"}]},
+        "atom": {"predicate": "temperature", "subject": "obj-relay", "value": false}
+      },
+      "expect": false
+    },
+    {
+      "name": "ontology accepts an ordered numeric predicate comparison (ADR 0037)",
+      "check": "ontology_valid",
+      "input": {
+        "ontology": {"predicates": [{"name": "temperature", "arity": "unary", "subject_types": ["obj"], "value_type": "number", "minimum": -20, "maximum": 50}]},
+        "atom": {"predicate": "temperature", "subject": "obj-relay", "value": 0, "comparison": "lt"}
+      },
+      "expect": true
+    },
+    {
+      "name": "ontology rejects an undeclared id for a closed entity type (ADR 0037)",
+      "check": "ontology_valid",
+      "input": {
+        "ontology": {"predicates": [{"name": "located_at", "arity": "binary", "subject_types": ["char"], "object_types": ["loc"]}]},
+        "entity_registry": {"closed_types": ["loc"], "entities": [{"id": "loc-station", "type": "loc"}]},
+        "atom": {"predicate": "located_at", "subject": "char-jonas", "object": "loc-ghost"}
+      },
+      "expect": false
+    },
+    {
       "name": "prose audit flags a focalizer knowing an ungranted fact (ADR 0014, review §4)",
       "check": "prose_knowledge_leak",
       "input": {"pov_knows_before": false, "granted_this_scene": false},

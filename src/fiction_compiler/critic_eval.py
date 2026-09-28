@@ -87,9 +87,16 @@ def run_deterministic_case(case: dict) -> bool:
     if detector == "injection":
         return len(safety.scan_injection(inp.get("text", ""))) > 0
     if detector == "ontology":
-        ont = {p["name"]: p for p in inp.get("ontology", {}).get("predicates", [])}
         atom = inp.get("atom", {})
-        return bool(ontology.check_atom(ont, atom.get("predicate"), atom.get("subject"), atom.get("object")))
+        kwargs = {"registry": inp.get("entity_registry"), "op": atom.get("op")}
+        if "value" in atom:
+            kwargs["value"] = atom["value"]
+        if "comparison" in atom:
+            kwargs["comparison"] = atom["comparison"]
+        return bool(ontology.check_atom(
+            inp.get("ontology", {}), atom.get("predicate"), atom.get("subject"), atom.get("object"),
+            **kwargs,
+        ))
     raise ValueError(f"non-deterministic or unknown detector {detector!r}")
 
 

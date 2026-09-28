@@ -177,6 +177,8 @@ def audit_plan(project: Path, scene_id: str, plan: dict) -> dict:
         for precondition in event.get("preconditions", []):
             if isinstance(precondition, dict):
                 kwargs = {"value": precondition["value"]} if "value" in precondition else {}
+                if "comparison" in precondition:
+                    kwargs["comparison"] = precondition["comparison"]
                 if not before.holds(
                     precondition.get("predicate"), precondition.get("subject"),
                     precondition.get("object"), **kwargs,

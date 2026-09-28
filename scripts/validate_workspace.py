@@ -19,7 +19,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from fiction_compiler import integrity, schema  # noqa: E402
+from fiction_compiler import integrity, ontology, schema  # noqa: E402
 
 
 def read_json(path: Path) -> Any:
@@ -139,7 +139,16 @@ def validate_projects(errors: list[str]) -> None:
 
         ontology_path = project / "canon" / "ontology.json"
         if ontology_path.exists():
-            check_schema(errors, ontology_path, read_json(ontology_path), "ontology")
+            ontology_data = read_json(ontology_path)
+            check_schema(errors, ontology_path, ontology_data, "ontology")
+            for message in ontology.ontology_definition_errors(ontology_data):
+                errors.append(f"{project.name}: ontology semantics — {message}")
+        entity_registry_path = project / "canon" / "entity-registry.json"
+        if entity_registry_path.exists():
+            registry_data = read_json(entity_registry_path)
+            check_schema(errors, entity_registry_path, registry_data, "entity-registry")
+            for message in ontology.entity_registry_errors(registry_data):
+                errors.append(f"{project.name}: entity registry semantics — {message}")
 
         validate_characters(errors, project)
         validate_event_graph(errors, project)

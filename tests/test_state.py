@@ -135,6 +135,21 @@ class TypedIRStateTests(unittest.TestCase):
             # Directional: trust does not imply the reverse edge exists.
             self.assertIsNone(before.relationship_directed("char-jonas", "char-mara", "trusts"))
 
+    def test_typed_value_comparison_does_not_coerce_boolean_and_zero(self) -> None:
+        current = state.StoryState()
+        current.predicates[("temperature", "obj-relay", None)] = -2
+        current.predicates[("enabled", "obj-relay", None)] = False
+        current.predicates[("mode", "obj-relay", None)] = "manual"
+
+        self.assertTrue(current.holds("temperature", "obj-relay", value=0, comparison="lt"))
+        self.assertTrue(current.holds("temperature", "obj-relay", value=-2))
+        self.assertFalse(current.holds("temperature", "obj-relay", value=False))
+        self.assertTrue(current.holds("enabled", "obj-relay", value=False))
+        self.assertFalse(current.holds("enabled", "obj-relay", value=0))
+        self.assertTrue(current.holds("mode", "obj-relay", value="manual"))
+        self.assertTrue(current.holds("mode", "obj-relay", value="automatic", comparison="ne"))
+        self.assertFalse(current.holds("mode", "obj-relay", value="zzz", comparison="lt"))
+
     def test_delta_predicate_add_and_remove(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             final = state.reconstruct(build_typed_project(Path(tmp)))

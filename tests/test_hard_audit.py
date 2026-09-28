@@ -171,6 +171,19 @@ class HardAuditExecutableEventTests(unittest.TestCase):
             self.assertEqual(critique["verdict"], "revise")
             self.assertTrue(any("effect" in f["evidence"] for f in critique["findings"]))
 
+    def test_typed_effect_does_not_treat_boolean_as_numeric_zero(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": [],
+                     "effects": [{"op": "add", "predicate": "enabled", "subject": "obj-relay",
+                                  "value": False}]}
+            delta_extra = {"predicate_changes": [
+                {"op": "add", "predicate": "enabled", "subject": "obj-relay", "value": 0},
+            ]}
+            project = self._project(Path(tmp), event, delta_extra)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any("effect" in f["evidence"] for f in critique["findings"]))
+
     def test_predicate_at_event_cannot_satisfy_an_earlier_event(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project = base_project(Path(tmp), ["ch01-sc01"])
@@ -542,6 +555,78 @@ class HardAuditOntologyTests(unittest.TestCase):
                                     with_ontology=True, world=world)
             critique = hard_audit.audit_scene(project, "ch01-sc01")
             self.assertFalse(any(f["dimension"] == "ontology" for f in critique["findings"]), critique["findings"])
+
+    def test_closed_entity_registry_rejects_unknown_location(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            world = json.dumps({"predicate": "located_at", "subject": "char-jonas", "object": "loc-ghost"}) + "\n"
+            project = self._project(Path(tmp),
+                                    {"predicate": "located_at", "subject": "char-jonas", "object": "loc-ghost"},
+                                    with_ontology=True, world=world)
+            write_json(project / "canon" / "entity-registry.json", {
+                "closed_types": ["loc"],
+                "entities": [{"id": "loc-station", "type": "loc"}],
+            })
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertTrue(any(
+                f["dimension"] == "ontology" and "closed entity registry" in f["evidence"]
+                for f in critique["findings"]
+            ), critique["findings"])
+
+    def test_numeric_value_domain_and_comparison_are_executable(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            world = json.dumps({
+                "predicate": "temperature", "subject": "obj-relay", "value": -2,
+            }) + "\n"
+            project = self._project(Path(tmp), {
+                "predicate": "temperature", "subject": "obj-relay", "value": 0, "comparison": "lt",
+            }, with_ontology=True, world=world)
+            write_json(project / "canon" / "ontology.json", {"predicates": [{
+                "name": "temperature", "arity": "unary", "subject_types": ["obj"],
+                "value_type": "number", "minimum": -20, "maximum": 50,
+            }]})
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+
+    def test_value_domain_rejects_wrong_typed_precondition(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            world = json.dumps({
+                "predicate": "temperature", "subject": "obj-relay", "value": -2,
+            }) + "\n"
+            project = self._project(Path(tmp), {
+                "predicate": "temperature", "subject": "obj-relay", "value": False,
+            }, with_ontology=True, world=world)
+            write_json(project / "canon" / "ontology.json", {"predicates": [{
+                "name": "temperature", "arity": "unary", "subject_types": ["obj"],
+                "value_type": "number",
+            }]})
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertTrue(any(
+                f["dimension"] == "ontology" and "not number" in f["evidence"]
+                for f in critique["findings"]
+            ), critique["findings"])
+
+    def test_declared_exclusive_location_rejects_two_active_targets(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            world = json.dumps({"predicate": "located_at", "subject": "char-jonas", "object": "loc-a"}) + "\n"
+            project = self._project(Path(tmp),
+                                    {"predicate": "located_at", "subject": "char-jonas", "object": "loc-a"},
+                                    with_ontology=True, world=world)
+            write_json(project / "canon" / "ontology.json", {"predicates": [{
+                "name": "located_at", "arity": "binary", "subject_types": ["char"],
+                "object_types": ["loc"], "value_type": "boolean",
+                "exclusive_object_per_subject": True,
+            }]})
+            delta_path = project / "scenes" / "ch01-sc01" / "state-delta.json"
+            delta = json.loads(delta_path.read_text())
+            delta["predicate_changes"] = [{
+                "op": "add", "predicate": "located_at", "subject": "char-jonas", "object": "loc-b",
+            }]
+            write_json(delta_path, delta)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertTrue(any(
+                f["dimension"] == "ontology" and "multiple active objects" in f["evidence"]
+                for f in critique["findings"]
+            ), critique["findings"])
 
 
 class HardAuditCanonTests(unittest.TestCase):

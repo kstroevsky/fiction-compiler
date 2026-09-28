@@ -100,7 +100,8 @@ class ValidatorKeywordTests(unittest.TestCase):
 
 class SchemaValidatorTests(unittest.TestCase):
     def test_all_repo_schemas_load(self) -> None:
-        for name in ["project", "character", "scene", "event", "state-delta", "critique"]:
+        for name in ["project", "character", "scene", "event", "state-delta", "critique",
+                     "ontology", "entity-registry"]:
             self.assertIsInstance(schema.load_schema(name), dict)
 
     def test_valid_project_passes(self) -> None:
@@ -147,6 +148,20 @@ class SchemaValidatorTests(unittest.TestCase):
         self.assertEqual(schema.validate_named(event, "event"), [])
         event["effects"] = [{"op": "add"}]
         self.assertTrue(any("oneOf" in error for error in schema.validate_named(event, "event")))
+
+    def test_event_schema_accepts_declared_comparison_and_rejects_unknown_operator(self) -> None:
+        event = {
+            "id": "evt-x", "time": 1, "actors": ["char-a"],
+            "preconditions": [{
+                "predicate": "temperature", "subject": "obj-relay", "value": 0,
+                "comparison": "lt",
+            }],
+            "action": "check", "effects": [], "causes": [],
+        }
+        self.assertEqual(schema.validate_named(event, "event"), [])
+        event["preconditions"][0]["comparison"] = "approximately"
+        self.assertTrue(any("comparison" in error or "not one of" in error
+                            for error in schema.validate_named(event, "event")))
 
     def test_nested_findings_and_numeric_range(self) -> None:
         critique = {

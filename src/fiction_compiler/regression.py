@@ -47,9 +47,15 @@ def _tournament_decision(inp: dict) -> str:
 
 
 def _ontology_valid(inp: dict) -> bool:
-    ont = {p["name"]: p for p in inp["ontology"].get("predicates", [])}
     atom = inp["atom"]
-    return not ontology.check_atom(ont, atom.get("predicate"), atom.get("subject"), atom.get("object"))
+    kwargs = {"registry": inp.get("entity_registry"), "op": atom.get("op")}
+    if "value" in atom:
+        kwargs["value"] = atom["value"]
+    if "comparison" in atom:
+        kwargs["comparison"] = atom["comparison"]
+    return not ontology.check_atom(
+        inp["ontology"], atom.get("predicate"), atom.get("subject"), atom.get("object"), **kwargs
+    )
 
 
 def _prose_knowledge_leak(inp: dict) -> bool:

@@ -141,6 +141,28 @@ class PlanSearchTests(unittest.TestCase):
             self.assertEqual(audit["verdict"], "revise")
             self.assertTrue(any("absent" in f["diagnosis"] for f in audit["findings"]))
 
+    def test_plan_precondition_honors_numeric_comparison(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build_project(Path(tmp))
+            _write(project / "canon" / "world-state.jsonl",
+                   json.dumps({"predicate": "temperature", "subject": "obj-relay", "value": -2}) + "\n")
+            _write(project / "planning" / "event-graph.json", {"events": [{
+                "id": "evt-a",
+                "preconditions": [{
+                    "predicate": "temperature", "subject": "obj-relay", "value": 0,
+                    "comparison": "lt",
+                }],
+                "effects": [],
+            }]})
+            result = plan_search.record_plan(
+                project, "ch01-sc01",
+                plan("plan-cold", tactic="wait for the relay", turn="the relay trips", cost="time",
+                     learns="the relay fails below freezing", event="evt-a"),
+            )
+            self.assertNotIn("error", result)
+            audit = plan_search.search_status(project, "ch01-sc01")["plans"][0]["hard_audit"]
+            self.assertEqual(audit["verdict"], "pass", audit["findings"])
+
     def test_plan_review_packet_is_plan_aware_and_contains_no_prose_prefix(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project = build_project(Path(tmp))

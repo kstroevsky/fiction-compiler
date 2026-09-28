@@ -26,7 +26,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from .ontology import check_atom, load_ontology
+from .ontology import (check_atom, exclusive_predicate_errors, load_entity_registry,
+                       load_ontology, typed_equal)
 from .state import (accepted_scene_ids, reconstruct_state_before, resource_change_errors,
                     scene_sort_key, seed_state)
 
@@ -190,7 +191,10 @@ def _atom_str(atom: dict) -> str:
     inside = f"{atom.get('subject', '?')}" + (f", {obj}" if obj else "")
     rendered = f"{atom.get('predicate', '?')}({inside})"
     if "value" in atom:
-        rendered += f" == {atom['value']!r}"
+        operator = {
+            "eq": "==", "ne": "!=", "lt": "<", "lte": "<=", "gt": ">", "gte": ">=",
+        }.get(atom.get("comparison", "eq"), atom.get("comparison", "?"))
+        rendered += f" {operator} {atom['value']!r}"
     return rendered
 
 
@@ -201,7 +205,7 @@ def _effect_matches(required: dict, declared: dict) -> bool:
         return False
     if required.get("op") == "remove":
         return True
-    return required.get("value", True) == declared.get("value", True)
+    return typed_equal(required.get("value", True), declared.get("value", True))
 
 
 def _knowledge_effect_matches(required: dict, change: dict) -> bool:
@@ -341,12 +345,20 @@ def _match_and_apply_event_effect(state, effect: dict, scene_delta: dict,
     return True, ""
 
 
-def _ontology_findings(ontology: dict, spec: dict, event_map: dict, scene_delta: dict) -> list[dict]:
-    """Every typed atom the scene touches must use a declared predicate at the right arity/type."""
+def _ontology_findings(ontology: dict, registry: dict | None, before, spec: dict,
+                       event_map: dict, scene_delta: dict) -> list[dict]:
+    """Check declared predicate, entity, value-domain and exclusivity constraints."""
     findings: list[dict] = []
 
-    def check(context: str, predicate: str | None, subject: str | None, object: str | None) -> None:
-        for message in check_atom(ontology, predicate, subject, object):
+    def check(context: str, atom: dict, *, op: str | None = None) -> None:
+        kwargs: dict[str, Any] = {"registry": registry, "op": op or atom.get("op")}
+        if "value" in atom:
+            kwargs["value"] = atom["value"]
+        if "comparison" in atom:
+            kwargs["comparison"] = atom["comparison"]
+        for message in check_atom(
+            ontology, atom.get("predicate"), atom.get("subject"), atom.get("object"), **kwargs
+        ):
             findings.append(_finding("ontology", "material", f"{context}: {message}",
                                      "Typed atom violates the predicate ontology (canon/ontology.json).", "world"))
 
@@ -356,14 +368,38 @@ def _ontology_findings(ontology: dict, spec: dict, event_map: dict, scene_delta:
             continue
         for pre in event.get("preconditions", []):
             if isinstance(pre, dict):
-                check(f"{event_id} precondition", pre.get("predicate"), pre.get("subject"), pre.get("object"))
+                check(f"{event_id} precondition", pre)
         for eff in event.get("effects", []):
             if isinstance(eff, dict) and eff.get("predicate"):
-                check(f"{event_id} effect", eff.get("predicate"), eff.get("subject"), eff.get("object"))
+                check(f"{event_id} effect", eff)
     for change in scene_delta.get("predicate_changes", []):
-        check("delta predicate_changes", change.get("predicate"), change.get("subject"), change.get("object"))
+        check("delta predicate_changes", change)
     for edge in scene_delta.get("relationship_edges", []):
-        check("delta relationship_edges", edge.get("dimension"), edge.get("subject"), edge.get("object"))
+        atom = {
+            "predicate": edge.get("dimension"), "subject": edge.get("subject"),
+            "object": edge.get("object"),
+        }
+        if "value" in edge:
+            atom["value"] = edge["value"]
+        check("delta relationship_edges", atom, op="add")
+
+    pre_errors = set(exclusive_predicate_errors(ontology, before.predicates))
+    for message in sorted(pre_errors):
+        findings.append(_finding(
+            "ontology", "material", f"pre-scene state: {message}",
+            "Canonical state violates a declared predicate exclusivity rule.", "world"))
+    if scene_delta.get("predicate_changes"):
+        after_predicates = deepcopy(before.predicates)
+        for change in scene_delta.get("predicate_changes", []):
+            key = (change.get("predicate"), change.get("subject"), change.get("object"))
+            if change.get("op") == "remove":
+                after_predicates.pop(key, None)
+            else:
+                after_predicates[key] = change.get("value", True)
+        for message in sorted(set(exclusive_predicate_errors(ontology, after_predicates)) - pre_errors):
+            findings.append(_finding(
+                "ontology", "material", f"post-scene state: {message}",
+                "Scene consequences violate a declared predicate exclusivity rule.", "scene"))
     return findings
 
 
@@ -599,6 +635,8 @@ def audit_scene(project: Path, scene_id: str) -> dict:
             pre_state = event_state if ordered_events else before
             if isinstance(pre, dict):
                 kwargs = {"value": pre["value"]} if "value" in pre else {}
+                if "comparison" in pre:
+                    kwargs["comparison"] = pre["comparison"]
                 if not pre_state.holds(pre.get("predicate"), pre.get("subject"), pre.get("object"), **kwargs):
                     findings.append(_finding(
                         "causal", "material", f"{event_id} precondition {_atom_str(pre)}",
@@ -633,7 +671,8 @@ def audit_scene(project: Path, scene_id: str) -> dict:
 
     ontology = load_ontology(project)
     if ontology is not None:
-        findings.extend(_ontology_findings(ontology, spec, event_map, scene_delta))
+        registry = load_entity_registry(project)
+        findings.extend(_ontology_findings(ontology, registry, before, spec, event_map, scene_delta))
 
     return {
         "candidate": scene_id,
