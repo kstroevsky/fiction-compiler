@@ -1,0 +1,3 @@
+COMMAND ['python3', 'scripts/validate_workspace.py']
+EXIT 0
+Validation passed

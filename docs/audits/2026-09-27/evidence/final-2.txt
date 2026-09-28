@@ -1,0 +1,32 @@
+COMMAND ['python3', 'scripts/run_regression.py']
+EXIT 0
+[PASS] defaultness catches a stock cliché (ADR pre-0004 linter)
+[PASS] defaultness passes concrete, unhedged prose
+[PASS] revision rejects the count-drop trap: 2 minors -> 1 new material (ADR 0009)
+[PASS] revision accepts a clean, identity-resolved target fix (ADR 0009)
+[PASS] revision accepts a waived deliberate regression (ADR 0009)
+[PASS] tournament defers a genuine style-vs-cliche tradeoff (ADR 0007)
+[PASS] tournament selects a clean dominator (ADR 0007)
+[PASS] tournament ignores the scene-level hard audit as a phantom candidate
+[PASS] ontology rejects a predicate typo (ADR 0005)
+[PASS] ontology accepts a declared, well-typed atom (ADR 0005)
+[PASS] prose audit flags a focalizer knowing an ungranted fact (ADR 0014, review §4)
+[PASS] prose audit allows the focalizer to perceive a fact this scene grants (ADR 0014)
+[PASS] tournament floor excludes a candidate with a material code-audit finding (ADR 0016)
+[PASS] tournament reports no eligible candidate when all fail the deterministic floor (ADR 0016)
+[PASS] premise divergence floor rejects a batch collapsed to one architecture (ADR 0017)
+[PASS] premise divergence floor accepts three distinct architectures (ADR 0017)
+[PASS] record_critique refuses a pass that carries a material finding (ADR 0018)
+[PASS] record_critique accepts a clean pass (ADR 0018)
+[PASS] record_critique allows a revise to carry a material finding (ADR 0018)
+[PASS] critic recall: defaultness catches the planted cliche (ADR 0019)
+[PASS] critic specificity: defaultness does not flag clean concrete prose (ADR 0019)
+[PASS] critic recall: prose audit catches the planted knowledge leak (ADR 0019)
+[PASS] critic recall: injection scan flags a reprogramming attempt in prose (ADR 0019)
+[PASS] critic specificity: injection scan does not flag a character told to ignore noise (ADR 0019)
+[PASS] vendor output: a clean pass parses and is consistent (ADR 0020)
+[PASS] vendor output: a pass carrying a material finding is flagged inconsistent, not recorded (ADR 0020)
+[PASS] vendor output: a ```json-fenced revise is unwrapped and parsed (ADR 0020)
+[PASS] vendor output: non-JSON prose is rejected at the untrusted boundary (ADR 0020)
+
+28/28 passed. framework_fingerprint=2b3406ddfa04…

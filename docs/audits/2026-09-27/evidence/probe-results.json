@@ -1,0 +1,253 @@
+[
+  {
+    "probe": "spoofed-audits-invalid-spec",
+    "schema_errors": [
+      "$scene: missing required property 'chapter'",
+      "$scene: missing required property 'pov'",
+      "$scene: missing required property 'participants'",
+      "$scene: missing required property 'purpose'",
+      "$scene: missing required property 'entry_state'",
+      "$scene: missing required property 'desire'",
+      "$scene: missing required property 'conflict'",
+      "$scene: missing required property 'turn'",
+      "$scene: missing required property 'exit_state'",
+      "$scene: missing required property 'required_events'",
+      "$scene: missing required property 'forbidden_moves'"
+    ],
+    "promotion": {
+      "promoted_to": "manuscript/chapters/ch01-sc01.md",
+      "accepted_state_deltas": [
+        "ch01-sc01"
+      ],
+      "decision_file": "decisions/promote-ch01-sc01.json",
+      "critique_files": [
+        "scenes/ch01-sc01/critiques/defaultness.json",
+        "scenes/ch01-sc01/critiques/hard.json",
+        "scenes/ch01-sc01/critiques/literary.json"
+      ],
+      "resulting_canon_hash": "11a1704dbcef5ac0bab374da82103d0930a05ecb30b1a06d0be022cff848b274"
+    }
+  },
+  {
+    "probe": "mutated-manuscript",
+    "verifier_errors": []
+  },
+  {
+    "probe": "repromotion",
+    "verifier_errors": [
+      "ch01-sc01: canon chain broken \u2014 recorded parent does not match the prior scene"
+    ]
+  },
+  {
+    "probe": "interleaved-promotion",
+    "both_returned": true,
+    "index": {
+      "accepted_state_deltas": [
+        "ch01-sc01"
+      ]
+    },
+    "manuscripts": [
+      "ch01-sc02.md",
+      "ch01-sc01.md"
+    ],
+    "verifier_errors": []
+  },
+  {
+    "probe": "vendor-mutation",
+    "sent_hash": "90dc20efa181de02651846647352886a3a6c7e4fb4918b22a6942515d4687838",
+    "reported_input_hash": "90dc20efa181de02651846647352886a3a6c7e4fb4918b22a6942515d4687838",
+    "recorded_hash": "1ed5ad932867f1b55b4771fb0327fe504937906ec6a29e33a23ab7883373208e",
+    "current_hash": "1ed5ad932867f1b55b4771fb0327fe504937906ec6a29e33a23ab7883373208e"
+  },
+  {
+    "probe": "filename-traversal",
+    "record": {
+      "written": "scenes/ch01-sc01/critiques/../escaped.json",
+      "candidate": "a.md",
+      "candidate_sha256": "1ed5ad932867f1b55b4771fb0327fe504937906ec6a29e33a23ab7883373208e",
+      "audit_class": "literary",
+      "verdict": "pass",
+      "findings": 0
+    },
+    "escaped_exists": true
+  },
+  {
+    "probe": "fabricated-evidence",
+    "result": {
+      "written": "scenes/ch01-sc01/critiques/fabricated.json",
+      "candidate": "a.md",
+      "candidate_sha256": "1ed5ad932867f1b55b4771fb0327fe504937906ec6a29e33a23ab7883373208e",
+      "audit_class": "literary",
+      "verdict": "revise",
+      "findings": 1
+    }
+  },
+  {
+    "probe": "all-roles-failed",
+    "result": {
+      "scene_id": "ch01-sc01",
+      "candidate": "a.md",
+      "roles": [
+        {
+          "role": "style-editor",
+          "error": "VendorUnavailable: offline intentional failure"
+        }
+      ],
+      "verdicts": {},
+      "disagreement": {
+        "distinct_verdicts": [],
+        "unanimous": true,
+        "dissenting_roles": []
+      },
+      "note": "Disagreement is information \u2014 recorded per role, never collapsed into an average or a single aggregate verdict. A human weighs the panel."
+    }
+  },
+  {
+    "probe": "empty-claims",
+    "result": {
+      "candidate": "ch01-sc01",
+      "critic": "prose-audit",
+      "audit_class": "hard",
+      "verdict": "pass",
+      "confidence": 1.0,
+      "findings": []
+    }
+  },
+  {
+    "probe": "ungranted-fact-mixed-tense-wrong-scene",
+    "schema_errors": [],
+    "result": {
+      "candidate": "a.md",
+      "critic": "prose-audit",
+      "audit_class": "hard",
+      "verdict": "pass",
+      "confidence": 1.0,
+      "findings": []
+    }
+  },
+  {
+    "probe": "typed-value-ignored",
+    "result": {
+      "candidate": "ch01-sc01",
+      "critic": "hard-audit",
+      "verdict": "pass",
+      "confidence": 1.0,
+      "findings": []
+    }
+  },
+  {
+    "probe": "effect-value-ignored",
+    "result": {
+      "candidate": "ch01-sc01",
+      "critic": "hard-audit",
+      "verdict": "pass",
+      "confidence": 1.0,
+      "findings": []
+    }
+  },
+  {
+    "probe": "unresolved-string-precondition-cause",
+    "result": {
+      "candidate": "ch01-sc01",
+      "critic": "hard-audit",
+      "verdict": "pass",
+      "confidence": 1.0,
+      "findings": []
+    }
+  },
+  {
+    "probe": "hard-audit-cli-material-exit",
+    "exit_code": 0,
+    "output": "[REVISE] ch01-sc01 (1 findings)\n  - material causal     Required event is not present in planning/event-graph.json.\n    evidence: required_events includes 'evt-test'  -> repair @ plot\n"
+  },
+  {
+    "probe": "fact-id-overwrite-knowledge",
+    "facts": {
+      "fact-code": "Door code is 2222"
+    },
+    "knows_new_code": true,
+    "canon_audit": {
+      "candidate": "canon",
+      "critic": "hard-audit",
+      "verdict": "pass",
+      "confidence": 1.0,
+      "findings": []
+    }
+  },
+  {
+    "probe": "tournament-ignores-scene-fatal",
+    "result": {
+      "decision": "select",
+      "candidate": "a.md"
+    }
+  },
+  {
+    "probe": "tournament-asymmetric-dissent",
+    "recommendation": {
+      "decision": "select",
+      "candidate": "a.md"
+    },
+    "disagreement": true
+  },
+  {
+    "probe": "tournament-partial-matrix",
+    "recommendation": {
+      "decision": "select",
+      "candidate": "a.md"
+    },
+    "eligible": [
+      "a.md",
+      "b.md"
+    ],
+    "scored": [
+      "a.md"
+    ]
+  },
+  {
+    "probe": "revision-wrong-issue-fixed",
+    "outcome": "accept"
+  },
+  {
+    "probe": "literal-or-deliberate-lint",
+    "text": "The tank was filled with water.",
+    "findings": [
+      {
+        "dimension": "defaultness",
+        "severity": "material",
+        "evidence": "L1: 'filled with water' in \u201cThe tank was filled with water.\u201d",
+        "diagnosis": "Emotion named then paraphrased instead of enacted. Cut the label; show the behavior that implies it.",
+        "repair_layer": "prose"
+      }
+    ]
+  },
+  {
+    "probe": "literal-or-deliberate-lint",
+    "text": "The label read: \"deafening silence\" \u2014 a phrase she hated.",
+    "findings": [
+      {
+        "dimension": "defaultness",
+        "severity": "material",
+        "evidence": "L1: 'deafening silence' in \u201cThe label read: \"deafening silence\" \u2014 a phrase she hated.\u201d",
+        "diagnosis": "Stock phrase; the image is inherited, not perceived. Replace with something only this character in this moment would notice.",
+        "repair_layer": "prose"
+      }
+    ]
+  },
+  {
+    "probe": "self-reported-diversity",
+    "result": {
+      "ok": true,
+      "issues": [],
+      "distinct_architectures": 3,
+      "candidates": 3
+    }
+  },
+  {
+    "probe": "critic-keyword-negation",
+    "counted_as_caught": true
+  },
+  {
+    "probe": "nan-schema",
+    "errors": []
+  }
+]

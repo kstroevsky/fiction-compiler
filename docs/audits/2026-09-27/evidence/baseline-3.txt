@@ -1,0 +1,13 @@
+COMMAND ['python3', 'scripts/run_critic_eval.py']
+EXIT 0
+[OK ] defaultness-cliche     critic=defaultness-lint   defect   caught  (scored)
+[OK ] defaultness-clean      critic=defaultness-lint   control  missed  (scored)
+[OK ] knowledge-leak         critic=prose-audit        defect   caught  (scored)
+[OK ] knowledge-ok           critic=prose-audit        control  missed  (scored)
+[OK ] ontology-typo          critic=hard-audit         defect   caught  (scored)
+[OK ] injection-in-prose     critic=safety             defect   caught  (scored)
+[OK ] injection-clean        critic=safety             control  missed  (scored)
+[----] llm-told-emotion       critic=adversarial-reader defect   -       (needs_live)
+[----] llm-spoken-theme       critic=adversarial-reader defect   -       (needs_live)
+
+scored 7/9 (needs_live=2) | recall=1.00 specificity=1.00

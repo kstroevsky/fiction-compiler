@@ -1,0 +1,2730 @@
+{
+  "commit": "310e50cfe9b8087c8a2af64e6e74f098548e6824",
+  "python": "3.14.7 (main, Aug  5 2026, 10:29:49) [Clang 17.0.0 (clang-1700.6.4.2)]",
+  "initial_untracked": [
+    ".agents/",
+    ".codegraph/"
+  ],
+  "files": [
+    {
+      "path": ".claude/agents/adversarial-reader.md",
+      "sha256": "f411299fd8f25239fe67ba6834562a7f0eb24a92fc681e2dd8e0552d3f3aa030",
+      "bytes": 515
+    },
+    {
+      "path": ".claude/agents/character-simulator.md",
+      "sha256": "dd28b3f9e7801a7542508bbf57143d0ea998cabcaf00da7be4b4cde6e3b0c798",
+      "bytes": 573
+    },
+    {
+      "path": ".claude/agents/continuity-auditor.md",
+      "sha256": "73c658b79e234bbc206ca5f31df6273eb0490e59816b46188f54e8da919bdaa3",
+      "bytes": 476
+    },
+    {
+      "path": ".claude/agents/narrative-architect.md",
+      "sha256": "723c7ba31f11e0754cb90e55858111b739b770f68ec902ddbea622b7f6e437b5",
+      "bytes": 600
+    },
+    {
+      "path": ".claude/agents/style-editor.md",
+      "sha256": "d7fa60d6ccfe9a43ca7910e6eeded6211c296bd101e961d641894f09e75e3d74",
+      "bytes": 514
+    },
+    {
+      "path": ".claude/settings.json",
+      "sha256": "1917f59c3b0f7b20aa196e27bf940c2f7ab431475a860529111cc82dcacffd28",
+      "bytes": 932
+    },
+    {
+      "path": ".claude/skills/avoid-defaults/SKILL.md",
+      "sha256": "1430cb1714bb8823bd21712c892320a6af4d134e824f445199fa8f65d8f4c3cf",
+      "bytes": 2393
+    },
+    {
+      "path": ".claude/skills/bootstrap-story/SKILL.md",
+      "sha256": "8014393de82c8545e6c817cf6b494c3fc96652eac310109aeb0801c77461c89e",
+      "bytes": 877
+    },
+    {
+      "path": ".claude/skills/compile-scene-context/SKILL.md",
+      "sha256": "1044734a4b93bbe9ea80e0a6ffe2285bc29fd0103f66f0527d2f24196b352eaf",
+      "bytes": 489
+    },
+    {
+      "path": ".claude/skills/draft-scene/SKILL.md",
+      "sha256": "3aa5f4b36c95ae0b621f2d406c090bce4e66888714797df677f8f90291993fd8",
+      "bytes": 1766
+    },
+    {
+      "path": ".claude/skills/generate-premises/SKILL.md",
+      "sha256": "b740081c83716bb6e4cbcc74a27ef7e65b768cee6d503f66e92a7cb27516b8be",
+      "bytes": 782
+    },
+    {
+      "path": ".claude/skills/promote-candidate/SKILL.md",
+      "sha256": "1f1f266517577fef5a68ddc1e3e47349c5c245c4252e0ebaa6c6bcda0e720587",
+      "bytes": 597
+    },
+    {
+      "path": ".claude/skills/retrospective/SKILL.md",
+      "sha256": "021a3f46c258eab1852f9ef32863fe8112d2d6b4f32ae91d58970eb49bd59bef",
+      "bytes": 584
+    },
+    {
+      "path": ".claude/skills/triple-audit/SKILL.md",
+      "sha256": "8ab7c06083bc29eb375ebb9efd6d8022222c50ab4da660fe0158b48e501a2a66",
+      "bytes": 2841
+    },
+    {
+      "path": ".codex/agents/adversarial-reader.toml",
+      "sha256": "59df893bd16895295a555025455c17b4bae375275dd4aa87edc400c555671132",
+      "bytes": 681
+    },
+    {
+      "path": ".codex/agents/character-simulator.toml",
+      "sha256": "5cd0059548b11f7b92a57a0683699b65f75bd6a64d227da998e568454a302a5a",
+      "bytes": 621
+    },
+    {
+      "path": ".codex/agents/continuity-auditor.toml",
+      "sha256": "d5568f97697ff59d0c1d808d040ea3c1c962dcfc03c31357222d490e9f453baf",
+      "bytes": 540
+    },
+    {
+      "path": ".codex/agents/narrative-architect.toml",
+      "sha256": "dff88d58933931462003dea0dec5324d472b6e3fce8d0a2918b2164bc3e63878",
+      "bytes": 684
+    },
+    {
+      "path": ".codex/agents/style-editor.toml",
+      "sha256": "a457ae9ae6c78d65184b96f5931dbae52072d4fc1664c91b144fb583f7c4257c",
+      "bytes": 566
+    },
+    {
+      "path": ".codex/config.toml",
+      "sha256": "7875c6c46cf2e69fbfc2b6d20665f1dc3aa7df3cedfe80f49d033670e9a141b5",
+      "bytes": 1139
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "7554af3b344cb1c876beaff49996fe60a617716962a0fc659ac088b6257491bd",
+      "bytes": 87
+    },
+    {
+      "path": ".mcp.json",
+      "sha256": "cbdb5bf159d4af6820945d2e0dce777642f6ee72e4189693305d5144424241a7",
+      "bytes": 127
+    },
+    {
+      "path": ".runs/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "b7c4efa32fb2f25542111d0e029ba1944867a288f7d2b2d3ea8c1bf6ca8c5ef4",
+      "bytes": 3249
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "3625918aac55a3ccf718b055a294b8ad27a8a67f82110848036a3a412176d705",
+      "bytes": 544
+    },
+    {
+      "path": "Makefile",
+      "sha256": "77099d507905611e1b406c08690baf7d500a01b2a7cedbe4ceeb50413e5bacb6",
+      "bytes": 663
+    },
+    {
+      "path": "README.md",
+      "sha256": "476c89975b3fef8f60de86554b3186925764267079075804858961fa8de821b5",
+      "bytes": 3484
+    },
+    {
+      "path": "config/model-roster.json",
+      "sha256": "70eca282ccd46a8839fde679194e5beb6ae4b75276c0997e233e0ea4b07a219c",
+      "bytes": 1257
+    },
+    {
+      "path": "constitution/change-policy.md",
+      "sha256": "d2ef535af86af67bfdea3be0759adce41e40741d2d46d411fb916dc98073260e",
+      "bytes": 430
+    },
+    {
+      "path": "constitution/quality-contract.md",
+      "sha256": "6ec944224dc106a5a22264d4d8ec144aa9a9cb8ec5f655d02d6457f96b4cf92f",
+      "bytes": 1028
+    },
+    {
+      "path": "docs/agent-loop.md",
+      "sha256": "f9e0a03a392e056b34f6b9b91e0e3d75c55181cce616250c52cbaac9dfcf7c80",
+      "bytes": 1850
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "5747c4ca574475d6132d4f3dc2889c236b11929f4840b3db78450d13bb4d6a50",
+      "bytes": 1167
+    },
+    {
+      "path": "docs/decisions/0001-structured-state-delta.md",
+      "sha256": "3dcc30f3c1d7558b30007e58a0347ed1d0cc9725606ac9ab64bb19e9bbc0cfc8",
+      "bytes": 3725
+    },
+    {
+      "path": "docs/decisions/0002-promotion-audit-gate.md",
+      "sha256": "4c159810748f84e22000b83989f861231b6e77b4c1e41684e8bf77fc3186ace5",
+      "bytes": 6295
+    },
+    {
+      "path": "docs/decisions/0003-tamper-evident-promotion.md",
+      "sha256": "0202267b2aa8de2ee3ea0e8d41307d5564925ee985d0a8c3674806aa13d3e498",
+      "bytes": 6330
+    },
+    {
+      "path": "docs/decisions/0004-executable-story-ir.md",
+      "sha256": "8ea28d942670a5b326b7bca30f8138933f500199a137d6a2b9e8e273edf166ce",
+      "bytes": 5739
+    },
+    {
+      "path": "docs/decisions/0005-predicate-ontology.md",
+      "sha256": "b7fd36108db342fe18c7fff66a0f0fee2344b51b643ef94076c547fe81ee1979",
+      "bytes": 4562
+    },
+    {
+      "path": "docs/decisions/0006-fabula-vs-discourse.md",
+      "sha256": "20183f1c77c91b4eec3489f09f992630d174fbd8f2e140798848ecd6f6cd5e6d",
+      "bytes": 4026
+    },
+    {
+      "path": "docs/decisions/0007-tournament-selection-engine.md",
+      "sha256": "f5e7a6da21ef64d286ebe2bd43bf67278ace1a252ebb3b9facfdf9ae87b95a9e",
+      "bytes": 5162
+    },
+    {
+      "path": "docs/decisions/0008-tournament-judges-and-evidence.md",
+      "sha256": "b9c83820115bc3e8ced6df358c8e2b9b03b74d6c41c69dc36eb53e2d7970ca02",
+      "bytes": 4177
+    },
+    {
+      "path": "docs/decisions/0009-revision-by-finding-identity.md",
+      "sha256": "6443b397dad5697281ae2b87e3db79d28dd25fda57dcb2165fa03107cae52b23",
+      "bytes": 4453
+    },
+    {
+      "path": "docs/decisions/0010-revision-acceptance-by-identity-and-waivers.md",
+      "sha256": "81caa95a93266b1688229afe161699b57fa55302454ffda630cb5beb64bfbfae",
+      "bytes": 4292
+    },
+    {
+      "path": "docs/decisions/0011-framework-regression-harness.md",
+      "sha256": "23d2ed1666038f80e6570ffe875ace66b26e8532fa1e7dd3b0bf2a355e2dfb8d",
+      "bytes": 4291
+    },
+    {
+      "path": "docs/decisions/0012-human-gate-and-rubric.md",
+      "sha256": "432e152146faa66c8a320acbb12586a8150da435670a07f9d862706831893586",
+      "bytes": 4076
+    },
+    {
+      "path": "docs/decisions/0013-operational-cleanups.md",
+      "sha256": "5d2bfd49781d2bc84a449264c62bd60fd79e8e30afe4effe848f5811e8cf4180",
+      "bytes": 4647
+    },
+    {
+      "path": "docs/decisions/0014-prose-audit.md",
+      "sha256": "38c28e7f98611c69a5e9b9da83f9369900398be6d203b3e6caa65fa30a460e99",
+      "bytes": 4921
+    },
+    {
+      "path": "docs/decisions/0015-kb-structured-depth.md",
+      "sha256": "b949fea318eb13b0f0be7f3a7f6ba7338d6aa004cbe40f49b9a86fe961032604",
+      "bytes": 4984
+    },
+    {
+      "path": "docs/decisions/0016-critic-drives-selection.md",
+      "sha256": "42f67d6b1bbdd9c10bf04a435a70be7b252187ff8562f4841d91057f767f8d9c",
+      "bytes": 5045
+    },
+    {
+      "path": "docs/decisions/0017-premise-divergence-and-probes.md",
+      "sha256": "487f733dd87c7adc10172991449ada2022f987f812c8c57aff29b8f685872a8e",
+      "bytes": 5815
+    },
+    {
+      "path": "docs/decisions/0018-agent-legible-critique-and-cache-hygiene.md",
+      "sha256": "518482ea79776a94fa9b3487026103716d74afb9129f04810819db1b6f301e60",
+      "bytes": 5997
+    },
+    {
+      "path": "docs/decisions/0019-critic-eval-untrusted-boundary-trace.md",
+      "sha256": "6d3a63b5b2f2d485c632caa2d871c20f591fa929722fc763ee9acd52021acb28",
+      "bytes": 5449
+    },
+    {
+      "path": "docs/decisions/0020-external-multi-vendor-role-runner.md",
+      "sha256": "171738eb66b8b88cf7f30dabd0aaa37f18a15337cd4f9e1a7df6e4247c35da05",
+      "bytes": 7323
+    },
+    {
+      "path": "docs/domain-map.md",
+      "sha256": "bd5a2fb4bf74a026fd90366173fbaa688f002ac7875909b306f4574cf76d10c2",
+      "bytes": 3232
+    },
+    {
+      "path": "docs/evaluation.md",
+      "sha256": "ae94437f6f2322caeec78acbde82744a88bebac064827ff9bf82aba2aeed9a5a",
+      "bytes": 1187
+    },
+    {
+      "path": "docs/implementation-roadmap.md",
+      "sha256": "97badd5223362eeedcc3d42759f1b372b1a234305fb339327c21396511c1316d",
+      "bytes": 19560
+    },
+    {
+      "path": "docs/knowledge-base.md",
+      "sha256": "f29c6b1c3551dbae94d82f6009fea4958c6d745074f3f676b453ba2e0b04bb7e",
+      "bytes": 2005
+    },
+    {
+      "path": "docs/mcp-and-tools.md",
+      "sha256": "ab65df403b48856d4f60d486f45273e71bc1a201b07e15e2c4c41d5551172088",
+      "bytes": 3426
+    },
+    {
+      "path": "docs/original-design-brief.md",
+      "sha256": "3d4956658c63c047f6e15a68d070057012a8b24f4ecb853ad16bae9dac17c4e8",
+      "bytes": 41372
+    },
+    {
+      "path": "docs/self-improvement-loops.md",
+      "sha256": "e9e1e55040eb5ad3b580122181a5583f4b9dfd76e127ae8efe8874955b6048b7",
+      "bytes": 2973
+    },
+    {
+      "path": "evals/critic-cases.json",
+      "sha256": "d5f3fe0a64cf87f7bb36a9dbb5ed655f5eeded4e43de28e30309f7bb502b10c9",
+      "bytes": 3083
+    },
+    {
+      "path": "kb/README.md",
+      "sha256": "f040120b785e0c904b35c7c0bfdbde8cf24e5b21d39d3d390ac06cf926f842b3",
+      "bytes": 1825
+    },
+    {
+      "path": "kb/corpus-notes/README.md",
+      "sha256": "026dead3e8a09dc0e7a8e19749e524017a75a4eeb557c7a5556aa1ce9d77be16",
+      "bytes": 1393
+    },
+    {
+      "path": "kb/corpus-notes/the-overnight-ch01-sc02.md",
+      "sha256": "f844e15b457883304a11e60ce77b4e0d654b83cb84a0c30d1badadb04b60e099",
+      "bytes": 2899
+    },
+    {
+      "path": "kb/craft/causality-and-preconditions.md",
+      "sha256": "6e88f70278025111b0635564104682f2ed25bd98c3cbcc74bb16ca497e8ba60c",
+      "bytes": 1701
+    },
+    {
+      "path": "kb/craft/character-intentionality.md",
+      "sha256": "023ef3b1a862f6675d8712aa8ab7e7d62c6620136fad988a02177d617af327a2",
+      "bytes": 1613
+    },
+    {
+      "path": "kb/craft/dialogue-subtext.md",
+      "sha256": "cbe3471f938eb70a3a258c6a048daf22b638468f7a9419d01e50dc3acec73b03",
+      "bytes": 1622
+    },
+    {
+      "path": "kb/craft/dramatic-structure.md",
+      "sha256": "c3b4a567738f2f5e397d82887d051e6844898335949d69d886733bf44c24c11e",
+      "bytes": 1840
+    },
+    {
+      "path": "kb/craft/promise-and-payoff.md",
+      "sha256": "a335e1a2b097f06ed221485b05f5de1b329b0b9506eeee15dcdb5800dd631774",
+      "bytes": 1751
+    },
+    {
+      "path": "kb/craft/revision-as-craft.md",
+      "sha256": "ff9f8cb6e25ed8c4328d01c8f4d2c513bb2fdb419b836fdcda007ffdf7cf7b00",
+      "bytes": 2375
+    },
+    {
+      "path": "kb/craft/scene-dramaturgy.md",
+      "sha256": "080070e15724a585d945274cd830bca927dc05cfd161f6113d09663e6d7ce959",
+      "bytes": 2301
+    },
+    {
+      "path": "kb/craft/showing-and-telling.md",
+      "sha256": "c7810810da475cd2ac2e60547649a312a99dcddc7848bb4a6a4c195dca0e34d1",
+      "bytes": 1931
+    },
+    {
+      "path": "kb/craft/unity-of-effect.md",
+      "sha256": "6a7aa34d430358fd9f2a0282edb3bd5432dc628164b09529d340185399f0c956",
+      "bytes": 1724
+    },
+    {
+      "path": "kb/index.json",
+      "sha256": "9f14524f564ae0dc4f83e7cc1bde61eebdae42f9527fbfe8ff45d469da101c47",
+      "bytes": 18092
+    },
+    {
+      "path": "kb/narratology/eventfulness.md",
+      "sha256": "13024ce3b3f24f2e7bd75b885981f88dd3b9fb3e7b93ca64fceb8ba7ce738c4d",
+      "bytes": 2326
+    },
+    {
+      "path": "kb/narratology/fabula-vs-discourse.md",
+      "sha256": "6f07fdfd3b83c5f890b4da3cdc8d5bf9df3e25cf399f08fea2bf4353028a1487",
+      "bytes": 1641
+    },
+    {
+      "path": "kb/narratology/focalization-and-knowledge.md",
+      "sha256": "6fd65620d98fa427b0367035ef1733669328c9868425789e0dd7f4a0e93374cf",
+      "bytes": 2454
+    },
+    {
+      "path": "kb/narratology/static-scene.md",
+      "sha256": "dc80e67f0d92baedde10f7178cdd2ede866e56437833d14b4ea87cc943183871",
+      "bytes": 2592
+    },
+    {
+      "path": "kb/narratology/suspense-surprise-curiosity.md",
+      "sha256": "e7e44937b4b62405f153f32342e61d2b29e444468757568f3b3009fd89810683",
+      "bytes": 1938
+    },
+    {
+      "path": "kb/source-register.json",
+      "sha256": "460fae6d5607723f1c70c482f961b7dcc7052e46db555085b09e057a8f58ec49",
+      "bytes": 12980
+    },
+    {
+      "path": "kb/style/concrete-vs-abstract.md",
+      "sha256": "0bd924d2b9b380b5e1ca72165f5a8627c84555e9eb5f8d74659843fca78f3a22",
+      "bytes": 1762
+    },
+    {
+      "path": "kb/style/defaultness-catalog.json",
+      "sha256": "d2ebbace70dd41c518ea4e87a3e434d7846cee664c63160bdd21fc7d04a7db75",
+      "bytes": 2464
+    },
+    {
+      "path": "kb/style/defaultness.md",
+      "sha256": "1788e83ba228b69227ea531d8697fcad72d676f3c02be6cc59ce71a39575f988",
+      "bytes": 2259
+    },
+    {
+      "path": "kb/style/narrative-distance.md",
+      "sha256": "c835f5c1869f4c08b534c8a8b684df395dc22de98d1f18be56fe40b108065977",
+      "bytes": 1803
+    },
+    {
+      "path": "premise-probes.json",
+      "sha256": "72c85fbc5ce1452257ea47bb284c98214133a3cbab8a8292c327a102890ead35",
+      "bytes": 2107
+    },
+    {
+      "path": "projects/.DS_Store",
+      "sha256": "2eae0a1fbc308d4f1691d9a6a8dbeb0d915be8f023d3926f8a2d62effcae6b81",
+      "bytes": 6148
+    },
+    {
+      "path": "projects/_template/brief/creative-brief.md",
+      "sha256": "a02c3bfe0455a2fcbfd924249f64444c078194a7e39398792ee905e06aedb261",
+      "bytes": 195
+    },
+    {
+      "path": "projects/_template/brief/project.json",
+      "sha256": "465e8ad204411b4933a3ccb7c9088bc9f6eceab87698c45f2e6e318168960fcb",
+      "bytes": 263
+    },
+    {
+      "path": "projects/_template/canon/facts.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "projects/_template/canon/index.json",
+      "sha256": "712b8737e11833cd310a4455610ffac74af66dcec5af6435a3b2dfc57570eba5",
+      "bytes": 129
+    },
+    {
+      "path": "projects/_template/canon/knowledge-state.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "projects/_template/canon/ontology.json",
+      "sha256": "cd665ba60be08acbdea3b5dfcb03e42301ab3d8cbd726cad3e218b02f09e152f",
+      "bytes": 1081
+    },
+    {
+      "path": "projects/_template/canon/promises.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "projects/_template/canon/relationship-state.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "projects/_template/canon/timeline.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "projects/_template/canon/world-state.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "projects/_template/decisions/README.md",
+      "sha256": "1b0c6f132d843998ab98e0025a940afafd9077ede839fff7440dc07c34e53a3e",
+      "bytes": 166
+    },
+    {
+      "path": "projects/_template/planning/discourse-plan.json",
+      "sha256": "972ed185fd0158bef06480024cf5305083ae7a6319bfcb926fb751248e651c47",
+      "bytes": 87
+    },
+    {
+      "path": "projects/_template/planning/event-graph.json",
+      "sha256": "a6e605e4a3c30004295e047685fcdadbe99b70551974c1061a2e4e503264db98",
+      "bytes": 28
+    },
+    {
+      "path": "projects/_template/planning/style-profile.json",
+      "sha256": "2aea9ffc85e27e9d9342760f54e5c4c245e9d8e6670d096288751c14c3565c1c",
+      "bytes": 308
+    },
+    {
+      "path": "projects/forecourt/.runs/trace/ch01-sc01.jsonl",
+      "sha256": "b8204f75fd6a950fdda910e33bb4b32ff1fa29243bffa9491fa4e02d787d13b6",
+      "bytes": 2243
+    },
+    {
+      "path": "projects/forecourt/.runs/trace/ch01-sc02.jsonl",
+      "sha256": "b3504e1d53152f92636a5ae665592588c425537cbfb03d28bb6f600b1892d147",
+      "bytes": 2245
+    },
+    {
+      "path": "projects/forecourt/.runs/trace/ch01-sc03.jsonl",
+      "sha256": "90141a5f9d540f00a63a4078915c3835100a0a055137cc86554127645f7d9784",
+      "bytes": 2245
+    },
+    {
+      "path": "projects/forecourt/brief/creative-brief.md",
+      "sha256": "93bc2a2ed4151d50eb7daace9579731c619c93f470e159db14f1a37d44612d1b",
+      "bytes": 2129
+    },
+    {
+      "path": "projects/forecourt/brief/project.json",
+      "sha256": "0749e2b9bbeeba4f9311e440422ef1e9d53b2945c8e37ed84f89592213aed578",
+      "bytes": 1843
+    },
+    {
+      "path": "projects/forecourt/canon/characters/char-jo.json",
+      "sha256": "8f2224697c983fd4279d65b0345935d85e326a5dc8c1dfd400f6698df638f207",
+      "bytes": 1557
+    },
+    {
+      "path": "projects/forecourt/canon/characters/char-officer.json",
+      "sha256": "f36d89675deaaca308cd58643c3d7635827c5f524cb3ed1021d4afa8f6e0c048",
+      "bytes": 681
+    },
+    {
+      "path": "projects/forecourt/canon/characters/char-stranger.json",
+      "sha256": "3be158bf51c288ede9b508d5ca2e30c0b3679558f8f90c8adb52ebca4d5d135e",
+      "bytes": 1146
+    },
+    {
+      "path": "projects/forecourt/canon/facts.jsonl",
+      "sha256": "cb59f81ac0e14eb2a2b4756a74b91a6ca4d1a770fd2e211e6319890659a2e918",
+      "bytes": 545
+    },
+    {
+      "path": "projects/forecourt/canon/index.json",
+      "sha256": "331f5b2a7f98993bad318f4cf417cdd088749b1cde53466837ffce53a9d20c0a",
+      "bytes": 1106
+    },
+    {
+      "path": "projects/forecourt/canon/knowledge-state.jsonl",
+      "sha256": "29b9bf8fdd1c8f5165e4e1206bf471493e0f7af35ea198ef362219d7a97ba4b6",
+      "bytes": 142
+    },
+    {
+      "path": "projects/forecourt/canon/ontology.json",
+      "sha256": "35c965cf1d42cfc59fa2b8d68f5b805515808485e772ce2aec4ed461ca281ae7",
+      "bytes": 851
+    },
+    {
+      "path": "projects/forecourt/canon/promises.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "projects/forecourt/canon/relationship-state.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "projects/forecourt/canon/timeline.jsonl",
+      "sha256": "5d3182f58538d67dfbab582741055a6e77aece786fb6c9c361b0ba192a1276be",
+      "bytes": 113
+    },
+    {
+      "path": "projects/forecourt/canon/world-state.jsonl",
+      "sha256": "aa681dac0bcbfe0a352b3c707c333b7cb9ddcce9996645a7f8334e674475639b",
+      "bytes": 149
+    },
+    {
+      "path": "projects/forecourt/decisions/README.md",
+      "sha256": "b2996a391e9d5d4af9564c03594e8ddb9725f80c9b5bbab350089baea16c3362",
+      "bytes": 399
+    },
+    {
+      "path": "projects/forecourt/decisions/promote-ch01-sc01.json",
+      "sha256": "f9c52fc5d659ca94cdf16c3582460497b91e8bf23649687567faa8e4a597fa50",
+      "bytes": 2206
+    },
+    {
+      "path": "projects/forecourt/decisions/promote-ch01-sc02.json",
+      "sha256": "85155b91f8364f2ed520f3e315193c466a81303418a85ec9c28233f9da1d19df",
+      "bytes": 2206
+    },
+    {
+      "path": "projects/forecourt/decisions/promote-ch01-sc03.json",
+      "sha256": "be46b25afc3aa964456c2909b07cacfbdea64999f8bef2e5f961230ce318b5cf",
+      "bytes": 2206
+    },
+    {
+      "path": "projects/forecourt/manuscript/chapters/ch01-sc01.md",
+      "sha256": "0601b3e9ca20b0996f69bd2a8ff59017bbbff2fa21d805d40e99865e374f0357",
+      "bytes": 3749
+    },
+    {
+      "path": "projects/forecourt/manuscript/chapters/ch01-sc02.md",
+      "sha256": "0d85cf33584308b3faffb185e4edcf6aef556fd70ea34aa82ca91e14fb808692",
+      "bytes": 2656
+    },
+    {
+      "path": "projects/forecourt/manuscript/chapters/ch01-sc03.md",
+      "sha256": "67a771f9897ef185f7db1c5ecb0624b363abb3e97abff19a33929bdcbc9f9cec",
+      "bytes": 2419
+    },
+    {
+      "path": "projects/forecourt/manuscript/manuscript.md",
+      "sha256": "6db2193319635b3b23adb56f319d30b68bf35d94baf3bdeacf6dab5077fd3304",
+      "bytes": 8880
+    },
+    {
+      "path": "projects/forecourt/planning/discourse-plan.json",
+      "sha256": "7495f49a52813dab85eb8858fecdc67591154679388477143d0900e301a4de16",
+      "bytes": 1283
+    },
+    {
+      "path": "projects/forecourt/planning/event-graph.json",
+      "sha256": "4011d06a62e2e020e1d938f93f6cc8c71c32c5d769bf0879b7bd69d0f3d93067",
+      "bytes": 2123
+    },
+    {
+      "path": "projects/forecourt/planning/style-profile.json",
+      "sha256": "187af6a05e4a5c38254e678f89a6f410b7a13b5f15d7cba898f0ba1dedf08652",
+      "bytes": 1639
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc01/candidates/candidate-a-r1.md",
+      "sha256": "0601b3e9ca20b0996f69bd2a8ff59017bbbff2fa21d805d40e99865e374f0357",
+      "bytes": 3749
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc01/candidates/candidate-a.md",
+      "sha256": "fd4ba9fd04a9f8292efe8cebee72470219fb5c4b68ac568fabd3d69afebb894f",
+      "bytes": 3702
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc01/candidates/candidate-b.md",
+      "sha256": "1d42c9e0ab2d771fdb852187854fd236a3b7e0481e9aa5cd6de90d927771af0d",
+      "bytes": 2450
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc01/critiques/adversarial-reader-candidate-a-r1.json",
+      "sha256": "0961b4f1b1404ce2911ce5b2004089a9b63f82507d8ab2d549d900dafd385bfc",
+      "bytes": 964
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc01/critiques/adversarial-reader-candidate-a.json",
+      "sha256": "13b8860f654b1f7ef5774672e048868def71313a49131e25b16de3bbeb4e6e98",
+      "bytes": 929
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc01/critiques/adversarial-reader-candidate-b.json",
+      "sha256": "331731108cbcc1f389733a600b77b1c204f30c1ec163c6dd318f11fa78910195",
+      "bytes": 883
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc01/critiques/character-simulator-candidate-a.json",
+      "sha256": "abc071c8ea90fcc6e3b75dbdb5473f1853b14b18f28f673d7f67ab4f463da702",
+      "bytes": 906
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc01/critiques/character-simulator-candidate-b.json",
+      "sha256": "f853d6fad7b26cad531e5fb6a0b5535e864ab0e636779320d18ba4ca3802df89",
+      "bytes": 1008
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc01/critiques/defaultness-lint-candidate-a-r1.json",
+      "sha256": "1a4dda469481848343fcb71524a534cf1b08704c9c76a97de9a543f5a11e5dca",
+      "bytes": 253
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc01/critiques/defaultness-lint-candidate-a.json",
+      "sha256": "2abfe42ff66f85dac784f9fa897fa80c5847fb27fd408fb5854e1c5820343370",
+      "bytes": 250
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc01/critiques/defaultness-lint-candidate-b.json",
+      "sha256": "31793811c5a3b949666a40cebce13114d97ed114c357d0cc33fea04f9d535d48",
+      "bytes": 250
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc01/critiques/hard-audit-ch01-sc01.json",
+      "sha256": "3865543e3f71c3ee203e6677ded0924fe2eda65998a1ff52b4eb883b724817a0",
+      "bytes": 140
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc01/critiques/style-editor-candidate-a.json",
+      "sha256": "85ca094c72518bc6f710a325f465a51f05a74332cffe221df5b177d839e48103",
+      "bytes": 1533
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc01/critiques/style-editor-candidate-b.json",
+      "sha256": "7df7a834a827e9cb1b05cf5f33006f9942fd208dca4448ecca8f1264f6a587a0",
+      "bytes": 1093
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc01/spec.json",
+      "sha256": "44e5e6a48dc61c9d0b75171b55bbdc8b744e99584ef22fc1c5a8984273021a49",
+      "bytes": 1818
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc01/state-delta.json",
+      "sha256": "5e6bfa4cfead62ec9146d6ffaba3d5b6935c599784b7987e11c636f690d9847c",
+      "bytes": 927
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc02/candidates/candidate-a-r1.md",
+      "sha256": "0d85cf33584308b3faffb185e4edcf6aef556fd70ea34aa82ca91e14fb808692",
+      "bytes": 2656
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc02/candidates/candidate-a.md",
+      "sha256": "057cfda828f68621f352919e07e51f3962dae756a6789a402ed8bca196986fca",
+      "bytes": 2764
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc02/candidates/candidate-b.md",
+      "sha256": "25a0b994490da0acac1961b0b883e5236d4f86f16176561c09dbebcb2a8bf78b",
+      "bytes": 2060
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc02/critiques/adversarial-reader-candidate-a-r1.json",
+      "sha256": "d923a8c9ba1e3b358bbd2b6e815855bd608e685d0f291a59684211d00a4b12b3",
+      "bytes": 1162
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc02/critiques/adversarial-reader-candidate-a.json",
+      "sha256": "c7f3125d035b7027c076face335c6ebe254ce473d31a3c81e285d6b3ac952beb",
+      "bytes": 1054
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc02/critiques/adversarial-reader-candidate-b.json",
+      "sha256": "3ab0ce7f22f13a0a161f85e300a77c8ab82d9784b63bc45113efba3bc84ef015",
+      "bytes": 1106
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc02/critiques/character-simulator-candidate-a.json",
+      "sha256": "f6d4cdff6653d77f554471201d9a0e9417e19f9c4548c407b91f09d2a1c6fc53",
+      "bytes": 1044
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc02/critiques/character-simulator-candidate-b.json",
+      "sha256": "6869bd779575257895a5b3030cdaba68214db7cb705493abc026de0223f6f65c",
+      "bytes": 1009
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc02/critiques/defaultness-lint-candidate-a-r1.json",
+      "sha256": "19356248405fd4bc1fdd23709e23ef5556ceae2a77652371d8931c829e6aa2a7",
+      "bytes": 253
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc02/critiques/defaultness-lint-candidate-a.json",
+      "sha256": "f7430f96f8327adc23976f39c617a88f55ee57d41f548c38e4232364757827cb",
+      "bytes": 250
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc02/critiques/defaultness-lint-candidate-b.json",
+      "sha256": "f931d40fcf8cb034374ba9fba5284de039f756f8f5a11ecb63801dfe746fbb0b",
+      "bytes": 250
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc02/critiques/hard-audit-ch01-sc02.json",
+      "sha256": "9794bf419c4e2bcdaad91b6d5a677db9cdc975b723cd927a5e7f4d0c51be6257",
+      "bytes": 140
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc02/critiques/style-editor-candidate-a.json",
+      "sha256": "3aa39432a52c966e8e504a724e649c0acc1b81e2bd3b045a9be49b8b19502685",
+      "bytes": 1546
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc02/critiques/style-editor-candidate-b.json",
+      "sha256": "ffb23f232eb020bf54c19c6226a52ff816f4fd8bfea97cdf3cbc75cc7d8b4cd9",
+      "bytes": 1586
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc02/spec.json",
+      "sha256": "e647333fe8a882f6896497ff4ccd1aaf29b802914b39bd916d23c114fe4e6901",
+      "bytes": 1928
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc02/state-delta.json",
+      "sha256": "3684c56747b84a787b8ea8bd4d43d3e2336adf2545546ae4b1ab7a5781769705",
+      "bytes": 559
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc03/candidates/candidate-a-r1.md",
+      "sha256": "67a771f9897ef185f7db1c5ecb0624b363abb3e97abff19a33929bdcbc9f9cec",
+      "bytes": 2419
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc03/candidates/candidate-a.md",
+      "sha256": "f1aca497fce68b1eb4f03281b01844df179d672a71f8806e2287045b42dd6355",
+      "bytes": 2537
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc03/candidates/candidate-b.md",
+      "sha256": "5ef46f1e803ae5054baec9940fae1ad991793d9e04748f6f046bf0a6a24cc455",
+      "bytes": 1313
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc03/critiques/adversarial-reader-candidate-a-r1.json",
+      "sha256": "576ccd4ff5c95b7fcf82b049e9bbcd3282952d4849d7c60053463e7abfc65953",
+      "bytes": 1528
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc03/critiques/adversarial-reader-candidate-a.json",
+      "sha256": "c463054135d1ae1c10406beaf56a41f2929fcbe1c381ba8d631e10308bf3b596",
+      "bytes": 979
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc03/critiques/adversarial-reader-candidate-b.json",
+      "sha256": "ca368840cbf9fe2a602b8944dcc7e2cebca8d10b7e2cce028061c2bbf1adc078",
+      "bytes": 646
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc03/critiques/character-simulator-candidate-a.json",
+      "sha256": "6daedfd46730fa6610cee4512dd707fb0040a82c0a22054f77875f71635632fa",
+      "bytes": 1238
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc03/critiques/character-simulator-candidate-b.json",
+      "sha256": "8b49bcdd79eade7198f1542f9f5a5b3d55d8b05a4a2acf6a01f23698556d61f5",
+      "bytes": 612
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc03/critiques/defaultness-lint-candidate-a-r1.json",
+      "sha256": "5a2ceac0270e8288c59cff4e58590a3175696a0d8ac75f7b36dde8fb4b7d144a",
+      "bytes": 253
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc03/critiques/defaultness-lint-candidate-a.json",
+      "sha256": "fc0d894e8bd5d6dd5b5da0388771176cec06281acdee8f510dd613b4a17caf5d",
+      "bytes": 250
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc03/critiques/defaultness-lint-candidate-b.json",
+      "sha256": "ed4292c7f6e80b34d28861f96edbc95c6ebb64f10cd8728f57851438ceaa1b2b",
+      "bytes": 500
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc03/critiques/hard-audit-ch01-sc03.json",
+      "sha256": "59b8fcffc323c200d33dd1c23f4bf123db1033b7359d0e226cb272dc474dd0dd",
+      "bytes": 140
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc03/critiques/style-editor-candidate-a.json",
+      "sha256": "04a7c40b057afbf5b93e05ad86684e767b8f709dc114b6fb6797deaba1bb6e40",
+      "bytes": 1693
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc03/critiques/style-editor-candidate-b.json",
+      "sha256": "cb1f9ef4e34662d3efc323fa1ad3cca6a3a55df258795f203b45b5ab852b642d",
+      "bytes": 857
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc03/spec.json",
+      "sha256": "6d1eb326ba9db412dc76d1d909a39655adf43dd585f62ecd005ae6e8790e0cd6",
+      "bytes": 1691
+    },
+    {
+      "path": "projects/forecourt/scenes/ch01-sc03/state-delta.json",
+      "sha256": "c032feda3b3647d5c21ae00a96ea81fe00a079f894860fc890d729f596259ccd",
+      "bytes": 469
+    },
+    {
+      "path": "projects/salt-in-the-wire/README.md",
+      "sha256": "f88dd4b72883e373d63c1ce32d6612892efd163be0ff6973c2c37914999fd7f4",
+      "bytes": 2697
+    },
+    {
+      "path": "projects/salt-in-the-wire/brief/creative-brief.md",
+      "sha256": "be76ee1594800d9013b33692bdeaffbd9fcb7b6f7eb3023f9b239d94dbcf5811",
+      "bytes": 1747
+    },
+    {
+      "path": "projects/salt-in-the-wire/brief/project.json",
+      "sha256": "897cf51b775678cd943dbe91802cf4941370e4474993872a700043a47ade48a0",
+      "bytes": 1032
+    },
+    {
+      "path": "projects/salt-in-the-wire/canon/characters/char-jonas.json",
+      "sha256": "36794a944e8a75922b809f8e89b1ec747168d3304caef05b64e7e0632c5c882c",
+      "bytes": 1145
+    },
+    {
+      "path": "projects/salt-in-the-wire/canon/characters/char-mara.json",
+      "sha256": "e012d84f13cab67bf18c865fb1247860525f4470f9a7dd037130a1f7978194a6",
+      "bytes": 1098
+    },
+    {
+      "path": "projects/salt-in-the-wire/canon/facts.jsonl",
+      "sha256": "8b7eaa4467ae9fa54e6691066b71791ebc8f011b1585ceb817e1c597a8959e0b",
+      "bytes": 689
+    },
+    {
+      "path": "projects/salt-in-the-wire/canon/index.json",
+      "sha256": "757bbdeb6fb42e95860665c2aa15fd243616ba949760f589be8e143dd6d49af2",
+      "bytes": 1142
+    },
+    {
+      "path": "projects/salt-in-the-wire/canon/knowledge-state.jsonl",
+      "sha256": "f720e14d5ee1d9ea0ae74a7e2a55a06dd04a38e0ea50a84df7ef48a44da1c36c",
+      "bytes": 407
+    },
+    {
+      "path": "projects/salt-in-the-wire/canon/promises.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "projects/salt-in-the-wire/canon/relationship-state.jsonl",
+      "sha256": "fdb76ca462e7890983a20d22d5b330cd9e52382dc7a252fcac8341f57752c7e5",
+      "bytes": 148
+    },
+    {
+      "path": "projects/salt-in-the-wire/canon/timeline.jsonl",
+      "sha256": "8eebfbb5a953e657ad78d89bbb2ee3a525e15b54f61d872ad677bf52e56aaa5c",
+      "bytes": 66
+    },
+    {
+      "path": "projects/salt-in-the-wire/decisions/README.md",
+      "sha256": "1b0c6f132d843998ab98e0025a940afafd9077ede839fff7440dc07c34e53a3e",
+      "bytes": 166
+    },
+    {
+      "path": "projects/salt-in-the-wire/decisions/promote-ch01-sc01.json",
+      "sha256": "a6d0109b11887dd545520485af01e547446be59addda4201c0b622fd3cd245b9",
+      "bytes": 399
+    },
+    {
+      "path": "projects/salt-in-the-wire/decisions/promote-ch01-sc02.json",
+      "sha256": "e025e81f938db99f91d2211b12a8f1fdeb492f0e8d75ba56aff15d5a4225773b",
+      "bytes": 454
+    },
+    {
+      "path": "projects/salt-in-the-wire/manuscript/chapters/ch01-sc01.md",
+      "sha256": "01b4aac29a248db2d4b9db9e3fc2b5f3c4c01fc5f9c92514fe7542c9c27c0ea0",
+      "bytes": 1520
+    },
+    {
+      "path": "projects/salt-in-the-wire/manuscript/chapters/ch01-sc02.md",
+      "sha256": "d3b10883df9ffb89e7f3036daf2df398b13c24459b2baa38ae4a91677895be97",
+      "bytes": 2016
+    },
+    {
+      "path": "projects/salt-in-the-wire/planning/discourse-plan.json",
+      "sha256": "14c87d54ded61d53c24b6d016701e508381a934523051ac83f857ed88a312042",
+      "bytes": 822
+    },
+    {
+      "path": "projects/salt-in-the-wire/planning/event-graph.json",
+      "sha256": "2a3289ee20d96ac1bf421775908497879cebacfa3292ed5841741d9eb42ffee4",
+      "bytes": 1767
+    },
+    {
+      "path": "projects/salt-in-the-wire/planning/style-profile.json",
+      "sha256": "4278f85fbf0e16c4e49470168959e3712481227424fd7b6d9618b72622b0a9cf",
+      "bytes": 1095
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc01/candidates/candidate-a.md",
+      "sha256": "01b4aac29a248db2d4b9db9e3fc2b5f3c4c01fc5f9c92514fe7542c9c27c0ea0",
+      "bytes": 1520
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc01/candidates/candidate-b.md",
+      "sha256": "57a261de0295eacea910ef86dee81717b6f550846adc9fc2614f9183e50b9d8c",
+      "bytes": 500
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc01/critiques/defaultness-candidate-a.json",
+      "sha256": "30dcea3a8757aa4a27e4fc51c85551c60c7c9e9f25de4581ce7ed85f1dd8bcb4",
+      "bytes": 128
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc01/critiques/defaultness-candidate-b.json",
+      "sha256": "a83d23e47a5d932f856cf25aa9d4d2de8d71faa0893bf39ad1894e585f9b35d5",
+      "bytes": 5941
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc01/critiques/hard-audit.json",
+      "sha256": "4d4d8ab9d3410ad8b98545472a29212f3daa0b1ad45c4f45af33e8da29e307b3",
+      "bytes": 117
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc01/revision-log.jsonl",
+      "sha256": "59db1381b747a1cc94ce1dc5182e2cd168e56aed457aa85394a058b44427f6c6",
+      "bytes": 367
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc01/spec.json",
+      "sha256": "81c0927b7d957c01ba935873de5badaa7669fbf23b59322ef3deda7ce76a5090",
+      "bytes": 1462
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc01/state-delta.json",
+      "sha256": "2de3cb23dfeef8de700046edc53f8ec406da28d5c05d0a5954ce23288e437dbe",
+      "bytes": 735
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc02/candidates/candidate-a.md",
+      "sha256": "3c7eadba1cd587f5e1db82cd16c1ff436e38e7882e20f9e2c9e4bba180e41aef",
+      "bytes": 1879
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc02/candidates/candidate-b.md",
+      "sha256": "d3b10883df9ffb89e7f3036daf2df398b13c24459b2baa38ae4a91677895be97",
+      "bytes": 2016
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc02/candidates/draft-1.md",
+      "sha256": "e19bd89e0db4787dbff90b4356f4204b07b70dd142fcf718e2c71ed25dea3205",
+      "bytes": 1921
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc02/critiques/adversarial-reader-rev.json",
+      "sha256": "8d5183ffa3be01f188a5ff1e5d3655621c8d42092da26b315f4c29ec03fed7bd",
+      "bytes": 856
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc02/critiques/adversarial-reader.json",
+      "sha256": "1c4b9c6956ee4c5ae1611cfc6bb1183679dc9b3d9ef22519d427d3cfc6a26d6a",
+      "bytes": 1513
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc02/critiques/character-simulator.json",
+      "sha256": "8125ebfa82d73c640beb920d02835c613117738cbd9beeae04045332cf199cd5",
+      "bytes": 1492
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc02/critiques/style-editor.json",
+      "sha256": "88d7e44aca7806faffd89a02e1bb90f73e5af89fb2f5a94426e73a57f15fa0eb",
+      "bytes": 1375
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc02/spec.json",
+      "sha256": "78a7aebfc3c18d32ba5752ffcae0f5f261a08832e3e1e46e3de8031b53a27304",
+      "bytes": 1382
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc02/state-delta.json",
+      "sha256": "d258f4259c427c8c31e243a71b8a1a6241714bd3a6bf2536207df937dcd5560a",
+      "bytes": 636
+    },
+    {
+      "path": "projects/salt-in-the-wire/scenes/ch01-sc03/spec.json",
+      "sha256": "f0d2674a35788f9b93e6a0031baba770bb21ffe72051dfdecf6c4f22af872956",
+      "bytes": 1408
+    },
+    {
+      "path": "projects/slack-water/.runs/tournament/ch01-sc01/20260730T193426Z/blind/A.md",
+      "sha256": "3dcd47ec50a242dde535d7b050e126613a0a81829d1637f52c74a0fe26df1ddb",
+      "bytes": 3205
+    },
+    {
+      "path": "projects/slack-water/.runs/tournament/ch01-sc01/20260730T193426Z/blind/B.md",
+      "sha256": "97b8e21220da9b2484d6f5e3f9f95212d0b3d9f5e27ee8cc42710eb52ee98b1b",
+      "bytes": 2240
+    },
+    {
+      "path": "projects/slack-water/.runs/tournament/ch01-sc01/20260730T193426Z/record.json",
+      "sha256": "67dd9372efd4185b99f9ac02b25ee8afe46a724c17b0de68edf0e37735f97de0",
+      "bytes": 2014
+    },
+    {
+      "path": "projects/slack-water/brief/creative-brief.md",
+      "sha256": "e6395ce7eb46f4aecea7c02186e9289f67ac7a766c3ac047868fa5ac8eb3f733",
+      "bytes": 1577
+    },
+    {
+      "path": "projects/slack-water/brief/project.json",
+      "sha256": "50e8b8461c0a94e9f797b2f88e340f6d1b8554075cf2f28418787045dbfa22a8",
+      "bytes": 1494
+    },
+    {
+      "path": "projects/slack-water/canon/characters/char-aldous.json",
+      "sha256": "1f6b2bf4bde882b8d056c3599444fd762ee21d93f91c207539fc5a425b7f20fb",
+      "bytes": 1464
+    },
+    {
+      "path": "projects/slack-water/canon/characters/char-rennie.json",
+      "sha256": "a65384bf798aaf8b5431667223739ed1bab06b353b4a861cfb9ac8bc77e999be",
+      "bytes": 1547
+    },
+    {
+      "path": "projects/slack-water/canon/facts.jsonl",
+      "sha256": "af3841c28924524514979a9e55789aa47eae4bfa1b4db98a9eeccac00cc7f660",
+      "bytes": 615
+    },
+    {
+      "path": "projects/slack-water/canon/index.json",
+      "sha256": "7d81a1ebedd5ac6485f50540f5d84a25f0bc6fd3724b3e72b951593e54d19ef8",
+      "bytes": 1090
+    },
+    {
+      "path": "projects/slack-water/canon/knowledge-state.jsonl",
+      "sha256": "f4ef04f70adcbdd2507e7f8b2f62d7b84271afac448d1eb8aa98290485d357ad",
+      "bytes": 452
+    },
+    {
+      "path": "projects/slack-water/canon/ontology.json",
+      "sha256": "08537a33c5f02d9c29a6b2dfb3111d4c4e27fb33c1af450f0dfe53e7e03a0910",
+      "bytes": 1160
+    },
+    {
+      "path": "projects/slack-water/canon/promises.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "projects/slack-water/canon/relationship-state.jsonl",
+      "sha256": "f18419884c5070d26b77fcc121d3737b7bea8792b0a13c352ea4686e674a7bd1",
+      "bytes": 92
+    },
+    {
+      "path": "projects/slack-water/canon/timeline.jsonl",
+      "sha256": "ac71052ebde10c4da2857f90f1521befff1c45f257782d5c5d6123a2581b00c3",
+      "bytes": 126
+    },
+    {
+      "path": "projects/slack-water/canon/world-state.jsonl",
+      "sha256": "83570bf082379ee9565dd3c8b97a5722d63e7948fdafc23b8b981d8b8d47740e",
+      "bytes": 153
+    },
+    {
+      "path": "projects/slack-water/decisions/README.md",
+      "sha256": "665e1f4ab7b6ff18f5ce9f5d0bfaae9c08dd14208969379538db0db82992726e",
+      "bytes": 401
+    },
+    {
+      "path": "projects/slack-water/decisions/promote-ch01-sc01.json",
+      "sha256": "375a847ad3714a48d59d48a2f9c97c4abf2777059ab7ba05f54fe80ea5b70cb1",
+      "bytes": 2099
+    },
+    {
+      "path": "projects/slack-water/decisions/promote-ch01-sc02.json",
+      "sha256": "4d91f4478cabf9078b5d9d994b75258414f2e698d45b83dc699ad5cbbc6f0016",
+      "bytes": 2099
+    },
+    {
+      "path": "projects/slack-water/decisions/promote-ch01-sc03.json",
+      "sha256": "58b8cc7dc39d70364159d29da40725c1b7c5aacdcafc9100af736a231cef94e1",
+      "bytes": 1970
+    },
+    {
+      "path": "projects/slack-water/manuscript/chapters/ch01-sc01.md",
+      "sha256": "c4569d2ebeb458377af53b01069a70f2c47a30cc1e2d6797e7ca10a8f7d1c32d",
+      "bytes": 2221
+    },
+    {
+      "path": "projects/slack-water/manuscript/chapters/ch01-sc02.md",
+      "sha256": "4e2d9714de739a8133e0fc03722f24d32a5e3a67fea060ff42d0e38711e96f71",
+      "bytes": 4149
+    },
+    {
+      "path": "projects/slack-water/manuscript/chapters/ch01-sc03.md",
+      "sha256": "68c811454522ce0c62b7998ed77134893cf05ff9a1787e9c21e731c583513d46",
+      "bytes": 2290
+    },
+    {
+      "path": "projects/slack-water/manuscript/manuscript.md",
+      "sha256": "1b02dabd2583a7f9965fc5898720c75811a36bb692b76fbc9a513adb3cf57e40",
+      "bytes": 8718
+    },
+    {
+      "path": "projects/slack-water/planning/discourse-plan.json",
+      "sha256": "59b977c5ef1b1796d9a2dae13cec514504060f067a652c9e43b0e18536af50e1",
+      "bytes": 994
+    },
+    {
+      "path": "projects/slack-water/planning/event-graph.json",
+      "sha256": "c3a22ea6b304e66d40d7590bcd3de7bc8d52a052eb39c83811f0ae584908e4d3",
+      "bytes": 2887
+    },
+    {
+      "path": "projects/slack-water/planning/style-profile.json",
+      "sha256": "ac0655bda9c8211fa232a2aff163fdf97d796e0df2e0fb73db1c48a722a73c82",
+      "bytes": 1290
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/candidates/candidate-a.md",
+      "sha256": "3dcd47ec50a242dde535d7b050e126613a0a81829d1637f52c74a0fe26df1ddb",
+      "bytes": 3205
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/candidates/candidate-b-r1.md",
+      "sha256": "2e55df08c83ace84db0c7c0f80d1770bee01536f32e515828f6d4a2b20a4e604",
+      "bytes": 2275
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/candidates/candidate-b-r2.md",
+      "sha256": "c4569d2ebeb458377af53b01069a70f2c47a30cc1e2d6797e7ca10a8f7d1c32d",
+      "bytes": 2221
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/candidates/candidate-b.md",
+      "sha256": "97b8e21220da9b2484d6f5e3f9f95212d0b3d9f5e27ee8cc42710eb52ee98b1b",
+      "bytes": 2240
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/critiques/adversarial-reader-a.json",
+      "sha256": "dcd70c7ce812ae17d717d17d814e08dcf277ad12dd889140af4ce9419ddf2d6e",
+      "bytes": 1274
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/critiques/adversarial-reader-b-r1.json",
+      "sha256": "7972c43a765c31ca8b00e46137220414ea20d00e9e5aaba01edcb498d3b32457",
+      "bytes": 1328
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/critiques/adversarial-reader-b-r2.json",
+      "sha256": "29d5746452fc2955938b7fabe7e1cf4aaa09381aa48a97e35b680d065ee76d4c",
+      "bytes": 756
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/critiques/adversarial-reader-b.json",
+      "sha256": "157a5a1c885f4b8fa88222592c361f120e769e8532776dbacde17addbdd8e6f2",
+      "bytes": 1747
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/critiques/character-simulator-a.json",
+      "sha256": "ed57edf52de2dd2f53d3e111eb9b3562c129b1f763a1d00a8d78ba80946befae",
+      "bytes": 936
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/critiques/character-simulator-b.json",
+      "sha256": "6c7bdfa6746056e8082cb4613c191f629da2dd21071f4ce2e2d54b19f035009a",
+      "bytes": 807
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/critiques/defaultness-candidate-a.json",
+      "sha256": "9a4f38c374f400d8d3d2e4ae381ae2e091bd6ad2284f4f56de7c5881cce33352",
+      "bytes": 250
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/critiques/defaultness-candidate-b-r1.json",
+      "sha256": "250ba70485c1642c9d0ef651ad779dbb351c1a992956bcea317626018537a110",
+      "bytes": 253
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/critiques/defaultness-candidate-b-r2.json",
+      "sha256": "23f3b4384cfba22bbd1691ac98c50363efb257a4171938c7437cb2e4dbff3dd4",
+      "bytes": 253
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/critiques/defaultness-candidate-b.json",
+      "sha256": "60def34429f5f9a6f98bb4ed3afe78e8101832e5e9932ed1967ce6628d419c5f",
+      "bytes": 250
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/critiques/hard-audit.json",
+      "sha256": "7caa127c86b867831459377300cf8744c595ccbbee2b870a77ca89108cce00a1",
+      "bytes": 142
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/critiques/style-editor-a.json",
+      "sha256": "f55669ba13cb26f60f3d6a26ba8d4b3a0348afdfdf06084239231ee1e119dea2",
+      "bytes": 1299
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/critiques/style-editor-b.json",
+      "sha256": "e605490868e45143633275d2fe263602212aba017ec6d74767a602a089eb8c8e",
+      "bytes": 1118
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/spec.json",
+      "sha256": "f5c87ab0543d4b059aef532523ab8827ac553acd5d13720371549f50845bb4d4",
+      "bytes": 1797
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc01/state-delta.json",
+      "sha256": "5793365071cb71f7c6fd95d6d31307b769a1154738e1087400a70c7c5244ff33",
+      "bytes": 1087
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/candidates/candidate-a.md",
+      "sha256": "f69562da5dfc936c086e4f34e042b3675142b331c07560efa825a3c2321d2869",
+      "bytes": 4362
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/candidates/candidate-b-r1.md",
+      "sha256": "58003c37e5e687e66a602adad64866a5b2137cee6ed777123a85b4d6a933d992",
+      "bytes": 4255
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/candidates/candidate-b-r2.md",
+      "sha256": "4e2d9714de739a8133e0fc03722f24d32a5e3a67fea060ff42d0e38711e96f71",
+      "bytes": 4149
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/candidates/candidate-b.md",
+      "sha256": "fb6a10e4c1fd8ab80d8299bcc2dfcd950ed76fa3e9e2f08ea326d16ac93cf0b5",
+      "bytes": 3205
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/critiques/adversarial-reader-a.json",
+      "sha256": "677da3c3b833dd592856e7fcacb16a9423c877725639c28649fa0ed038b4335a",
+      "bytes": 1498
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/critiques/adversarial-reader-b-r1.json",
+      "sha256": "fd8758f33335bfdd2d5d1b96115e3cf311a68827eed38bb459740dc684534399",
+      "bytes": 1127
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/critiques/adversarial-reader-b-r2.json",
+      "sha256": "abc714693f74bff47436f51c4b9f5100c4cee83c7515b09b346a23f07514fab7",
+      "bytes": 1389
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/critiques/adversarial-reader-b.json",
+      "sha256": "866a99f83ebdb66686f11a6efeb37f06663cbb2738f8bd323d59f987b68f19fe",
+      "bytes": 1548
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/critiques/character-simulator-a.json",
+      "sha256": "26e19007539f9d62e91a2b62e406c7a189648ba0d1a14ae4496f577b51064401",
+      "bytes": 1620
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/critiques/character-simulator-b.json",
+      "sha256": "e94e9135f5e26c990ce4432fc474f070863f66ee7b819e1532f44fbff6b70de6",
+      "bytes": 950
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/critiques/defaultness-candidate-a.json",
+      "sha256": "95b59648342b36ed1f15978a339a7f421c5bb5390c5025b12a9b31f03336f56e",
+      "bytes": 250
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/critiques/defaultness-candidate-b-r1.json",
+      "sha256": "13b874cc90a490fbd4b75ad80bff44e82c5af6669e35c5ad6c9320e141b31e9d",
+      "bytes": 253
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/critiques/defaultness-candidate-b-r2.json",
+      "sha256": "f9fc3dc7b04761aa17cce4f31e52724a3798535d7900d86712d1fda038d7ab51",
+      "bytes": 253
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/critiques/defaultness-candidate-b.json",
+      "sha256": "7eed47c2eabe2b656307445214af7d8dcf92ba3896fbe315d6fae306ec1b612d",
+      "bytes": 250
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/critiques/hard-audit.json",
+      "sha256": "9c197b481b42a8bb1761791275aa2af0d9ad04ae4adb6b7df110ef69329725e0",
+      "bytes": 142
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/critiques/style-editor-a.json",
+      "sha256": "634414ee4de61943ac3bd602db2f3738cab85b8e6e576aefc486a80fa54fb7a6",
+      "bytes": 1566
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/critiques/style-editor-b.json",
+      "sha256": "e8c4491dc31d5f6051ad29ef0e7f55839d3c7c14b14bc2b65b9476e5e3f749f8",
+      "bytes": 1223
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/spec.json",
+      "sha256": "5bece4d97665027176cf3ce8e77eb4b784dc39f95fb6133d6a33cd6a545b9260",
+      "bytes": 1740
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc02/state-delta.json",
+      "sha256": "8aeabca604cd7e0efb0956c95b21b769d47c380501a24f0ec93018b8ffb47a5e",
+      "bytes": 817
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc03/candidates/candidate-a.md",
+      "sha256": "dc008b5c6114b8613d01dd7bb5379b94a24a229b4ea1d97d7fa8ea1595c44e4f",
+      "bytes": 3484
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc03/candidates/candidate-b-r1.md",
+      "sha256": "68c811454522ce0c62b7998ed77134893cf05ff9a1787e9c21e731c583513d46",
+      "bytes": 2290
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc03/candidates/candidate-b.md",
+      "sha256": "6c2898d3ad8a369c8c009b981ef52383474b3e6f26846cb5c2f000ba83c7e43a",
+      "bytes": 2178
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc03/critiques/adversarial-reader-a.json",
+      "sha256": "39f1bcf38fb1bc3203a944cbbdc9cba1f9393bf2d6b3b181f8eee161b089ea8d",
+      "bytes": 1272
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc03/critiques/adversarial-reader-b-r1.json",
+      "sha256": "2fef8df54d76f9b3f0cfa2fa795c29e1c5230fc916968f12857596f18385bfb6",
+      "bytes": 1273
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc03/critiques/adversarial-reader-b.json",
+      "sha256": "3f4aef584339d0f97434407a35357a53e14001660c83999d8ee71b5b993ae5eb",
+      "bytes": 890
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc03/critiques/character-simulator-a.json",
+      "sha256": "31272726c7b7d09b48b5def4283197dbed77648d0c67c380793078052a48e448",
+      "bytes": 1459
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc03/critiques/character-simulator-b.json",
+      "sha256": "a5baddb50be0dedab5061f017359adc7f64b59c15375df90f1c28a666f520d22",
+      "bytes": 952
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc03/critiques/defaultness-candidate-a.json",
+      "sha256": "0d3e9166400ccc7b31ddd952bee92d1b4ec2a6009bd6c0cee1a867eb26f91c44",
+      "bytes": 250
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc03/critiques/defaultness-candidate-b-r1.json",
+      "sha256": "fb6ad548b70ecb3ed9b46ff19cf2b1a670c2015c5f3b7453bf24421efbdd59dc",
+      "bytes": 253
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc03/critiques/defaultness-candidate-b.json",
+      "sha256": "c152c935327ed938623a1c5ddd387fd93762f6546a5a70fed47ee38492958c7b",
+      "bytes": 250
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc03/critiques/hard-audit.json",
+      "sha256": "0f7aaed0eed43670bfc45656e6d16996a38e3d1d53d22a67bc3d37b10bd660e3",
+      "bytes": 142
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc03/critiques/style-editor-a.json",
+      "sha256": "40cb17c396a99154076bfd84cd6f967965e7bad99b266bde512c760333418c38",
+      "bytes": 1385
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc03/critiques/style-editor-b.json",
+      "sha256": "1835742e2d8af27bfb248eb7106b84389c7afd71448c8b52c7c2fff02502b464",
+      "bytes": 881
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc03/spec.json",
+      "sha256": "4328d950e7ce4590160dfa39669a7de635c6f6c0ec091c386360651c173974a9",
+      "bytes": 1657
+    },
+    {
+      "path": "projects/slack-water/scenes/ch01-sc03/state-delta.json",
+      "sha256": "9aac9783d63cc856d33023f2f9797261ea4f6db891c4b51b37cc9ced8431646d",
+      "bytes": 500
+    },
+    {
+      "path": "projects/the-overnight/.runs/tournament/ch01-sc01/20260729T210850Z/blind/A.md",
+      "sha256": "e32b924cdbff073d7b5f5423543c90d29a4d926b6b4e1964180d0ad6e9872454",
+      "bytes": 2637
+    },
+    {
+      "path": "projects/the-overnight/.runs/tournament/ch01-sc01/20260729T210850Z/blind/C.md",
+      "sha256": "642d1305b2cafcdbc69d59328b44d7ceb9f3ce62569c69381be32afa6564a617",
+      "bytes": 1335
+    },
+    {
+      "path": "projects/the-overnight/.runs/tournament/ch01-sc01/20260729T210850Z/record.json",
+      "sha256": "36399546dc895f6767bfbb74c4f61dcacd4d07d9ce6f675c205e3d909f2cf8eb",
+      "bytes": 1166
+    },
+    {
+      "path": "projects/the-overnight/.runs/tournament/ch01-sc01/20260729T210955Z/blind/A.md",
+      "sha256": "e32b924cdbff073d7b5f5423543c90d29a4d926b6b4e1964180d0ad6e9872454",
+      "bytes": 2637
+    },
+    {
+      "path": "projects/the-overnight/.runs/tournament/ch01-sc01/20260729T210955Z/blind/B.md",
+      "sha256": "642d1305b2cafcdbc69d59328b44d7ceb9f3ce62569c69381be32afa6564a617",
+      "bytes": 1335
+    },
+    {
+      "path": "projects/the-overnight/.runs/tournament/ch01-sc01/20260729T210955Z/record.json",
+      "sha256": "b264446ccb2e0744e37e28705181b0bc973572da4204b338ca4f599c271233e8",
+      "bytes": 1110
+    },
+    {
+      "path": "projects/the-overnight/brief/creative-brief.md",
+      "sha256": "a02c3bfe0455a2fcbfd924249f64444c078194a7e39398792ee905e06aedb261",
+      "bytes": 195
+    },
+    {
+      "path": "projects/the-overnight/brief/project.json",
+      "sha256": "9c90c73fbd2b59a538a6debaba69f7e0b540cd8537d98b89d729b2da9f53466c",
+      "bytes": 1307
+    },
+    {
+      "path": "projects/the-overnight/canon/characters/char-gran.json",
+      "sha256": "63f5998d576fd74d224aa33e5c55fcb1abb23057744c00a2dae0e9286aa0b81f",
+      "bytes": 689
+    },
+    {
+      "path": "projects/the-overnight/canon/characters/char-halloran.json",
+      "sha256": "ce0cff65024b81b51c01aad906c92b03076e5f4136563c3058cf0fd8fbd05e6d",
+      "bytes": 550
+    },
+    {
+      "path": "projects/the-overnight/canon/characters/char-nadia.json",
+      "sha256": "4731601e3a6dc5a4ab48d6f8c413292349b84db93fef2912eb69a1be704d88c0",
+      "bytes": 1235
+    },
+    {
+      "path": "projects/the-overnight/canon/facts.jsonl",
+      "sha256": "94cfcd583156323e2cc9b0a45b27ef77848e36752983e3038adc358cc82b5f7a",
+      "bytes": 537
+    },
+    {
+      "path": "projects/the-overnight/canon/index.json",
+      "sha256": "112e41b9e927610c2406556d448de9d6432a45872fd1bd673a69ed794ec93dcb",
+      "bytes": 942
+    },
+    {
+      "path": "projects/the-overnight/canon/knowledge-state.jsonl",
+      "sha256": "3191d5f3cc7cd5738a741ad7b0f5d3a71ade2fde8ef8cc33c3af153717639bde",
+      "bytes": 225
+    },
+    {
+      "path": "projects/the-overnight/canon/ontology.json",
+      "sha256": "51c8d2cb4819f8af3cabebbb016ce5b141986bf60c8d8e54d7b1d2106b6e2d24",
+      "bytes": 1298
+    },
+    {
+      "path": "projects/the-overnight/canon/promises.jsonl",
+      "sha256": "ad06a8608e5c3d8d6307f6ddbafb591cc7520b10a0085869743b0ca3837c8472",
+      "bytes": 102
+    },
+    {
+      "path": "projects/the-overnight/canon/relationship-state.jsonl",
+      "sha256": "4a8336f98e7cfd0dd49608f7592bf3f4db58a47315980c23a70bc7baadc616bf",
+      "bytes": 93
+    },
+    {
+      "path": "projects/the-overnight/canon/timeline.jsonl",
+      "sha256": "831e1c5f0e9596cdf891837df5ac1b417936b397041c4478561c807a9bb15292",
+      "bytes": 85
+    },
+    {
+      "path": "projects/the-overnight/canon/world-state.jsonl",
+      "sha256": "fa4f96c06455fe0c10168c1873240beffab0bb26676aeb384b84e813cdacc199",
+      "bytes": 206
+    },
+    {
+      "path": "projects/the-overnight/decisions/README.md",
+      "sha256": "1b0c6f132d843998ab98e0025a940afafd9077ede839fff7440dc07c34e53a3e",
+      "bytes": 166
+    },
+    {
+      "path": "projects/the-overnight/decisions/promote-ch01-sc01.json",
+      "sha256": "6003afac66292ceea8e0d2dff2c24c6efa1687fc659c30c79fcadcdda17322de",
+      "bytes": 2557
+    },
+    {
+      "path": "projects/the-overnight/decisions/promote-ch01-sc02.json",
+      "sha256": "c0845b05d9fdc768fea45a33794dfd7977e5691da81bf2b09b61a2f2eda28009",
+      "bytes": 2117
+    },
+    {
+      "path": "projects/the-overnight/decisions/promote-ch01-sc03.json",
+      "sha256": "2feb5b9011230bc51181500371d28aa9daa06c5119141a2c1d04ca8dece808e3",
+      "bytes": 2117
+    },
+    {
+      "path": "projects/the-overnight/manuscript/chapters/ch01-sc01.md",
+      "sha256": "aa9bcd920e3e4fb6fc6066c36a96818051b869d70f4f562d9057fa1b6b220440",
+      "bytes": 2654
+    },
+    {
+      "path": "projects/the-overnight/manuscript/chapters/ch01-sc02.md",
+      "sha256": "3c41832431e25ede97f4d2382051d7ab9ef1e9b8f62875f68aff679eca600f57",
+      "bytes": 2618
+    },
+    {
+      "path": "projects/the-overnight/manuscript/chapters/ch01-sc03.md",
+      "sha256": "c892cffea733e2e93e9c5741a20df0e589677c360384f9809c906162d96a90be",
+      "bytes": 2325
+    },
+    {
+      "path": "projects/the-overnight/manuscript/manuscript.md",
+      "sha256": "48fe742f8d5ad59508c6fc57ae679e398eb9a0c31a1bd36d7bb7b1e70ec20707",
+      "bytes": 7657
+    },
+    {
+      "path": "projects/the-overnight/planning/discourse-plan.json",
+      "sha256": "9197337caf749ea5d0eb36f355a98ed1da0f224c53926fe950dd79cbf6f0b270",
+      "bytes": 955
+    },
+    {
+      "path": "projects/the-overnight/planning/event-graph.json",
+      "sha256": "34e7e993a59c5ff61d9c67d66fe1d10fe1988db22b6d7a429abba969c9502d60",
+      "bytes": 2655
+    },
+    {
+      "path": "projects/the-overnight/planning/style-profile.json",
+      "sha256": "97de906d1c2da34e9a585c625922ab5bcfe688eb1a5b0fdfab28f9577a63c04f",
+      "bytes": 1167
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/candidates/candidate-a-r1.md",
+      "sha256": "aa9bcd920e3e4fb6fc6066c36a96818051b869d70f4f562d9057fa1b6b220440",
+      "bytes": 2654
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/candidates/candidate-a.md",
+      "sha256": "e32b924cdbff073d7b5f5423543c90d29a4d926b6b4e1964180d0ad6e9872454",
+      "bytes": 2637
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/candidates/candidate-b.md",
+      "sha256": "642d1305b2cafcdbc69d59328b44d7ceb9f3ce62569c69381be32afa6564a617",
+      "bytes": 1335
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/critiques/adversarial-reader-a-r1.json",
+      "sha256": "7fbf77c1fa0be366051a6d6fda0c91d3094f5e9f6117ff01c6a1fc1cfb874288",
+      "bytes": 224
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/critiques/adversarial-reader-a.json",
+      "sha256": "7237ef3ce72c2bbd9e39991711abf6ce3db6dc68bab7e166c0f2d8589d55ef93",
+      "bytes": 495
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/critiques/adversarial-reader-b.json",
+      "sha256": "b854987edb3ac867dc791f0f3332e49375c2e8ea9d0694dcfb28767560b6e19b",
+      "bytes": 510
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/critiques/character-simulator-a-r1.json",
+      "sha256": "da6422ae609ce792d89ea82fa874a32ab145906b69b272e9408c3440504b8918",
+      "bytes": 225
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/critiques/character-simulator-a.json",
+      "sha256": "425aec099d7d4cf1fc06a8a7780f24e17e91353e9dcc1f4810886f637db4f348",
+      "bytes": 550
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/critiques/character-simulator-b.json",
+      "sha256": "db178bfc1582208c37d01900b741fba26c1d1bba24c3e3c3d801cfb7d2f53399",
+      "bytes": 221
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/critiques/defaultness-candidate-a-r1.json",
+      "sha256": "9a411afb5fa69c7107be017075e32b2fc8819b9cad93719e2c82084da58be558",
+      "bytes": 253
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/critiques/defaultness-candidate-a.json",
+      "sha256": "2de4f367979a60ca62153e2a889fac6f7889fd993914196d5b9504b886214e32",
+      "bytes": 523
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/critiques/defaultness-candidate-b.json",
+      "sha256": "0b1d3d658d7eaf2876bda3b253b8b901121d11e3f850a6541b7de1829703754f",
+      "bytes": 250
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/critiques/hard-audit.json",
+      "sha256": "4d4d8ab9d3410ad8b98545472a29212f3daa0b1ad45c4f45af33e8da29e307b3",
+      "bytes": 117
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/critiques/prose-audit.json",
+      "sha256": "ade2bf655c2ae2e7604b5c05b6e0c413d3f332f62b03b3373802a81591e26332",
+      "bytes": 241
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/critiques/style-editor-a-r1.json",
+      "sha256": "0ab51c3f46577db6454ead084a4367cfffa04b5857d519dbec3822005205b35c",
+      "bytes": 217
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/critiques/style-editor-a.json",
+      "sha256": "7d0caf16161caa78cac041220528da68b97d09bde6520d4143e1907480ff4a96",
+      "bytes": 547
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/critiques/style-editor-b.json",
+      "sha256": "2436544b6a38adb4306540cc195a10660e761c95c80b1c9b7d4091f64f90a9cc",
+      "bytes": 502
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/prose-claims.json",
+      "sha256": "5f27a8f7ac1d4673e2040a89f9ea5a02694ec4076e717c26239fe443beb63852",
+      "bytes": 956
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/revision-log.jsonl",
+      "sha256": "b5323c8dd2ab956773668898b9a9f81b09240ff63fe6e44ea6cfffc0d512a74a",
+      "bytes": 448
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/spec.json",
+      "sha256": "c45417c04771f2f471cb65b8aca6d4911ac520465a17db6b5074295691f72de2",
+      "bytes": 1482
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc01/state-delta.json",
+      "sha256": "b7f5c451485de5946b4dba8298fdb2d144ffbbed38ef11d4f4f6bcc606fa9746",
+      "bytes": 671
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc02/candidates/candidate-a.md",
+      "sha256": "3c41832431e25ede97f4d2382051d7ab9ef1e9b8f62875f68aff679eca600f57",
+      "bytes": 2618
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc02/candidates/candidate-b.md",
+      "sha256": "ae3e168e859773666b567430ba36f9838ce6fbd1f3d7e4f39ecd3b00558c8423",
+      "bytes": 1557
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc02/critiques/adversarial-reader-a.json",
+      "sha256": "265973fe9e4d53b8c611e389a70845ea006efd5300d16a9195008627ac454bad",
+      "bytes": 221
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc02/critiques/character-simulator-a.json",
+      "sha256": "1dfccffdeff35603d04f852ae03b36f7260925664b2358ae281ec093bb5e29d7",
+      "bytes": 222
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc02/critiques/defaultness-candidate-a.json",
+      "sha256": "dabc494f72db123a0399a6aaffab8c8ede5831237cb80413ad34724b22d916c2",
+      "bytes": 250
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc02/critiques/defaultness-candidate-b.json",
+      "sha256": "40a2ced27b3e9b72851dd3f7e8ab0d610147af43a6c20690d562d71b847cf91e",
+      "bytes": 250
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc02/critiques/hard-audit.json",
+      "sha256": "9393a49efb7a49ab78769726aa4675b6b668fb691f55901da3a4e3d387912f93",
+      "bytes": 117
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc02/critiques/style-editor-a.json",
+      "sha256": "6485fe92a9b755993287f1bd5b11fa5b81a5dc753f74744d27d4651817b325b3",
+      "bytes": 534
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc02/spec.json",
+      "sha256": "4e6dd4ef02998c031803cdbfd477df20db6a920d469ecdff4da8bd73212ed9a8",
+      "bytes": 1447
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc02/state-delta.json",
+      "sha256": "7ff1bc839f414c314b87a6eed44ee05d4da0a4c5f8aa99a1b557d81c555d7e4d",
+      "bytes": 762
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc03/candidates/candidate-a.md",
+      "sha256": "c892cffea733e2e93e9c5741a20df0e589677c360384f9809c906162d96a90be",
+      "bytes": 2325
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc03/candidates/candidate-b.md",
+      "sha256": "b9fa1ebd458558249c190d30c468b779652de6a78e30746902b44c66eae04428",
+      "bytes": 1393
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc03/critiques/adversarial-reader-a.json",
+      "sha256": "486bf3372ffa93321a77ae9e360a5a6161a9864bdab0ded8c33436d33adf6405",
+      "bytes": 221
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc03/critiques/character-simulator-a.json",
+      "sha256": "f35e0da6ebca1e5fbbd2be09a12f57be41c129f567905c93d46652c112dc648e",
+      "bytes": 221
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc03/critiques/defaultness-candidate-a.json",
+      "sha256": "d8ec55b8d01aa4543d63024a157bf1a43255d09805419198add08777113c21ff",
+      "bytes": 250
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc03/critiques/defaultness-candidate-b.json",
+      "sha256": "649ecb07ec0e820b2bcb38f0ba69d48e5be780c3ba7a2b87ec07f93027c4ca9a",
+      "bytes": 532
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc03/critiques/hard-audit.json",
+      "sha256": "e2dadf89ae3e03c4d59c2e17183e508f8ad8e4b66a742d6c111ff2d4942f93cf",
+      "bytes": 117
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc03/critiques/style-editor-a.json",
+      "sha256": "038af61e3be46fae4f4ab437772d3434909d4bcfca87ba5bc2ccbe30ef06de25",
+      "bytes": 215
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc03/spec.json",
+      "sha256": "27730e27deb8795cacbd83c4314172699f15a3a6184855f98decf52d00ca2986",
+      "bytes": 1297
+    },
+    {
+      "path": "projects/the-overnight/scenes/ch01-sc03/state-delta.json",
+      "sha256": "d2bf78ae9ac1b3cf2652cd064ad8eec36c655314ea6b3ea904a5267feff93cdc",
+      "bytes": 801
+    },
+    {
+      "path": "projects/verbatim/brief/creative-brief.md",
+      "sha256": "3185c2cfb8af2438b106f3e9023824091fb6b65e06f2ef3d45ffda88736e660f",
+      "bytes": 2042
+    },
+    {
+      "path": "projects/verbatim/brief/project.json",
+      "sha256": "b339e7b59ce43f63e116cbe792c4fcd89d699be27ac7ca71a02e4464ea53b0f9",
+      "bytes": 1145
+    },
+    {
+      "path": "projects/verbatim/canon/characters/char-josif.json",
+      "sha256": "a614a0a89a6de4cc8ee0ee48ea6a19ac32681d8982f7c65e305a32e5e67e2df7",
+      "bytes": 1166
+    },
+    {
+      "path": "projects/verbatim/canon/characters/char-mira.json",
+      "sha256": "a5bcd4b433338c010e597798aaa937147ab075e953ca7fc37259e5c3122ff783",
+      "bytes": 1189
+    },
+    {
+      "path": "projects/verbatim/canon/facts.jsonl",
+      "sha256": "e133c8a2ed9e1e1f86e394baade4a0ec34a19d2d517a60856778ecb38c346ae6",
+      "bytes": 1047
+    },
+    {
+      "path": "projects/verbatim/canon/index.json",
+      "sha256": "b5642802c3c89a31e31decc7cce8851ad561a9a4e427456903845be6e8706ce2",
+      "bytes": 1033
+    },
+    {
+      "path": "projects/verbatim/canon/knowledge-state.jsonl",
+      "sha256": "0c84d6f495227438f265d36fa883e90caad3eb0afe34b4b710ac984bc523eec8",
+      "bytes": 429
+    },
+    {
+      "path": "projects/verbatim/canon/promises.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "projects/verbatim/canon/relationship-state.jsonl",
+      "sha256": "ee9e31b985a44e1fc8e89ed33ca4416b114410234a4538570a12af29ce588004",
+      "bytes": 200
+    },
+    {
+      "path": "projects/verbatim/canon/timeline.jsonl",
+      "sha256": "2996d4936e21bed09368dc7fcca3e97b27bf2a3080644d6f0bb84126f87b9ee7",
+      "bytes": 51
+    },
+    {
+      "path": "projects/verbatim/decisions/README.md",
+      "sha256": "1b0c6f132d843998ab98e0025a940afafd9077ede839fff7440dc07c34e53a3e",
+      "bytes": 166
+    },
+    {
+      "path": "projects/verbatim/decisions/ending-strategy-ch01-sc03.md",
+      "sha256": "b5219bef40ee9c5e4b1f6f08e5d98fc992535066b1dee876ce4a6cd7e2fd1340",
+      "bytes": 2552
+    },
+    {
+      "path": "projects/verbatim/decisions/promote-ch01-sc01.json",
+      "sha256": "68d5a46e56474cbbb4968ff4f971f5b79501e91e0d1a6810a23f43a16d78d161",
+      "bytes": 273
+    },
+    {
+      "path": "projects/verbatim/decisions/promote-ch01-sc02.json",
+      "sha256": "683eb76e6d200aa77450c29145fa7318002481ece5d1fec3caf93fbb5911dba9",
+      "bytes": 273
+    },
+    {
+      "path": "projects/verbatim/decisions/promote-ch01-sc03.json",
+      "sha256": "3697f70915d21ba5f3bc6ba0fc12daaaa39840c9c6cfc40ff66cfee56eea0441",
+      "bytes": 442
+    },
+    {
+      "path": "projects/verbatim/manuscript/chapters/ch01-sc01.md",
+      "sha256": "e72e63404938cca7850ae71550864c357349411ac36a8b455f49c3f15257ed13",
+      "bytes": 2214
+    },
+    {
+      "path": "projects/verbatim/manuscript/chapters/ch01-sc02.md",
+      "sha256": "6a0a8378503b9282026b78b1ee6be3e3293e7097af318fbdbab2581ba48d2006",
+      "bytes": 2301
+    },
+    {
+      "path": "projects/verbatim/manuscript/chapters/ch01-sc03.md",
+      "sha256": "4ab58999898c921e52f344b998ec8243a79d985c9d689287b46e044adeacffd9",
+      "bytes": 2335
+    },
+    {
+      "path": "projects/verbatim/manuscript/manuscript.md",
+      "sha256": "f0e713799b4e5fedda04a4ccfb52d68ba94440dd671d0992b4da19c7ca28aef5",
+      "bytes": 6905
+    },
+    {
+      "path": "projects/verbatim/planning/discourse-plan.json",
+      "sha256": "3ca292edbc749c1ea53c8f5cce95222c661f5a58d6ad7200140d016d6297098e",
+      "bytes": 921
+    },
+    {
+      "path": "projects/verbatim/planning/event-graph.json",
+      "sha256": "da7326e5fc8c043dff906f5c7ea8ca042f9c63fb346e4aa547416136b4a9fe4d",
+      "bytes": 2498
+    },
+    {
+      "path": "projects/verbatim/planning/style-profile.json",
+      "sha256": "9aae04eb3d4220135411c7580dfbca1435f29c6a6781e0e8727644ab09f9d3eb",
+      "bytes": 1324
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc01/candidates/candidate-a.md",
+      "sha256": "e72e63404938cca7850ae71550864c357349411ac36a8b455f49c3f15257ed13",
+      "bytes": 2214
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc01/candidates/draft-1.md",
+      "sha256": "c8f962a4c66cf9cb236b96c8d19cc84de4a09337d075e26c71b2ac717a303823",
+      "bytes": 2210
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc01/critiques/hard-audit.json",
+      "sha256": "4d4d8ab9d3410ad8b98545472a29212f3daa0b1ad45c4f45af33e8da29e307b3",
+      "bytes": 117
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc01/revision-log.jsonl",
+      "sha256": "3833c22be79d9dd21a6193e29e214eab1a0361a557b81827ad5a62c02cda2387",
+      "bytes": 352
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc01/spec.json",
+      "sha256": "f7a9007e8fb4acb241d239c930de42e3ea8bf328c23cec3879ceb77e44edcba1",
+      "bytes": 1623
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc01/state-delta.json",
+      "sha256": "6bd2ecf31c2aeaf169872f02a7460a7977941df83c714c46f98d8980cbd059fd",
+      "bytes": 772
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc02/candidates/candidate-a.md",
+      "sha256": "6a0a8378503b9282026b78b1ee6be3e3293e7097af318fbdbab2581ba48d2006",
+      "bytes": 2301
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc02/critiques/hard-audit.json",
+      "sha256": "9393a49efb7a49ab78769726aa4675b6b668fb691f55901da3a4e3d387912f93",
+      "bytes": 117
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc02/spec.json",
+      "sha256": "7c22df6fa3829a2005dc78b9ab882d350ab106e363d69e7a15468184753209f0",
+      "bytes": 1470
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc02/state-delta.json",
+      "sha256": "ea70ae780a75bf70e22c6b4f2e183d2f4dcdfbfc19f888f38cc0a2a39d4f67cd",
+      "bytes": 558
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc03/candidates/candidate-a.md",
+      "sha256": "94fef653d458a8d2d6ceed0865471c2100afb3b1c587cbf85a2146c4b0b43b22",
+      "bytes": 2128
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc03/candidates/candidate-b.md",
+      "sha256": "4ab58999898c921e52f344b998ec8243a79d985c9d689287b46e044adeacffd9",
+      "bytes": 2335
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc03/critiques/adversarial-reader.json",
+      "sha256": "877230af87623f516d5c443f11abd85980f2e0775a419cfc599c329c9f12e741",
+      "bytes": 1164
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc03/critiques/character-simulator.json",
+      "sha256": "33158ea508bfdefada054bf041a14ef882d5448d625aea079dc4ca9091b33b2c",
+      "bytes": 1034
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc03/critiques/hard-audit.json",
+      "sha256": "e2dadf89ae3e03c4d59c2e17183e508f8ad8e4b66a742d6c111ff2d4942f93cf",
+      "bytes": 117
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc03/critiques/style-editor.json",
+      "sha256": "a9f6dfcf7820e6c9db4301be6e35ce334c61d1e3fa1c5282967b0effd08f1438",
+      "bytes": 1077
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc03/revision-log.jsonl",
+      "sha256": "4524b932b7cfe909d42b5f5e0d206c1a9d5d7550d1d66ec9d2032f596309b65e",
+      "bytes": 356
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc03/spec.json",
+      "sha256": "b38a6dba90987537676c2c19515a843dc27006347718e4893d56f4f562c01103",
+      "bytes": 1529
+    },
+    {
+      "path": "projects/verbatim/scenes/ch01-sc03/state-delta.json",
+      "sha256": "74138efc770fda6649b21f319f5d6c49684da7f304dde021e350e6c23774c5b4",
+      "bytes": 629
+    },
+    {
+      "path": "projects/visiting-order/brief/creative-brief.md",
+      "sha256": "6d69051d08ed166391da4fbc3f4d8b5b6b3202e361e12daa8cbf73c5ee6f238f",
+      "bytes": 1867
+    },
+    {
+      "path": "projects/visiting-order/brief/project.json",
+      "sha256": "f99f6273eb3cb8571c59174ea30346acd4f571ad1647df58481c104e37b2f330",
+      "bytes": 1666
+    },
+    {
+      "path": "projects/visiting-order/canon/characters/char-danny.json",
+      "sha256": "f0a7e3473786323b3127864cffad23a80e7b42df6e75cdbfd50157988959df76",
+      "bytes": 1370
+    },
+    {
+      "path": "projects/visiting-order/canon/characters/char-lena.json",
+      "sha256": "02ce337810402bab829327675a8c2a6b012d2a6f63413d564a6ee69568f0cfb3",
+      "bytes": 1524
+    },
+    {
+      "path": "projects/visiting-order/canon/facts.jsonl",
+      "sha256": "e49d028110f520e92ad093926f115dc5ae699c8beb9cfd94c203fe2ae0ea8025",
+      "bytes": 674
+    },
+    {
+      "path": "projects/visiting-order/canon/index.json",
+      "sha256": "467adbb8c2b67e2e9edae29e94f161b93f3d948fcda934988d5d00e47e507627",
+      "bytes": 954
+    },
+    {
+      "path": "projects/visiting-order/canon/knowledge-state.jsonl",
+      "sha256": "9706be091ea8fbe8d096e123cf76e6e9bdc48eef99d0b12b2cf2209007984bdf",
+      "bytes": 397
+    },
+    {
+      "path": "projects/visiting-order/canon/ontology.json",
+      "sha256": "ce8593b2ef6087afa7d042d091a605d5a422972e110a5da90be0e8f50ecb2c87",
+      "bytes": 834
+    },
+    {
+      "path": "projects/visiting-order/canon/promises.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "projects/visiting-order/canon/relationship-state.jsonl",
+      "sha256": "fcf276c7b600f57201bb7ac1466d87ea34bcd34bc7c08b46f5af939263d110a7",
+      "bytes": 94
+    },
+    {
+      "path": "projects/visiting-order/canon/timeline.jsonl",
+      "sha256": "fc5b0d10544d6f0e696d02c9f74e6a533dcb0ea39dca019c674b3286cd18a000",
+      "bytes": 89
+    },
+    {
+      "path": "projects/visiting-order/canon/world-state.jsonl",
+      "sha256": "175dc4e4a5e3ff2b71f3c54ac3d876e97216330a25f9b45cb2851b1022c2151b",
+      "bytes": 156
+    },
+    {
+      "path": "projects/visiting-order/decisions/README.md",
+      "sha256": "265efd698a91898920786af1ba3fdc9c95447fad10a3cd003727808bc573c7b7",
+      "bytes": 404
+    },
+    {
+      "path": "projects/visiting-order/decisions/promote-ch01-sc01.json",
+      "sha256": "8cfadd67629f26d9d98c77773178917e7bef38567a80e1094dd9836f85f84310",
+      "bytes": 1970
+    },
+    {
+      "path": "projects/visiting-order/decisions/promote-ch01-sc02.json",
+      "sha256": "66eb3f56420e1e8b9033a912dc31b8a50a60d79b4c9e03bbe037cf8cd80e644e",
+      "bytes": 1970
+    },
+    {
+      "path": "projects/visiting-order/decisions/promote-ch01-sc03.json",
+      "sha256": "b9e3434ad4306b27c8bd43e08c9aa8e4c31d4d1edc0907688b88e07a53283c04",
+      "bytes": 1970
+    },
+    {
+      "path": "projects/visiting-order/manuscript/chapters/ch01-sc01.md",
+      "sha256": "c89b2ca272ac68f1ea9bda7b45b16fea8a89dd968dc35450be24e964b6fe5f6e",
+      "bytes": 3286
+    },
+    {
+      "path": "projects/visiting-order/manuscript/chapters/ch01-sc02.md",
+      "sha256": "d90f06251c8de84b4ebb89ec0afb0d9e256cc7601ef4737e0be9c9cbd3acbe5b",
+      "bytes": 1659
+    },
+    {
+      "path": "projects/visiting-order/manuscript/chapters/ch01-sc03.md",
+      "sha256": "c642ebdf131a87fcf59d5de2015f52bc68acf86f698c48f4e05ea194a79b14bb",
+      "bytes": 1590
+    },
+    {
+      "path": "projects/visiting-order/manuscript/manuscript.md",
+      "sha256": "8fc1f4fa5940f674175b92c2a8d334af3d2d9deb5f13ea073b710069a9b341c9",
+      "bytes": 6596
+    },
+    {
+      "path": "projects/visiting-order/planning/discourse-plan.json",
+      "sha256": "9ed0dc1e8f28c902c242fada4d10cdfcae05c6636b9a2c4cc0f0cb9b598effe1",
+      "bytes": 1188
+    },
+    {
+      "path": "projects/visiting-order/planning/event-graph.json",
+      "sha256": "51732220c48a232337298b3c9c184c7628af2948296cf316d873449c08d38c0d",
+      "bytes": 1798
+    },
+    {
+      "path": "projects/visiting-order/planning/style-profile.json",
+      "sha256": "47067cd0afc35c829d6c0a3176aa71228146b2c122b54a5c84951ea9d5bddcb4",
+      "bytes": 1581
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc01/candidates/candidate-a-r1.md",
+      "sha256": "c89b2ca272ac68f1ea9bda7b45b16fea8a89dd968dc35450be24e964b6fe5f6e",
+      "bytes": 3286
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc01/candidates/candidate-a.md",
+      "sha256": "e03aa66b348fd18378912eae457314a4aa098199f17b65906b1e0349c68201d3",
+      "bytes": 2999
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc01/candidates/candidate-b.md",
+      "sha256": "76e5a4fd869a1cfdca91db912c5c4b39223ee237d440a17ddc0aa9da71ed315b",
+      "bytes": 1928
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc01/critiques/adversarial-reader-a-r1.json",
+      "sha256": "5af30ad8a0d1092c797885f27e181aa9635310ae01ba719dd3dcbce38201f707",
+      "bytes": 1365
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc01/critiques/adversarial-reader-a.json",
+      "sha256": "a99f82a08a49096a9897b0a1885e77ce9fece2ecdd05c23ee5b1d359720c4cca",
+      "bytes": 1267
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc01/critiques/adversarial-reader-b.json",
+      "sha256": "577e81291b05080f865f407ab46bb3215dbc8d20b99ec4ae5cda5f4f45d193f6",
+      "bytes": 1584
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc01/critiques/character-simulator-a.json",
+      "sha256": "7732b6f00a306c948a1370653c5dedd32591b229968ecf4248c160f744490005",
+      "bytes": 1279
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc01/critiques/character-simulator-b.json",
+      "sha256": "73f7e619184fcf80c99e916877979f3b874437e2e4e7035e9aa9e86a76f3d457",
+      "bytes": 915
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc01/critiques/defaultness-candidate-a-r1.json",
+      "sha256": "68d8d9ffc36011c41c528ac059436453bb1a39c89674a2fc57b8a0b014471f51",
+      "bytes": 253
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc01/critiques/defaultness-candidate-a.json",
+      "sha256": "b1bbf8ad70e6dde4002a64f1907bb81f1a9b819aecb767d71010f9c3b2c8dc47",
+      "bytes": 662
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc01/critiques/defaultness-candidate-b.json",
+      "sha256": "ae6faa2ace8c4a17c1b712249b3356038e99625fdae78e846c9f289aa524373a",
+      "bytes": 636
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc01/critiques/hard-audit.json",
+      "sha256": "7caa127c86b867831459377300cf8744c595ccbbee2b870a77ca89108cce00a1",
+      "bytes": 142
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc01/critiques/style-editor-a.json",
+      "sha256": "f4b309f8241a0a015f6f93efe034fe2c2e158c7e2e28d5a9b08982b420cf3381",
+      "bytes": 863
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc01/critiques/style-editor-b.json",
+      "sha256": "1b6cadcd21c744a33fd3baa8a3e9c199495d032f5e88736547671b8c589fc12e",
+      "bytes": 1313
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc01/spec.json",
+      "sha256": "4776ff0842ba8941a3b9861f3364184b602052a9fc7ec7a0a21f3eb326e4135d",
+      "bytes": 1683
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc01/state-delta.json",
+      "sha256": "1fded66c4ad7b4966a0a114ba7b472bdb7496f73a4bbb5ce83b55e50b253a98d",
+      "bytes": 442
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc02/candidates/candidate-a.md",
+      "sha256": "4c937964720c18d40c9a8b42642deb18a57e7b65631bb9c0b3a704526216796e",
+      "bytes": 2482
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc02/candidates/candidate-b-r1.md",
+      "sha256": "d90f06251c8de84b4ebb89ec0afb0d9e256cc7601ef4737e0be9c9cbd3acbe5b",
+      "bytes": 1659
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc02/candidates/candidate-b.md",
+      "sha256": "2457dc24a077198d13e611508636381e5ca98e5f6bf6a2f4201f015ea56321d3",
+      "bytes": 1777
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc02/critiques/adversarial-reader-a.json",
+      "sha256": "29674e96b7dfb0dd0be8631be09c4177e084a098549c3487122159e1faf2b5d7",
+      "bytes": 1006
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc02/critiques/adversarial-reader-b-r1.json",
+      "sha256": "393fcf02ddf3359e8e2dd63f2d5fd360dbda3a57445dc64482450eed70799076",
+      "bytes": 926
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc02/critiques/adversarial-reader-b.json",
+      "sha256": "11e07c81d6988dbbe7c44d66393672b093e63b9b830f2fc62479a34a6cea28fe",
+      "bytes": 1238
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc02/critiques/character-simulator-a.json",
+      "sha256": "994d4dc5bfa7cc2f1d1ba1f27f9432ec761b24e30f7e70cbbc5ec2371dbd2271",
+      "bytes": 1280
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc02/critiques/character-simulator-b.json",
+      "sha256": "12f642abcee0ef818ba014971fe880566ad6ffaebcce33155b8da9454e270e4f",
+      "bytes": 1084
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc02/critiques/defaultness-candidate-a.json",
+      "sha256": "1b57c88c41ba9fce92b48302ad4c84a5378e6e9f8f55c80ccc0c5722df212f40",
+      "bytes": 250
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc02/critiques/defaultness-candidate-b-r1.json",
+      "sha256": "122060fe0f9a90e5c0a4316807250fc3494aba60fad86c476fbfd95aabcda89b",
+      "bytes": 253
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc02/critiques/defaultness-candidate-b.json",
+      "sha256": "38a75c16dc379b68bf59581835e280b1977245970adecd872f3a163ad28c961a",
+      "bytes": 250
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc02/critiques/hard-audit.json",
+      "sha256": "9c197b481b42a8bb1761791275aa2af0d9ad04ae4adb6b7df110ef69329725e0",
+      "bytes": 142
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc02/critiques/style-editor-a.json",
+      "sha256": "5364a79b5c7407e2f42eb54e950d51d198e2ef0742a324c0ff51d595340c1419",
+      "bytes": 1502
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc02/critiques/style-editor-b.json",
+      "sha256": "28e21fc68b72e90be3282ef798dcba35a4738615e1ddbaf94d6b2b5fd84d51bf",
+      "bytes": 1024
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc02/spec.json",
+      "sha256": "29e249a4b641b2832d1006956b73ca856c47c9aae9a80a7f5a9adb16d6799e5a",
+      "bytes": 1889
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc02/state-delta.json",
+      "sha256": "dd4e304df0b0241365596a342ae9b130cc3219bcb220c3cdb22f1cf1c30dc183",
+      "bytes": 548
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc03/candidates/candidate-a-r1.md",
+      "sha256": "c642ebdf131a87fcf59d5de2015f52bc68acf86f698c48f4e05ea194a79b14bb",
+      "bytes": 1590
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc03/candidates/candidate-a.md",
+      "sha256": "44ed60d933787e20b1c2313550cea8521ae9c6938a066dd302af82faaa12bae1",
+      "bytes": 1717
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc03/candidates/candidate-b.md",
+      "sha256": "2bbc56aa3d53a2d4dad54460651345e8c4d6411a1200a30c27854d782bcfab14",
+      "bytes": 791
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc03/critiques/adversarial-reader-a-r1.json",
+      "sha256": "5cb6e3767ed2d85fc06eb353da81980f0de231d3df3a870866ccfdad7888715d",
+      "bytes": 756
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc03/critiques/adversarial-reader-a.json",
+      "sha256": "6bfff48257aa886bc5259f3352ed9c1b3e15dc126aee9484678e81ed1f17fb58",
+      "bytes": 1141
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc03/critiques/adversarial-reader-b.json",
+      "sha256": "1945c788c47ff9e08bc030e8fe74a9b3bf70d393e0d284484a3dd195e909ada7",
+      "bytes": 1232
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc03/critiques/character-simulator-a.json",
+      "sha256": "254ed02c67e81e011cf6056fb025ae6bd22f1bd25c65769b51b1add6d5935017",
+      "bytes": 1656
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc03/critiques/character-simulator-b.json",
+      "sha256": "fa6e5913ebd813b7273646c2b0334fab39a239c0b7870b3a019d6f533c62c687",
+      "bytes": 647
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc03/critiques/defaultness-candidate-a-r1.json",
+      "sha256": "a6b4fa08ee135843a411739096f234ccb51668d326ae0d151ff90216321f9d35",
+      "bytes": 253
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc03/critiques/defaultness-candidate-a.json",
+      "sha256": "9d3f71f2f9c7975d09b9a100e840b59212fa7a902aad40929cd4f7892dd11776",
+      "bytes": 467
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc03/critiques/defaultness-candidate-b.json",
+      "sha256": "8c31affd6e7d2a5e086a1fb92005639c191d610af838feeeb2c4938fd47ef8a3",
+      "bytes": 250
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc03/critiques/hard-audit.json",
+      "sha256": "0f7aaed0eed43670bfc45656e6d16996a38e3d1d53d22a67bc3d37b10bd660e3",
+      "bytes": 142
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc03/critiques/style-editor-a.json",
+      "sha256": "6bee36f2b32e5ea4e28077d42290fb59c71c2c5219983537f78be732b8873b9f",
+      "bytes": 1079
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc03/critiques/style-editor-b.json",
+      "sha256": "011b43dd3ebe745091b4a8b2629e2e829bcd912bf0a207b6a8de5cab5304a4a7",
+      "bytes": 1177
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc03/spec.json",
+      "sha256": "977d3252e50bd8b8e7b0e855bd8c9c33f92a7343b76885fd13d192eaa1530b67",
+      "bytes": 1440
+    },
+    {
+      "path": "projects/visiting-order/scenes/ch01-sc03/state-delta.json",
+      "sha256": "34a7bc7ddc6a71677b3fc53e565b71b53eb7bfffd58bc815967be2cbdc607282",
+      "bytes": 438
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "c2d0d8e092e97ededcd4a2369a7a983fc15ea089a5c07b965ce29d4887cf5b6c",
+      "bytes": 196
+    },
+    {
+      "path": "regression/fixtures.json",
+      "sha256": "b4493fcfd4a944785731d2e6751b3625cdd21c9b17141ed2b8e15557bdce3a2c",
+      "bytes": 11548
+    },
+    {
+      "path": "schemas/character.schema.json",
+      "sha256": "96f90b5f0282e2e58c2be1670d4c5c455e04152236ea330ac033cabb91a4b989",
+      "bytes": 1096
+    },
+    {
+      "path": "schemas/critique.schema.json",
+      "sha256": "62efad9ae157ad605c3e3d3d4bd8c412d7b049b157a16b149ebaac1984c8e355",
+      "bytes": 1106
+    },
+    {
+      "path": "schemas/event.schema.json",
+      "sha256": "42131d8bf1e3a42b3a9372c8722fab51414516c5a38f1291cfc8a5b7cb187266",
+      "bytes": 1771
+    },
+    {
+      "path": "schemas/judgment.schema.json",
+      "sha256": "3830fcc18921e58fac91eb63f0c363dd59473628602be20ee0e51b20ffeb784f",
+      "bytes": 1005
+    },
+    {
+      "path": "schemas/ontology.schema.json",
+      "sha256": "aa5fc573205e9900fd8b94873de678e6f55896479b67f8e429203bb913238c19",
+      "bytes": 687
+    },
+    {
+      "path": "schemas/premise.schema.json",
+      "sha256": "a423008eff682f0a6da38d374f7c32e9e553eded87e38594b0249b3eccd39a4a",
+      "bytes": 1487
+    },
+    {
+      "path": "schemas/project.schema.json",
+      "sha256": "55f00ca915450a58ac65f8bb130e632648b36304c96e2a7c136b4851ad72c133",
+      "bytes": 806
+    },
+    {
+      "path": "schemas/prose-claims.schema.json",
+      "sha256": "68a69f7e7c6ff2067c16f08964d699899289cb870b5109e04db935e540fe50c6",
+      "bytes": 1330
+    },
+    {
+      "path": "schemas/role-roster.schema.json",
+      "sha256": "dc29696e91e64343d54fed2a1b48af8ebe9d304826aad7c6b9f32430fa9663f8",
+      "bytes": 268
+    },
+    {
+      "path": "schemas/scene.schema.json",
+      "sha256": "5a1a80150420aeae4cc386f64d5674f1f4ad596f3517fd06eaaa0f8c36bbf10b",
+      "bytes": 1761
+    },
+    {
+      "path": "schemas/state-delta.schema.json",
+      "sha256": "9bd1e55d901d6b843c33d0da1c3b8fa0c91d045b5b212e4b57ed367e29f36b1c",
+      "bytes": 2976
+    },
+    {
+      "path": "scripts/assemble_manuscript.py",
+      "sha256": "730744c80d1c3b96f4f782c06f29f5c2d1579b727a66b425fc414e9015dc47eb",
+      "bytes": 846
+    },
+    {
+      "path": "scripts/compile_scene_context.py",
+      "sha256": "ec6e8a764f85e727d6a7c1dd021d98c1f68fb65981932d08066f0fce517060b8",
+      "bytes": 1163
+    },
+    {
+      "path": "scripts/defaultness_lint.py",
+      "sha256": "3a72caa00b53c190c88d89286f362938014c362076fd1d323add48acb08994d3",
+      "bytes": 2918
+    },
+    {
+      "path": "scripts/fiction_mcp.py",
+      "sha256": "f7b174b1b6734f8d26cdc1654ef46e4c940978a6f70cb7b254508a828dab4bd0",
+      "bytes": 3679
+    },
+    {
+      "path": "scripts/hard_audit.py",
+      "sha256": "21141956aa1f0fe9bf9ef79aed8e0cbc097237eb7da883101ee61d74799efbf6",
+      "bytes": 2902
+    },
+    {
+      "path": "scripts/new_project.py",
+      "sha256": "540028a8b236e50e8a171163a3e930e443041ac2df88d5307c8704371ccd2d85",
+      "bytes": 1014
+    },
+    {
+      "path": "scripts/promote_candidate.py",
+      "sha256": "70885b2c64e8ca2f678933587c0ec5d0cbf3110c873b328d7b2bd61681a890f4",
+      "bytes": 1220
+    },
+    {
+      "path": "scripts/prose_audit.py",
+      "sha256": "94418f232ff0e6efb715c86f1a8ec9a9bebcc0a96bf34c617a4dc7ab7a4cb1a3",
+      "bytes": 2215
+    },
+    {
+      "path": "scripts/revise_scene.py",
+      "sha256": "c6061fdf6530b506d1924186ced60db92487a821c4b994ef6e407046409c11fd",
+      "bytes": 4650
+    },
+    {
+      "path": "scripts/run_critic_eval.py",
+      "sha256": "8324ee5d90956fb1845221c9fddad8618f1fc7d726e41f1226c8efaa35ff15ce",
+      "bytes": 1532
+    },
+    {
+      "path": "scripts/run_regression.py",
+      "sha256": "94378bb17a8ffe4925ca53f7501b823299ecb8b881490c76b137b4fb427fb5d8",
+      "bytes": 1214
+    },
+    {
+      "path": "scripts/run_role.py",
+      "sha256": "65513b8505f65a6e7eb586f44ab92c1e56f50580a9f32dfc81664bb17557719a",
+      "bytes": 3191
+    },
+    {
+      "path": "scripts/validate_workspace.py",
+      "sha256": "a7a1a53b9ac0a52d5c2cdf1186be0780d9abecb5d7b6abde2ca5cf93c9230f2d",
+      "bytes": 8702
+    },
+    {
+      "path": "src/fiction_compiler/__init__.py",
+      "sha256": "c67abdf293f43eed8d6bbd9efb8634344416bed2ba352d1d4e4eb719897742e0",
+      "bytes": 372
+    },
+    {
+      "path": "src/fiction_compiler/assemble.py",
+      "sha256": "68c9d63f861fa8d07f2690904621009aab12aabe7dc634471847abfe70f53754",
+      "bytes": 2449
+    },
+    {
+      "path": "src/fiction_compiler/context.py",
+      "sha256": "ca2f1e15f9cf5e039f148db58f8145a137c84037488a3baa98b24511abf13388",
+      "bytes": 5287
+    },
+    {
+      "path": "src/fiction_compiler/critic_eval.py",
+      "sha256": "3dab965b3a6e68d8fd118bdef9ccae1f73ab3a4a8d5c69e573b40776718dbb43",
+      "bytes": 4927
+    },
+    {
+      "path": "src/fiction_compiler/critique.py",
+      "sha256": "41a9ad70119b0c61bcc36cf8bd203d7913d2711b326902c7dfdcf4aa6b869e19",
+      "bytes": 8246
+    },
+    {
+      "path": "src/fiction_compiler/defaultness.py",
+      "sha256": "d2d4156b03f8d4e024d46423977c7e35c4d0a090a2294dc92e2c84c816941e59",
+      "bytes": 5926
+    },
+    {
+      "path": "src/fiction_compiler/hard_audit.py",
+      "sha256": "57ea420db5715a834e18b76c7ca7f4e7adb585c4ae0784ba600b025212031957",
+      "bytes": 14179
+    },
+    {
+      "path": "src/fiction_compiler/integrity.py",
+      "sha256": "8d12c8303df738cfc9454a89e4461b4efd3b6b14c273e5f1c26086dc3a5ef0bb",
+      "bytes": 6736
+    },
+    {
+      "path": "src/fiction_compiler/kb.py",
+      "sha256": "fc083f2d30cd782bd9d1497cb741041b62c46120458fcff048aa6863f99dba85",
+      "bytes": 2815
+    },
+    {
+      "path": "src/fiction_compiler/ontology.py",
+      "sha256": "e1d45014b3b1b75971b862e1cfca80fce25b7e546dcf7ec52b912fb111a6c183",
+      "bytes": 2249
+    },
+    {
+      "path": "src/fiction_compiler/premise.py",
+      "sha256": "351ce7ac8ec2a384f2864c12d5086b0987217b579fc73e1c55478b4351e3cd8b",
+      "bytes": 5365
+    },
+    {
+      "path": "src/fiction_compiler/promote.py",
+      "sha256": "1791a925189340eef143b304a7d37dbae975e21627c607370b1a5ab80229f032",
+      "bytes": 13188
+    },
+    {
+      "path": "src/fiction_compiler/prose_audit.py",
+      "sha256": "5240c669f177e5182685b9ff729046233c59bdb41d3bf31697a63571059095e3",
+      "bytes": 6914
+    },
+    {
+      "path": "src/fiction_compiler/regression.py",
+      "sha256": "4efec03411b9ba5d77d83b496cf0ac5404e921f2e294c41ed522097bb2f217bf",
+      "bytes": 7372
+    },
+    {
+      "path": "src/fiction_compiler/revision.py",
+      "sha256": "64af6e5dfa078167e305d15a8e43a1732f6c4ce4427a4f3069efecc9365a1c02",
+      "bytes": 11541
+    },
+    {
+      "path": "src/fiction_compiler/role_runner.py",
+      "sha256": "6bf0cb4708c005ea49d43aa0c10f290f6e74fe09021bc1a6b3a8852bd56d4ef5",
+      "bytes": 19840
+    },
+    {
+      "path": "src/fiction_compiler/safety.py",
+      "sha256": "a2bb4a5a345a1dd9b6666e003fc39cee3e9c1a7e5374e3dc8af1cdeec7722341",
+      "bytes": 2734
+    },
+    {
+      "path": "src/fiction_compiler/schema.py",
+      "sha256": "fb773f58c0a912b17f950f528b0e9ba8ba6392f8a659ca2865367375e621a724",
+      "bytes": 5627
+    },
+    {
+      "path": "src/fiction_compiler/state.py",
+      "sha256": "1e3e512ac452011e899b142728a45e98c291d91ba7f97ab56a3e9ddbafef3188",
+      "bytes": 9994
+    },
+    {
+      "path": "src/fiction_compiler/tools.py",
+      "sha256": "8685d00bc4a1c2b5127b048820890bbccba710b44ee02700e387140243403f3f",
+      "bytes": 30730
+    },
+    {
+      "path": "src/fiction_compiler/tournament.py",
+      "sha256": "18fafa074972928cf00b7ecb9606b5135eb0ab3a290b628093cc7fdb287988f2",
+      "bytes": 11867
+    },
+    {
+      "path": "src/fiction_compiler/trace.py",
+      "sha256": "30c81e1f6eacb3e59afb9dc4937779410a37c6a5fb1a4ed7fc84bf4d0ccf7b57",
+      "bytes": 1774
+    },
+    {
+      "path": "src/fiction_compiler/workspace.py",
+      "sha256": "8e300d52e5b0dfeec368882bff92e561d7d045431b1fe020977f40e8bbd5a074",
+      "bytes": 2380
+    },
+    {
+      "path": "tests/test_assemble.py",
+      "sha256": "42f5cbd277f14dd460737122c99d2ceff3fef0338a8985b1cff3fe0a74124f81",
+      "bytes": 2442
+    },
+    {
+      "path": "tests/test_context.py",
+      "sha256": "e270e0ff63ae33636938ca625440d9cc7cd6d868460032679c3d2ebd86a257df",
+      "bytes": 2183
+    },
+    {
+      "path": "tests/test_critic_eval.py",
+      "sha256": "bb211f9aae1922912aa715cd814ed9901fcddebf8aaeedfbf6bf464d52e31e76",
+      "bytes": 3366
+    },
+    {
+      "path": "tests/test_critique.py",
+      "sha256": "e596a4aa01cdd3937f386842653e5a2f94cd7e11b95871643e7c12114649da13",
+      "bytes": 5606
+    },
+    {
+      "path": "tests/test_defaultness.py",
+      "sha256": "a4127be6c5001f47749688d881e0e3d59592ad9f6153a6adc827671332fdeed4",
+      "bytes": 1910
+    },
+    {
+      "path": "tests/test_hard_audit.py",
+      "sha256": "10172b02d640b1716a02e158481078e9890c1a2680c6c1a304745acb94d76bfa",
+      "bytes": 16874
+    },
+    {
+      "path": "tests/test_kb.py",
+      "sha256": "3e47e916040f8ac0100ae55d323d8694322d9b5742fa7575cb27bc6447f9f438",
+      "bytes": 1888
+    },
+    {
+      "path": "tests/test_mcp.py",
+      "sha256": "8af3ffcb04e30964c234c4442603c25270e861464c0b10d03ac4908397c04154",
+      "bytes": 2503
+    },
+    {
+      "path": "tests/test_ontology.py",
+      "sha256": "6018cfa32a0c89518f27cadece93e867b70ac29d0d4519a20be9ddee8d8a398c",
+      "bytes": 1557
+    },
+    {
+      "path": "tests/test_promote.py",
+      "sha256": "aab4577e33dbc0675d1182411d1b75bb2980da4000211703b45a3523ff63edb0",
+      "bytes": 16742
+    },
+    {
+      "path": "tests/test_prose_audit.py",
+      "sha256": "e849dac0325470c213cdbaa5d4ac9f63920b36fd6c9e9da3f376afac602dc780",
+      "bytes": 4784
+    },
+    {
+      "path": "tests/test_regression.py",
+      "sha256": "11a7a645f6673bb6312f98d98e2ce21a23e09723d15f20a88c10291e4b2bae9a",
+      "bytes": 1993
+    },
+    {
+      "path": "tests/test_revision.py",
+      "sha256": "2369eae7119a6952f9ec20167f40191adfbc6f919fbe59dbe060d0386f512d39",
+      "bytes": 8497
+    },
+    {
+      "path": "tests/test_role_runner.py",
+      "sha256": "e37abe9c3f3fdb7d806db4059790bee69af674613fa9121711ffeb04de043e0e",
+      "bytes": 14714
+    },
+    {
+      "path": "tests/test_safety.py",
+      "sha256": "9f4a7848615b7846c0f2f35566400cf99602f9e3da896d785897215c41816da4",
+      "bytes": 1914
+    },
+    {
+      "path": "tests/test_schema.py",
+      "sha256": "9d9ddd2beb1ef178e4955af66932f3ae06155c22024cb3260fe31742678c15ad",
+      "bytes": 4805
+    },
+    {
+      "path": "tests/test_state.py",
+      "sha256": "a7dd6f7e19d72f5bb5c3384efae4f0931696c02351221234925fdd337da49091",
+      "bytes": 7527
+    },
+    {
+      "path": "tests/test_tools.py",
+      "sha256": "00ae7d70dab3231b108633d71d9acf2451f376ed947580a5946c2740ff3a3352",
+      "bytes": 5492
+    },
+    {
+      "path": "tests/test_tournament.py",
+      "sha256": "733c6b0fd458bdf2923093a992054d388786aa5abd7210a0957ab0d413850a00",
+      "bytes": 11050
+    },
+    {
+      "path": "tests/test_trace.py",
+      "sha256": "56b7a420998dc0f095f2a56cb905c7cb4c2bf9db8264f279d3259a7f9a2e7a1c",
+      "bytes": 1519
+    },
+    {
+      "path": "tests/test_validators.py",
+      "sha256": "f299f2ee67c6c343a8d847d4f3998947c1ed49a0affa7a8589251266e383f56c",
+      "bytes": 856
+    }
+  ]
+}

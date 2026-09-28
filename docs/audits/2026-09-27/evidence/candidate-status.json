@@ -1,0 +1,428 @@
+[
+  {
+    "project": "forecourt",
+    "scene": "ch01-sc01",
+    "candidate": "candidate-a-r1.md",
+    "gate_ready": true,
+    "reasons": []
+  },
+  {
+    "project": "forecourt",
+    "scene": "ch01-sc01",
+    "candidate": "candidate-a.md",
+    "gate_ready": false,
+    "reasons": [
+      "style-editor-candidate-a.json: verdict 'revise' is unresolved (not 'pass')"
+    ]
+  },
+  {
+    "project": "forecourt",
+    "scene": "ch01-sc01",
+    "candidate": "candidate-b.md",
+    "gate_ready": false,
+    "reasons": [
+      "adversarial-reader-candidate-b.json: verdict 'revise' is unresolved (not 'pass')",
+      "style-editor-candidate-b.json: verdict 'revise' is unresolved (not 'pass')"
+    ]
+  },
+  {
+    "project": "forecourt",
+    "scene": "ch01-sc02",
+    "candidate": "candidate-a-r1.md",
+    "gate_ready": true,
+    "reasons": []
+  },
+  {
+    "project": "forecourt",
+    "scene": "ch01-sc02",
+    "candidate": "candidate-a.md",
+    "gate_ready": false,
+    "reasons": [
+      "style-editor-candidate-a.json: verdict 'revise' is unresolved (not 'pass')"
+    ]
+  },
+  {
+    "project": "forecourt",
+    "scene": "ch01-sc02",
+    "candidate": "candidate-b.md",
+    "gate_ready": false,
+    "reasons": [
+      "adversarial-reader-candidate-b.json: verdict 'revise' is unresolved (not 'pass')",
+      "character-simulator-candidate-b.json: verdict 'revise' is unresolved (not 'pass')",
+      "style-editor-candidate-b.json: verdict 'revise' is unresolved (not 'pass')",
+      "no clean, candidate-bound literary audit found for 'candidate-b.md'"
+    ]
+  },
+  {
+    "project": "forecourt",
+    "scene": "ch01-sc03",
+    "candidate": "candidate-a-r1.md",
+    "gate_ready": true,
+    "reasons": []
+  },
+  {
+    "project": "forecourt",
+    "scene": "ch01-sc03",
+    "candidate": "candidate-a.md",
+    "gate_ready": false,
+    "reasons": [
+      "character-simulator-candidate-a.json: verdict 'revise' is unresolved (not 'pass')",
+      "style-editor-candidate-a.json: verdict 'revise' is unresolved (not 'pass')"
+    ]
+  },
+  {
+    "project": "forecourt",
+    "scene": "ch01-sc03",
+    "candidate": "candidate-b.md",
+    "gate_ready": false,
+    "reasons": [
+      "adversarial-reader-candidate-b.json: verdict 'revise' is unresolved (not 'pass')",
+      "style-editor-candidate-b.json: verdict 'revise' is unresolved (not 'pass')"
+    ]
+  },
+  {
+    "project": "salt-in-the-wire",
+    "scene": "ch01-sc01",
+    "candidate": "candidate-a.md",
+    "gate_ready": false,
+    "reasons": [
+      "no clean, candidate-bound literary audit found for 'candidate-a.md'",
+      "no clean, candidate-bound defaultness audit found for 'candidate-a.md'"
+    ]
+  },
+  {
+    "project": "salt-in-the-wire",
+    "scene": "ch01-sc01",
+    "candidate": "candidate-b.md",
+    "gate_ready": false,
+    "reasons": [
+      "defaultness-candidate-b.json: verdict 'revise' is unresolved (not 'pass')",
+      "no clean, candidate-bound literary audit found for 'candidate-b.md'",
+      "no clean, candidate-bound defaultness audit found for 'candidate-b.md'"
+    ]
+  },
+  {
+    "project": "salt-in-the-wire",
+    "scene": "ch01-sc02",
+    "candidate": "candidate-a.md",
+    "gate_ready": false,
+    "reasons": [
+      "adversarial-reader.json: verdict 'pass' contradicts ['material'] finding(s) \u2014 a pass may not carry a material/fatal finding",
+      "character-simulator.json: verdict 'revise' is unresolved (not 'pass')",
+      "style-editor.json: verdict 'pass' contradicts ['material'] finding(s) \u2014 a pass may not carry a material/fatal finding",
+      "no clean, candidate-bound hard audit found for 'candidate-a.md'",
+      "no clean, candidate-bound literary audit found for 'candidate-a.md'",
+      "no clean, candidate-bound defaultness audit found for 'candidate-a.md'"
+    ]
+  },
+  {
+    "project": "salt-in-the-wire",
+    "scene": "ch01-sc02",
+    "candidate": "draft-1.md",
+    "gate_ready": false,
+    "reasons": [
+      "no clean, candidate-bound hard audit found for 'draft-1.md'",
+      "no clean, candidate-bound literary audit found for 'draft-1.md'",
+      "no clean, candidate-bound defaultness audit found for 'draft-1.md'"
+    ]
+  },
+  {
+    "project": "salt-in-the-wire",
+    "scene": "ch01-sc02",
+    "candidate": "candidate-b.md",
+    "gate_ready": false,
+    "reasons": [
+      "no clean, candidate-bound hard audit found for 'candidate-b.md'",
+      "no clean, candidate-bound literary audit found for 'candidate-b.md'",
+      "no clean, candidate-bound defaultness audit found for 'candidate-b.md'"
+    ]
+  },
+  {
+    "project": "slack-water",
+    "scene": "ch01-sc01",
+    "candidate": "candidate-a.md",
+    "gate_ready": false,
+    "reasons": [
+      "adversarial-reader-a.json: verdict 'revise' is unresolved (not 'pass')",
+      "character-simulator-a.json: verdict 'revise' is unresolved (not 'pass')",
+      "style-editor-a.json: verdict 'revise' is unresolved (not 'pass')",
+      "no clean, candidate-bound literary audit found for 'candidate-a.md'"
+    ]
+  },
+  {
+    "project": "slack-water",
+    "scene": "ch01-sc01",
+    "candidate": "candidate-b-r1.md",
+    "gate_ready": false,
+    "reasons": [
+      "adversarial-reader-b-r1.json: verdict 'revise' is unresolved (not 'pass')",
+      "no clean, candidate-bound literary audit found for 'candidate-b-r1.md'"
+    ]
+  },
+  {
+    "project": "slack-water",
+    "scene": "ch01-sc01",
+    "candidate": "candidate-b-r2.md",
+    "gate_ready": true,
+    "reasons": []
+  },
+  {
+    "project": "slack-water",
+    "scene": "ch01-sc01",
+    "candidate": "candidate-b.md",
+    "gate_ready": false,
+    "reasons": [
+      "adversarial-reader-b.json: verdict 'revise' is unresolved (not 'pass')",
+      "style-editor-b.json: verdict 'revise' is unresolved (not 'pass')"
+    ]
+  },
+  {
+    "project": "slack-water",
+    "scene": "ch01-sc02",
+    "candidate": "candidate-a.md",
+    "gate_ready": false,
+    "reasons": [
+      "adversarial-reader-a.json: verdict 'revise' is unresolved (not 'pass')",
+      "character-simulator-a.json: verdict 'revise' is unresolved (not 'pass')",
+      "style-editor-a.json: verdict 'revise' is unresolved (not 'pass')",
+      "no clean, candidate-bound literary audit found for 'candidate-a.md'"
+    ]
+  },
+  {
+    "project": "slack-water",
+    "scene": "ch01-sc02",
+    "candidate": "candidate-b-r1.md",
+    "gate_ready": false,
+    "reasons": [
+      "adversarial-reader-b-r1.json: verdict 'revise' is unresolved (not 'pass')",
+      "no clean, candidate-bound literary audit found for 'candidate-b-r1.md'"
+    ]
+  },
+  {
+    "project": "slack-water",
+    "scene": "ch01-sc02",
+    "candidate": "candidate-b-r2.md",
+    "gate_ready": true,
+    "reasons": []
+  },
+  {
+    "project": "slack-water",
+    "scene": "ch01-sc02",
+    "candidate": "candidate-b.md",
+    "gate_ready": false,
+    "reasons": [
+      "adversarial-reader-b.json: verdict 'revise' is unresolved (not 'pass')",
+      "style-editor-b.json: verdict 'revise' is unresolved (not 'pass')"
+    ]
+  },
+  {
+    "project": "slack-water",
+    "scene": "ch01-sc03",
+    "candidate": "candidate-a.md",
+    "gate_ready": false,
+    "reasons": [
+      "adversarial-reader-a.json: verdict 'revise' is unresolved (not 'pass')",
+      "character-simulator-a.json: verdict 'revise' is unresolved (not 'pass')",
+      "style-editor-a.json: verdict 'revise' is unresolved (not 'pass')",
+      "no clean, candidate-bound literary audit found for 'candidate-a.md'"
+    ]
+  },
+  {
+    "project": "slack-water",
+    "scene": "ch01-sc03",
+    "candidate": "candidate-b-r1.md",
+    "gate_ready": true,
+    "reasons": []
+  },
+  {
+    "project": "slack-water",
+    "scene": "ch01-sc03",
+    "candidate": "candidate-b.md",
+    "gate_ready": true,
+    "reasons": []
+  },
+  {
+    "project": "the-overnight",
+    "scene": "ch01-sc01",
+    "candidate": "candidate-a-r1.md",
+    "gate_ready": true,
+    "reasons": []
+  },
+  {
+    "project": "the-overnight",
+    "scene": "ch01-sc01",
+    "candidate": "candidate-a.md",
+    "gate_ready": true,
+    "reasons": []
+  },
+  {
+    "project": "the-overnight",
+    "scene": "ch01-sc01",
+    "candidate": "candidate-b.md",
+    "gate_ready": true,
+    "reasons": []
+  },
+  {
+    "project": "the-overnight",
+    "scene": "ch01-sc02",
+    "candidate": "candidate-a.md",
+    "gate_ready": true,
+    "reasons": []
+  },
+  {
+    "project": "the-overnight",
+    "scene": "ch01-sc02",
+    "candidate": "candidate-b.md",
+    "gate_ready": false,
+    "reasons": [
+      "no clean, candidate-bound literary audit found for 'candidate-b.md'"
+    ]
+  },
+  {
+    "project": "the-overnight",
+    "scene": "ch01-sc03",
+    "candidate": "candidate-a.md",
+    "gate_ready": true,
+    "reasons": []
+  },
+  {
+    "project": "the-overnight",
+    "scene": "ch01-sc03",
+    "candidate": "candidate-b.md",
+    "gate_ready": false,
+    "reasons": [
+      "no clean, candidate-bound literary audit found for 'candidate-b.md'"
+    ]
+  },
+  {
+    "project": "verbatim",
+    "scene": "ch01-sc01",
+    "candidate": "candidate-a.md",
+    "gate_ready": false,
+    "reasons": [
+      "no clean, candidate-bound literary audit found for 'candidate-a.md'",
+      "no clean, candidate-bound defaultness audit found for 'candidate-a.md'"
+    ]
+  },
+  {
+    "project": "verbatim",
+    "scene": "ch01-sc01",
+    "candidate": "draft-1.md",
+    "gate_ready": false,
+    "reasons": [
+      "no clean, candidate-bound literary audit found for 'draft-1.md'",
+      "no clean, candidate-bound defaultness audit found for 'draft-1.md'"
+    ]
+  },
+  {
+    "project": "verbatim",
+    "scene": "ch01-sc02",
+    "candidate": "candidate-a.md",
+    "gate_ready": false,
+    "reasons": [
+      "no clean, candidate-bound literary audit found for 'candidate-a.md'",
+      "no clean, candidate-bound defaultness audit found for 'candidate-a.md'"
+    ]
+  },
+  {
+    "project": "verbatim",
+    "scene": "ch01-sc03",
+    "candidate": "candidate-a.md",
+    "gate_ready": false,
+    "reasons": [
+      "adversarial-reader.json: verdict 'pass' contradicts ['material'] finding(s) \u2014 a pass may not carry a material/fatal finding",
+      "character-simulator.json: verdict 'revise' is unresolved (not 'pass')",
+      "style-editor.json: verdict 'revise' is unresolved (not 'pass')",
+      "no clean, candidate-bound literary audit found for 'candidate-a.md'",
+      "no clean, candidate-bound defaultness audit found for 'candidate-a.md'"
+    ]
+  },
+  {
+    "project": "verbatim",
+    "scene": "ch01-sc03",
+    "candidate": "candidate-b.md",
+    "gate_ready": false,
+    "reasons": [
+      "no clean, candidate-bound literary audit found for 'candidate-b.md'",
+      "no clean, candidate-bound defaultness audit found for 'candidate-b.md'"
+    ]
+  },
+  {
+    "project": "visiting-order",
+    "scene": "ch01-sc01",
+    "candidate": "candidate-a-r1.md",
+    "gate_ready": true,
+    "reasons": []
+  },
+  {
+    "project": "visiting-order",
+    "scene": "ch01-sc01",
+    "candidate": "candidate-a.md",
+    "gate_ready": false,
+    "reasons": [
+      "adversarial-reader-a.json: verdict 'revise' is unresolved (not 'pass')",
+      "character-simulator-a.json: verdict 'revise' is unresolved (not 'pass')"
+    ]
+  },
+  {
+    "project": "visiting-order",
+    "scene": "ch01-sc01",
+    "candidate": "candidate-b.md",
+    "gate_ready": false,
+    "reasons": [
+      "adversarial-reader-b.json: verdict 'revise' is unresolved (not 'pass')",
+      "style-editor-b.json: verdict 'revise' is unresolved (not 'pass')"
+    ]
+  },
+  {
+    "project": "visiting-order",
+    "scene": "ch01-sc02",
+    "candidate": "candidate-a.md",
+    "gate_ready": false,
+    "reasons": [
+      "adversarial-reader-a.json: verdict 'revise' is unresolved (not 'pass')",
+      "character-simulator-a.json: verdict 'revise' is unresolved (not 'pass')",
+      "style-editor-a.json: verdict 'revise' is unresolved (not 'pass')",
+      "no clean, candidate-bound literary audit found for 'candidate-a.md'"
+    ]
+  },
+  {
+    "project": "visiting-order",
+    "scene": "ch01-sc02",
+    "candidate": "candidate-b-r1.md",
+    "gate_ready": true,
+    "reasons": []
+  },
+  {
+    "project": "visiting-order",
+    "scene": "ch01-sc02",
+    "candidate": "candidate-b.md",
+    "gate_ready": true,
+    "reasons": []
+  },
+  {
+    "project": "visiting-order",
+    "scene": "ch01-sc03",
+    "candidate": "candidate-a-r1.md",
+    "gate_ready": true,
+    "reasons": []
+  },
+  {
+    "project": "visiting-order",
+    "scene": "ch01-sc03",
+    "candidate": "candidate-a.md",
+    "gate_ready": false,
+    "reasons": [
+      "character-simulator-a.json: verdict 'revise' is unresolved (not 'pass')"
+    ]
+  },
+  {
+    "project": "visiting-order",
+    "scene": "ch01-sc03",
+    "candidate": "candidate-b.md",
+    "gate_ready": false,
+    "reasons": [
+      "style-editor-b.json: verdict 'revise' is unresolved (not 'pass')"
+    ]
+  }
+]
