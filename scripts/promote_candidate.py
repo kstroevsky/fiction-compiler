@@ -22,10 +22,13 @@ def main() -> int:
     parser.add_argument("project_dir")
     parser.add_argument("scene_id")
     parser.add_argument("candidate_file")
+    parser.add_argument("--approved-by", help="record the human approver when the project requires a promotion gate")
+    parser.add_argument("--rubric-version", help="record the rubric/version used for the promotion decision")
     args = parser.parse_args()
     project = (ROOT / args.project_dir).resolve() if not Path(args.project_dir).is_absolute() else Path(args.project_dir)
     try:
-        result = promote_candidate(project, args.scene_id, args.candidate_file)
+        result = promote_candidate(project, args.scene_id, args.candidate_file,
+                                   approved_by=args.approved_by, rubric_version=args.rubric_version)
     except ValueError as exc:
         raise SystemExit(str(exc))
     print(result["promoted_to"])

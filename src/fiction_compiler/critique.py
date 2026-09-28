@@ -22,7 +22,7 @@ import json
 import re
 from pathlib import Path
 
-from . import acceptance, defaultness, hard_audit, integrity, review_policy, schema
+from . import acceptance, defaultness, hard_audit, integrity, issue_resolution, review_policy, schema
 from .promote import (AUDIT_CLASS_BY_CRITIC, BLOCKING_SEVERITIES, _collect_binding,
                       _policy_gate, audit_class_of)
 from .workspace import resolve_scene_candidate, validate_leaf_filename, validate_scene_id
@@ -179,6 +179,14 @@ def scene_status(project: Path, scene_id: str, candidate: str) -> dict:
         reasons, binding = _policy_gate(
             loaded, candidate_name, candidate_sha256, scene_id, policy
         )
+        issue_bindings: list[dict] = []
+        if policy.get("require_issue_resolutions"):
+            issue_reasons, issue_bindings = issue_resolution.evaluate_gate(
+                scene_dir, candidate_name, candidate_sha256, loaded
+            )
+            reasons.extend(issue_reasons)
+    if policy is None:
+        issue_bindings = []
 
     structural: list[str] = []
     if not spec_path.exists():
@@ -246,6 +254,13 @@ def scene_status(project: Path, scene_id: str, candidate: str) -> dict:
         "binding_critiques": [
             {"file": label, "critic": c.get("critic"), "audit_class": cls, "verdict": c.get("verdict")}
             for label, c, cls in binding
+        ],
+        "issue_resolutions": [
+            {
+                "resolution": str(item["resolution_path"].relative_to(project)),
+                "source_critique": str(item["source_critique_path"].relative_to(project)),
+            }
+            for item in issue_bindings
         ],
         "review_policy": (
             {"id": policy.get("id"), "sha256": policy_artifact.get("sha256")}

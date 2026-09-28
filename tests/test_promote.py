@@ -276,6 +276,7 @@ class AcceptanceIntegrityTests(unittest.TestCase):
                 "minimum_literary_reviews": 1,
                 "required_literary_roles": ["style-editor"],
                 "require_runtime_provenance": True,
+                "require_issue_resolutions": True,
                 "defaultness_mode": "blocking",
                 "require_prose_audit": False,
             }

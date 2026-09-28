@@ -16,7 +16,8 @@ from typing import Any, Callable
 
 from . import critic_eval as _critic_eval
 from . import critique as _critique
-from . import defaultness, hard_audit, integrity, kb, regression, revision, safety, schema, trace
+from . import (defaultness, hard_audit, integrity, issue_resolution, kb, regression, revision,
+               safety, schema, trace)
 from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
@@ -245,6 +246,22 @@ def record_critique(project: str, scene_id: str, candidate: str, critic: str, ve
 def scene_status(project: str, scene_id: str, candidate: str) -> dict:
     """Read-only: would promote accept this candidate, and if not, exactly why?"""
     return _critique.scene_status(project_dir(project), scene_id, candidate)
+
+
+def record_issue_resolution(project: str, scene_id: str, target_candidate: str,
+                            source_critique: str, source_finding_id: str, relationship: str,
+                            applicability: str, resolution: str, reason: str,
+                            decided_by: str) -> dict:
+    """Record an immutable cross-candidate finding disposition used by promotion coverage."""
+    result = issue_resolution.record_resolution(
+        project_dir(project), scene_id, target_candidate, source_critique, source_finding_id,
+        relationship, applicability, resolution, reason, decided_by,
+    )
+    if "error" not in result:
+        trace.log(project_dir(project), scene_id, "issue_resolution",
+                  finding_id=source_finding_id, target=target_candidate,
+                  relationship=relationship, resolution=resolution)
+    return result
 
 
 _JUDGE_SPEC_KEYS = ["pov", "purpose", "desire", "conflict", "turn", "forbidden_moves", "style_constraints"]
@@ -477,6 +494,21 @@ TOOLS: list[dict] = [
           "whether the scene is already promoted. Call before promote to see what is missing.",
           {"project": {"type": "string"}, "scene_id": {"type": "string"}, "candidate": {"type": "string"}},
           ["project", "scene_id", "candidate"], scene_status),
+    _tool("record_issue_resolution",
+          "Record a source-critique- and target-candidate-bound disposition for a serious finding. "
+          "Use relationship=predecessor for the revision-log predecessor; sibling otherwise. "
+          "Sibling findings require an explicit applies/does_not_apply decision. Predecessor findings "
+          "must apply and be resolved, rechecked, waived, or adjudicated before promotion.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "target_candidate": {"type": "string"}, "source_critique": {"type": "string"},
+           "source_finding_id": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+           "relationship": {"type": "string", "enum": ["predecessor", "sibling"]},
+           "applicability": {"type": "string", "enum": ["applies", "does_not_apply"]},
+           "resolution": {"type": "string", "enum": ["resolved", "rechecked", "waived", "adjudicated", "open"]},
+           "reason": {"type": "string", "minLength": 1}, "decided_by": {"type": "string", "minLength": 1}},
+          ["project", "scene_id", "target_candidate", "source_critique", "source_finding_id",
+           "relationship", "applicability", "resolution", "reason", "decided_by"],
+          record_issue_resolution),
     _tool("judge_bundle",
           "Build the ONLY thing a critic subagent should see for a scene candidate: one candidate, "
           "blind, with its prose FENCED as untrusted data (plus an injection scan). Returns the "
@@ -553,13 +585,15 @@ def call_tool(name: str, arguments: dict[str, Any] | None) -> dict:
             )
         if confined_project is not None and isinstance(args.get("scene_id"), str):
             sid = args["scene_id"]
-            for key in ("candidate", "candidate_file", "before", "after"):
+            for key in ("candidate", "candidate_file", "before", "after", "target_candidate"):
                 value = args.get(key)
                 if not isinstance(value, str):
                     continue
                 if name == "record_critique" and key == "candidate" and value == sid:
                     continue
                 resolve_scene_candidate(confined_project, sid, value)
+        if isinstance(args.get("source_critique"), str):
+            validate_leaf_filename(args["source_critique"], ".json")
         if name == "prose_audit" and isinstance(args.get("claims"), dict):
             claim_scene = args["claims"].get("scene_id")
             if claim_scene is not None and claim_scene != args.get("scene_id"):

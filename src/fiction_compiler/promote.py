@@ -24,7 +24,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from . import acceptance, defaultness, hard_audit, integrity, review_policy, schema
+from . import acceptance, defaultness, hard_audit, integrity, issue_resolution, review_policy, schema
 from .state import scene_sort_key
 from .workspace import resolve_scene_candidate, validate_scene_id
 
@@ -354,6 +354,12 @@ def promote_candidate(project: Path, scene_id: str, candidate_file: str, *,
         gate_reasons, binding = _policy_gate(
             loaded, candidate.name, candidate_artifact["sha256"], scene_id, policy
         )
+        issue_bindings: list[dict] = []
+        if policy.get("require_issue_resolutions"):
+            issue_reasons, issue_bindings = issue_resolution.evaluate_gate(
+                scene_dir, candidate.name, candidate_artifact["sha256"], loaded
+            )
+            gate_reasons.extend(issue_reasons)
 
         # Cheap deterministic checks are produced by the runtime itself. Stored JSON cannot spoof
         # them by claiming an audit_class.
@@ -419,6 +425,13 @@ def promote_candidate(project: Path, scene_id: str, candidate_file: str, *,
                 }
             )
             frozen_binding.append(artifact)
+        frozen_issue_resolutions = [
+            {
+                "resolution": _freeze(item["resolution_path"], project),
+                "source_critique": _freeze(item["source_critique_path"], project),
+            }
+            for item in issue_bindings
+        ]
 
         snapshot = {
             "schema_version": 1,
@@ -436,6 +449,7 @@ def promote_candidate(project: Path, scene_id: str, candidate_file: str, *,
                 "defaultness": runtime_defaultness,
             },
             "binding_critiques": frozen_binding,
+            "issue_resolutions": frozen_issue_resolutions,
             "rubric_version": rubric_version,
             "human_gate": {
                 "required": gate_required,
@@ -454,6 +468,11 @@ def promote_candidate(project: Path, scene_id: str, candidate_file: str, *,
             path = project / artifact["path"]
             if path.read_bytes() != artifact["text"].encode("utf-8"):
                 raise ValueError(f"review evidence changed during validation: {artifact['path']}")
+        for pair in frozen_issue_resolutions:
+            for artifact in pair.values():
+                path = project / artifact["path"]
+                if path.read_bytes() != artifact["text"].encode("utf-8"):
+                    raise ValueError(f"issue evidence changed during validation: {artifact['path']}")
 
         object_id = acceptance.write_object(project, snapshot)
         accepted.append(scene_id)

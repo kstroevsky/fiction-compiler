@@ -23,6 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from fiction_compiler import defaultness, revision  # noqa: E402
+from fiction_compiler.workspace import resolve_scene_candidate, validate_scene_id  # noqa: E402
 
 
 def resolve_project(arg: str) -> Path:
@@ -30,12 +31,13 @@ def resolve_project(arg: str) -> Path:
 
 
 def resolve_candidate(project: Path, scene: str, arg: str) -> Path:
-    candidate = Path(arg)
+    validate_scene_id(scene)
+    try:
+        candidate = resolve_scene_candidate(project, scene, arg)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
     if candidate.exists():
         return candidate
-    in_scene = project / "scenes" / scene / "candidates" / arg
-    if in_scene.exists():
-        return in_scene
     raise SystemExit(f"Candidate not found: {arg}")
 
 

@@ -56,6 +56,23 @@ class McpProtocolTests(unittest.TestCase):
         self.assertEqual(responses[0]["id"], 9)
         self.assertEqual(responses[0]["error"]["code"], -32601)
 
+    def test_server_does_not_echo_arbitrary_protocol_version(self) -> None:
+        responses = run_session([{
+            "jsonrpc": "2.0", "id": 1, "method": "initialize",
+            "params": {"protocolVersion": "2099-made-up", "capabilities": {},
+                       "clientInfo": {"name": "t", "version": "0"}},
+        }])
+        self.assertEqual(responses[0]["result"]["protocolVersion"], "2025-06-18")
+
+    def test_scalar_and_empty_batch_are_invalid_requests_not_crashes(self) -> None:
+        payload = "42\n[]\n"
+        result = subprocess.run(
+            [sys.executable, str(SERVER)], input=payload, capture_output=True, text=True,
+            timeout=30, cwd=ROOT,
+        )
+        responses = [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
+        self.assertEqual([r["error"]["code"] for r in responses], [-32600, -32600])
+
 
 if __name__ == "__main__":
     unittest.main()

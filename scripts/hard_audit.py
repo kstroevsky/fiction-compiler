@@ -4,7 +4,7 @@
     python3 scripts/hard_audit.py <project> <scene-id>   # audit one scene, write critique
     python3 scripts/hard_audit.py <project>              # audit canon + every accepted scene
 
-Exit code is non-zero when any fatal finding exists, so this can gate promotion.
+Exit code is non-zero when any material or fatal finding exists, matching the promotion blocker.
 """
 from __future__ import annotations
 
@@ -68,8 +68,11 @@ def main() -> int:
     for critique in critiques:
         print_critique(critique)
 
-    fatal = any(hard_audit.has_fatal(c) for c in critiques)
-    return 1 if fatal else 0
+    blocking = any(
+        finding.get("severity") in {"material", "fatal"}
+        for critique in critiques for finding in critique.get("findings", [])
+    )
+    return 1 if blocking else 0
 
 
 if __name__ == "__main__":

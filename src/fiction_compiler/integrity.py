@@ -164,6 +164,23 @@ def verify_report(project: Path) -> dict:
             if item.get("sha256") != sha256_bytes(data):
                 authority_errors.append(f"{scene_id}: frozen critique #{position} digest mismatch")
 
+        for position, pair in enumerate(snapshot.get("issue_resolutions", [])):
+            if not isinstance(pair, dict):
+                authority_errors.append(f"{scene_id}: frozen issue-resolution #{position} is malformed")
+                continue
+            for kind in ("resolution", "source_critique"):
+                item = pair.get(kind)
+                if not isinstance(item, dict) or not isinstance(item.get("text"), str):
+                    authority_errors.append(
+                        f"{scene_id}: frozen issue-resolution #{position} {kind} is malformed"
+                    )
+                    continue
+                data = item["text"].encode("utf-8")
+                if item.get("sha256") != sha256_bytes(data):
+                    authority_errors.append(
+                        f"{scene_id}: frozen issue-resolution #{position} {kind} digest mismatch"
+                    )
+
         live_delta = project / "scenes" / scene_id / "state-delta.json"
         if delta_bytes is not None:
             if not live_delta.exists():
