@@ -28,6 +28,12 @@
      "signals": ["told", "emotion", "named", "abstract", "sentiment"], "expect_caught": true},
     {"id": "llm-spoken-theme", "critic": "adversarial-reader", "detector": "llm", "kind": "defect",
      "input": {"text": "\"A kind lie,\" she said, \"is still a betrayal in the end, and we both know it.\""},
-     "signals": ["theme", "stated", "on-the-nose", "spoken", "abstract"], "expect_caught": true}
+     "signals": ["theme", "stated", "on-the-nose", "spoken", "abstract"], "expect_caught": true},
+    {"id": "llm-physical-control", "critic": "adversarial-reader", "detector": "llm", "kind": "control",
+     "input": {"text": "She turned the cup until the chipped side faced the wall, then signed the receipt."},
+     "signals": ["emotion", "theme", "abstract"], "expect_caught": false},
+    {"id": "llm-dialogue-control", "critic": "adversarial-reader", "detector": "llm", "kind": "control",
+     "input": {"text": "\"Three crates,\" he said. \"The invoice says four.\""},
+     "signals": ["theme", "on-the-nose", "abstract"], "expect_caught": false}
   ]
 }

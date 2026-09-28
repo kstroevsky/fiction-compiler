@@ -10,6 +10,7 @@ calibration into a number instead of a hope.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from . import defaultness, ontology, prose_audit, safety
@@ -30,6 +31,38 @@ def _blocking(findings: list[dict]) -> list[dict]:
     return [f for f in findings if f.get("severity") in ("material", "fatal")]
 
 
+def _asserts_signal(text: str, signal: str) -> bool:
+    """Whether free-form text asserts a signal rather than clearly negating it."""
+    hay = text.lower()
+    needle = signal.lower().strip()
+    if not needle:
+        return False
+    pattern = re.compile(rf"(?<!\w){re.escape(needle)}(?!\w)")
+    for match in pattern.finditer(hay):
+        prefix = hay[max(0, match.start() - 48):match.start()]
+        if re.search(
+            r"(?:\bno\b|\bnot\b|\bnever\b|\bwithout\b|\blacks?\b|"
+            r"\blacking\b|\babsence\s+of\b)(?:\W+\w+){0,3}\W*$",
+            prefix,
+        ):
+            continue
+        return True
+    return False
+
+
+def matching_signals(case: dict, findings: list[dict]) -> list[str]:
+    """Return planted-defect signals positively localized by blocking findings."""
+    signals = [str(s).lower() for s in case.get("signals", []) if str(s).strip()]
+    matched: set[str] = set()
+    for finding in _blocking(findings):
+        dimension = str(finding.get("dimension", "")).lower()
+        prose = " ".join(str(finding.get(k, "")) for k in ("diagnosis", "evidence"))
+        for signal in signals:
+            if _asserts_signal(dimension, signal) or _asserts_signal(prose, signal):
+                matched.add(signal)
+    return sorted(matched)
+
+
 def score_findings(case: dict, findings: list[dict]) -> bool:
     """Did a critic's findings catch this case's planted defect?
 
@@ -41,11 +74,7 @@ def score_findings(case: dict, findings: list[dict]) -> bool:
     signals = [s.lower() for s in case.get("signals", [])]
     if not signals:
         return bool(blocking)
-    for finding in blocking:
-        hay = " ".join(str(finding.get(k, "")) for k in ("dimension", "diagnosis", "evidence")).lower()
-        if any(sig in hay for sig in signals):
-            return True
-    return False
+    return bool(matching_signals(case, blocking))
 
 
 def run_deterministic_case(case: dict) -> bool:
@@ -76,16 +105,19 @@ def run_corpus(cases: list[dict] | None = None, live_findings: dict | None = Non
     results: list[dict] = []
     for case in cases:
         detector = case.get("detector")
+        matched_signals: list[str] = []
         if detector == "llm":
             if case["id"] in live_findings:
-                caught, status = score_findings(case, live_findings[case["id"]]), "scored"
+                supplied = live_findings[case["id"]]
+                caught, status = score_findings(case, supplied), "scored"
+                matched_signals = matching_signals(case, supplied)
             else:
                 caught, status = None, "needs_live"
         else:
             caught, status = run_deterministic_case(case), "scored"
         expect = case.get("expect_caught", True)
         results.append({"id": case["id"], "critic": case.get("critic"), "kind": case.get("kind", "defect"),
-                        "caught": caught, "status": status,
+                        "caught": caught, "status": status, "matched_signals": matched_signals,
                         "correct": None if caught is None else (caught == expect)})
 
     scored = [r for r in results if r["status"] == "scored"]

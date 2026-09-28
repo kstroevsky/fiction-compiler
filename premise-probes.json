@@ -1,36 +1,60 @@
 {
-  "version": "1.0.0",
-  "note": "Fixed, versioned diagnostic questions applied to each premise candidate at the premise layer (ADR 0017). These DIAGNOSE; they do not select. Selection stays the human 'premise' gate, informed by preserved disagreement. Power lives in this editable artifact, not in any model instance. Each probe names the risk it watches for; none carries a veto.",
+  "version": "2.0.0",
+  "note": "Core probes are contract-neutral diagnostics. Taste-specific profiles are opt-in and never select a winner.",
   "probes": [
     {
-      "id": "tested-need",
-      "question": "Does the POV character have a need the story actively tests — is the transforming character on camera?",
-      "risk_if": "The POV character is a fixed catalyst and the real arc belongs to someone we never inhabit (diffuse center; the wise-agent archetype). This is exactly where 'Slack Water' lost to 'The Overnight'."
+      "id": "causal-engine",
+      "question": "What concrete pressure, choice, or process keeps generating story events after the setup?",
+      "risk_if": "The logline names a situation but no mechanism that can continue producing consequential action."
     },
     {
-      "id": "proof-resolvable",
-      "question": "Can the central conflict be settled by evidence or proof?",
-      "risk_if": "Once the proof lands, the conflict is over. Character-against-self cannot be closed by evidence and stays richer."
+      "id": "agency",
+      "question": "Whose choices can materially alter what happens, and what meaningful option can they refuse?",
+      "risk_if": "The central figure is only carried by events or exists mainly to deliver information."
     },
     {
-      "id": "obliqueness",
-      "question": "Does the story approach its core feeling directly or from the side?",
-      "risk_if": "Walking straight at the sentiment (death, grief, legacy) is the sentimental default and hard to keep honest."
+      "id": "consequence",
+      "question": "What changes because of the decisive action, even if the outward situation looks similar?",
+      "risk_if": "The premise can reset after its climax with no durable cost, knowledge, relationship, or value change."
     },
     {
-      "id": "resolution-humility",
-      "question": "Is the turn humble and earned, or clever and engineered?",
-      "risk_if": "A clever 'third thing' shows the author's hand and reads as contrived; humility hides the author."
+      "id": "formal-intent",
+      "question": "Which genre, tonal, or formal expectation is this premise relying on, fulfilling, delaying, or violating deliberately?",
+      "risk_if": "A convention is treated as accidental defaultness or surprise is pursued without regard to the reader contract."
     },
     {
-      "id": "enacted-vs-spoken",
-      "question": "Can the theme be enacted, or will it get spoken aloud?",
-      "risk_if": "Two-handers tempt the theme into dialogue (near-mottos); a single-consciousness piece enacts it through the hands."
-    },
-    {
-      "id": "premise-defaultness",
-      "question": "Is this the model's first, most-probable premise? What are three less-obvious, still-motivated alternatives?",
-      "risk_if": "The most-probable premise is the statistically obvious one — defaultness at the deepest, least-audited layer."
+      "id": "contract-fit",
+      "question": "Which part of the explicit reader contract does this premise test, and what evidence would show it failed?",
+      "risk_if": "The premise is being judged by a generic taste preference rather than the project contract."
     }
-  ]
+  ],
+  "profiles": {
+    "restrained-realism": [
+      {
+        "id": "tested-need",
+        "question": "Does the focal character's need receive sustained pressure on the page?",
+        "risk_if": "For a restrained-realism contract, the emotional center may remain off-camera."
+      },
+      {
+        "id": "proof-resolvable",
+        "question": "Can the central conflict be settled by evidence or proof alone?",
+        "risk_if": "For this profile, proof may close pressure earlier than intended; this is not a universal defect."
+      },
+      {
+        "id": "obliqueness",
+        "question": "Does the story approach its core feeling directly or from the side?",
+        "risk_if": "For this profile, direct sentiment may conflict with the desired restraint; directness is valid under other contracts."
+      },
+      {
+        "id": "resolution-humility",
+        "question": "Does the turn aim for a quiet/earned resolution or a visibly engineered one?",
+        "risk_if": "For this profile, an overtly clever turn may expose authorial machinery; comedy, puzzle fiction, or spectacle may want that machinery visible."
+      },
+      {
+        "id": "enacted-vs-spoken",
+        "question": "How much of the theme should be enacted versus spoken for this project's restraint target?",
+        "risk_if": "The project may explain more than its declared style intends."
+      }
+    ]
+  }
 }

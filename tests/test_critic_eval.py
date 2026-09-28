@@ -68,6 +68,26 @@ class ScoreFindingsTests(unittest.TestCase):
         self.assertEqual(row["status"], "scored")
         self.assertTrue(row["caught"])
 
+    def test_negated_signal_does_not_count_as_detection(self) -> None:
+        case = {"signals": ["theme"]}
+        findings = [{
+            "severity": "material",
+            "dimension": "style",
+            "evidence": "No theme problem exists; the actual issue is spelling.",
+            "diagnosis": "No thematic defect is present.",
+        }]
+        self.assertFalse(critic_eval.score_findings(case, findings))
+
+    def test_signal_in_dimension_is_strong_localization_evidence(self) -> None:
+        case = {"signals": ["theme"]}
+        findings = [{
+            "severity": "material",
+            "dimension": "spoken-theme",
+            "evidence": "The dialogue states the governing idea.",
+            "diagnosis": "The theme is stated rather than enacted.",
+        }]
+        self.assertTrue(critic_eval.score_findings(case, findings))
+
 
 if __name__ == "__main__":
     unittest.main()

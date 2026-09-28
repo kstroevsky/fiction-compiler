@@ -114,17 +114,17 @@
       "name": "tournament reports no eligible candidate when all fail the deterministic floor (ADR 0016)",
       "check": "tournament_selected",
       "input": {"critiques": [
-        {"candidate": "candidate-a.md", "critic": "defaultness-lint", "findings": [{"dimension": "x", "severity": "material"}]},
+        {"candidate": "candidate-a.md", "critic": "prose-audit", "findings": [{"dimension": "x", "severity": "material"}]},
         {"candidate": "candidate-b.md", "critic": "prose-audit", "findings": [{"dimension": "y", "severity": "fatal"}]}]},
       "expect": "no_eligible_candidates"
     },
     {
-      "name": "premise divergence floor rejects a batch collapsed to one architecture (ADR 0017)",
+      "name": "premise search floor rejects relabeled copies of one premise",
       "check": "premise_diversity",
       "input": {"candidates": [
         {"id": "p1", "logline": "A woman confronts a rival.", "pov_character": "char-a", "transforming_character": "char-b", "conflict_type": "interpersonal", "obliqueness": "direct", "resolution_type": "clever", "theme_question": "who wins?", "why_not_default": "n/a"},
-        {"id": "p2", "logline": "A man confronts a rival.", "pov_character": "char-c", "transforming_character": "char-d", "conflict_type": "interpersonal", "obliqueness": "direct", "resolution_type": "clever", "theme_question": "who wins?", "why_not_default": "n/a"},
-        {"id": "p3", "logline": "A stranger confronts a rival.", "pov_character": "char-e", "transforming_character": "char-f", "conflict_type": "interpersonal", "obliqueness": "direct", "resolution_type": "clever", "theme_question": "who wins?", "why_not_default": "n/a"}]},
+        {"id": "p2", "logline": "A woman confronts a rival.", "pov_character": "char-c", "transforming_character": "char-c", "conflict_type": "internal", "obliqueness": "oblique", "resolution_type": "ambiguous", "theme_question": "who wins?", "why_not_default": "n/a"},
+        {"id": "p3", "logline": "A woman confronts a rival.", "pov_character": "char-e", "transforming_character": "char-f", "conflict_type": "character-vs-society", "obliqueness": "direct", "resolution_type": "refusal", "theme_question": "who wins?", "why_not_default": "n/a"}]},
       "expect": false
     },
     {
