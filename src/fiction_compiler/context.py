@@ -82,6 +82,10 @@ def compile_bundle(project: Path, scene_id: str) -> dict:
             "relationships": relationships,
             "predicates": predicates,
             "open_promises": before.open_promises,
+            "promise_definitions": {
+                promise_id: before.promise_definitions.get(promise_id, {"id": promise_id, "text": text})
+                for promise_id, text in before.open_promises.items()
+            },
         },
         "world_rules": canon_index.get("world_rules", []),
         "context_manifest": context_manifest,

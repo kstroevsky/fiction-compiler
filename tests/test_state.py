@@ -65,6 +65,7 @@ class StateReconstructionTests(unittest.TestCase):
             self.assertTrue(before.knows("char-mara", "fact-relay-cut"))
             self.assertEqual(before.relationship("char-mara", "char-jonas"), "wary")
             self.assertTrue(before.promise_is_open("promise-who-cut-it"))
+            self.assertEqual(before.promise_definitions["promise-who-cut-it"]["text"], "Who cut the relay?")
             self.assertEqual(before.time, 1)
 
     def test_no_future_knowledge_leak(self) -> None:

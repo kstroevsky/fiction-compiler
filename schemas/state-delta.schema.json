@@ -81,7 +81,9 @@
         "properties": {
           "id": {"type": "string", "pattern": "^promise-[a-z0-9-]+$"},
           "text": {"type": "string", "minLength": 1},
-          "owed_by": {"type": "string"}
+          "owed_by": {"type": "string"},
+          "trigger_event": {"type": "string", "pattern": "^evt-[a-z0-9-]+$"},
+          "payoff_event": {"type": "string", "pattern": "^evt-[a-z0-9-]+$"}
         }
       }
     },

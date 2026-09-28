@@ -39,6 +39,7 @@ def _state_json(state: StoryState) -> dict:
         "predicates": [{"predicate": p, "subject": s, "object": o, "value": v}
                        for (p, s, o), v in state.predicates.items()],
         "open_promises": state.open_promises,
+        "promise_definitions": state.promise_definitions,
         "closed_promises": sorted(state.closed_promises),
         "applied_scenes": state.applied_scenes,
     }

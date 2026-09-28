@@ -72,6 +72,9 @@ class StoryState:
     # Typed world/spatial/object predicates: (predicate, subject, object) -> value (default True).
     predicates: dict[PredKey, Any] = field(default_factory=dict)
     open_promises: dict[str, str] = field(default_factory=dict)  # promise id -> text
+    # Full promise declarations survive closure so audits can retain trigger/payoff semantics while
+    # ``open_promises`` stays backward-compatible as id -> display text.
+    promise_definitions: dict[str, dict[str, Any]] = field(default_factory=dict)
     closed_promises: set[str] = field(default_factory=set)
     applied_scenes: list[str] = field(default_factory=list)
 
@@ -172,6 +175,7 @@ def _apply_delta(state: StoryState, delta: dict) -> None:
         _apply_predicate_record(state, predicate)
     for promise in delta.get("promises_opened", []):
         state.open_promises[promise["id"]] = promise["text"]
+        state.promise_definitions.setdefault(promise["id"], dict(promise))
     for promise_id in delta.get("promises_closed", []):
         state.open_promises.pop(promise_id, None)
         state.closed_promises.add(promise_id)
@@ -193,6 +197,7 @@ def seed_state(project: Path) -> StoryState:
         _apply_predicate_record(state, record)
     for record in _read_jsonl(canon / "promises.jsonl"):
         state.open_promises[record["id"]] = record["text"]
+        state.promise_definitions.setdefault(record["id"], dict(record))
     timeline = _read_jsonl(canon / "timeline.jsonl")
     if timeline:
         # The last seed record defines the story's opening time.

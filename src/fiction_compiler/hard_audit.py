@@ -296,6 +296,9 @@ def audit_canon(project: Path) -> dict:
     fact_definitions = dict(before.fact_definitions)
     knowledge = {c: set(v) for c, v in before.knowledge.items()}
     open_promises = dict(before.open_promises)
+    promise_definitions = {pid: dict(value) for pid, value in before.promise_definitions.items()}
+    event_map = _events(project)
+    occurred_events: set[str] = set()
     prev_time: Any = before.time
 
     for scene_id in accepted_scene_ids(project):
@@ -304,6 +307,9 @@ def audit_canon(project: Path) -> dict:
             findings.append(_finding("factual", "material", f"accepted scene {scene_id}",
                                      "Accepted scene has no state-delta.json.", "process"))
             continue
+
+        spec = _load_json(project / "scenes" / scene_id / "spec.json", {})
+        scene_events = set(spec.get("required_events", []))
 
         valid_added_ids: set[str] = set()
         for fact in delta.get("facts_added", []):
@@ -331,6 +337,32 @@ def audit_canon(project: Path) -> dict:
             if promise_id not in open_promises:
                 findings.append(_finding("promise", "material", f"{scene_id} closes {promise_id!r}",
                                          "Delta pays off a promise that was never opened.", "plot"))
+                continue
+            definition = promise_definitions.get(promise_id, {})
+            trigger_event = definition.get("trigger_event")
+            payoff_event = definition.get("payoff_event")
+            if trigger_event and trigger_event not in occurred_events | scene_events:
+                findings.append(_finding(
+                    "promise", "material", f"{scene_id} closes {promise_id!r} before {trigger_event!r}",
+                    "Promise is closed before its declared trigger event occurs.", "plot"))
+            if payoff_event and payoff_event not in scene_events:
+                findings.append(_finding(
+                    "promise", "material", f"{scene_id} closes {promise_id!r} without {payoff_event!r}",
+                    "Promise closure does not occur in a scene that declares its payoff event.", "plot"))
+
+        for promise in delta.get("promises_opened", []):
+            promise_id = promise["id"]
+            previous = promise_definitions.get(promise_id)
+            if previous is not None and previous != promise:
+                findings.append(_finding(
+                    "promise", "material", f"{scene_id} redefines {promise_id!r}",
+                    "A promise id already has a different definition; use a new id for a new obligation.", "plot"))
+            for key in ("trigger_event", "payoff_event"):
+                event_id = promise.get(key)
+                if event_id and event_id not in event_map:
+                    findings.append(_finding(
+                        "promise", "material", f"{scene_id} {promise_id!r} {key}={event_id!r}",
+                        f"Promise {key} does not resolve to planning/event-graph.json.", "plot"))
 
         # Chronology is checked along the LINEAR (discourse == fabula) thread only. A scene marked
         # analepsis/prolepsis is a deliberate divergence: it neither trips the backward-time rule nor
@@ -362,14 +394,29 @@ def audit_canon(project: Path) -> dict:
             knowledge.setdefault(change["character"], set()).add(change["fact"])
         for promise in delta.get("promises_opened", []):
             open_promises[promise["id"]] = promise["text"]
+            promise_definitions.setdefault(promise["id"], dict(promise))
         for promise_id in delta.get("promises_closed", []):
             open_promises.pop(promise_id, None)
+        for promise_id in sorted(open_promises):
+            payoff_event = promise_definitions.get(promise_id, {}).get("payoff_event")
+            if payoff_event and payoff_event in scene_events:
+                findings.append(_finding(
+                    "promise", "material", f"{scene_id} reaches payoff event {payoff_event!r} for {promise_id!r}",
+                    "Declared payoff event occurs but the promise remains open; record the closure or revise the promise definition.",
+                    "scene"))
+        occurred_events.update(scene_events)
         if current_time is not None and mode == "linear":
             prev_time = current_time
 
     for promise_id, text in sorted(open_promises.items()):
-        findings.append(_finding("promise", "minor", f"{promise_id}: {text}",
-                                 "Promise remains open at the end of the accepted manuscript.", "plot"))
+        trigger_event = promise_definitions.get(promise_id, {}).get("trigger_event")
+        if trigger_event and trigger_event in occurred_events:
+            findings.append(_finding(
+                "promise", "material", f"{promise_id}: {text} (triggered by {trigger_event})",
+                "Promise's declared trigger occurred, but the obligation remains open at manuscript end.", "plot"))
+        else:
+            findings.append(_finding("promise", "minor", f"{promise_id}: {text}",
+                                     "Promise remains open at the end of the accepted manuscript.", "plot"))
 
     return {
         "candidate": "canon",

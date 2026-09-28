@@ -365,6 +365,64 @@ class HardAuditCanonTests(unittest.TestCase):
             self.assertTrue(any(f["dimension"] == "promise" and f["severity"] == "minor"
                                 for f in critique["findings"]))
 
+    def test_triggered_promise_unpaid_at_end_is_material(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01"])
+            write_json(project / "planning" / "event-graph.json", {
+                "events": [{"id": "evt-trigger"}, {"id": "evt-payoff"}], "edges": []})
+            write_json(project / "scenes" / "ch01-sc01" / "spec.json", {
+                "id": "ch01-sc01", "required_events": ["evt-trigger"]})
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": 1,
+                "facts_added": [], "facts_removed": [], "knowledge_changes": [],
+                "relationship_changes": [],
+                "promises_opened": [{"id": "promise-triggered", "text": "Answer the signal.",
+                                      "trigger_event": "evt-trigger", "payoff_event": "evt-payoff"}],
+                "promises_closed": [],
+            })
+            critique = hard_audit.audit_canon(project)
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any(f["dimension"] == "promise" and f["severity"] == "material"
+                                and "triggered by evt-trigger" in f["evidence"]
+                                for f in critique["findings"]), critique["findings"])
+
+    def test_payoff_event_must_close_promise_in_same_scene(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01", "ch01-sc02"])
+            write_json(project / "planning" / "event-graph.json", {
+                "events": [{"id": "evt-trigger"}, {"id": "evt-payoff"}], "edges": []})
+            write_json(project / "scenes" / "ch01-sc01" / "spec.json", {
+                "id": "ch01-sc01", "required_events": ["evt-trigger"]})
+            write_json(project / "scenes" / "ch01-sc02" / "spec.json", {
+                "id": "ch01-sc02", "required_events": ["evt-payoff"]})
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": 1, "facts_added": [], "facts_removed": [],
+                "knowledge_changes": [], "relationship_changes": [],
+                "promises_opened": [{"id": "promise-triggered", "text": "Answer the signal.",
+                                      "trigger_event": "evt-trigger", "payoff_event": "evt-payoff"}],
+                "promises_closed": [],
+            })
+            write_json(project / "scenes" / "ch01-sc02" / "state-delta.json", {
+                "scene_id": "ch01-sc02", "time": 2, "facts_added": [], "facts_removed": [],
+                "knowledge_changes": [], "relationship_changes": [], "promises_opened": [],
+                "promises_closed": [],
+            })
+            critique = hard_audit.audit_canon(project)
+            self.assertTrue(any("payoff event" in f["diagnosis"] for f in critique["findings"]), critique["findings"])
+
+    def test_promise_event_references_must_resolve(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01"])
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": 1, "facts_added": [], "facts_removed": [],
+                "knowledge_changes": [], "relationship_changes": [],
+                "promises_opened": [{"id": "promise-bad", "text": "Mystery",
+                                      "trigger_event": "evt-missing"}],
+                "promises_closed": [],
+            })
+            critique = hard_audit.audit_canon(project)
+            self.assertTrue(any("does not resolve" in f["diagnosis"] for f in critique["findings"]), critique["findings"])
+
     def test_fact_id_cannot_change_meaning(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project = base_project(Path(tmp), ["ch01-sc01", "ch01-sc02"])

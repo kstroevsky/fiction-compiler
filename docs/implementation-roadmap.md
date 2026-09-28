@@ -125,6 +125,10 @@ test, not just a feature.
 > (analepsis/prolepsis) marks a deliberate divergence so a flashback is no longer flagged as "time
 > runs backward". Still ⬜ in P1: richer resource/physical state, a real entity type system, and
 > fabula-**ordered** state reconstruction (a flashback still replays in discourse order today).
+> Promise obligations now optionally carry typed `trigger_event` / `payoff_event` references
+> (ADR 0025): triggered-but-unpaid promises and payoff events without closure are material, while
+> legacy/untriggered open promises remain advisory. Prose-level payoff legibility is still a reader/
+> realization question rather than a hard fact.
 >
 > **Selection engine exists (ADR 0007, P2 slice 1).** A deterministic `tournament` module + MCP tool
 > owns the fairness machinery the contract requires: seeded anonymization (blinded labels + reveal
