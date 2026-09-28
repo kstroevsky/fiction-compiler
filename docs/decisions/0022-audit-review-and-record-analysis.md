@@ -1,5 +1,7 @@
 # ADR 0022 — Record a review of the 2026-09-27 audit without adopting its proposals
 
+> Recheck at commit `158eed6`: see `docs/audits/2026-09-28/recheck.md` and ADR 0023. Historical statements below about a single writer family, identical endings and unreviewed dissent are qualified in the current review; the original proposed Tian correction was reversed against the published table. These historical notes are not fresh verified conclusions.
+
 ## Request and scope
 
 The user asked for the 2026-09-27 audit (ADR 0021) to be analysed and double-checked against the code, the stored project record and the research literature, and for additions that would significantly improve the project. Reviewed commit: `2b8ef0b`; production source is identical to the audited `310e50c`.

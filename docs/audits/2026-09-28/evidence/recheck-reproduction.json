@@ -1,0 +1,23 @@
+[
+  {
+    "script_at_reviewed_commit": "docs/audits/2026-09-27/evidence/probes.py",
+    "reviewed_commit": "158eed65db5a194c5ad24a0ca99ca8099b93d5e7",
+    "scratch_exit": 0,
+    "matches_committed_output": true,
+    "recorded_items": 24
+  },
+  {
+    "script_at_reviewed_commit": "docs/audits/2026-09-28/evidence/extra_probes.py",
+    "reviewed_commit": "158eed65db5a194c5ad24a0ca99ca8099b93d5e7",
+    "scratch_exit": 0,
+    "matches_committed_output": true,
+    "recorded_items": 8
+  },
+  {
+    "script_at_reviewed_commit": "docs/audits/2026-09-28/evidence/record_analysis.py",
+    "reviewed_commit": "158eed65db5a194c5ad24a0ca99ca8099b93d5e7",
+    "scratch_exit": 0,
+    "matches_committed_output": true,
+    "recorded_items": null
+  }
+]

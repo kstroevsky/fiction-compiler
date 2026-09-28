@@ -1,0 +1,27 @@
+[
+  {
+    "case": "within-rubric-strict-pareto",
+    "result": {
+      "decision": "select",
+      "candidate": "a.md"
+    },
+    "interpretation": "correct strict dominance; no uncertainty policy, not a mathematical defect"
+  },
+  {
+    "case": "analyzer-rejects-filename-only-binding",
+    "passed": true
+  },
+  {
+    "case": "analyzer-preserves-multiple-records-per-role",
+    "passed": true
+  },
+  {
+    "case": "accepted-byte-and-coverage-inventory",
+    "accepted": 17,
+    "candidate_manuscript_bytes_match": true,
+    "three_named_roles_hash_bound": 3,
+    "unbound_literary_records": 1,
+    "matching_tournament_label_maps": 2,
+    "stored_tournament_maps": 3
+  }
+]

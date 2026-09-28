@@ -1,4 +1,10 @@
 {
+  "methodology": {
+    "unit": "scene listed in canon/index.json",
+    "byte_binding": "all literary records preserved; candidate digest checked; manuscript equality reported",
+    "lineage": "inferred from filenames only",
+    "absence": "missing artifacts do not establish absence of execution"
+  },
   "summary": {
     "accepted_scenes": 17,
     "accepted_but_failing_current_gate": [
@@ -23,17 +29,52 @@
       "scene": "ch01-sc01",
       "promoted": "candidate-a-r1.md",
       "gate_era_manifest": true,
+      "cohort_definition": "binding_critiques present; not an authenticated historical policy version",
       "passes_current_gate": true,
       "current_gate_reasons": [],
+      "candidate_sha256": "0601b3e9ca20b0996f69bd2a8ff59017bbbff2fa21d805d40e99865e374f0357",
+      "candidate_matches_manuscript": true,
+      "decision_candidate_hash_matches": true,
       "literary_critics_on_promoted_bytes": [
         "adversarial-reader"
       ],
+      "literary_records_on_promoted_bytes": [
+        {
+          "file": "projects/forecourt/scenes/ch01-sc01/critiques/adversarial-reader-candidate-a-r1.json",
+          "candidate": "candidate-a-r1.md",
+          "critic": "adversarial-reader",
+          "verdict": "pass",
+          "candidate_sha256": "0601b3e9ca20b0996f69bd2a8ff59017bbbff2fa21d805d40e99865e374f0357"
+        }
+      ],
+      "filename_only_unbound_literary_records": [],
+      "inferred_predecessor": "candidate-a.md",
+      "lineage_basis": "filename suffix only; no verified parent artifact",
       "unreviewed_parent_dissent": [
         "style-editor"
+      ],
+      "parent_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/forecourt/scenes/ch01-sc01/critiques/style-editor-candidate-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "style-editor",
+          "verdict": "revise",
+          "candidate_sha256": "fd4ba9fd04a9f8292efe8cebee72470219fb5c4b68ac568fabd3d69afebb894f"
+        }
       ],
       "unreviewed_sibling_dissent": [
         "style-editor"
       ],
+      "sibling_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/forecourt/scenes/ch01-sc01/critiques/style-editor-candidate-b.json",
+          "candidate": "candidate-b.md",
+          "critic": "style-editor",
+          "verdict": "revise",
+          "candidate_sha256": "1d42c9e0ab2d771fdb852187854fd236a3b7e0481e9aa5cd6de90d927771af0d"
+        }
+      ],
+      "dissent_interpretation": "missing bound same-role record; persistence, applicability and actual review occurrence unknown",
       "prose_audit_present": false,
       "revision_log_present": false,
       "human_gate_required": false
@@ -43,18 +84,60 @@
       "scene": "ch01-sc02",
       "promoted": "candidate-a-r1.md",
       "gate_era_manifest": true,
+      "cohort_definition": "binding_critiques present; not an authenticated historical policy version",
       "passes_current_gate": true,
       "current_gate_reasons": [],
+      "candidate_sha256": "0d85cf33584308b3faffb185e4edcf6aef556fd70ea34aa82ca91e14fb808692",
+      "candidate_matches_manuscript": true,
+      "decision_candidate_hash_matches": true,
       "literary_critics_on_promoted_bytes": [
         "adversarial-reader"
       ],
+      "literary_records_on_promoted_bytes": [
+        {
+          "file": "projects/forecourt/scenes/ch01-sc02/critiques/adversarial-reader-candidate-a-r1.json",
+          "candidate": "candidate-a-r1.md",
+          "critic": "adversarial-reader",
+          "verdict": "pass",
+          "candidate_sha256": "0d85cf33584308b3faffb185e4edcf6aef556fd70ea34aa82ca91e14fb808692"
+        }
+      ],
+      "filename_only_unbound_literary_records": [],
+      "inferred_predecessor": "candidate-a.md",
+      "lineage_basis": "filename suffix only; no verified parent artifact",
       "unreviewed_parent_dissent": [
         "style-editor"
+      ],
+      "parent_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/forecourt/scenes/ch01-sc02/critiques/style-editor-candidate-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "style-editor",
+          "verdict": "revise",
+          "candidate_sha256": "057cfda828f68621f352919e07e51f3962dae756a6789a402ed8bca196986fca"
+        }
       ],
       "unreviewed_sibling_dissent": [
         "character-simulator",
         "style-editor"
       ],
+      "sibling_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/forecourt/scenes/ch01-sc02/critiques/character-simulator-candidate-b.json",
+          "candidate": "candidate-b.md",
+          "critic": "character-simulator",
+          "verdict": "revise",
+          "candidate_sha256": "25a0b994490da0acac1961b0b883e5236d4f86f16176561c09dbebcb2a8bf78b"
+        },
+        {
+          "file": "projects/forecourt/scenes/ch01-sc02/critiques/style-editor-candidate-b.json",
+          "candidate": "candidate-b.md",
+          "critic": "style-editor",
+          "verdict": "revise",
+          "candidate_sha256": "25a0b994490da0acac1961b0b883e5236d4f86f16176561c09dbebcb2a8bf78b"
+        }
+      ],
+      "dissent_interpretation": "missing bound same-role record; persistence, applicability and actual review occurrence unknown",
       "prose_audit_present": false,
       "revision_log_present": false,
       "human_gate_required": false
@@ -64,18 +147,60 @@
       "scene": "ch01-sc03",
       "promoted": "candidate-a-r1.md",
       "gate_era_manifest": true,
+      "cohort_definition": "binding_critiques present; not an authenticated historical policy version",
       "passes_current_gate": true,
       "current_gate_reasons": [],
+      "candidate_sha256": "67a771f9897ef185f7db1c5ecb0624b363abb3e97abff19a33929bdcbc9f9cec",
+      "candidate_matches_manuscript": true,
+      "decision_candidate_hash_matches": true,
       "literary_critics_on_promoted_bytes": [
         "adversarial-reader"
       ],
+      "literary_records_on_promoted_bytes": [
+        {
+          "file": "projects/forecourt/scenes/ch01-sc03/critiques/adversarial-reader-candidate-a-r1.json",
+          "candidate": "candidate-a-r1.md",
+          "critic": "adversarial-reader",
+          "verdict": "pass",
+          "candidate_sha256": "67a771f9897ef185f7db1c5ecb0624b363abb3e97abff19a33929bdcbc9f9cec"
+        }
+      ],
+      "filename_only_unbound_literary_records": [],
+      "inferred_predecessor": "candidate-a.md",
+      "lineage_basis": "filename suffix only; no verified parent artifact",
       "unreviewed_parent_dissent": [
         "character-simulator",
         "style-editor"
       ],
+      "parent_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/forecourt/scenes/ch01-sc03/critiques/character-simulator-candidate-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "character-simulator",
+          "verdict": "revise",
+          "candidate_sha256": "f1aca497fce68b1eb4f03281b01844df179d672a71f8806e2287045b42dd6355"
+        },
+        {
+          "file": "projects/forecourt/scenes/ch01-sc03/critiques/style-editor-candidate-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "style-editor",
+          "verdict": "revise",
+          "candidate_sha256": "f1aca497fce68b1eb4f03281b01844df179d672a71f8806e2287045b42dd6355"
+        }
+      ],
       "unreviewed_sibling_dissent": [
         "style-editor"
       ],
+      "sibling_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/forecourt/scenes/ch01-sc03/critiques/style-editor-candidate-b.json",
+          "candidate": "candidate-b.md",
+          "critic": "style-editor",
+          "verdict": "revise",
+          "candidate_sha256": "5ef46f1e803ae5054baec9940fae1ad991793d9e04748f6f046bf0a6a24cc455"
+        }
+      ],
+      "dissent_interpretation": "missing bound same-role record; persistence, applicability and actual review occurrence unknown",
       "prose_audit_present": false,
       "revision_log_present": false,
       "human_gate_required": false
@@ -85,14 +210,25 @@
       "scene": "ch01-sc01",
       "promoted": "candidate-a.md",
       "gate_era_manifest": false,
+      "cohort_definition": "binding_critiques present; not an authenticated historical policy version",
       "passes_current_gate": false,
       "current_gate_reasons": [
         "no clean, candidate-bound literary audit found for 'candidate-a.md'",
         "no clean, candidate-bound defaultness audit found for 'candidate-a.md'"
       ],
+      "candidate_sha256": "01b4aac29a248db2d4b9db9e3fc2b5f3c4c01fc5f9c92514fe7542c9c27c0ea0",
+      "candidate_matches_manuscript": true,
+      "decision_candidate_hash_matches": false,
       "literary_critics_on_promoted_bytes": [],
+      "literary_records_on_promoted_bytes": [],
+      "filename_only_unbound_literary_records": [],
+      "inferred_predecessor": null,
+      "lineage_basis": "filename suffix only; no verified parent artifact",
       "unreviewed_parent_dissent": [],
+      "parent_dissent_records_without_same_role_rereview": [],
       "unreviewed_sibling_dissent": [],
+      "sibling_dissent_records_without_same_role_rereview": [],
+      "dissent_interpretation": "missing bound same-role record; persistence, applicability and actual review occurrence unknown",
       "prose_audit_present": false,
       "revision_log_present": true,
       "human_gate_required": null
@@ -102,19 +238,44 @@
       "scene": "ch01-sc02",
       "promoted": "candidate-b.md",
       "gate_era_manifest": false,
+      "cohort_definition": "binding_critiques present; not an authenticated historical policy version",
       "passes_current_gate": false,
       "current_gate_reasons": [
         "no clean, candidate-bound hard audit found for 'candidate-b.md'",
         "no clean, candidate-bound literary audit found for 'candidate-b.md'",
         "no clean, candidate-bound defaultness audit found for 'candidate-b.md'"
       ],
-      "literary_critics_on_promoted_bytes": [
-        "adversarial-reader"
+      "candidate_sha256": "d3b10883df9ffb89e7f3036daf2df398b13c24459b2baa38ae4a91677895be97",
+      "candidate_matches_manuscript": true,
+      "decision_candidate_hash_matches": false,
+      "literary_critics_on_promoted_bytes": [],
+      "literary_records_on_promoted_bytes": [],
+      "filename_only_unbound_literary_records": [
+        {
+          "file": "projects/salt-in-the-wire/scenes/ch01-sc02/critiques/adversarial-reader-rev.json",
+          "candidate": "candidate-b.md",
+          "critic": "adversarial-reader",
+          "verdict": "pass",
+          "candidate_sha256": null
+        }
       ],
+      "inferred_predecessor": null,
+      "lineage_basis": "filename suffix only; no verified parent artifact",
       "unreviewed_parent_dissent": [],
+      "parent_dissent_records_without_same_role_rereview": [],
       "unreviewed_sibling_dissent": [
         "character-simulator"
       ],
+      "sibling_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/salt-in-the-wire/scenes/ch01-sc02/critiques/character-simulator.json",
+          "candidate": "candidate-a.md",
+          "critic": "character-simulator",
+          "verdict": "revise",
+          "candidate_sha256": null
+        }
+      ],
+      "dissent_interpretation": "missing bound same-role record; persistence, applicability and actual review occurrence unknown",
       "prose_audit_present": false,
       "revision_log_present": false,
       "human_gate_required": null
@@ -124,18 +285,60 @@
       "scene": "ch01-sc01",
       "promoted": "candidate-b-r2.md",
       "gate_era_manifest": true,
+      "cohort_definition": "binding_critiques present; not an authenticated historical policy version",
       "passes_current_gate": true,
       "current_gate_reasons": [],
+      "candidate_sha256": "c4569d2ebeb458377af53b01069a70f2c47a30cc1e2d6797e7ca10a8f7d1c32d",
+      "candidate_matches_manuscript": true,
+      "decision_candidate_hash_matches": true,
       "literary_critics_on_promoted_bytes": [
         "adversarial-reader"
       ],
+      "literary_records_on_promoted_bytes": [
+        {
+          "file": "projects/slack-water/scenes/ch01-sc01/critiques/adversarial-reader-b-r2.json",
+          "candidate": "candidate-b-r2.md",
+          "critic": "adversarial-reader",
+          "verdict": "pass",
+          "candidate_sha256": "c4569d2ebeb458377af53b01069a70f2c47a30cc1e2d6797e7ca10a8f7d1c32d"
+        }
+      ],
+      "filename_only_unbound_literary_records": [],
+      "inferred_predecessor": "candidate-b.md",
+      "lineage_basis": "filename suffix only; no verified parent artifact",
       "unreviewed_parent_dissent": [
         "style-editor"
+      ],
+      "parent_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/slack-water/scenes/ch01-sc01/critiques/style-editor-b.json",
+          "candidate": "candidate-b.md",
+          "critic": "style-editor",
+          "verdict": "revise",
+          "candidate_sha256": "97b8e21220da9b2484d6f5e3f9f95212d0b3d9f5e27ee8cc42710eb52ee98b1b"
+        }
       ],
       "unreviewed_sibling_dissent": [
         "character-simulator",
         "style-editor"
       ],
+      "sibling_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/slack-water/scenes/ch01-sc01/critiques/character-simulator-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "character-simulator",
+          "verdict": "revise",
+          "candidate_sha256": "3dcd47ec50a242dde535d7b050e126613a0a81829d1637f52c74a0fe26df1ddb"
+        },
+        {
+          "file": "projects/slack-water/scenes/ch01-sc01/critiques/style-editor-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "style-editor",
+          "verdict": "revise",
+          "candidate_sha256": "3dcd47ec50a242dde535d7b050e126613a0a81829d1637f52c74a0fe26df1ddb"
+        }
+      ],
+      "dissent_interpretation": "missing bound same-role record; persistence, applicability and actual review occurrence unknown",
       "prose_audit_present": false,
       "revision_log_present": false,
       "human_gate_required": null
@@ -145,18 +348,60 @@
       "scene": "ch01-sc02",
       "promoted": "candidate-b-r2.md",
       "gate_era_manifest": true,
+      "cohort_definition": "binding_critiques present; not an authenticated historical policy version",
       "passes_current_gate": true,
       "current_gate_reasons": [],
+      "candidate_sha256": "4e2d9714de739a8133e0fc03722f24d32a5e3a67fea060ff42d0e38711e96f71",
+      "candidate_matches_manuscript": true,
+      "decision_candidate_hash_matches": true,
       "literary_critics_on_promoted_bytes": [
         "adversarial-reader"
       ],
+      "literary_records_on_promoted_bytes": [
+        {
+          "file": "projects/slack-water/scenes/ch01-sc02/critiques/adversarial-reader-b-r2.json",
+          "candidate": "candidate-b-r2.md",
+          "critic": "adversarial-reader",
+          "verdict": "pass",
+          "candidate_sha256": "4e2d9714de739a8133e0fc03722f24d32a5e3a67fea060ff42d0e38711e96f71"
+        }
+      ],
+      "filename_only_unbound_literary_records": [],
+      "inferred_predecessor": "candidate-b.md",
+      "lineage_basis": "filename suffix only; no verified parent artifact",
       "unreviewed_parent_dissent": [
         "style-editor"
+      ],
+      "parent_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/slack-water/scenes/ch01-sc02/critiques/style-editor-b.json",
+          "candidate": "candidate-b.md",
+          "critic": "style-editor",
+          "verdict": "revise",
+          "candidate_sha256": "fb6a10e4c1fd8ab80d8299bcc2dfcd950ed76fa3e9e2f08ea326d16ac93cf0b5"
+        }
       ],
       "unreviewed_sibling_dissent": [
         "character-simulator",
         "style-editor"
       ],
+      "sibling_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/slack-water/scenes/ch01-sc02/critiques/character-simulator-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "character-simulator",
+          "verdict": "revise",
+          "candidate_sha256": "f69562da5dfc936c086e4f34e042b3675142b331c07560efa825a3c2321d2869"
+        },
+        {
+          "file": "projects/slack-water/scenes/ch01-sc02/critiques/style-editor-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "style-editor",
+          "verdict": "revise",
+          "candidate_sha256": "f69562da5dfc936c086e4f34e042b3675142b331c07560efa825a3c2321d2869"
+        }
+      ],
+      "dissent_interpretation": "missing bound same-role record; persistence, applicability and actual review occurrence unknown",
       "prose_audit_present": false,
       "revision_log_present": false,
       "human_gate_required": null
@@ -166,16 +411,50 @@
       "scene": "ch01-sc03",
       "promoted": "candidate-b-r1.md",
       "gate_era_manifest": true,
+      "cohort_definition": "binding_critiques present; not an authenticated historical policy version",
       "passes_current_gate": true,
       "current_gate_reasons": [],
+      "candidate_sha256": "68c811454522ce0c62b7998ed77134893cf05ff9a1787e9c21e731c583513d46",
+      "candidate_matches_manuscript": true,
+      "decision_candidate_hash_matches": true,
       "literary_critics_on_promoted_bytes": [
         "adversarial-reader"
       ],
+      "literary_records_on_promoted_bytes": [
+        {
+          "file": "projects/slack-water/scenes/ch01-sc03/critiques/adversarial-reader-b-r1.json",
+          "candidate": "candidate-b-r1.md",
+          "critic": "adversarial-reader",
+          "verdict": "pass",
+          "candidate_sha256": "68c811454522ce0c62b7998ed77134893cf05ff9a1787e9c21e731c583513d46"
+        }
+      ],
+      "filename_only_unbound_literary_records": [],
+      "inferred_predecessor": "candidate-b.md",
+      "lineage_basis": "filename suffix only; no verified parent artifact",
       "unreviewed_parent_dissent": [],
+      "parent_dissent_records_without_same_role_rereview": [],
       "unreviewed_sibling_dissent": [
         "character-simulator",
         "style-editor"
       ],
+      "sibling_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/slack-water/scenes/ch01-sc03/critiques/character-simulator-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "character-simulator",
+          "verdict": "revise",
+          "candidate_sha256": "dc008b5c6114b8613d01dd7bb5379b94a24a229b4ea1d97d7fa8ea1595c44e4f"
+        },
+        {
+          "file": "projects/slack-water/scenes/ch01-sc03/critiques/style-editor-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "style-editor",
+          "verdict": "revise",
+          "candidate_sha256": "dc008b5c6114b8613d01dd7bb5379b94a24a229b4ea1d97d7fa8ea1595c44e4f"
+        }
+      ],
+      "dissent_interpretation": "missing bound same-role record; persistence, applicability and actual review occurrence unknown",
       "prose_audit_present": false,
       "revision_log_present": false,
       "human_gate_required": null
@@ -185,15 +464,48 @@
       "scene": "ch01-sc01",
       "promoted": "candidate-a-r1.md",
       "gate_era_manifest": true,
+      "cohort_definition": "binding_critiques present; not an authenticated historical policy version",
       "passes_current_gate": true,
       "current_gate_reasons": [],
+      "candidate_sha256": "aa9bcd920e3e4fb6fc6066c36a96818051b869d70f4f562d9057fa1b6b220440",
+      "candidate_matches_manuscript": true,
+      "decision_candidate_hash_matches": true,
       "literary_critics_on_promoted_bytes": [
         "adversarial-reader",
         "character-simulator",
         "style-editor"
       ],
+      "literary_records_on_promoted_bytes": [
+        {
+          "file": "projects/the-overnight/scenes/ch01-sc01/critiques/adversarial-reader-a-r1.json",
+          "candidate": "candidate-a-r1.md",
+          "critic": "adversarial-reader",
+          "verdict": "pass",
+          "candidate_sha256": "aa9bcd920e3e4fb6fc6066c36a96818051b869d70f4f562d9057fa1b6b220440"
+        },
+        {
+          "file": "projects/the-overnight/scenes/ch01-sc01/critiques/character-simulator-a-r1.json",
+          "candidate": "candidate-a-r1.md",
+          "critic": "character-simulator",
+          "verdict": "pass",
+          "candidate_sha256": "aa9bcd920e3e4fb6fc6066c36a96818051b869d70f4f562d9057fa1b6b220440"
+        },
+        {
+          "file": "projects/the-overnight/scenes/ch01-sc01/critiques/style-editor-a-r1.json",
+          "candidate": "candidate-a-r1.md",
+          "critic": "style-editor",
+          "verdict": "pass",
+          "candidate_sha256": "aa9bcd920e3e4fb6fc6066c36a96818051b869d70f4f562d9057fa1b6b220440"
+        }
+      ],
+      "filename_only_unbound_literary_records": [],
+      "inferred_predecessor": "candidate-a.md",
+      "lineage_basis": "filename suffix only; no verified parent artifact",
       "unreviewed_parent_dissent": [],
+      "parent_dissent_records_without_same_role_rereview": [],
       "unreviewed_sibling_dissent": [],
+      "sibling_dissent_records_without_same_role_rereview": [],
+      "dissent_interpretation": "missing bound same-role record; persistence, applicability and actual review occurrence unknown",
       "prose_audit_present": true,
       "revision_log_present": true,
       "human_gate_required": null
@@ -203,15 +515,48 @@
       "scene": "ch01-sc02",
       "promoted": "candidate-a.md",
       "gate_era_manifest": true,
+      "cohort_definition": "binding_critiques present; not an authenticated historical policy version",
       "passes_current_gate": true,
       "current_gate_reasons": [],
+      "candidate_sha256": "3c41832431e25ede97f4d2382051d7ab9ef1e9b8f62875f68aff679eca600f57",
+      "candidate_matches_manuscript": true,
+      "decision_candidate_hash_matches": true,
       "literary_critics_on_promoted_bytes": [
         "adversarial-reader",
         "character-simulator",
         "style-editor"
       ],
+      "literary_records_on_promoted_bytes": [
+        {
+          "file": "projects/the-overnight/scenes/ch01-sc02/critiques/adversarial-reader-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "adversarial-reader",
+          "verdict": "pass",
+          "candidate_sha256": "3c41832431e25ede97f4d2382051d7ab9ef1e9b8f62875f68aff679eca600f57"
+        },
+        {
+          "file": "projects/the-overnight/scenes/ch01-sc02/critiques/character-simulator-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "character-simulator",
+          "verdict": "pass",
+          "candidate_sha256": "3c41832431e25ede97f4d2382051d7ab9ef1e9b8f62875f68aff679eca600f57"
+        },
+        {
+          "file": "projects/the-overnight/scenes/ch01-sc02/critiques/style-editor-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "style-editor",
+          "verdict": "pass",
+          "candidate_sha256": "3c41832431e25ede97f4d2382051d7ab9ef1e9b8f62875f68aff679eca600f57"
+        }
+      ],
+      "filename_only_unbound_literary_records": [],
+      "inferred_predecessor": null,
+      "lineage_basis": "filename suffix only; no verified parent artifact",
       "unreviewed_parent_dissent": [],
+      "parent_dissent_records_without_same_role_rereview": [],
       "unreviewed_sibling_dissent": [],
+      "sibling_dissent_records_without_same_role_rereview": [],
+      "dissent_interpretation": "missing bound same-role record; persistence, applicability and actual review occurrence unknown",
       "prose_audit_present": false,
       "revision_log_present": false,
       "human_gate_required": null
@@ -221,15 +566,48 @@
       "scene": "ch01-sc03",
       "promoted": "candidate-a.md",
       "gate_era_manifest": true,
+      "cohort_definition": "binding_critiques present; not an authenticated historical policy version",
       "passes_current_gate": true,
       "current_gate_reasons": [],
+      "candidate_sha256": "c892cffea733e2e93e9c5741a20df0e589677c360384f9809c906162d96a90be",
+      "candidate_matches_manuscript": true,
+      "decision_candidate_hash_matches": true,
       "literary_critics_on_promoted_bytes": [
         "adversarial-reader",
         "character-simulator",
         "style-editor"
       ],
+      "literary_records_on_promoted_bytes": [
+        {
+          "file": "projects/the-overnight/scenes/ch01-sc03/critiques/adversarial-reader-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "adversarial-reader",
+          "verdict": "pass",
+          "candidate_sha256": "c892cffea733e2e93e9c5741a20df0e589677c360384f9809c906162d96a90be"
+        },
+        {
+          "file": "projects/the-overnight/scenes/ch01-sc03/critiques/character-simulator-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "character-simulator",
+          "verdict": "pass",
+          "candidate_sha256": "c892cffea733e2e93e9c5741a20df0e589677c360384f9809c906162d96a90be"
+        },
+        {
+          "file": "projects/the-overnight/scenes/ch01-sc03/critiques/style-editor-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "style-editor",
+          "verdict": "pass",
+          "candidate_sha256": "c892cffea733e2e93e9c5741a20df0e589677c360384f9809c906162d96a90be"
+        }
+      ],
+      "filename_only_unbound_literary_records": [],
+      "inferred_predecessor": null,
+      "lineage_basis": "filename suffix only; no verified parent artifact",
       "unreviewed_parent_dissent": [],
+      "parent_dissent_records_without_same_role_rereview": [],
       "unreviewed_sibling_dissent": [],
+      "sibling_dissent_records_without_same_role_rereview": [],
+      "dissent_interpretation": "missing bound same-role record; persistence, applicability and actual review occurrence unknown",
       "prose_audit_present": false,
       "revision_log_present": false,
       "human_gate_required": null
@@ -239,14 +617,25 @@
       "scene": "ch01-sc01",
       "promoted": "candidate-a.md",
       "gate_era_manifest": false,
+      "cohort_definition": "binding_critiques present; not an authenticated historical policy version",
       "passes_current_gate": false,
       "current_gate_reasons": [
         "no clean, candidate-bound literary audit found for 'candidate-a.md'",
         "no clean, candidate-bound defaultness audit found for 'candidate-a.md'"
       ],
+      "candidate_sha256": "e72e63404938cca7850ae71550864c357349411ac36a8b455f49c3f15257ed13",
+      "candidate_matches_manuscript": true,
+      "decision_candidate_hash_matches": false,
       "literary_critics_on_promoted_bytes": [],
+      "literary_records_on_promoted_bytes": [],
+      "filename_only_unbound_literary_records": [],
+      "inferred_predecessor": null,
+      "lineage_basis": "filename suffix only; no verified parent artifact",
       "unreviewed_parent_dissent": [],
+      "parent_dissent_records_without_same_role_rereview": [],
       "unreviewed_sibling_dissent": [],
+      "sibling_dissent_records_without_same_role_rereview": [],
+      "dissent_interpretation": "missing bound same-role record; persistence, applicability and actual review occurrence unknown",
       "prose_audit_present": false,
       "revision_log_present": true,
       "human_gate_required": null
@@ -256,14 +645,25 @@
       "scene": "ch01-sc02",
       "promoted": "candidate-a.md",
       "gate_era_manifest": false,
+      "cohort_definition": "binding_critiques present; not an authenticated historical policy version",
       "passes_current_gate": false,
       "current_gate_reasons": [
         "no clean, candidate-bound literary audit found for 'candidate-a.md'",
         "no clean, candidate-bound defaultness audit found for 'candidate-a.md'"
       ],
+      "candidate_sha256": "6a0a8378503b9282026b78b1ee6be3e3293e7097af318fbdbab2581ba48d2006",
+      "candidate_matches_manuscript": true,
+      "decision_candidate_hash_matches": false,
       "literary_critics_on_promoted_bytes": [],
+      "literary_records_on_promoted_bytes": [],
+      "filename_only_unbound_literary_records": [],
+      "inferred_predecessor": null,
+      "lineage_basis": "filename suffix only; no verified parent artifact",
       "unreviewed_parent_dissent": [],
+      "parent_dissent_records_without_same_role_rereview": [],
       "unreviewed_sibling_dissent": [],
+      "sibling_dissent_records_without_same_role_rereview": [],
+      "dissent_interpretation": "missing bound same-role record; persistence, applicability and actual review occurrence unknown",
       "prose_audit_present": false,
       "revision_log_present": false,
       "human_gate_required": null
@@ -273,17 +673,43 @@
       "scene": "ch01-sc03",
       "promoted": "candidate-b.md",
       "gate_era_manifest": false,
+      "cohort_definition": "binding_critiques present; not an authenticated historical policy version",
       "passes_current_gate": false,
       "current_gate_reasons": [
         "no clean, candidate-bound literary audit found for 'candidate-b.md'",
         "no clean, candidate-bound defaultness audit found for 'candidate-b.md'"
       ],
+      "candidate_sha256": "4ab58999898c921e52f344b998ec8243a79d985c9d689287b46e044adeacffd9",
+      "candidate_matches_manuscript": true,
+      "decision_candidate_hash_matches": false,
       "literary_critics_on_promoted_bytes": [],
+      "literary_records_on_promoted_bytes": [],
+      "filename_only_unbound_literary_records": [],
+      "inferred_predecessor": null,
+      "lineage_basis": "filename suffix only; no verified parent artifact",
       "unreviewed_parent_dissent": [],
+      "parent_dissent_records_without_same_role_rereview": [],
       "unreviewed_sibling_dissent": [
         "character-simulator",
         "style-editor"
       ],
+      "sibling_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/verbatim/scenes/ch01-sc03/critiques/character-simulator.json",
+          "candidate": "candidate-a.md",
+          "critic": "character-simulator",
+          "verdict": "revise",
+          "candidate_sha256": null
+        },
+        {
+          "file": "projects/verbatim/scenes/ch01-sc03/critiques/style-editor.json",
+          "candidate": "candidate-a.md",
+          "critic": "style-editor",
+          "verdict": "revise",
+          "candidate_sha256": null
+        }
+      ],
+      "dissent_interpretation": "missing bound same-role record; persistence, applicability and actual review occurrence unknown",
       "prose_audit_present": false,
       "revision_log_present": true,
       "human_gate_required": null
@@ -293,17 +719,52 @@
       "scene": "ch01-sc01",
       "promoted": "candidate-a-r1.md",
       "gate_era_manifest": true,
+      "cohort_definition": "binding_critiques present; not an authenticated historical policy version",
       "passes_current_gate": true,
       "current_gate_reasons": [],
+      "candidate_sha256": "c89b2ca272ac68f1ea9bda7b45b16fea8a89dd968dc35450be24e964b6fe5f6e",
+      "candidate_matches_manuscript": true,
+      "decision_candidate_hash_matches": true,
       "literary_critics_on_promoted_bytes": [
         "adversarial-reader"
       ],
+      "literary_records_on_promoted_bytes": [
+        {
+          "file": "projects/visiting-order/scenes/ch01-sc01/critiques/adversarial-reader-a-r1.json",
+          "candidate": "candidate-a-r1.md",
+          "critic": "adversarial-reader",
+          "verdict": "pass",
+          "candidate_sha256": "c89b2ca272ac68f1ea9bda7b45b16fea8a89dd968dc35450be24e964b6fe5f6e"
+        }
+      ],
+      "filename_only_unbound_literary_records": [],
+      "inferred_predecessor": "candidate-a.md",
+      "lineage_basis": "filename suffix only; no verified parent artifact",
       "unreviewed_parent_dissent": [
         "character-simulator"
+      ],
+      "parent_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/visiting-order/scenes/ch01-sc01/critiques/character-simulator-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "character-simulator",
+          "verdict": "revise",
+          "candidate_sha256": "e03aa66b348fd18378912eae457314a4aa098199f17b65906b1e0349c68201d3"
+        }
       ],
       "unreviewed_sibling_dissent": [
         "style-editor"
       ],
+      "sibling_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/visiting-order/scenes/ch01-sc01/critiques/style-editor-b.json",
+          "candidate": "candidate-b.md",
+          "critic": "style-editor",
+          "verdict": "revise",
+          "candidate_sha256": "76e5a4fd869a1cfdca91db912c5c4b39223ee237d440a17ddc0aa9da71ed315b"
+        }
+      ],
+      "dissent_interpretation": "missing bound same-role record; persistence, applicability and actual review occurrence unknown",
       "prose_audit_present": false,
       "revision_log_present": false,
       "human_gate_required": null
@@ -313,16 +774,50 @@
       "scene": "ch01-sc02",
       "promoted": "candidate-b-r1.md",
       "gate_era_manifest": true,
+      "cohort_definition": "binding_critiques present; not an authenticated historical policy version",
       "passes_current_gate": true,
       "current_gate_reasons": [],
+      "candidate_sha256": "d90f06251c8de84b4ebb89ec0afb0d9e256cc7601ef4737e0be9c9cbd3acbe5b",
+      "candidate_matches_manuscript": true,
+      "decision_candidate_hash_matches": true,
       "literary_critics_on_promoted_bytes": [
         "adversarial-reader"
       ],
+      "literary_records_on_promoted_bytes": [
+        {
+          "file": "projects/visiting-order/scenes/ch01-sc02/critiques/adversarial-reader-b-r1.json",
+          "candidate": "candidate-b-r1.md",
+          "critic": "adversarial-reader",
+          "verdict": "pass",
+          "candidate_sha256": "d90f06251c8de84b4ebb89ec0afb0d9e256cc7601ef4737e0be9c9cbd3acbe5b"
+        }
+      ],
+      "filename_only_unbound_literary_records": [],
+      "inferred_predecessor": "candidate-b.md",
+      "lineage_basis": "filename suffix only; no verified parent artifact",
       "unreviewed_parent_dissent": [],
+      "parent_dissent_records_without_same_role_rereview": [],
       "unreviewed_sibling_dissent": [
         "character-simulator",
         "style-editor"
       ],
+      "sibling_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/visiting-order/scenes/ch01-sc02/critiques/character-simulator-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "character-simulator",
+          "verdict": "revise",
+          "candidate_sha256": "4c937964720c18d40c9a8b42642deb18a57e7b65631bb9c0b3a704526216796e"
+        },
+        {
+          "file": "projects/visiting-order/scenes/ch01-sc02/critiques/style-editor-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "style-editor",
+          "verdict": "revise",
+          "candidate_sha256": "4c937964720c18d40c9a8b42642deb18a57e7b65631bb9c0b3a704526216796e"
+        }
+      ],
+      "dissent_interpretation": "missing bound same-role record; persistence, applicability and actual review occurrence unknown",
       "prose_audit_present": false,
       "revision_log_present": false,
       "human_gate_required": null
@@ -332,17 +827,52 @@
       "scene": "ch01-sc03",
       "promoted": "candidate-a-r1.md",
       "gate_era_manifest": true,
+      "cohort_definition": "binding_critiques present; not an authenticated historical policy version",
       "passes_current_gate": true,
       "current_gate_reasons": [],
+      "candidate_sha256": "c642ebdf131a87fcf59d5de2015f52bc68acf86f698c48f4e05ea194a79b14bb",
+      "candidate_matches_manuscript": true,
+      "decision_candidate_hash_matches": true,
       "literary_critics_on_promoted_bytes": [
         "adversarial-reader"
       ],
+      "literary_records_on_promoted_bytes": [
+        {
+          "file": "projects/visiting-order/scenes/ch01-sc03/critiques/adversarial-reader-a-r1.json",
+          "candidate": "candidate-a-r1.md",
+          "critic": "adversarial-reader",
+          "verdict": "pass",
+          "candidate_sha256": "c642ebdf131a87fcf59d5de2015f52bc68acf86f698c48f4e05ea194a79b14bb"
+        }
+      ],
+      "filename_only_unbound_literary_records": [],
+      "inferred_predecessor": "candidate-a.md",
+      "lineage_basis": "filename suffix only; no verified parent artifact",
       "unreviewed_parent_dissent": [
         "character-simulator"
+      ],
+      "parent_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/visiting-order/scenes/ch01-sc03/critiques/character-simulator-a.json",
+          "candidate": "candidate-a.md",
+          "critic": "character-simulator",
+          "verdict": "revise",
+          "candidate_sha256": "44ed60d933787e20b1c2313550cea8521ae9c6938a066dd302af82faaa12bae1"
+        }
       ],
       "unreviewed_sibling_dissent": [
         "style-editor"
       ],
+      "sibling_dissent_records_without_same_role_rereview": [
+        {
+          "file": "projects/visiting-order/scenes/ch01-sc03/critiques/style-editor-b.json",
+          "candidate": "candidate-b.md",
+          "critic": "style-editor",
+          "verdict": "revise",
+          "candidate_sha256": "2bbc56aa3d53a2d4dad54460651345e8c4d6411a1200a30c27854d782bcfab14"
+        }
+      ],
+      "dissent_interpretation": "missing bound same-role record; persistence, applicability and actual review occurrence unknown",
       "prose_audit_present": false,
       "revision_log_present": false,
       "human_gate_required": null
@@ -542,8 +1072,8 @@
   ],
   "plan_layer": {
     "scene_specs": 18,
-    "alternative_plans_per_scene": "none: the scene schema holds exactly one spec per scene",
+    "alternative_plans_per_scene": "one spec.json at each inventoried scene path; no alternative-plan artifact inventoried",
     "specs_with_candidate_strategies": 18,
-    "note": "candidate_strategies vary prose realization of the single plan, not the plan itself"
+    "note": "Strategy text may vary tactics/disclosure; inventory alone does not establish absence of prior planning alternatives"
   }
 }

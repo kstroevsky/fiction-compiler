@@ -1,0 +1,61 @@
+{
+  "reviewed_commit": "158eed65db5a194c5ad24a0ca99ca8099b93d5e7",
+  "source_rechecks": {
+    "audit26-tian-discourse": "Published ACL PDF page 8 (printed 17666), Table 6 extracted with pypdf and visually inspected after rendering with pypdfium2; arXiv HTML v2 agrees. Overall 23/9/68; Character 23/27/50.",
+    "review28-storyscope": "Primary HTML v1 abstract, methods/data and narrative-feature discussion inspected. Human corpus is Books3-derived; mirrored prompts and model-based features do not validate interventions or classify this repository.",
+    "review28-antislop": "Primary HTML v1 section 4 inspected: sequence/regex suppression; waiting for a full sequence avoids prefix bans, not semantic literal/quotation false positives.",
+    "review28-litbench": "Primary ACL abstract inspected: Reddit-derived training/test pairs; 73% strongest OTS and 78% trained reward-model results are task-specific, not ceilings.",
+    "review28-storyalign": "Primary arXiv abstract inspected: 1,133 instances with one chosen and three rejected stories; 66.3% best existing reward model is not directly comparable to every pairwise task.",
+    "review28-rating-roulette": "Primary ACL abstract rechecked for run-to-run instability. No fixed k>=3 or temperature policy is inferred; prior temperature detail was not independently rechecked here.",
+    "review28-correlated-errors": "Primary arXiv record reopened; cross-vendor correlation motivates local measurement, not guaranteed independence.",
+    "review28-pds": "Primary ACL abstract inspected: alpha .72 and model-human correlations; also reports GPT-4 matching/exceeding highly rated Reddit stories on studied measures. Not a universal literary merit instrument.",
+    "review28-alt-test": "Primary arXiv v4 abstract inspected. Annotation replacement under tested conditions does not by itself authorize a creative promotion veto.",
+    "review28-git-update-ref": "Official documentation reopened. Conditional old-value ref update can implement CAS; domain-level acceptance/reachability checks remain necessary."
+  },
+  "new_source": {
+    "id": "recheck28-git-fsck",
+    "title": "git-fsck documentation",
+    "creator": "Git project",
+    "type": "website",
+    "stream": "reference",
+    "license": "reference-online",
+    "location": "https://git-scm.com/docs/git-fsck",
+    "accessed": "2026-09-28",
+    "verification": "Official documentation inspected during recheck",
+    "notes": "Checks Git object validity/connectivity; does not enforce fiction-domain audit policies or bind arbitrary working-tree manuscript files to acceptance.",
+    "used_in": "docs/audits/2026-09-28/review.md",
+    "copyright_note": "Citation and analytical summary only."
+  },
+  "tian_pdf_sha256": "20bd61c88e73b20f41f6c9ba6bb11f535f18c276ecd88dd49aceffe572f33130",
+  "table6": {
+    "columns": [
+      "theme",
+      "setting",
+      "conflict",
+      "character",
+      "overall"
+    ],
+    "outline_only": [
+      5,
+      32,
+      5,
+      23,
+      23
+    ],
+    "tie": [
+      32,
+      36,
+      41,
+      27,
+      9
+    ],
+    "arc_enhanced": [
+      64,
+      32,
+      55,
+      50,
+      68
+    ]
+  },
+  "limits": "Targeted claim-to-source checks; not a full-text re-review of all 36 added references."
+}

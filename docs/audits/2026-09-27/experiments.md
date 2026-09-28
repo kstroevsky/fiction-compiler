@@ -1,14 +1,14 @@
 # Proposed validation program and bounded improvement transactions
 
-> **Update, 28 September 2026.** The follow-up [review](../2026-09-28/review.md) proposes these changes to this plan:
+> **Update, 28 September 2026.** The follow-up [review](/Users/kstroevsky/Desktop/dev/fiction-compiler-starter/docs/audits/2026-09-28/review.md) proposes these changes to this plan:
 > - **Phase 1:**
 >   - Run it without waiting for the trust repairs, on frozen snapshots (review §2.7).
->   - Plan statistical power by the number of briefs, not raters (§5.6).
->   - Name the deciding reader population in advance and use validated instruments (§5.6).
+>   - Plan power for the actual crossed brief/story/run/rater design; the review’s simple cluster calculation is illustrative (§5.6).
+>   - Name the deciding reader population in advance and select instruments appropriate to the construct, population and form (§5.6).
 >   - Add one 8–12k-word condition (§6.10) and a multi-family-writer arm (§6.11).
 > - **Phase 2:**
->   - First test the thesis itself: critic's pick vs the writer's first draft vs random, on human-labelled pairs (§6.7).
->   - Then add CheckList-style invariance and directional tests, k-sample stability, a per-dimension alternative-annotator test, and public-domain literature as controls (§5.1, §6.9).
+>   - First test the thesis itself: public-pair ranking agreement, followed by critic/first/random selection from ordered frozen in-house candidate pools (§6.7).
+>   - Then add CheckList-style invariance and directional tests, measured repeatability, a per-dimension alternative-annotator test, and public-domain literature as controls (§5.1, §6.9).
 > - **Phase 3, new hypotheses:** plan-level search (§6.1), a plan-to-prose realization check (§6.3), a reader-disclosure ledger (§6.4), whole-work revision with dependency invalidation (§6.2), and a cross-project repetition check (§6.8).
 
 This is a proposal. No new prompt, rubric, schema or process rule has been adopted. No paid model runs or reader recruitment were performed. The purpose is to turn the audit into falsifiable decisions while preserving the user's objective of strong LLM-generated prose.
@@ -39,7 +39,7 @@ Compare four arms, three independent runs per brief: **144 outputs in an explora
 | A | Strong base model, careful brief, one whole-story draft | What does the model do without this harness? |
 | B | Plain outline, draft, one targeted revision, with deterministic basic checks | Does a simple writing loop already capture most benefit? |
 | C | Independent best-of-N drafts and a frozen selection method, at a matched total budget to D | Is any gain just extra sampling and selection? |
-| D | Fiction Compiler workflow with trust repairs, documented settings and complete traces | Does the particular decomposition/state/craft machinery add value? |
+| D | Fiction Compiler workflow on isolated frozen snapshots, documented settings and complete traces; shared-canon repairs are not a prerequisite | Does the particular decomposition/state/craft machinery add value? |
 
 Use the same underlying model where isolating harness effects. A is a useful lower-cost baseline, not an equal-cost competitor by itself. Match C and D on **total** generation, critique and revision expenditure, with the same final length range; report actual costs and failures. Also evaluate the best affordable stronger-model baseline before attributing value to orchestration. Freeze stopping rules. Include all runs, not only accepted survivors.
 

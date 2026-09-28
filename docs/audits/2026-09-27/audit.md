@@ -1,14 +1,12 @@
 # Fiction Compiler: independently rechecked audit and improvement proposal
 
-> **Update, 28 September 2026.** A follow-up [review](../2026-09-28/review.md) rechecked this audit and reproduced all 24 probes; the engineering findings stand. Corrections and additions, with evidence, are in the review:
-> - **House style:** the *Forecourt* and *Visiting Order* briefs quote the premise-probe rubric, so the briefs are partly pipeline outputs. The cause is partly established, not merely plausible (review §2.1).
-> - ***Slack Water*:** its critics did flag the problems ADR 0017 later attributed to the premise; the one-literary-critic gate dropped them (§2.2).
-> - ***The Overnight*'s loaf count:** the defect originates in the scene plan, not only the prose (§2.3).
-> - **Tian et al.:** the figure cited here as "overall diversity preference of 23% versus 68%" is the character-diversity row, and the "over 40%" is the authors' own abstract claim (§2.4).
-> - **What the stored record shows:** full literary coverage in 3 of 17 accepted scenes; 5 of 17 fail today's gate; unreviewed dissent on the promoted text's own earlier draft in 7 of 12 gate-era promotions (§3).
-> - **Eight further reproduced defects,** N1–N8 (§4).
-> - **Gaps in the core design:** search over plans, backward revision, a plan-to-prose check, the reader model, and the untested "strong critic, weak writer" thesis (§6).
-> - **Priorities re-ranked,** with workstream B decoupled from workstream A (§7, §2.7).
+> **Rechecked update, 28 September 2026.** The [follow-up review](/Users/kstroevsky/Desktop/dev/fiction-compiler-starter/docs/audits/2026-09-28/review.md) adds stored-record analysis and core-design proposals. Its latest corrections are explained in [recheck notes](/Users/kstroevsky/Desktop/dev/fiction-compiler-starter/docs/audits/2026-09-28/recheck.md):
+> - Two briefs explicitly reference the premise probes, establishing framework influence but not its full causal effect or clause authorship.
+> - Seven of twelve manifest-bearing promotions lack a same-role, hash-bound re-review of a filename-inferred predecessor’s non-pass criticism; persistence of those defects is not established.
+> - The loaf inconsistency appears in the scene plan as well as the prose.
+> - **The original Tian table labels below are correct:** Overall is 23% versus 68%; Character is 23% versus 50%. The proposed follow-up correction misread the columns. The abstract’s “over 40%” wording belongs to the paper’s authors.
+> - Additional probes include implementation defects, overlaps and policy gaps; they are not eight independent new bugs.
+> - Trust fixes and isolated literary measurement proceed in parallel. Extraction, reader-state predictions and benchmark results must retain explicit uncertainty.
 
 Assessment date: 27 September 2026. Repository: `310e50cfe9b8087c8a2af64e6e74f098548e6824`. This is an audit and a proposal, not an implemented redesign or a certification of literary quality.
 

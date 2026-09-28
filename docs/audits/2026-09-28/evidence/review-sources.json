@@ -11,7 +11,8 @@
     "verification": "Primary abstract inspected (arXiv/venue page or search-result abstract), 2026-09-28 (full abstract read)",
     "notes": "Discourse-level features alone reach 93.2% macro-F1 human-vs-AI; AI over-explains themes, tidy single-track plots, less temporal complexity; per-model fingerprints. Diagnostic features, not quality targets.",
     "used_in": "docs/audits/2026-09-28/review.md",
-    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion."
+    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion.",
+    "recheck_2026_09_28": "Primary HTML v1 abstract, methods/data and narrative-feature discussion inspected. Human corpus is Books3-derived; mirrored prompts and model-based features do not validate interventions or classify this repository."
   },
   {
     "id": "review28-antislop",
@@ -25,7 +26,8 @@
     "verification": "Primary abstract inspected (arXiv/venue page or search-result abstract), 2026-09-28",
     "notes": "Profiles model-specific over-represented patterns against human baselines; motivates a data-derived phrase catalog. Not evidence that suppressing patterns improves literary quality for readers.",
     "used_in": "docs/audits/2026-09-28/review.md",
-    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion."
+    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion.",
+    "recheck_2026_09_28": "Primary HTML v1 section 4 inspected: sequence/regex suppression; waiting for a full sequence avoids prefix bans, not semantic literal/quotation false positives."
   },
   {
     "id": "review28-lamp",
@@ -67,7 +69,8 @@
     "verification": "Primary abstract inspected (arXiv/venue page or search-result abstract), 2026-09-28",
     "notes": "Models agree ~60% when both err on one leaderboard dataset; larger models correlate across providers. Multi-vendor panels are not independent by construction.",
     "used_in": "docs/audits/2026-09-28/review.md",
-    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion."
+    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion.",
+    "recheck_2026_09_28": "Primary arXiv record reopened; cross-vendor correlation motivates local measurement, not guaranteed independence."
   },
   {
     "id": "review28-poll",
@@ -123,7 +126,8 @@
     "verification": "Primary abstract inspected (arXiv/venue page or search-result abstract), 2026-09-28",
     "notes": "Low run-to-run self-consistency of LLM judges; temperature 0 can reduce human agreement. Motivates k-sample critics and dispersion reporting.",
     "used_in": "docs/audits/2026-09-28/review.md",
-    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion."
+    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion.",
+    "recheck_2026_09_28": "Primary ACL abstract rechecked for run-to-run instability. No fixed k>=3 or temperature policy is inferred; prior temperature detail was not independently rechecked here."
   },
   {
     "id": "review28-litbench",
@@ -137,7 +141,8 @@
     "verification": "Primary abstract inspected (arXiv/venue page or search-result abstract), 2026-09-28",
     "notes": "Reddit-upvote preference pairs; best zero-shot judge 73%, trained reward models 78% agreement. Popularity is not literary quality; useful as cheap pre-calibration.",
     "used_in": "docs/audits/2026-09-28/review.md",
-    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion."
+    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion.",
+    "recheck_2026_09_28": "Primary ACL abstract inspected: Reddit-derived training/test pairs; 73% strongest OTS and 78% trained reward-model results are task-specific, not ceilings."
   },
   {
     "id": "review28-storyalign",
@@ -151,7 +156,8 @@
     "verification": "Primary abstract inspected (arXiv/venue page or search-result abstract), 2026-09-28 (summary of abstract read)",
     "notes": "StoryRMB: best existing reward model 66.3% on preferred-vs-three-rejected stories.",
     "used_in": "docs/audits/2026-09-28/review.md",
-    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion."
+    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion.",
+    "recheck_2026_09_28": "Primary arXiv abstract inspected: 1,133 instances with one chosen and three rejected stories; 66.3% best existing reward model is not directly comparable to every pairwise task."
   },
   {
     "id": "review28-alt-test",
@@ -165,7 +171,8 @@
     "verification": "Primary abstract inspected (arXiv/venue page or search-result abstract), 2026-09-28",
     "notes": "Statistical procedure over a modest annotated subset; proposed as the criterion for granting a critic gate power per dimension.",
     "used_in": "docs/audits/2026-09-28/review.md",
-    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion."
+    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion.",
+    "recheck_2026_09_28": "Primary arXiv v4 abstract inspected. Annotation replacement under tested conditions does not by itself authorize a creative promotion veto."
   },
   {
     "id": "review28-flawed-fictions",
@@ -221,7 +228,8 @@
     "verification": "Primary abstract inspected (arXiv/venue page or search-result abstract), 2026-09-28",
     "notes": "Psychological Depth Scale, five dimensions, human Krippendorff alpha 0.72; candidate reader instrument.",
     "used_in": "docs/audits/2026-09-28/review.md",
-    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion."
+    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion.",
+    "recheck_2026_09_28": "Primary ACL abstract inspected: alpha .72 and model-human correlations; also reports GPT-4 matching/exceeding highly rated Reddit stories on studied measures. Not a universal literary merit instrument."
   },
   {
     "id": "review28-mturk-perils",
@@ -473,7 +481,8 @@
     "verification": "Established reference cited from prior knowledge; not re-inspected in this session",
     "notes": "Conditional ref update (old-value check) as a compare-and-swap commit primitive.",
     "used_in": "docs/audits/2026-09-28/review.md",
-    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion."
+    "copyright_note": "Citation and analytical summary only; no full-text republication or training-data ingestion.",
+    "recheck_2026_09_28": "Official documentation reopened. Conditional old-value ref update can implement CAS; domain-level acceptance/reachability checks remain necessary."
   },
   {
     "id": "review28-generative-paradox",

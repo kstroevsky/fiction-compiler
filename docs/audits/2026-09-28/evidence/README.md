@@ -1,6 +1,6 @@
 # Review evidence
 
-Target: commit `2b8ef0b` (production source identical to the audited `310e50c`). Supports [`../review.md`](../review.md).
+Target: commit `2b8ef0b` (production source identical to the audited `310e50c`). Supports [`../review.md`](/Users/kstroevsky/Desktop/dev/fiction-compiler-starter/docs/audits/2026-09-28/review.md).
 
 * `extra_probes.py` → `extra-probe-results.json`: eight isolated observations (N1–N8 in the review). Disposable projects in a temporary directory; no network or credentials. Observations, not assertions.
 * `record_analysis.py` → `record-analysis.json`: read-only analysis of the stored projects. For each accepted scene: current gate readiness, literary critics on the promoted bytes, unreviewed parent and sibling dissent, prose-audit and revision-log presence, human gate. Also tournament label mappings, trace event counts, literary-critique recording times, brief vocabulary shared with the premise probes and lint catalog, the final paragraph of each project's last accepted scene (review §6.8), and plan-layer facts (review §6.1).
@@ -16,3 +16,14 @@ python3 docs/audits/2026-09-28/evidence/record_analysis.py
 Each script overwrites only its own sibling JSON file. The audit's original `probes.py` was also rerun, from a scratch copy so that `docs/audits/2026-09-27/` stays untouched; all 24 observations matched the stored results exactly.
 
 Recording times in traces mark when `record_critique` was called, not when a critique was generated. The timing observations therefore show that the record cannot establish reviewer independence; they do not establish authorship.
+
+## Final revision recheck
+
+The pre-edit results of all three evidence scripts were reproduced against commit `158eed6` before changing the analyzer. The analyzer now verifies byte bindings and labels lineage/absence uncertainty; see `../recheck.md`. The two original probe output files are unchanged.
+
+* `recheck-reproduction.json`: before-edit scratch reruns compared with committed JSON at `158eed6`; all match.
+* `recheck.py` → `recheck-results.json`: valid-scale Pareto observation, temporary-copy tests of digest rejection and multiple-record preservation, and strengthened coverage counts.
+* `recheck-source-verification.json`: exact published Tian table values, source URL via registered reference, downloaded PDF hash, and access depth of targeted research rechecks.
+* `recheck-validation-0.txt` through `recheck-validation-3.txt`: fresh maintained checks after the document/evidence changes.
+
+Run `python3 docs/audits/2026-09-28/evidence/recheck.py` from the repository root. It changes only its sibling output; scenario modifications are confined to temporary copies.
