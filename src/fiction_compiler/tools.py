@@ -89,6 +89,7 @@ def evaluate_revision(
     before_findings: list,
     after_findings: list,
     target: str | None = None,
+    target_evidence: str | None = None,
     iteration: int = 1,
     attempts_at_current_layer: int = 1,
     max_iterations: int = 3,
@@ -96,7 +97,7 @@ def evaluate_revision(
     waivers: list | None = None,
 ) -> dict:
     outcome = revision.evaluate_revision(
-        before_findings, after_findings, target_dimension=target,
+        before_findings, after_findings, target_dimension=target, target_evidence=target_evidence,
         iteration=iteration, attempts_at_current_layer=attempts_at_current_layer,
         max_iterations=max_iterations, max_attempts_per_layer=max_attempts_per_layer,
         waivers=waivers,
@@ -123,6 +124,7 @@ def _resolve_candidate(scene_dir, name: str):
 
 
 def record_revision(project: str, scene_id: str, before: str, after: str, target: str | None = None,
+                    target_evidence: str | None = None,
                     max_iterations: int = 3, max_attempts_per_layer: int = 2) -> dict:
     """Lint before/after, derive iteration+attempts from the persisted revision-log, decide, and log.
 
@@ -138,16 +140,20 @@ def record_revision(project: str, scene_id: str, before: str, after: str, target
     after_findings = [defaultness.lint_file(after_path)]
     history = revision.revision_history(scene_dir)
     iteration = len(history) + 1
-    attempts = 1 + sum(1 for h in history if h.get("target_dimension") == target)
+    attempts = 1 + sum(
+        1 for h in history
+        if h.get("target_dimension") == target
+        and (target_evidence is None or h.get("target_evidence") == target_evidence)
+    )
     outcome = revision.evaluate_revision(
-        before_findings, after_findings, target_dimension=target,
+        before_findings, after_findings, target_dimension=target, target_evidence=target_evidence,
         iteration=iteration, attempts_at_current_layer=attempts,
         max_iterations=max_iterations, max_attempts_per_layer=max_attempts_per_layer,
     )
     b, a = revision.tally(before_findings), revision.tally(after_findings)
     revision.log_revision(scene_dir, {
         "iteration": iteration, "before": before_path.name, "after": after_path.name,
-        "target_dimension": target, "counts": outcome.counts(b, a),
+        "target_dimension": target, "target_evidence": target_evidence, "counts": outcome.counts(b, a),
         "finding_diff": {"fixed": len(outcome.fixed_findings), "persisted": len(outcome.persisted_findings),
                          "worsened": len(outcome.worsened_findings), "new": len(outcome.new_findings)},
         "decision": outcome.decision, "reason": outcome.reason,

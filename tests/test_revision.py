@@ -127,6 +127,26 @@ class IdentityDecisionTests(unittest.TestCase):
                                              iteration=1, attempts_at_current_layer=1)
         self.assertNotEqual(outcome.decision, revision.ACCEPT)
 
+    def test_fixing_minor_sibling_does_not_count_as_fixing_material_target(self) -> None:
+        before = [{"findings": [
+            _fe("agency", "material", "target defect"),
+            _fe("agency", "minor", "other wording"),
+        ]}]
+        after = [{"findings": [_fe("agency", "material", "target defect")]}]
+        outcome = revision.evaluate_revision(before, after, target_dimension="agency")
+        self.assertNotEqual(outcome.decision, revision.ACCEPT)
+
+    def test_target_evidence_pins_exact_issue_identity(self) -> None:
+        before = [{"findings": [
+            _fe("agency", "material", "target defect"),
+            _fe("agency", "material", "separate defect"),
+        ]}]
+        after = [{"findings": [_fe("agency", "material", "separate defect")]}]
+        outcome = revision.evaluate_revision(
+            before, after, target_dimension="agency", target_evidence="target defect"
+        )
+        self.assertEqual(outcome.decision, revision.ACCEPT)
+
 
 class WaiverTests(unittest.TestCase):
     def test_waived_new_finding_does_not_block_acceptance(self) -> None:
