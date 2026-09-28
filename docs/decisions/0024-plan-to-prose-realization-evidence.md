@@ -27,7 +27,8 @@ required canonical events to those observations and records one of `realized`, `
 
 This is translation-validation infrastructure, not evidence that the extractor/alignment model is
 accurate. `require_prose_audit` remains opt-in until those stages are calibrated on planted omissions,
-oblique realizations, and clean controls.
+oblique realizations, and clean controls. ADR 0030 adds the calibration evidence workflow, while the
+actual live/hidden-set calibration result remains open.
 
 ## Verification
 

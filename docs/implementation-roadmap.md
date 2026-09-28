@@ -31,6 +31,7 @@ mechanical validity, modeled/extracted consistency, and literary preference.
 | Event-sourced canon / `reconstruct_state_before` | `src/fiction_compiler/state.py` | **Implemented** | Seed state + accepted deltas, typed values/relationships/knowledge, parsed chronology semantics |
 | Candidate promotion / backward revision | `promote.py`, `acceptance.py`, `integrity.py`, `dependencies.py` | **Implemented, downstream literary recheck remains manual** | Frozen candidate/spec/delta/review policy/evidence; immutable active/history chains, conservative read sets, rebasing + invalidation |
 | Hard/symbolic audit | `hard_audit.py`, `prose_audit.py` | **Implemented, extraction boundary remains empirical** | Code checks state/event constraints; extracted prose claims are judged deterministically |
+| Realization calibration | `realization_calibration.py`, planted controls, ADR 0030 | **Evidence infrastructure implemented; live calibration not yet run** | Plan-blind extraction and plan-aware alignment are measured separately; extractor misses cannot become proved omissions |
 | Literary review | `role_runner.py`, role personas, review policy | **Implemented as evidence-producing model review** | Role-specific blind packets, immutable attempts, provenance, issue applicability/resolution |
 | Defaultness/style heuristics | `defaultness.py`, catalog | **Advisory by default** | Contextual evidence; a project can explicitly opt into blocking mode |
 | Blind tournament / Pareto | `tournament.py`, `tools.tournament` | **Implemented** | Anonymization, order balancing, complete-matrix checks, eligibility floors, dissent preservation |
@@ -205,8 +206,12 @@ test, not just a feature.
 > prose but not in the delta are material findings. The realization prototype now separates
 > **plan-blind observed events** from a later plan-aware alignment: explicit required-event omission is
 > material, while missing/uncertain alignment stays `uncertain`; free-text turn/exit-state remain
-> unverified. Still ⬜: calibrating extraction/alignment on planted omissions + oblique controls before
-> making `prose_audit` a required gate, and auto-rerunning calibrated prose-reading audits after revision.
+> unverified. **ADR 0030 now supplies the missing calibration harness:** frozen planted omission,
+> literal-realization and oblique-realization controls are presented first to a plan-blind extractor,
+> then to a separate plan-aware aligner with the frozen prose available for targeted re-inspection.
+> Reports distinguish extractor misses from alignment misses and never convert a missed extraction into
+> proof of omission. Still ⬜: run the live/hidden-set calibration and adopt predeclared tolerances before
+> making `prose_audit` a required gate; auto-rerun calibrated prose-reading audits after revision.
 >
 > **Framework loop now has a regression harness (ADR 0011, P5 slice 1).** `scripts/run_regression.py`
 > + the `run_regression` tool run fixed fixtures (`regression/fixtures.json`) that pin the invariants
@@ -227,6 +232,7 @@ test, not just a feature.
 > `0025-typed-promise-obligations.md`, `0026-backward-revision-and-conservative-invalidation.md`,
 > `0027-plan-level-search-before-prose.md`, `0028-frozen-selection-measurement.md`,
 > `0029-critic-behavioral-calibration.md`,
+> `0030-realization-calibration-evidence.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 

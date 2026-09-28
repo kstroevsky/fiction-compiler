@@ -18,7 +18,7 @@ from typing import Any, Callable
 from . import critic_eval as _critic_eval
 from . import critique as _critique
 from . import (critic_calibration, defaultness, hard_audit, integrity, issue_resolution, kb, plan_search, reader,
-               regression, revision, safety, schema, selection_eval, trace)
+               realization_calibration, regression, revision, safety, schema, selection_eval, trace)
 from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
@@ -364,6 +364,48 @@ def record_selection_operation(project: str, scene_id: str, experiment_id: str, 
 def selection_experiment_report(project: str, scene_id: str, experiment_id: str) -> dict:
     """Compare first/random/recorded selectors against independent human pairwise evidence."""
     return selection_eval.report(project_dir(project), scene_id, experiment_id)
+
+
+def start_realization_calibration(project: str, name: str, case_ids: list[str] | None = None,
+                                  criteria: dict | None = None) -> dict:
+    """Freeze an ADR 0030 extraction/alignment calibration study."""
+    return realization_calibration.start_study(
+        project_dir(project), name, case_ids=case_ids, criteria=criteria
+    )
+
+
+def realization_extractor_packet(project: str, study_id: str, case_id: str) -> dict:
+    """Return prose-only calibration input for the plan-blind extraction stage."""
+    return realization_calibration.extractor_packet(project_dir(project), study_id, case_id)
+
+
+def record_realization_extraction(project: str, study_id: str, case_id: str,
+                                  extractor_family: str, extractor_id: str, trial_index: int,
+                                  observed_events: list[dict]) -> dict:
+    """Persist plan-blind observed-event extraction evidence."""
+    return realization_calibration.record_extraction(
+        project_dir(project), study_id, case_id, extractor_family, extractor_id, trial_index,
+        observed_events,
+    )
+
+
+def realization_aligner_packet(project: str, study_id: str, extraction_id: str) -> dict:
+    """Return prose + extraction + required-event descriptions with expected labels hidden."""
+    return realization_calibration.aligner_packet(project_dir(project), study_id, extraction_id)
+
+
+def record_realization_alignment(project: str, study_id: str, extraction_id: str,
+                                 aligner_family: str, aligner_id: str,
+                                 event_alignment: list[dict]) -> dict:
+    """Persist the plan-aware second-stage event alignment for one frozen extraction."""
+    return realization_calibration.record_alignment(
+        project_dir(project), study_id, extraction_id, aligner_family, aligner_id, event_alignment
+    )
+
+
+def realization_calibration_report(project: str, study_id: str) -> dict:
+    """Report extractor/alignment evidence without enabling prose-audit authority."""
+    return realization_calibration.report(project_dir(project), study_id)
 
 
 def prose_audit(project: str, scene_id: str, claims: dict) -> dict:
@@ -856,6 +898,51 @@ TOOLS: list[dict] = [
            "experiment_id": {"type": "string",
                              "pattern": "^selection-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"}},
           ["project", "scene_id", "experiment_id"], selection_experiment_report),
+    _tool("start_realization_calibration",
+          "Freeze the ADR 0030 plan-to-prose calibration cases before extractor/aligner observations. "
+          "This is evidence infrastructure only and never enables the prose-audit gate by itself.",
+          {"project": {"type": "string"}, "name": {"type": "string", "minLength": 1},
+           "case_ids": {"type": "array", "uniqueItems": True, "items": {"type": "string"}},
+           "criteria": {"type": "object"}},
+          ["project", "name"], start_realization_calibration),
+    _tool("realization_extractor_packet",
+          "Return one frozen calibration prose input for PLAN-BLIND event extraction. Required event "
+          "IDs, plan descriptions, expected status and fixture evidence anchors are withheld.",
+          {"project": {"type": "string"}, "study_id": {"type": "string"},
+           "case_id": {"type": "string"}},
+          ["project", "study_id", "case_id"], realization_extractor_packet),
+    _tool("record_realization_extraction",
+          "Persist one immutable plan-blind observed-event extraction with exact prose evidence, "
+          "extractor family/id and repeat index. Evidence must occur in the frozen prose.",
+          {"project": {"type": "string"}, "study_id": {"type": "string"},
+           "case_id": {"type": "string"}, "extractor_family": {"type": "string", "minLength": 1},
+           "extractor_id": {"type": "string", "minLength": 1},
+           "trial_index": {"type": "integer", "minimum": 1},
+           "observed_events": {"type": "array"}},
+          ["project", "study_id", "case_id", "extractor_family", "extractor_id", "trial_index",
+           "observed_events"], record_realization_extraction),
+    _tool("realization_aligner_packet",
+          "Return the frozen prose, plan-blind observations and required-event descriptions for the "
+          "second-stage aligner. Expected realized/omitted status and fixture anchors stay hidden; "
+          "the aligner should use unverified when extractor failure cannot be ruled out.",
+          {"project": {"type": "string"}, "study_id": {"type": "string"},
+           "extraction_id": {"type": "string"}},
+          ["project", "study_id", "extraction_id"], realization_aligner_packet),
+    _tool("record_realization_alignment",
+          "Persist one plan-aware alignment for every required event in a frozen extraction. Realized "
+          "events must reference an observed event; omitted/unverified events cannot do so.",
+          {"project": {"type": "string"}, "study_id": {"type": "string"},
+           "extraction_id": {"type": "string"}, "aligner_family": {"type": "string", "minLength": 1},
+           "aligner_id": {"type": "string", "minLength": 1},
+           "event_alignment": {"type": "array", "minItems": 1}},
+          ["project", "study_id", "extraction_id", "aligner_family", "aligner_id",
+           "event_alignment"], record_realization_alignment),
+    _tool("realization_calibration_report",
+          "Read-only ADR 0030 report that separates extractor misses, alignment misses, explicit planted "
+          "omissions and unresolved cases. Fixture-anchor metrics are descriptive and never grant prose-audit "
+          "gate authority or make free-text turn/affect deterministic.",
+          {"project": {"type": "string"}, "study_id": {"type": "string"}},
+          ["project", "study_id"], realization_calibration_report),
     _tool("assemble",
           "Stitch the accepted (promoted) scenes into a single manuscript.md, in fabula order, "
           "with title and chapter/scene breaks. Returns the path and word count.",

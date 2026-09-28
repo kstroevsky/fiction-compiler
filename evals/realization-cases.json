@@ -1,0 +1,47 @@
+{
+  "note": "Provisional planted cases for ADR 0030 realization calibration. These fixtures measure whether plan-blind extraction plus a separate aligner can distinguish a planted required-event omission from literal and oblique realizations. They are diagnostic controls, not literary gold labels or authority to enable prose_audit as a production gate.",
+  "cases": [
+    {
+      "id": "required-event-omitted",
+      "source_kind": "local_control",
+      "label_source": "provisional_fixture",
+      "prose": "Mara counted the invoices twice, stacked them under the ledger, and switched off the desk lamp.",
+      "required_events": [
+        {
+          "event_id": "evt-refusal",
+          "description": "Mara refuses the offered shipment.",
+          "expected_status": "omitted",
+          "evidence_anchors": []
+        }
+      ]
+    },
+    {
+      "id": "required-event-literal",
+      "source_kind": "local_control",
+      "label_source": "provisional_fixture",
+      "prose": "Mara pushed the manifest back across the desk. \"No. Send the shipment back.\"",
+      "required_events": [
+        {
+          "event_id": "evt-refusal",
+          "description": "Mara refuses the offered shipment.",
+          "expected_status": "realized",
+          "evidence_anchors": ["No. Send the shipment back."]
+        }
+      ]
+    },
+    {
+      "id": "required-event-oblique",
+      "source_kind": "local_control",
+      "label_source": "provisional_fixture",
+      "prose": "Mara folded the unsigned manifest into quarters and slid it beneath the driver's empty coffee cup. She held his gaze until he took both away.",
+      "required_events": [
+        {
+          "event_id": "evt-refusal",
+          "description": "Mara refuses the offered shipment without stating the refusal directly.",
+          "expected_status": "realized",
+          "evidence_anchors": ["folded the unsigned manifest into quarters", "held his gaze until he took both away"]
+        }
+      ]
+    }
+  ]
+}

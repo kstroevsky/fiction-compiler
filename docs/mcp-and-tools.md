@@ -42,6 +42,12 @@ It runs anywhere `python3` runs — no install step.
 | `record_critic_calibration_observation` | Persist repeat/family/transform-bound live critic evidence |
 | `record_critic_human_label` | Persist independent human labels while preserving disagreement |
 | `critic_calibration_report` | Report repeatability, conditional invariance, crossed families, joint errors, and human agreement without granting gate authority |
+| `start_realization_calibration` | Freeze planted omission/literal/oblique prose-realization controls before observations |
+| `realization_extractor_packet` | Prose-only packet for plan-blind observed-event extraction |
+| `record_realization_extraction` | Persist evidence-bound extractor output with family/run provenance |
+| `realization_aligner_packet` | Frozen prose + observations + required-event descriptions, with expected labels hidden |
+| `record_realization_alignment` | Persist the separate plan-aware realized/omitted/unverified mapping |
+| `realization_calibration_report` | Separate extractor misses, alignment misses, omissions and unresolved cases without enabling the prose-audit gate |
 | `hard_audit` | Deterministic Audit 1 (knowledge cutoff, causal refs, POV, chronology, promise ledger) |
 | `defaultness_lint` | Model-default tics in prose, with evidence |
 | `evaluate_revision` | Accept/stop decision for a revision (stateless; takes iteration/attempts to reach every branch) |
