@@ -117,6 +117,8 @@ class PromoteTests(unittest.TestCase):
             snapshot = acceptance.load_object(project, result["acceptance_object"])
             self.assertEqual(acceptance.frozen_bytes(snapshot, "candidate"), PROSE.encode())
             self.assertEqual(snapshot["candidate"]["sha256"], PROSE_SHA)
+            self.assertEqual(snapshot["read_set"]["mode"], "conservative_context")
+            self.assertEqual(snapshot["context_basis"]["status"], "reconstructed_at_acceptance")
             self.assertEqual(snapshot["review_policy"]["id"], "review-policy@2")
             self.assertEqual(snapshot["review_policy"]["artifact"]["path"], "builtin:review-policy@2")
             self.assertTrue(snapshot["binding_critiques"])
@@ -170,6 +172,169 @@ class PromoteTests(unittest.TestCase):
 
 
 class AcceptanceIntegrityTests(unittest.TestCase):
+    def test_backward_revision_rebases_history_and_invalidates_downstream_reviews(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp), fact_id="fact-plant")
+            scene2 = project / "scenes" / "ch01-sc02"
+            (scene2 / "candidates").mkdir(parents=True)
+            (scene2 / "candidates" / "c.md").write_text(PROSE, encoding="utf-8")
+            (scene2 / "spec.json").write_text(
+                json.dumps(valid_spec("ch01-sc02")), encoding="utf-8"
+            )
+            (scene2 / "state-delta.json").write_text(
+                json.dumps(valid_delta("ch01-sc02")), encoding="utf-8"
+            )
+            write_review_set(scene2)
+
+            first = promote_candidate(project, "ch01-sc01", "c.md")
+            second = promote_candidate(project, "ch01-sc02", "c.md")
+            original_scene2 = acceptance.load_object(project, second["acceptance_object"])
+            self.assertIn("fact-plant", original_scene2["read_set"]["facts"])
+
+            revised_prose = "The brass plant marker caught the light."
+            revised_sha = hashlib.sha256(revised_prose.encode("utf-8")).hexdigest()
+            scene1 = project / "scenes" / "ch01-sc01"
+            (scene1 / "candidates" / "revision.md").write_text(revised_prose, encoding="utf-8")
+            revised_delta = valid_delta("ch01-sc01")
+            revised_delta["facts_added"] = [{"id": "fact-plant", "text": "The plant is visible."}]
+            (scene1 / "state-delta.json").write_text(json.dumps(revised_delta), encoding="utf-8")
+            write_review_set(scene1, candidate_name="revision.md", sha=revised_sha)
+
+            result = promote_candidate(project, "ch01-sc01", "revision.md", revision=True)
+            index = acceptance.load_index(project)
+
+            self.assertTrue(result["revision"])
+            self.assertEqual(result["rebased_scenes"], ["ch01-sc02"])
+            self.assertNotEqual(index["acceptance_objects"]["ch01-sc01"], first["acceptance_object"])
+            self.assertNotEqual(index["acceptance_objects"]["ch01-sc02"], second["acceptance_object"])
+            self.assertIn(first["acceptance_object"], index["acceptance_history"]["ch01-sc01"])
+            self.assertIn(second["acceptance_object"], index["acceptance_history"]["ch01-sc02"])
+
+            active_scene2 = acceptance.load_object(
+                project, index["acceptance_objects"]["ch01-sc02"]
+            )
+            self.assertEqual(
+                active_scene2["parent_acceptance"], index["acceptance_objects"]["ch01-sc01"]
+            )
+            recheck = index["rechecks_required"]["ch01-sc02"]
+            self.assertTrue(recheck["known_state_dependency"])
+            self.assertEqual(recheck["hard_audit"]["status"], "pass")
+            self.assertNotIn("hard", recheck["required_scopes"])
+            self.assertEqual(
+                recheck["required_scopes"], ["literary", "reader", "voice", "whole_work"]
+            )
+
+            report = integrity.verify_report(project)
+            self.assertEqual(report["status"], "verified")
+            self.assertEqual(report["orphaned"], [])
+            self.assertEqual(report["rechecks_required"], index["rechecks_required"])
+            self.assertEqual(
+                (project / "manuscript" / "chapters" / "ch01-sc01.md").read_text(encoding="utf-8"),
+                revised_prose,
+            )
+
+    def test_backward_prose_only_revision_still_requires_conservative_downstream_recheck(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp), fact_id="fact-plant")
+            scene2 = project / "scenes" / "ch01-sc02"
+            (scene2 / "candidates").mkdir(parents=True)
+            (scene2 / "candidates" / "c.md").write_text(PROSE, encoding="utf-8")
+            (scene2 / "spec.json").write_text(
+                json.dumps(valid_spec("ch01-sc02")), encoding="utf-8"
+            )
+            (scene2 / "state-delta.json").write_text(
+                json.dumps(valid_delta("ch01-sc02")), encoding="utf-8"
+            )
+            write_review_set(scene2)
+            promote_candidate(project, "ch01-sc01", "c.md")
+            promote_candidate(project, "ch01-sc02", "c.md")
+
+            scene1 = project / "scenes" / "ch01-sc01"
+            revised_prose = "A small brass marker stood beside the unchanged plant."
+            revised_sha = hashlib.sha256(revised_prose.encode("utf-8")).hexdigest()
+            (scene1 / "candidates" / "revision.md").write_text(revised_prose, encoding="utf-8")
+            write_review_set(scene1, candidate_name="revision.md", sha=revised_sha)
+
+            promote_candidate(project, "ch01-sc01", "revision.md", revision=True)
+            recheck = acceptance.load_index(project)["rechecks_required"]["ch01-sc02"]
+            self.assertFalse(recheck["known_state_dependency"])
+            self.assertEqual(
+                recheck["required_scopes"], ["literary", "reader", "voice", "whole_work"]
+            )
+
+    def test_backward_revision_refuses_drifted_downstream_views(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp), fact_id="fact-plant")
+            scene2 = project / "scenes" / "ch01-sc02"
+            (scene2 / "candidates").mkdir(parents=True)
+            (scene2 / "candidates" / "c.md").write_text(PROSE, encoding="utf-8")
+            (scene2 / "spec.json").write_text(
+                json.dumps(valid_spec("ch01-sc02")), encoding="utf-8"
+            )
+            (scene2 / "state-delta.json").write_text(
+                json.dumps(valid_delta("ch01-sc02")), encoding="utf-8"
+            )
+            write_review_set(scene2)
+            promote_candidate(project, "ch01-sc01", "c.md")
+            second = promote_candidate(project, "ch01-sc02", "c.md")
+            before_index = acceptance.load_index(project)
+
+            # The hard-audit recheck reads the live scene view, so rebasing must never proceed over a
+            # drifted downstream view and accidentally treat it as the accepted bytes.
+            (scene2 / "state-delta.json").write_text(
+                json.dumps(valid_delta("ch01-sc02", fact_id="fact-unaccepted")), encoding="utf-8"
+            )
+            scene1 = project / "scenes" / "ch01-sc01"
+            revised_prose = "A brass marker stood beside the plant."
+            revised_sha = hashlib.sha256(revised_prose.encode("utf-8")).hexdigest()
+            (scene1 / "candidates" / "revision.md").write_text(revised_prose, encoding="utf-8")
+            write_review_set(scene1, candidate_name="revision.md", sha=revised_sha)
+
+            with self.assertRaisesRegex(ValueError, "downstream derived view .* differs"):
+                promote_candidate(project, "ch01-sc01", "revision.md", revision=True)
+
+            after_index = acceptance.load_index(project)
+            self.assertEqual(after_index, before_index)
+            self.assertEqual(after_index["acceptance_objects"]["ch01-sc02"], second["acceptance_object"])
+
+    def test_backward_revision_retry_repairs_views_after_authoritative_commit(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp), fact_id="fact-plant")
+            scene2 = project / "scenes" / "ch01-sc02"
+            (scene2 / "candidates").mkdir(parents=True)
+            (scene2 / "candidates" / "c.md").write_text(PROSE, encoding="utf-8")
+            (scene2 / "spec.json").write_text(
+                json.dumps(valid_spec("ch01-sc02")), encoding="utf-8"
+            )
+            (scene2 / "state-delta.json").write_text(
+                json.dumps(valid_delta("ch01-sc02")), encoding="utf-8"
+            )
+            write_review_set(scene2)
+            promote_candidate(project, "ch01-sc01", "c.md")
+            promote_candidate(project, "ch01-sc02", "c.md")
+
+            scene1 = project / "scenes" / "ch01-sc01"
+            revised_prose = "The plant carried a small brass marker."
+            revised_sha = hashlib.sha256(revised_prose.encode("utf-8")).hexdigest()
+            (scene1 / "candidates" / "revision.md").write_text(revised_prose, encoding="utf-8")
+            write_review_set(scene1, candidate_name="revision.md", sha=revised_sha)
+
+            with mock.patch(
+                "fiction_compiler.promote._materialize_snapshot", side_effect=RuntimeError("view crash")
+            ):
+                with self.assertRaisesRegex(RuntimeError, "view crash"):
+                    promote_candidate(project, "ch01-sc01", "revision.md", revision=True)
+
+            committed = acceptance.load_index(project)
+            self.assertIn("ch01-sc02", committed["rechecks_required"])
+            self.assertEqual(integrity.verify_report(project)["status"], "invalid")
+
+            retry = promote_candidate(project, "ch01-sc01", "revision.md", revision=True)
+            self.assertTrue(retry["idempotent"])
+            self.assertTrue(retry["revision"])
+            self.assertEqual(retry["rebased_scenes"], ["ch01-sc02"])
+            self.assertEqual(integrity.verify_report(project)["status"], "verified")
+
     def test_live_view_edits_do_not_change_authoritative_replay_or_assembly(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project = build(Path(tmp), fact_id="fact-original")

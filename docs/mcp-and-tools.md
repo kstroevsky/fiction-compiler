@@ -31,9 +31,13 @@ It runs anywhere `python3` runs — no install step.
 | `evaluate_revision` | Accept/stop decision for a revision (stateless; takes iteration/attempts to reach every branch) |
 | `record_revision` | Runs one revision iteration, derives iteration/attempts from the scene's `revision-log`, and **persists** it — the history-driven, ESCALATE/STOP-capable path |
 | `promote` | **State-changing, gated by `confirm`** — copies a reviewed candidate into the manuscript and folds its delta into canon |
+| `revise_acceptance` | **State-changing, gated by `confirm`** — replace an accepted scene, preserve superseded acceptance objects, rebase downstream canon, rerun hard checks, and invalidate downstream literary/reader/voice evidence |
+| `revision_status` | Read-only view of pending downstream rechecks and the preserved backward-revision event ledger |
 
-Both write-path gaps are closed: an agent driving purely over MCP can now persist revision history
-(`record_revision`), reach the full stop-condition logic, and promote (`promote`, confirm-gated).
+The write path now supports both forward acceptance and explicit backward correction: an agent driving
+purely over MCP can persist revision history (`record_revision`), reach the full stop-condition logic,
+promote (`promote`, confirm-gated), and revise accepted history (`revise_acceptance`, confirm-gated)
+without erasing the superseded acceptance chain.
 
 ### Register with Claude Code
 `.mcp.json` at the repo root is auto-detected:

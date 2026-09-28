@@ -52,6 +52,8 @@ class ToolDispatchTests(unittest.TestCase):
         names = {t["name"] for t in tools.list_tools()}
         self.assertIn("kb_search", names)
         self.assertIn("hard_audit", names)
+        self.assertIn("revise_acceptance", names)
+        self.assertIn("revision_status", names)
         for descriptor in tools.list_tools():
             self.assertNotIn("handler", descriptor)  # handlers not exposed over the wire
             self.assertEqual(descriptor["inputSchema"]["type"], "object")
@@ -82,6 +84,15 @@ class ToolDispatchTests(unittest.TestCase):
     def test_promote_requires_confirm(self) -> None:
         out = tools.call_tool("promote", {"project": "salt-in-the-wire", "scene_id": "ch01-sc01",
                                           "candidate_file": "candidate-a.md"})
+        self.assertIn("error", out)
+        self.assertIn("confirm", out["error"])
+
+    def test_backward_revision_requires_confirm(self) -> None:
+        out = tools.call_tool(
+            "revise_acceptance",
+            {"project": "salt-in-the-wire", "scene_id": "ch01-sc01",
+             "candidate_file": "candidate-a.md"},
+        )
         self.assertIn("error", out)
         self.assertIn("confirm", out["error"])
 

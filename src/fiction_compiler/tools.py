@@ -198,6 +198,38 @@ def promote(project: str, scene_id: str, candidate_file: str, confirm: bool = Fa
         return {"error": str(exc)}
 
 
+def revise_acceptance(project: str, scene_id: str, candidate_file: str, confirm: bool = False,
+                      approved_by: str | None = None, rubric_version: str | None = None) -> dict:
+    """Replace an accepted scene and conservatively rebase/invalidate all downstream acceptances."""
+    if not confirm:
+        return {
+            "error": "backward revision changes canon history; call again with confirm=true to proceed"
+        }
+    try:
+        result = promote_candidate(
+            project_dir(project), scene_id, candidate_file, approved_by=approved_by,
+            rubric_version=rubric_version, revision=True,
+        )
+        trace.log(
+            project_dir(project), scene_id, "backward_revision", candidate=candidate_file,
+            acceptance_object=result.get("acceptance_object"),
+            rebased_scenes=result.get("rebased_scenes", []),
+        )
+        return result
+    except ValueError as exc:
+        return {"error": str(exc)}
+
+
+def revision_status(project: str) -> dict:
+    """Return pending downstream rechecks and preserved backward-revision history."""
+    report = integrity.verify_report(project_dir(project))
+    return {
+        "canon_status": report["status"],
+        "rechecks_required": report.get("rechecks_required", {}),
+        "revision_events": report.get("revision_events", []),
+    }
+
+
 def tournament(project: str, scene_id: str, seed: int = 0, persist: bool = False,
                judges: list | None = None, judgments: list | None = None,
                judge_rankings: list | None = None) -> dict:
@@ -555,6 +587,19 @@ TOOLS: list[dict] = [
            "candidate_file": {"type": "string"}, "confirm": {"type": "boolean"},
            "approved_by": {"type": "string"}, "rubric_version": {"type": "string"}},
           ["project", "scene_id", "candidate_file"], promote),
+    _tool("revise_acceptance",
+          "Replace an already accepted scene with newly reviewed bytes, preserve the superseded "
+          "acceptance chain as history, rebase every downstream immutable acceptance object, rerun "
+          "deterministic hard audits, and mark literary/reader/voice/whole-work downstream rechecks "
+          "as pending. STATE-CHANGING and gated: requires confirm=true.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "candidate_file": {"type": "string"}, "confirm": {"type": "boolean"},
+           "approved_by": {"type": "string"}, "rubric_version": {"type": "string"}},
+          ["project", "scene_id", "candidate_file"], revise_acceptance),
+    _tool("revision_status",
+          "Read-only status for backward revision: canonical integrity plus pending downstream "
+          "literary/reader/voice/whole-work rechecks and the preserved revision-event ledger.",
+          {"project": {"type": "string"}}, ["project"], revision_status),
     _tool("tournament",
           "Run a blind, Pareto-scored tournament over a scene's candidates from their critiques. "
           "Returns blinded labels + reveal map, forward/reversed presentation orders, per-candidate "

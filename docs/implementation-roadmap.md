@@ -28,7 +28,7 @@ mechanical validity, modeled/extracted consistency, and literary preference.
 | Workspace validation | `scripts/validate_workspace.py` | **Implemented** | Schema/integrity checks plus canon verification; maintained tests exercise failures |
 | Minimal context compilation | `src/fiction_compiler/context.py` | **Implemented, coarse relevance** | Replays state-before, filters to participants/required facts, writes collision-safe project-local evidence |
 | Event-sourced canon / `reconstruct_state_before` | `src/fiction_compiler/state.py` | **Implemented** | Seed state + accepted deltas, typed values/relationships/knowledge, parsed chronology semantics |
-| Candidate promotion | `promote.py`, `acceptance.py`, `integrity.py` | **Implemented** | Frozen candidate/spec/delta/review policy/evidence; atomic idempotent acceptance chain and verifier |
+| Candidate promotion / backward revision | `promote.py`, `acceptance.py`, `integrity.py`, `dependencies.py` | **Implemented, downstream literary recheck remains manual** | Frozen candidate/spec/delta/review policy/evidence; immutable active/history chains, conservative read sets, rebasing + invalidation |
 | Hard/symbolic audit | `hard_audit.py`, `prose_audit.py` | **Implemented, extraction boundary remains empirical** | Code checks state/event constraints; extracted prose claims are judged deterministically |
 | Literary review | `role_runner.py`, role personas, review policy | **Implemented as evidence-producing model review** | Role-specific blind packets, immutable attempts, provenance, issue applicability/resolution |
 | Defaultness/style heuristics | `defaultness.py`, catalog | **Advisory by default** | Contextual evidence; a project can explicitly opt into blocking mode |
@@ -94,7 +94,8 @@ test, not just a feature.
 > **Tools for the author.** The deterministic engine is exposed to the LLM as callable tools via
 > a dependency-free MCP server (`scripts/fiction_mcp.py`, wired in `.mcp.json` and `.codex/config.toml`):
 > `kb_search`/`kb_get`, `state_before`, `compile_context`, `hard_audit`, `defaultness_lint`,
-> `evaluate_revision`. Plus the `avoid-defaults` anti-obviousness skill (LLM-facing craft, not code).
+> `evaluate_revision`, `revise_acceptance`, and `revision_status`. Plus the `avoid-defaults`
+> anti-obviousness skill (LLM-facing craft, not code).
 > The engine equips the author; it does not replace the creative act. See `docs/mcp-and-tools.md`.
 >
 > **Promotion is now gated (ADR 0002) and tamper-evident (ADR 0003).** The versioned review policy is
@@ -148,6 +149,16 @@ test, not just a feature.
 > (the review's two-minors→one-material trap). Slice 2 (ADR 0010) makes **acceptance** itself
 > identity-based (the target finding must be resolved by fingerprint, not merely by a lower count) and
 > adds **waivers** (a human-approved finding, with a recorded reason, that no longer blocks).
+> **Backward revision now has canonical versioning (ADR 0026, review §6.2).** An explicitly revised
+> accepted scene creates a new immutable acceptance object and rebases every downstream acceptance
+> onto the new canon hash while retaining superseded objects as verified history. New acceptances carry
+> a conservative fact/predicate/promise read set. Changed typed state marks known dependents, while
+> every downstream scene is still invalidated for literary/reader/voice/whole-work review because the
+> typed read set is not complete for literary effects. Deterministic hard audits rerun immediately;
+> remaining scopes stay explicitly pending. A reconstructed context basis is frozen without claiming
+> it was the exact drafting prompt; exact role-runner packets are frozen when their provenance is
+> available. Still ⬜: a first-class whole-work literary pass and a provenance-bearing mechanism that
+> closes pending reader/voice scopes with fresh post-revision evidence.
 >
 > **KB now has enforced structured depth (ADR 0015, P4 slice 1).** Every concept carries a `claim`, an
 > `evidence_strength` grade, `dangerous_when` conditions, `counterexamples`, and resolvable
@@ -182,7 +193,9 @@ test, not just a feature.
 > `0008-tournament-judges-and-evidence.md`, `0009-revision-by-finding-identity.md`,
 > `0010-revision-acceptance-by-identity-and-waivers.md`, `0011-framework-regression-harness.md`,
 > `0012-human-gate-and-rubric.md`, `0013-operational-cleanups.md`, `0014-prose-audit.md`,
-> `0015-kb-structured-depth.md`, and the worked examples in `projects/salt-in-the-wire/` and
+> `0015-kb-structured-depth.md`, `0024-plan-to-prose-realization-evidence.md`,
+> `0025-typed-promise-obligations.md`, `0026-backward-revision-and-conservative-invalidation.md`,
+> and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 
 ### Stage 0 — Make the scaffold honest (foundations)

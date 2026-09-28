@@ -105,6 +105,22 @@ def verify_report(project: Path) -> dict:
     view_errors: list[str] = []
     expected_parent: str | None = seed_hash(project)
 
+    history = index.get("acceptance_history", {})
+    if isinstance(history, dict):
+        for history_scene, object_ids in history.items():
+            if not isinstance(object_ids, list):
+                authority_errors.append(f"{history_scene}: acceptance history is not a list")
+                continue
+            for object_id in object_ids:
+                if not isinstance(object_id, str) or not object_id:
+                    authority_errors.append(f"{history_scene}: invalid historical acceptance object id")
+                    continue
+                referenced_objects.add(object_id)
+                try:
+                    acceptance.load_object(project, object_id)
+                except (ValueError, json.JSONDecodeError) as exc:
+                    authority_errors.append(f"{history_scene}: historical {exc}")
+
     for scene_id in accepted:
         object_id = mapping.get(scene_id)
         if not isinstance(object_id, str) or not object_id:
@@ -236,6 +252,8 @@ def verify_report(project: Path) -> dict:
         "orphaned": orphaned,
         "accepted": accepted,
         "head_acceptance": index.get("head_acceptance"),
+        "rechecks_required": index.get("rechecks_required", {}),
+        "revision_events": index.get("revision_events", []),
     }
 
 
