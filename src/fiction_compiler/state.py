@@ -8,19 +8,20 @@ and without letting a fact a later scene introduces leak backward.
 
 Discourse vs fabula
 -------------------
-Three identifiers are distinct (per the design review): the **scene id** is repository identity
-*and* discourse (reading) order; each delta's **time** is fabula (event) time — when it happens in
-the story; and a scene spec's **narrative_mode** (linear / analepsis / prolepsis) marks a deliberate
-divergence between the two. Reconstruction still *replays* in scene-id (discourse) order; the
-chronology audit checks fabula time along the linear thread only, so a flashback (analepsis) does not
-read as "time running backward" (ADR 0006). Fabula-ordered state reconstruction — showing a flashback
-only what was true at its earlier fabula time — remains a deferred refinement (see ADR 0001).
+Three identifiers are distinct: the **scene id** is repository identity and discourse (reading)
+order; a state delta's **time** is its canonical fabula time; and a scene spec's **fabula_time** is
+the planning-time timestamp used before the delta is accepted. ``narrative_mode`` marks deliberate
+analepsis/prolepsis. When comparable timestamps are available, state replay follows fabula order so
+a flashback sees historical truth rather than later-in-story state. Discourse order remains the
+deterministic fallback for legacy artifacts whose time is absent or not comparable; that fallback is
+reported through ``reconstruction_issues`` rather than being silently presented as historical proof.
 """
 from __future__ import annotations
 
 import json
 from copy import deepcopy
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -35,6 +36,31 @@ def scene_sort_key(scene_id: str) -> tuple[int, int]:
         return (int(chapter[2:]), int(scene[2:]))
     except (ValueError, IndexError):
         return (10**9, 10**9)
+
+
+def normalize_fabula_time(value: Any) -> tuple[str, Any] | None:
+    """Normalize supported fabula timestamps without conflating numeric and datetime domains."""
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
+        return ("number", float(value))
+    if not isinstance(value, str):
+        return None
+    try:
+        parsed = datetime.fromisoformat(value[:-1] + "+00:00" if value.endswith("Z") else value)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return ("datetime-naive", parsed)
+    return ("datetime-aware", parsed.astimezone(timezone.utc).timestamp())
+
+
+def compare_fabula_time(left: Any, right: Any) -> int | None:
+    """Compare supported fabula times; return None when their domains are incomparable."""
+    a, b = normalize_fabula_time(left), normalize_fabula_time(right)
+    if a is None or b is None or a[0] != b[0]:
+        return None
+    return (a[1] > b[1]) - (a[1] < b[1])
 
 
 def _read_jsonl(path: Path) -> list[dict]:
@@ -104,6 +130,8 @@ class StoryState:
     promise_definitions: dict[str, dict[str, Any]] = field(default_factory=dict)
     closed_promises: set[str] = field(default_factory=set)
     applied_scenes: list[str] = field(default_factory=list)
+    reconstruction_order: str = "seed"
+    reconstruction_issues: list[str] = field(default_factory=list)
 
     def fact_exists(self, fact_id: str) -> bool:
         return fact_id in self.facts
@@ -388,23 +416,146 @@ def _load_delta(project: Path, scene_id: str) -> dict | None:
     return _read_json(path, None) if path.exists() else None
 
 
-def reconstruct(project: Path, upto_scene: str | None = None, *, inclusive: bool = False) -> StoryState:
-    """Reconstruct story state by replaying seed canon + accepted deltas.
+def _load_spec(project: Path, scene_id: str) -> dict:
+    frozen = acceptance.load_scene_snapshot(project, scene_id)
+    if frozen is not None:
+        _, snapshot = frozen
+        return acceptance.frozen_json(snapshot, "spec")
+    path = project / "scenes" / scene_id / "spec.json"
+    return _read_json(path, {}) if path.exists() else {}
 
-    Applies every accepted delta whose scene id sorts before ``upto_scene`` (or
-    ``<=`` when ``inclusive``). With ``upto_scene=None`` the full accepted history is
-    applied. Missing delta files are skipped (an accepted scene should always have one;
-    that invariant is enforced by ``validate_workspace``).
+
+def scene_fabula_time(project: Path, scene_id: str, *, prefer_live: bool = False) -> Any:
+    """Return a scene's fabula time, optionally preferring mutable planning/revision inputs.
+
+    Accepted history normally reads from immutable snapshots. While planning or validating a
+    revision, however, the target scene's live spec/delta is the proposed history and must determine
+    which accepted scenes precede it.
     """
+    delta_path = project / "scenes" / scene_id / "state-delta.json"
+    spec_path = project / "scenes" / scene_id / "spec.json"
+    delta = (
+        _read_json(delta_path, None)
+        if prefer_live and delta_path.exists()
+        else _load_delta(project, scene_id)
+    )
+    if isinstance(delta, dict) and delta.get("time") is not None:
+        return delta.get("time")
+    spec = (
+        _read_json(spec_path, {})
+        if prefer_live and spec_path.exists()
+        else _load_spec(project, scene_id)
+    )
+    return spec.get("fabula_time")
+
+
+def fabula_order(project: Path, scene_ids: list[str] | None = None) -> tuple[list[str], list[str]]:
+    """Order scenes by comparable fabula time, with an explicit discourse-order fallback."""
+    ids = list(scene_ids) if scene_ids is not None else accepted_scene_ids(project)
+    if not ids:
+        return [], []
+    normalized: dict[str, tuple[str, Any]] = {}
+    issues: list[str] = []
+    for scene_id in ids:
+        raw = scene_fabula_time(project, scene_id)
+        value = normalize_fabula_time(raw)
+        if value is None:
+            issues.append(f"{scene_id} has no orderable fabula time ({raw!r})")
+        else:
+            normalized[scene_id] = value
+    domains = {value[0] for value in normalized.values()}
+    if len(domains) > 1:
+        issues.append(f"scenes mix incomparable fabula time domains: {sorted(domains)}")
+    if issues:
+        return sorted(ids, key=scene_sort_key), issues
+    return sorted(ids, key=lambda scene_id: (normalized[scene_id][1], scene_sort_key(scene_id))), []
+
+
+def accepted_scene_ids_before(project: Path, scene_id: str) -> tuple[list[str], list[str]]:
+    """Accepted scenes earlier in fabula than a target; equal times use discourse order."""
+    ids = accepted_scene_ids(project)
+    target_time = scene_fabula_time(project, scene_id, prefer_live=True)
+    target_norm = normalize_fabula_time(target_time)
+    if target_norm is None:
+        target_key = scene_sort_key(scene_id)
+        return [sid for sid in ids if scene_sort_key(sid) < target_key], []
+
+    selected: list[str] = []
+    issues: list[str] = []
+    for accepted_id in ids:
+        if accepted_id == scene_id:
+            continue
+        accepted_time = scene_fabula_time(project, accepted_id)
+        comparison = compare_fabula_time(accepted_time, target_time)
+        if comparison is None:
+            issues.append(
+                f"cannot compare {accepted_id} fabula time {accepted_time!r} with "
+                f"{scene_id} fabula time {target_time!r}"
+            )
+            continue
+        if comparison < 0 or (
+            comparison == 0 and scene_sort_key(accepted_id) < scene_sort_key(scene_id)
+        ):
+            selected.append(accepted_id)
+    if issues:
+        target_key = scene_sort_key(scene_id)
+        return [sid for sid in ids if scene_sort_key(sid) < target_key], issues
+    ordered, order_issues = fabula_order(project, selected)
+    return ordered, order_issues
+
+
+def reconstruct(project: Path, upto_scene: str | None = None, *, inclusive: bool = False) -> StoryState:
+    """Reconstruct seed canon + accepted deltas, preferring fabula order when time is known."""
     state = seed_state(project)
-    target_key = scene_sort_key(upto_scene) if upto_scene is not None else None
-    for scene_id in accepted_scene_ids(project):
-        if target_key is not None:
-            key = scene_sort_key(scene_id)
-            if inclusive and key > target_key:
-                continue
-            if not inclusive and key >= target_key:
-                continue
+    if upto_scene is None:
+        replay_ids, issues = fabula_order(project)
+        order_issues = list(issues)
+        if state.time is not None:
+            for scene_id in replay_ids:
+                scene_time = scene_fabula_time(project, scene_id)
+                if scene_time is None:
+                    continue
+                seed_comparison = compare_fabula_time(scene_time, state.time)
+                if seed_comparison is None:
+                    issues.append(
+                        f"cannot compare {scene_id} fabula time {scene_time!r} with "
+                        f"seed canon time {state.time!r}"
+                    )
+                elif seed_comparison < 0:
+                    issues.append(
+                        f"{scene_id} fabula time {scene_time!r} precedes seed canon time {state.time!r}"
+                    )
+        state.reconstruction_order = "fabula" if not order_issues else "discourse_fallback"
+        state.reconstruction_issues.extend(issues)
+    else:
+        replay_ids, issues = accepted_scene_ids_before(project, upto_scene)
+        order_issues = list(issues)
+        if inclusive and upto_scene in accepted_scene_ids(project):
+            replay_ids = [*replay_ids, upto_scene]
+            replay_ids, extra = fabula_order(project, replay_ids)
+            issues.extend(extra)
+            order_issues.extend(extra)
+        target_time = scene_fabula_time(project, upto_scene, prefer_live=True)
+        normalized_target = normalize_fabula_time(target_time)
+        if state.time is not None and target_time is not None:
+            seed_comparison = compare_fabula_time(target_time, state.time)
+            if seed_comparison is None:
+                issues.append(
+                    f"cannot compare {upto_scene} fabula time {target_time!r} with "
+                    f"seed canon time {state.time!r}"
+                )
+            elif seed_comparison < 0:
+                issues.append(
+                    f"{upto_scene} fabula time {target_time!r} precedes seed canon time {state.time!r}"
+                )
+        if normalized_target is None:
+            state.reconstruction_order = "discourse"
+        elif order_issues:
+            state.reconstruction_order = "discourse_fallback"
+        else:
+            state.reconstruction_order = "fabula"
+        state.reconstruction_issues.extend(issues)
+    for scene_id in replay_ids:
         delta = _load_delta(project, scene_id)
         if delta is not None:
             _apply_delta(state, delta)

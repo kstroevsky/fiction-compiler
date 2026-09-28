@@ -22,14 +22,14 @@ from __future__ import annotations
 import json
 import re
 from copy import deepcopy
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from .ontology import (check_atom, exclusive_predicate_errors, load_entity_registry,
                        load_ontology, typed_equal)
-from .state import (accepted_scene_ids, reconstruct_state_before, resource_change_errors,
-                    scene_sort_key, seed_state)
+from .state import (accepted_scene_ids, accepted_scene_ids_before, compare_fabula_time,
+                    fabula_order, normalize_fabula_time, reconstruct_state_before,
+                    resource_change_errors, scene_fabula_time, scene_sort_key, seed_state)
 
 CHAR_ID = re.compile(r"^char-[a-z0-9-]+$")
 EVENT_ID = re.compile(r"^evt-[a-z0-9-]+$")
@@ -55,27 +55,9 @@ def _verdict(findings: list[dict]) -> str:
     return "pass"
 
 
-def _as_number(value: Any) -> float | None:
-    if isinstance(value, bool):
-        return None
-    if isinstance(value, (int, float)):
-        return float(value)
-    return None
-
-
 def _compare_time(a: Any, b: Any) -> int | None:
     """-1 if a<b, 0 if equal, 1 if a>b, None if not comparable."""
-    na, nb = _as_number(a), _as_number(b)
-    if na is not None and nb is not None:
-        return (na > nb) - (na < nb)
-    if isinstance(a, str) and isinstance(b, str):
-        try:
-            da = datetime.fromisoformat(a[:-1] + "+00:00" if a.endswith("Z") else a)
-            db = datetime.fromisoformat(b[:-1] + "+00:00" if b.endswith("Z") else b)
-            return (da > db) - (da < db)
-        except (TypeError, ValueError):
-            return None
-    return None
+    return compare_fabula_time(a, b)
 
 
 def _load_json(path: Path, default: Any) -> Any:
@@ -170,14 +152,23 @@ def _event_graph_findings(project: Path) -> list[dict]:
 
 
 def _occurred_events_before(project: Path, scene_id: str) -> set[str]:
-    """World events executed by earlier accepted scenes in discourse order."""
-    target = scene_sort_key(scene_id)
+    """World events executed before this scene in fabula order when time is reconstructible."""
     occurred: set[str] = set()
-    for prior_scene in accepted_scene_ids(project):
-        if scene_sort_key(prior_scene) >= target:
-            continue
+    prior_scenes, _ = accepted_scene_ids_before(project, scene_id)
+    for prior_scene in prior_scenes:
         prior_spec = _load_json(project / "scenes" / prior_scene / "spec.json", {})
         occurred.update(prior_spec.get("required_events", []))
+    return occurred
+
+
+def _executed_events_elsewhere(project: Path, scene_id: str) -> set[str]:
+    """Canonical event identities executed by any other accepted scene, regardless of discourse/fabula order."""
+    occurred: set[str] = set()
+    for other_scene in accepted_scene_ids(project):
+        if other_scene == scene_id:
+            continue
+        other_spec = _load_json(project / "scenes" / other_scene / "spec.json", {})
+        occurred.update(other_spec.get("required_events", []))
     return occurred
 
 
@@ -410,6 +401,12 @@ def audit_scene(project: Path, scene_id: str) -> dict:
     characters = _character_ids(project)
     before = reconstruct_state_before(project, scene_id)
 
+    for issue in before.reconstruction_issues:
+        findings.append(_finding(
+            "temporal", "material", f"{scene_id}: {issue}",
+            "Historical state could not be reconstructed unambiguously; use comparable fabula timestamps before relying on this scene's preconditions.",
+            "plot"))
+
     pov = spec.get("pov", "")
     if CHAR_ID.match(pov):
         if pov not in characters:
@@ -462,6 +459,31 @@ def audit_scene(project: Path, scene_id: str) -> dict:
 
     event_map = _events(project)
     scene_delta = _load_delta(project, scene_id) or {}
+    mode = spec.get("narrative_mode", "linear")
+    spec_time = spec.get("fabula_time")
+    delta_time = scene_delta.get("time")
+    if mode in {"analepsis", "prolepsis"}:
+        if spec_time is None:
+            findings.append(_finding(
+                "temporal", "material", f"{scene_id}: nonlinear scene has no fabula_time",
+                "Analepsis/prolepsis needs an explicit planning-time timestamp so historical state can be reconstructed.",
+                "discourse"))
+        if delta_time is None:
+            findings.append(_finding(
+                "temporal", "material", f"{scene_id}: nonlinear delta has no time",
+                "A nonlinear accepted scene needs canonical delta.time matching its planned fabula_time.",
+                "scene"))
+    if spec_time is not None and delta_time is not None:
+        comparison = compare_fabula_time(spec_time, delta_time)
+        if comparison is None:
+            findings.append(_finding(
+                "temporal", "material", f"{scene_id}: fabula_time {spec_time!r} vs delta.time {delta_time!r}",
+                "Scene planning time and canonical delta time use incomparable timestamp domains.", "scene"))
+        elif comparison != 0:
+            findings.append(_finding(
+                "temporal", "material", f"{scene_id}: fabula_time {spec_time!r} != delta.time {delta_time!r}",
+                "The accepted delta must take effect at the same fabula timestamp the scene was planned against.",
+                "scene"))
     knowledge_changes = scene_delta.get("knowledge_changes", [])
     belief_changes = scene_delta.get("belief_changes", [])
     required_event_ids = set(spec.get("required_events", []))
@@ -572,18 +594,11 @@ def audit_scene(project: Path, scene_id: str) -> dict:
             "Ordered resource operations would consume or transfer unavailable quantity, use an invalid quantity, or change units.",
             "scene"))
 
-    ordered_events = spec.get("narrative_mode", "linear") == "linear"
+    # Once the pre-scene snapshot is reconstructed at the scene's fabula time, nonlinear scenes can
+    # use the same beat executor as linear scenes. Repeated narration still belongs in event_references.
     event_state = deepcopy(before)
-    # Non-linear scenes are still validated against one pre-scene snapshot until fabula-ordered
-    # reconstruction lands. Preload end-of-scene facts only for effect/delta matching, never for
-    # their preconditions.
-    if not ordered_events:
-        for fact in scene_delta.get("facts_added", []):
-            previous = event_state.fact_definitions.get(fact.get("id"))
-            if previous is None or previous == fact.get("text"):
-                event_state.fact_definitions.setdefault(fact.get("id"), fact.get("text"))
-                event_state.facts[fact.get("id")] = fact.get("text")
     occurred_before = _occurred_events_before(project, scene_id)
+    executed_elsewhere = _executed_events_elsewhere(project, scene_id)
     executed_here: set[str] = set()
     event_references = set(spec.get("event_references", []))
     overlap = event_references & set(spec.get("required_events", []))
@@ -605,7 +620,7 @@ def audit_scene(project: Path, scene_id: str) -> dict:
             findings.append(_finding("causal", "material", f"required_events includes {event_id!r}",
                                      "Required event is not present in planning/event-graph.json.", "plot"))
             continue
-        if event_id in occurred_before:
+        if event_id in executed_elsewhere:
             findings.append(_finding(
                 "causal", "material", f"{scene_id} executes {event_id!r} again",
                 "A canonical world event already executed in an earlier scene; use event_references for a discourse reappearance instead of applying its world effects twice.",
@@ -617,12 +632,12 @@ def audit_scene(project: Path, scene_id: str) -> dict:
                     findings.append(_finding(
                         "causal", "material", f"{event_id} cause {cause!r}",
                         "Event cause does not resolve to an event in planning/event-graph.json.", "plot"))
-                elif ordered_events and cause not in occurred_before | executed_here:
+                elif cause not in occurred_before | executed_here:
                     findings.append(_finding(
                         "causal", "material", f"{event_id} cause {cause!r}",
                         "Causal predecessor has not executed before this event in the linear event order.", "plot"))
             elif isinstance(cause, str) and cause.startswith("fact-"):
-                cause_state = event_state if ordered_events else before
+                cause_state = event_state
                 if not cause_state.fact_exists(cause):
                     findings.append(_finding(
                         "causal", "material", f"{event_id} cause {cause!r}",
@@ -632,7 +647,7 @@ def audit_scene(project: Path, scene_id: str) -> dict:
                     "causal", "minor", f"{event_id} cause {cause!r}",
                     "Cause is unstructured prose; use a fact-* or evt-* reference to make it executable.", "plot"))
         for pre in event.get("preconditions", []):
-            pre_state = event_state if ordered_events else before
+            pre_state = event_state
             if isinstance(pre, dict):
                 kwargs = {"value": pre["value"]} if "value" in pre else {}
                 if "comparison" in pre:
@@ -651,7 +666,7 @@ def audit_scene(project: Path, scene_id: str) -> dict:
                         findings.append(_finding(
                             "causal", "material", f"{event_id} precondition {pre!r}",
                             "Event precondition does not resolve to an event in planning/event-graph.json.", "plot"))
-                    elif ordered_events and pre not in occurred_before | executed_here:
+                    elif pre not in occurred_before | executed_here:
                         findings.append(_finding(
                             "causal", "material", f"{event_id} precondition {pre!r}",
                             "Event precondition has not executed before this beat.", "plot"))
@@ -666,8 +681,7 @@ def audit_scene(project: Path, scene_id: str) -> dict:
                     findings.append(_finding(
                         "causal", "material", f"{event_id} effect {_atom_str(eff)}",
                         diagnosis, "scene"))
-        if ordered_events:
-            executed_here.add(event_id)
+        executed_here.add(event_id)
 
     ontology = load_ontology(project)
     if ontology is not None:
@@ -693,9 +707,75 @@ def audit_canon(project: Path) -> dict:
     promise_definitions = {pid: dict(value) for pid, value in before.promise_definitions.items()}
     event_map = _events(project)
     occurred_events: set[str] = set()
+    seed_time: Any = before.time
     prev_time: Any = before.time
 
-    for scene_id in accepted_scene_ids(project):
+    discourse_ids = accepted_scene_ids(project)
+    for scene_id in discourse_ids:
+        delta = _load_delta(project, scene_id)
+        if delta is None:
+            continue
+        spec = _load_json(project / "scenes" / scene_id / "spec.json", {})
+        mode = _narrative_mode(project, scene_id)
+        current_time = delta.get("time")
+        spec_time = spec.get("fabula_time")
+        if mode in {"analepsis", "prolepsis"} and spec_time is None:
+            findings.append(_finding(
+                "temporal", "material", f"{scene_id}: nonlinear scene has no fabula_time",
+                "Nonlinear scenes need an explicit planning timestamp for historical reconstruction.",
+                "discourse"))
+        if mode in {"analepsis", "prolepsis"} and current_time is None:
+            findings.append(_finding(
+                "temporal", "material", f"{scene_id}: nonlinear delta has no time",
+                "Nonlinear accepted scenes need canonical delta.time.", "scene"))
+        if current_time is not None and normalize_fabula_time(current_time) is None:
+            findings.append(_finding(
+                "temporal", "material", f"{scene_id}: unorderable time {current_time!r}",
+                "Accepted fabula time must be numeric or an ISO datetime before canonical history can be replayed.",
+                "plot"))
+        elif current_time is not None and seed_time is not None:
+            seed_comparison = compare_fabula_time(current_time, seed_time)
+            if seed_comparison is None:
+                findings.append(_finding(
+                    "temporal", "material",
+                    f"{scene_id}: fabula time {current_time!r} is incomparable with seed {seed_time!r}",
+                    "Accepted history and seed canon must use a comparable fabula-time domain.",
+                    "plot"))
+            elif seed_comparison < 0:
+                findings.append(_finding(
+                    "temporal", "material",
+                    f"{scene_id}: fabula time {current_time!r} precedes seed {seed_time!r}",
+                    "The current seed canon cannot reconstruct history earlier than its opening state.",
+                    "plot"))
+        if spec_time is not None and current_time is not None:
+            comparison = compare_fabula_time(spec_time, current_time)
+            if comparison is None or comparison != 0:
+                findings.append(_finding(
+                    "temporal", "material",
+                    f"{scene_id}: fabula_time {spec_time!r} vs delta.time {current_time!r}",
+                    "Planning-time and canonical fabula timestamps must be comparable and equal.", "scene"))
+        # Chronology diagnostics remain a discourse-order check over the linear thread. Nonlinear
+        # scenes deliberately diverge and do not advance that thread's clock.
+        if mode == "linear":
+            if current_time is not None and prev_time is not None:
+                comparison = _compare_time(prev_time, current_time)
+                if comparison is not None and comparison > 0:
+                    findings.append(_finding(
+                        "temporal", "material",
+                        f"{scene_id}: time {current_time!r} precedes previous {prev_time!r}",
+                        "Story time runs backward in linear narration; mark a deliberate flashback "
+                        "with narrative_mode 'analepsis'.", "plot"))
+            if current_time is not None:
+                prev_time = current_time
+
+    replay_ids, replay_issues = fabula_order(project, discourse_ids)
+    for issue in replay_issues:
+        findings.append(_finding(
+            "temporal", "material", f"canon replay: {issue}",
+            "Canonical cross-scene checks fell back to discourse order because fabula order is not fully specified.",
+            "plot"))
+
+    for scene_id in replay_ids:
         delta = _load_delta(project, scene_id)
         if delta is None:
             findings.append(_finding("factual", "material", f"accepted scene {scene_id}",
@@ -704,6 +784,11 @@ def audit_canon(project: Path) -> dict:
 
         spec = _load_json(project / "scenes" / scene_id / "spec.json", {})
         scene_events = set(spec.get("required_events", []))
+        for duplicate in sorted(scene_events & occurred_events):
+            findings.append(_finding(
+                "causal", "material", f"{scene_id} executes {duplicate!r} more than once in canon",
+                "Canonical world events execute once; later discourse appearances belong in event_references.",
+                "plot"))
 
         valid_defined_ids: set[str] = set()
         for proposition in [*delta.get("propositions_defined", []), *delta.get("facts_added", [])]:
@@ -765,21 +850,6 @@ def audit_canon(project: Path) -> dict:
                         "promise", "material", f"{scene_id} {promise_id!r} {key}={event_id!r}",
                         f"Promise {key} does not resolve to planning/event-graph.json.", "plot"))
 
-        # Chronology is checked along the LINEAR (discourse == fabula) thread only. A scene marked
-        # analepsis/prolepsis is a deliberate divergence: it neither trips the backward-time rule nor
-        # advances the linear clock (so a flashback between two present scenes is not a contradiction).
-        current_time = delta.get("time")
-        mode = _narrative_mode(project, scene_id)
-        if mode == "linear":
-            if current_time is not None and prev_time is not None:
-                comparison = _compare_time(prev_time, current_time)
-                if comparison is not None and comparison > 0:
-                    findings.append(_finding(
-                        "temporal", "material",
-                        f"{scene_id}: time {current_time!r} precedes previous {prev_time!r}",
-                        "Story time runs backward in linear narration; mark a deliberate flashback "
-                        "with narrative_mode 'analepsis'.", "plot"))
-
         # Apply the delta to the running shadow state.
         for proposition in delta.get("propositions_defined", []):
             fact_id, text = proposition["id"], proposition["text"]
@@ -808,8 +878,6 @@ def audit_canon(project: Path) -> dict:
                     "Declared payoff event occurs but the promise remains open; record the closure or revise the promise definition.",
                     "scene"))
         occurred_events.update(scene_events)
-        if current_time is not None and mode == "linear":
-            prev_time = current_time
 
     for promise_id, text in sorted(open_promises.items()):
         trigger_event = promise_definitions.get(promise_id, {}).get("trigger_event")

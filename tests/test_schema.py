@@ -97,6 +97,17 @@ class ValidatorKeywordTests(unittest.TestCase):
         self.assertTrue(any("exclusiveMinimum" in e or "oneOf" in e
                             for e in schema.validate_named(zero_quantity, "state-delta")))
 
+    def test_nonlinear_scene_requires_planning_fabula_time(self) -> None:
+        scene = {
+            "id": "ch01-sc02", "chapter": "ch01", "narrative_mode": "analepsis",
+            "pov": "", "participants": [], "purpose": [], "entry_state": [], "desire": "",
+            "conflict": "", "turn": "", "exit_state": [], "required_events": [],
+            "forbidden_moves": [],
+        }
+        self.assertTrue(any("fabula_time" in e for e in schema.validate_named(scene, "scene")))
+        scene["fabula_time"] = 2
+        self.assertEqual(schema.validate_named(scene, "scene"), [])
+
 
 class SchemaValidatorTests(unittest.TestCase):
     def test_all_repo_schemas_load(self) -> None:

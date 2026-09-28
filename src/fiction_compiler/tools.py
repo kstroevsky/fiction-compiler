@@ -56,6 +56,8 @@ def _state_json(state: StoryState) -> dict:
         "promise_definitions": state.promise_definitions,
         "closed_promises": sorted(state.closed_promises),
         "applied_scenes": state.applied_scenes,
+        "reconstruction_order": state.reconstruction_order,
+        "reconstruction_issues": state.reconstruction_issues,
     }
 
 

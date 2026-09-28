@@ -29,7 +29,7 @@ from pathlib import Path
 from . import (acceptance, defaultness, dependencies, hard_audit, integrity, issue_resolution,
                review_policy, schema)
 from .context import compile_bundle
-from .state import scene_sort_key
+from .state import compare_fabula_time, scene_fabula_time, scene_sort_key
 from .workspace import resolve_scene_candidate, validate_scene_id
 
 # --- Audit gate ------------------------------------------------------------------------------
@@ -331,32 +331,105 @@ def _revision_parent(project: Path, accepted: list[str], acceptance_objects: dic
     return parent_object, str(parent_snapshot["resulting_canon_hash"])
 
 
-def _assert_downstream_views_match(project: Path, accepted: list[str],
-                                   acceptance_objects: dict[str, str], scene_id: str) -> None:
-    """Refuse to rebase over mutable downstream views that no longer match accepted authority."""
-    ordered = sorted(accepted, key=scene_sort_key)
-    position = ordered.index(scene_id)
-    for downstream_scene in ordered[position + 1:]:
-        object_id = acceptance_objects.get(downstream_scene)
+def _assert_accepted_views_match(project: Path, acceptance_objects: dict[str, str],
+                                 scene_ids: list[str], cause_scene: str) -> None:
+    """Refuse to recheck/rebase accepted scenes whose mutable views drifted from authority."""
+    for accepted_scene in scene_ids:
+        object_id = acceptance_objects.get(accepted_scene)
         if not object_id:
             raise ValueError(
-                f"cannot revise {scene_id}: downstream scene {downstream_scene} has no immutable "
+                f"cannot revise {cause_scene}: affected scene {accepted_scene} has no immutable "
                 "acceptance object"
             )
         snapshot = acceptance.load_object(project, object_id)
         views = (
-            ("spec", project / "scenes" / downstream_scene / "spec.json"),
-            ("state_delta", project / "scenes" / downstream_scene / "state-delta.json"),
-            ("candidate", project / "manuscript" / "chapters" / f"{downstream_scene}.md"),
+            ("spec", project / "scenes" / accepted_scene / "spec.json"),
+            ("state_delta", project / "scenes" / accepted_scene / "state-delta.json"),
+            ("candidate", project / "manuscript" / "chapters" / f"{accepted_scene}.md"),
         )
         for field, path in views:
             expected = acceptance.frozen_bytes(snapshot, field)
             if not path.exists() or path.read_bytes() != expected:
                 relative = path.relative_to(project)
                 raise ValueError(
-                    f"cannot revise {scene_id}: downstream derived view {relative} differs from "
-                    f"accepted {downstream_scene}; restore/resolve it before rebasing history"
+                    f"cannot revise {cause_scene}: downstream derived view {relative} differs from "
+                    f"accepted {accepted_scene}; restore/resolve it before rebasing history"
                 )
+
+
+def _retroactive_fabula_scenes(project: Path, accepted: list[str], scene_id: str,
+                               delta: dict) -> list[str]:
+    """Prior discourse scenes whose entry state may change when this scene occurs earlier in fabula."""
+    current_time = delta.get("time")
+    if current_time is None:
+        return []
+    affected: list[str] = []
+    for prior_scene in accepted:
+        prior_time = scene_fabula_time(project, prior_scene)
+        comparison = compare_fabula_time(current_time, prior_time)
+        if comparison is not None and comparison < 0:
+            affected.append(prior_scene)
+    return sorted(affected, key=scene_sort_key)
+
+
+def _revision_fabula_rechecks(project: Path, accepted: list[str], scene_id: str,
+                              old_delta: dict, new_delta: dict,
+                              changed: dict) -> dict[str, dict[str, bool]]:
+    """Accepted scenes whose reconstructed entry state can change under a revision."""
+    old_time, new_time = old_delta.get("time"), new_delta.get("time")
+    time_comparison = compare_fabula_time(old_time, new_time)
+    time_changed = time_comparison is None or time_comparison != 0
+    state_changed = any(bool(values) for values in changed.values())
+    affected: dict[str, dict[str, bool]] = {}
+    for other_scene in accepted:
+        if other_scene == scene_id:
+            continue
+        other_time = scene_fabula_time(project, other_scene)
+        old_order = compare_fabula_time(old_time, other_time)
+        new_order = compare_fabula_time(new_time, other_time)
+        old_before = (
+            None if old_order is None else
+            old_order < 0 or (old_order == 0 and scene_sort_key(scene_id) < scene_sort_key(other_scene))
+        )
+        new_before = (
+            None if new_order is None else
+            new_order < 0 or (new_order == 0 and scene_sort_key(scene_id) < scene_sort_key(other_scene))
+        )
+        order_changed = old_before is None or new_before is None or old_before != new_before
+        if order_changed and time_changed:
+            affected[other_scene] = {"fabula_order_changed": True}
+        elif state_changed and (old_before is True or new_before is True):
+            affected[other_scene] = {"fabula_order_changed": False}
+    return affected
+
+
+def _record_retroactive_fabula_rechecks(project: Path, index: dict, affected: list[str],
+                                        scene_id: str, delta: dict) -> dict:
+    """Invalidate evidence for scenes whose historical entry state changed after nonlinear insertion."""
+    if not affected:
+        return index
+    acceptance_objects = dict(index.get("acceptance_objects", {}))
+    changed = dependencies.changed_state_refs({}, delta)
+    rechecks = index.get("rechecks_required", {})
+    rechecks = dict(rechecks) if isinstance(rechecks, dict) else {}
+    for affected_scene in affected:
+        object_id = acceptance_objects.get(affected_scene)
+        if not object_id:
+            raise ValueError(
+                f"cannot insert {scene_id} earlier in fabula: {affected_scene} has no immutable "
+                "acceptance object to recheck"
+            )
+        prior = acceptance.load_object(project, object_id)
+        rechecks[affected_scene] = {
+            "caused_by_scene": scene_id,
+            "reason": "retroactive_fabula_insertion",
+            "acceptance_object": object_id,
+            "known_state_dependency": dependencies.dependency_match(prior.get("read_set"), changed),
+            "required_scopes": ["hard", "literary", "reader", "voice", "whole_work"],
+            "hard_audit": {"status": "pending"},
+        }
+    index["rechecks_required"] = rechecks
+    return index
 
 
 def _refresh_pending_hard_rechecks(project: Path, index: dict) -> dict:
@@ -388,12 +461,15 @@ def _refresh_pending_hard_rechecks(project: Path, index: dict) -> dict:
 def _commit_revision_chain(project: Path, index: dict, accepted: list[str],
                            acceptance_objects: dict[str, str], scene_id: str,
                            old_object: str, new_object: str, new_snapshot: dict,
-                           old_delta: dict, new_delta: dict) -> tuple[dict, list[str]]:
+                           old_delta: dict, new_delta: dict) -> tuple[dict, list[str], list[str]]:
     """Replace one accepted scene and rebase immutable downstream snapshots onto its new chain."""
     ordered = sorted(accepted, key=scene_sort_key)
     position = ordered.index(scene_id)
     downstream = ordered[position + 1:]
     changed = dependencies.changed_state_refs(old_delta, new_delta)
+    fabula_rechecks = _revision_fabula_rechecks(
+        project, accepted, scene_id, old_delta, new_delta, changed
+    )
     _append_history(index, scene_id, old_object)
     acceptance_objects[scene_id] = new_object
 
@@ -426,8 +502,12 @@ def _commit_revision_chain(project: Path, index: dict, accepted: list[str],
         match = dependencies.dependency_match(prior.get("read_set"), changed)
         rechecks[downstream_scene] = {
             "caused_by_scene": scene_id,
+            "reason": "upstream_revision",
             "acceptance_object": replacement_object,
             "known_state_dependency": match,
+            "fabula_order_changed": bool(
+                fabula_rechecks.get(downstream_scene, {}).get("fabula_order_changed")
+            ),
             "required_scopes": ["hard", "literary", "reader", "voice", "whole_work"],
             "hard_audit": {"status": "pending"},
         }
@@ -438,6 +518,26 @@ def _commit_revision_chain(project: Path, index: dict, accepted: list[str],
         }
         current_object = replacement_object
         current_hash = str(replacement["resulting_canon_hash"])
+
+    for affected_scene, metadata in fabula_rechecks.items():
+        if affected_scene in downstream:
+            continue
+        active_object = acceptance_objects.get(affected_scene)
+        if not active_object:
+            raise ValueError(
+                f"cannot revise {scene_id}: fabula-dependent scene {affected_scene} has no "
+                "immutable acceptance object"
+            )
+        prior = acceptance.load_object(project, active_object)
+        rechecks[affected_scene] = {
+            "caused_by_scene": scene_id,
+            "reason": "fabula_revision",
+            "acceptance_object": active_object,
+            "known_state_dependency": dependencies.dependency_match(prior.get("read_set"), changed),
+            "fabula_order_changed": bool(metadata.get("fabula_order_changed")),
+            "required_scopes": ["hard", "literary", "reader", "voice", "whole_work"],
+            "hard_audit": {"status": "pending"},
+        }
 
     index["acceptance_objects"] = acceptance_objects
     index["head_acceptance"] = current_object
@@ -452,6 +552,7 @@ def _commit_revision_chain(project: Path, index: dict, accepted: list[str],
         "changed_state_refs": changed,
         "rebased": rebased,
         "conservative_downstream_recheck": downstream,
+        "fabula_rechecks": sorted(fabula_rechecks, key=scene_sort_key),
     }
     event["id"] = acceptance.sha256_bytes(acceptance.canonical_json_bytes(event))
     events.append(event)
@@ -464,7 +565,8 @@ def _commit_revision_chain(project: Path, index: dict, accepted: list[str],
     # Re-run the deterministic hard audit against the *new* active chain. Literary/reader/voice
     # effects remain explicitly pending because deterministic code cannot establish those outcomes.
     _refresh_pending_hard_rechecks(project, index)
-    return index, downstream
+    rechecked = sorted(set(downstream) | set(fabula_rechecks), key=scene_sort_key)
+    return index, downstream, rechecked
 
 
 def promote_candidate(project: Path, scene_id: str, candidate_file: str, *,
@@ -532,27 +634,45 @@ def promote_candidate(project: Path, scene_id: str, candidate_file: str, *,
                     )
                 revising = True
                 ordered = sorted(accepted, key=scene_sort_key)
-                for accepted_scene in ordered[ordered.index(scene_id):]:
+                downstream = ordered[ordered.index(scene_id) + 1:]
+                for accepted_scene in [scene_id, *downstream]:
                     if not acceptance_objects.get(accepted_scene):
                         raise ValueError(
                             f"cannot revise {scene_id}: {accepted_scene} has no immutable "
                             "acceptance object to preserve/rebase"
                         )
-                _assert_downstream_views_match(project, accepted, acceptance_objects, scene_id)
+                old_delta = acceptance.frozen_json(existing, "state_delta")
+                changed = dependencies.changed_state_refs(old_delta, delta)
+                fabula_affected = _revision_fabula_rechecks(
+                    project, accepted, scene_id, old_delta, delta, changed
+                )
+                for affected_scene in fabula_affected:
+                    if not acceptance_objects.get(affected_scene):
+                        raise ValueError(
+                            f"cannot revise {scene_id}: fabula-dependent scene {affected_scene} "
+                            "has no immutable acceptance object"
+                        )
+                views_to_check = sorted(
+                    set(downstream) | set(fabula_affected), key=scene_sort_key
+                )
+                _assert_accepted_views_match(
+                    project, acceptance_objects, views_to_check, scene_id
+                )
             else:
-                affected = []
-                if revision:
-                    index = _refresh_pending_hard_rechecks(project, index)
-                    affected = [
-                        sid for sid, entry in index.get("rechecks_required", {}).items()
-                        if isinstance(entry, dict) and entry.get("caused_by_scene") == scene_id
-                    ]
-                    for affected_scene in affected:
-                        active_object = acceptance_objects.get(affected_scene)
-                        if active_object:
-                            _materialize_snapshot(
-                                project, active_object, acceptance.load_object(project, active_object)
-                            )
+                index = _refresh_pending_hard_rechecks(project, index)
+                affected = [
+                    sid for sid, entry in index.get("rechecks_required", {}).items()
+                    if isinstance(entry, dict) and entry.get("caused_by_scene") == scene_id
+                ]
+                rebased = []
+                for affected_scene in affected:
+                    active_object = acceptance_objects.get(affected_scene)
+                    if not active_object:
+                        continue
+                    active_snapshot = acceptance.load_object(project, active_object)
+                    if active_snapshot.get("rebase_reason", {}).get("upstream_revision") == scene_id:
+                        rebased.append(affected_scene)
+                        _materialize_snapshot(project, active_object, active_snapshot)
                 decision = _materialize_snapshot(project, existing_object, existing)
                 result = {
                     "promoted_to": decision["promoted_to"],
@@ -568,11 +688,26 @@ def promote_candidate(project: Path, scene_id: str, candidate_file: str, *,
                 if revision:
                     result.update({
                         "revision": True,
-                        "rebased_scenes": affected,
+                        "rebased_scenes": sorted(rebased, key=scene_sort_key),
+                        "fabula_rechecked_scenes": sorted(affected, key=scene_sort_key),
                         "rechecks_required": {
                             sid: index.get("rechecks_required", {}).get(sid) for sid in affected
                         },
                     })
+                elif affected:
+                    historical = [
+                        sid for sid in affected
+                        if index.get("rechecks_required", {}).get(sid, {}).get("reason")
+                        == "retroactive_fabula_insertion"
+                    ]
+                    if historical:
+                        result["retroactive_fabula_scenes"] = sorted(
+                            historical, key=scene_sort_key
+                        )
+                        result["rechecks_required"] = {
+                            sid: index.get("rechecks_required", {}).get(sid)
+                            for sid in historical
+                        }
                 return result
         if not revising and accepted and scene_sort_key(scene_id) <= max(map(scene_sort_key, accepted)):
             raise ValueError(
@@ -728,6 +863,19 @@ def promote_candidate(project: Path, scene_id: str, candidate_file: str, *,
             snapshot["supersedes_acceptance"] = existing_object
             snapshot["rebase_reason"] = {"backward_revision": scene_id}
 
+        retroactive_fabula_scenes = (
+            [] if revising else _retroactive_fabula_scenes(project, accepted, scene_id, delta)
+        )
+        missing_recheck_objects = [
+            affected_scene for affected_scene in retroactive_fabula_scenes
+            if not acceptance_objects.get(affected_scene)
+        ]
+        if missing_recheck_objects:
+            raise ValueError(
+                f"cannot accept historical insertion {scene_id}: immutable acceptance objects "
+                f"are missing for {missing_recheck_objects}"
+            )
+
         # Detect an editor/agent changing a validated input while the checks were running. The
         # promotion lock serializes promotions; this second read also closes unrelated writer TOCTOU.
         for artifact in (candidate_artifact, spec_artifact, delta_artifact):
@@ -748,7 +896,7 @@ def promote_candidate(project: Path, scene_id: str, candidate_file: str, *,
         if revising:
             assert existing is not None and existing_object is not None
             old_delta = acceptance.frozen_json(existing, "state_delta")
-            index, downstream = _commit_revision_chain(
+            index, downstream, rechecked = _commit_revision_chain(
                 project, index, accepted, acceptance_objects, scene_id,
                 existing_object, object_id, snapshot, old_delta, delta,
             )
@@ -768,8 +916,9 @@ def promote_candidate(project: Path, scene_id: str, candidate_file: str, *,
                 "idempotent": False,
                 "revision": True,
                 "rebased_scenes": downstream,
+                "fabula_rechecked_scenes": rechecked,
                 "rechecks_required": {
-                    scene: index.get("rechecks_required", {}).get(scene) for scene in downstream
+                    scene: index.get("rechecks_required", {}).get(scene) for scene in rechecked
                 },
             }
         accepted.append(scene_id)
@@ -777,15 +926,20 @@ def promote_candidate(project: Path, scene_id: str, candidate_file: str, *,
         acceptance_objects[scene_id] = object_id
         index["acceptance_objects"] = acceptance_objects
         index["head_acceptance"] = object_id
+        index = _record_retroactive_fabula_rechecks(
+            project, index, retroactive_fabula_scenes, scene_id, delta
+        )
         acceptance.atomic_write(
             acceptance.index_path(project),
             (json.dumps(index, indent=2, ensure_ascii=False) + "\n").encode("utf-8"),
         )
+        if retroactive_fabula_scenes:
+            index = _refresh_pending_hard_rechecks(project, index)
 
         # These writes are views. If this process dies after the index replacement, the immutable
         # snapshot still contains the accepted state and a retry of the same promotion repairs them.
         decision = _materialize_snapshot(project, object_id, snapshot)
-        return {
+        result = {
             "promoted_to": decision["promoted_to"],
             "accepted_state_deltas": index["accepted_state_deltas"],
             "decision_file": str(
@@ -796,3 +950,10 @@ def promote_candidate(project: Path, scene_id: str, candidate_file: str, *,
             "acceptance_object": object_id,
             "idempotent": False,
         }
+        if retroactive_fabula_scenes:
+            result["retroactive_fabula_scenes"] = retroactive_fabula_scenes
+            result["rechecks_required"] = {
+                sid: index.get("rechecks_required", {}).get(sid)
+                for sid in retroactive_fabula_scenes
+            }
+        return result

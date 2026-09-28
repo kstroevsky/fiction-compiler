@@ -103,6 +103,8 @@ def compile_bundle(project: Path, scene_id: str) -> dict:
         "participants": character_sheets,
         "state_before": {
             "time": before.time,
+            "reconstruction_order": before.reconstruction_order,
+            "reconstruction_issues": before.reconstruction_issues,
             "facts": before.facts,
             "participant_knowledge": knowledge,
             "participant_memory": memory,
@@ -122,8 +124,9 @@ def compile_bundle(project: Path, scene_id: str) -> dict:
         "style_profile": _load(project / "planning" / "style-profile.json", {}),
         "selected_scene_plans": plan_search.selected_plans(project, scene_id),
         "note": (
-            "state_before is reconstructed from seed canon + accepted deltas only; it cannot "
-            "contain anything a later scene introduces. Current truth, retained memory, possibly "
+            "state_before is reconstructed from seed canon + accepted deltas, using fabula order "
+            "when comparable timestamps are available; reconstruction_issues exposes any legacy "
+            "fallback. Current truth, retained memory, possibly "
             "mistaken belief, and declared load-bearing resources are represented separately. "
             "Add targeted missing canon if needed; "
             "never paste the whole project. selected_scene_plans contains only an explicitly "

@@ -16,11 +16,12 @@ from __future__ import annotations
 
 import json
 import platform
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
 from . import (critic_eval, critique, defaultness, integrity, ontology, premise, prose_audit,
-               revision, tournament)
+               revision, state, tournament)
 from .workspace import ROOT
 
 FIXTURES = ROOT / "regression" / "fixtures.json"
@@ -97,6 +98,36 @@ def _tournament_selected(inp: dict) -> str:
     return rec.get("candidate", rec["decision"])
 
 
+def _fabula_replay(inp: dict) -> dict:
+    """Run an isolated canonical replay fixture through the production state engine."""
+    with tempfile.TemporaryDirectory() as tmp:
+        project = Path(tmp) / "project"
+        canon = project / "canon"
+        canon.mkdir(parents=True)
+        (canon / "index.json").write_text(
+            json.dumps({"accepted_state_deltas": inp.get("accepted", [])}), encoding="utf-8"
+        )
+        (canon / "timeline.jsonl").write_text(
+            json.dumps({"time": inp.get("seed_time", 0)}) + "\n", encoding="utf-8"
+        )
+        for scene_id, scene in inp.get("scenes", {}).items():
+            scene_dir = project / "scenes" / scene_id
+            scene_dir.mkdir(parents=True)
+            (scene_dir / "spec.json").write_text(
+                json.dumps(scene.get("spec", {"id": scene_id})), encoding="utf-8"
+            )
+            (scene_dir / "state-delta.json").write_text(
+                json.dumps(scene["delta"]), encoding="utf-8"
+            )
+        replayed = state.reconstruct(project)
+        return {
+            "applied_scenes": replayed.applied_scenes,
+            "facts": sorted(replayed.facts),
+            "reconstruction_order": replayed.reconstruction_order,
+            "issues": replayed.reconstruction_issues,
+        }
+
+
 CHECKS = {
     "defaultness_verdict": _defaultness_verdict,
     "revision_decision": _revision_decision,
@@ -108,6 +139,7 @@ CHECKS = {
     "critique_consistency": _critique_consistency,
     "critic_case": _critic_case,
     "vendor_output": _vendor_output,
+    "fabula_replay": _fabula_replay,
 }
 
 

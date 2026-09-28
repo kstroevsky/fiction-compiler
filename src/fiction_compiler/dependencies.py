@@ -17,6 +17,7 @@ def read_set_from_context(bundle: dict) -> dict:
     facts = before.get("facts", {}) if isinstance(before, dict) else {}
     memory = before.get("participant_memory", {}) if isinstance(before, dict) else {}
     beliefs = before.get("participant_beliefs", {}) if isinstance(before, dict) else {}
+    relationships = before.get("relationships", []) if isinstance(before, dict) else []
     predicates = before.get("predicates", []) if isinstance(before, dict) else []
     resources = before.get("resources", []) if isinstance(before, dict) else []
     promises = before.get("open_promises", {}) if isinstance(before, dict) else {}
@@ -37,15 +38,24 @@ def read_set_from_context(bundle: dict) -> dict:
                 {
                     "predicate": str(item.get("predicate")),
                     "subject": str(item.get("subject")),
-                    "object": str(item.get("object")),
+                    "object": None if item.get("object") is None else str(item.get("object")),
                 }
                 for item in predicates
                 if isinstance(item, dict)
                 and item.get("predicate") is not None
                 and item.get("subject") is not None
-                and item.get("object") is not None
             ],
-            key=lambda item: (item["predicate"], item["subject"], item["object"]),
+            key=lambda item: (item["predicate"], item["subject"], item["object"] or ""),
+        ),
+        "relationships": sorted(
+            [
+                {"subject": str(item.get("subject")), "object": str(item.get("object")),
+                 "dimension": str(dimension)}
+                for item in relationships if isinstance(item, dict)
+                and item.get("subject") is not None and item.get("object") is not None
+                for dimension in (item.get("dimensions") or {})
+            ],
+            key=lambda item: (item["subject"], item["object"], item["dimension"]),
         ),
         "resources": sorted({
             str(item.get("resource")) for item in resources
@@ -90,16 +100,35 @@ def _promise_effects(delta: dict) -> dict[str, list[str]]:
     return {key: sorted(values) for key, values in records.items()}
 
 
-def _predicate_effects(delta: dict) -> dict[tuple[str, str, str], list[str]]:
-    records: dict[tuple[str, str, str], list[str]] = {}
+def _predicate_effects(delta: dict) -> dict[tuple[str, str, str | None], list[str]]:
+    records: dict[tuple[str, str, str | None], list[str]] = {}
     for item in delta.get("predicate_changes", []):
         if not isinstance(item, dict):
             continue
-        parts = (item.get("predicate"), item.get("subject"), item.get("object"))
-        if any(value is None for value in parts):
+        if item.get("predicate") is None or item.get("subject") is None:
             continue
-        key = tuple(str(value) for value in parts)
+        key = (
+            str(item["predicate"]), str(item["subject"]),
+            None if item.get("object") is None else str(item.get("object")),
+        )
         records.setdefault(key, []).append(json.dumps(item, sort_keys=True, ensure_ascii=False))
+    return {key: sorted(values) for key, values in records.items()}
+
+
+def _relationship_effects(delta: dict) -> dict[tuple[str, str, str], list[str]]:
+    records: dict[tuple[str, str, str], list[str]] = {}
+    for item in delta.get("relationship_edges", []):
+        if not isinstance(item, dict) or any(item.get(key) is None for key in ("subject", "object", "dimension")):
+            continue
+        key = (str(item["subject"]), str(item["object"]), str(item["dimension"]))
+        records.setdefault(key, []).append(json.dumps(item, sort_keys=True, ensure_ascii=False))
+    for item in delta.get("relationship_changes", []):
+        if not isinstance(item, dict) or not isinstance(item.get("pair"), list) or len(item["pair"]) != 2:
+            continue
+        left, right = map(str, item["pair"])
+        rendered = json.dumps(item, sort_keys=True, ensure_ascii=False)
+        records.setdefault((left, right, "state"), []).append(rendered)
+        records.setdefault((right, left, "state"), []).append(rendered)
     return {key: sorted(values) for key, values in records.items()}
 
 
@@ -125,11 +154,18 @@ def changed_state_refs(before_delta: dict, after_delta: dict) -> dict:
     predicates = sorted(
         _changed_keys(_predicate_effects(before_delta), _predicate_effects(after_delta))
     )
+    relationships = sorted(
+        _changed_keys(_relationship_effects(before_delta), _relationship_effects(after_delta))
+    )
     return {
         "facts": facts,
         "predicates": [
             {"predicate": predicate, "subject": subject, "object": obj}
             for predicate, subject, obj in predicates
+        ],
+        "relationships": [
+            {"subject": subject, "object": obj, "dimension": dimension}
+            for subject, obj, dimension in relationships
         ],
         "resources": resources,
         "promises": promises,
@@ -147,13 +183,25 @@ def dependency_match(read_set: dict | None, changed: dict) -> bool | None:
     if set(map(str, read_set.get("promises", []))) & set(map(str, changed.get("promises", []))):
         return True
     reads = {
-        (str(item.get("predicate")), str(item.get("subject")), str(item.get("object")))
+        (str(item.get("predicate")), str(item.get("subject")),
+         None if item.get("object") is None else str(item.get("object")))
         for item in read_set.get("predicates", [])
         if isinstance(item, dict)
     }
     changed_predicates = {
-        (str(item.get("predicate")), str(item.get("subject")), str(item.get("object")))
+        (str(item.get("predicate")), str(item.get("subject")),
+         None if item.get("object") is None else str(item.get("object")))
         for item in changed.get("predicates", [])
         if isinstance(item, dict)
     }
-    return bool(reads & changed_predicates)
+    if reads & changed_predicates:
+        return True
+    relationship_reads = {
+        (str(item.get("subject")), str(item.get("object")), str(item.get("dimension")))
+        for item in read_set.get("relationships", []) if isinstance(item, dict)
+    }
+    relationship_changes = {
+        (str(item.get("subject")), str(item.get("object")), str(item.get("dimension")))
+        for item in changed.get("relationships", []) if isinstance(item, dict)
+    }
+    return bool(relationship_reads & relationship_changes)

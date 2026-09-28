@@ -28,8 +28,8 @@ mechanical validity, modeled/extracted consistency, and literary preference.
 | Workspace validation | `scripts/validate_workspace.py` | **Implemented** | Schema/integrity checks plus canon verification; maintained tests exercise failures |
 | Minimal context compilation | `src/fiction_compiler/context.py` | **Implemented, coarse relevance** | Replays state-before, filters to participants/required facts, writes collision-safe project-local evidence |
 | Scene-plan search | `plan_search.py`, `schemas/scene-plan*.json`, `generate-scene-plans` skill | **Implemented as experimental evidence workflow** | 3–4-plan divergence floor, typed feasibility, hash-bound plan review, explicit 1–2 selection; no automatic quality ranker |
-| Event-sourced canon / `reconstruct_state_before` | `src/fiction_compiler/state.py` | **Implemented** | Seed state + accepted deltas, typed comparisons/relationships/knowledge, declared value/entity domains, parsed chronology semantics |
-| Candidate promotion / backward revision | `promote.py`, `acceptance.py`, `integrity.py`, `dependencies.py` | **Implemented, downstream literary recheck remains manual** | Frozen candidate/spec/delta/review policy/evidence; immutable active/history chains, conservative read sets, rebasing + invalidation |
+| Event-sourced canon / `reconstruct_state_before` | `src/fiction_compiler/state.py` | **Implemented** | Seed state + accepted deltas, typed comparisons/relationships/knowledge, declared value/entity domains, fabula-ordered replay with explicit legacy fallback |
+| Candidate promotion / backward revision | `promote.py`, `acceptance.py`, `integrity.py`, `dependencies.py` | **Implemented, subjective recheck closure remains explicit** | Frozen candidate/spec/delta/review policy/evidence; immutable discourse-order chains, conservative read sets, discourse rebasing plus fabula-aware invalidation |
 | Hard/symbolic audit | `hard_audit.py`, `prose_audit.py` | **Implemented, extraction boundary remains empirical** | Code checks state/event constraints; candidate/spec/state-bound prose claims use exact spans and ordered truth, belief and typed-predicate evidence |
 | Realization calibration | `realization_calibration.py`, planted controls, ADR 0030 | **Evidence infrastructure implemented; live calibration not yet run** | Plan-blind extraction and plan-aware alignment are measured separately; extractor misses cannot become proved omissions |
 | Literary review | `role_runner.py`, role personas, review policy | **Implemented as evidence-producing model review** | Role-specific blind packets, immutable attempts, provenance, issue applicability/resolution |
@@ -146,9 +146,15 @@ test, not just a feature.
 > declarations may constrain value type/enumeration/range; optional closed entity registries validate
 > only explicitly closed types; and predicate-specific exclusivity checks domain invariants such as
 > one active location without imposing that physics globally. Plan feasibility, hard audit,
-> critic-eval and regression use the same semantics. Still ⬜ in P1: richer domain modeling only when
-> a story requires it, and fabula-**ordered** state reconstruction (a flashback still replays in
-> discourse order today).
+> critic-eval and regression use the same semantics. **Fabula-ordered nonlinear reconstruction is
+> now implemented (ADR 0038):** comparable accepted timestamps replay in story-time order; a live
+> nonlinear planning/revision target supplies its proposed historical boundary; canon
+> fact/knowledge/promise/event checks use the same order; discourse-only `event_references` do not
+> execute world effects twice; and retroactive insertions/revisions preserve immutable acceptance
+> objects while scheduling conservative rechecks for scenes whose historical entry state may change.
+> Missing/mixed time domains and attempts to precede the seed state are surfaced explicitly rather
+> than guessed. Still ⬜ in P1: richer domain modeling only when a story actually requires it; within
+> a scene, temporal granularity remains explicit event-beat order rather than timestamped prose.
 > Promise obligations now optionally carry typed `trigger_event` / `payoff_event` references
 > (ADR 0025): triggered-but-unpaid promises and payoff events without closure are material, while
 > legacy/untriggered open promises remain advisory. Prose-level payoff legibility is still a reader/
@@ -246,7 +252,8 @@ test, not just a feature.
 > the ADRs established — defaultness, the revision traps + waiver, tournament select/defer, ontology
 > typo — through a closed check whitelist, and report a **framework fingerprint** covering package
 > source, schemas, full KB/defaultness content, scripts, model roster/premise probes, eval/regression
-> corpora, personas/skills/governance text and runtime configuration. A change that regresses an
+> corpora, personas/skills/governance text and runtime configuration. The fixed suite now also pins
+> repeated-flashback fabula replay. A change that regresses an
 > invariant fails the run (non-zero exit). `framework_change.py` wraps that floor in a clean-baseline,
 > declared-scope transaction with exact pre-change snapshots, randomized blind A/B output evidence,
 > predeclared evidence thresholds, independent-of-agent-proposer accounting, a separate confirmed
@@ -269,6 +276,7 @@ test, not just a feature.
 > `0032-provider-usage-provenance.md`, `0033-framework-change-transactions.md`,
 > `0034-epistemic-and-resource-state.md`,
 > `0035-ordered-event-execution.md`, `0036-ordered-prose-evidence.md`,
+> `0037-declared-story-domains.md`, `0038-fabula-ordered-reconstruction.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 

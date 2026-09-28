@@ -96,6 +96,36 @@ class StateReconstructionTests(unittest.TestCase):
             self.assertEqual(before.relationship("char-mara", "char-jonas"), "colleagues")
             self.assertEqual(before.time, 0)
 
+    def test_flashback_uses_historical_state_and_full_replay_uses_fabula_order(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build_project(Path(tmp))
+            first = json.loads((project / "scenes" / "ch01-sc01" / "state-delta.json").read_text())
+            first["time"] = 5
+            first["facts_added"].append({"id": "fact-future", "text": "The later fact exists."})
+            first["facts_removed"] = ["fact-old-marker"]
+            write_delta(project, "ch01-sc01", first)
+
+            second = json.loads((project / "scenes" / "ch01-sc02" / "state-delta.json").read_text())
+            second["time"] = 2
+            second["facts_added"] = [{"id": "fact-old-marker", "text": "The old marker exists."}]
+            second["facts_removed"] = []
+            write_delta(project, "ch01-sc02", second)
+            write(project / "scenes" / "ch01-sc02" / "spec.json", json.dumps({
+                "id": "ch01-sc02", "narrative_mode": "analepsis", "fabula_time": 2,
+            }))
+
+            before_flashback = state.reconstruct_state_before(project, "ch01-sc02")
+            self.assertEqual(before_flashback.reconstruction_order, "fabula")
+            self.assertEqual(before_flashback.applied_scenes, [])
+            self.assertFalse(before_flashback.fact_exists("fact-future"))
+
+            final = state.reconstruct(project)
+            self.assertEqual(final.reconstruction_order, "fabula")
+            self.assertEqual(final.applied_scenes, ["ch01-sc02", "ch01-sc01"])
+            self.assertTrue(final.fact_exists("fact-future"))
+            self.assertFalse(final.fact_exists("fact-old-marker"))
+            self.assertEqual(final.time, 5)
+
 
 def build_typed_project(root: Path) -> Path:
     """A project exercising the typed-predicate layer and directional relationships (P1)."""

@@ -5,7 +5,7 @@
   "required": ["scene_id", "facts_added", "facts_removed", "knowledge_changes", "relationship_changes", "promises_opened", "promises_closed"],
   "properties": {
     "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
-    "time": {"type": ["string", "number"]},
+    "time": {"type": ["string", "number"], "comment": "Canonical fabula timestamp at which this scene delta takes effect. Required semantically for nonlinear accepted scenes."},
     "propositions_defined": {
       "type": "array",
       "items": {

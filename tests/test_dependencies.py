@@ -18,13 +18,22 @@ class DependencyStateTests(unittest.TestCase):
             "participant_beliefs": {"char-a": [
                 {"fact": "fact-false", "value": True, "source": "testimony"}
             ]},
-            "predicates": [],
+            "predicates": [{"predicate": "offline", "subject": "obj-relay", "object": None, "value": True}],
+            "relationships": [{
+                "subject": "char-a", "object": "char-b", "dimensions": {"trusts": "low"}
+            }],
             "resources": [{"resource": "res-loaf", "holder": "char-a", "quantity": 1}],
             "open_promises": {},
         }}
         read_set = dependencies.read_set_from_context(bundle)
         self.assertEqual(read_set["facts"], ["fact-current", "fact-false", "fact-stale"])
         self.assertEqual(read_set["resources"], ["res-loaf"])
+        self.assertEqual(read_set["predicates"], [
+            {"predicate": "offline", "subject": "obj-relay", "object": None}
+        ])
+        self.assertEqual(read_set["relationships"], [
+            {"subject": "char-a", "object": "char-b", "dimension": "trusts"}
+        ])
 
     def test_changed_state_refs_include_beliefs_definitions_and_resources(self) -> None:
         before = {
@@ -47,12 +56,32 @@ class DependencyStateTests(unittest.TestCase):
                 "op": "transfer", "resource": "res-loaf", "from": "char-a", "to": "customer",
                 "quantity": 2,
             }],
+            "predicate_changes": [{"op": "add", "predicate": "offline", "subject": "obj-relay"}],
+            "relationship_edges": [{
+                "subject": "char-a", "object": "char-b", "dimension": "trusts", "value": "low"
+            }],
         }
         changed = dependencies.changed_state_refs(before, after)
         self.assertEqual(changed["facts"], ["fact-door-open"])
         self.assertEqual(changed["resources"], ["res-loaf"])
+        self.assertEqual(changed["predicates"], [
+            {"predicate": "offline", "subject": "obj-relay", "object": None}
+        ])
+        self.assertEqual(changed["relationships"], [
+            {"subject": "char-a", "object": "char-b", "dimension": "trusts"}
+        ])
         self.assertTrue(dependencies.dependency_match(
             {"facts": [], "resources": ["res-loaf"], "predicates": [], "promises": []}, changed
+        ))
+        self.assertTrue(dependencies.dependency_match(
+            {"facts": [], "resources": [], "promises": [],
+             "predicates": [{"predicate": "offline", "subject": "obj-relay", "object": None}],
+             "relationships": []}, changed
+        ))
+        self.assertTrue(dependencies.dependency_match(
+            {"facts": [], "resources": [], "promises": [], "predicates": [],
+             "relationships": [{"subject": "char-a", "object": "char-b", "dimension": "trusts"}]},
+            changed,
         ))
 
 

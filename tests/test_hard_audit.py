@@ -475,7 +475,8 @@ class HardAuditExecutableEventTests(unittest.TestCase):
                 "required_events": ["evt-relay-cut"], "knowledge_required": [],
             })
             second_spec = {
-                "id": "ch01-sc02", "narrative_mode": "analepsis", "pov": "char-mara",
+                "id": "ch01-sc02", "narrative_mode": "analepsis", "fabula_time": 2,
+                "pov": "char-mara",
                 "participants": ["char-mara"], "required_events": ["evt-relay-cut"],
                 "knowledge_required": [],
             }
@@ -687,10 +688,72 @@ class HardAuditCanonTests(unittest.TestCase):
                 "knowledge_changes": [], "relationship_changes": [], "promises_opened": [], "promises_closed": [],
             })
             write_json(project / "scenes" / "ch01-sc02" / "spec.json", {
-                "id": "ch01-sc02", "narrative_mode": "analepsis", "required_events": [],
+                "id": "ch01-sc02", "narrative_mode": "analepsis", "fabula_time": 1,
+                "required_events": [],
             })
             critique = hard_audit.audit_canon(project)
             self.assertFalse(any(f["dimension"] == "temporal" for f in critique["findings"]), critique["findings"])
+
+    def test_canon_cross_scene_checks_follow_fabula_order(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01", "ch01-sc02"])
+            write_json(project / "planning" / "event-graph.json", {
+                "events": [{"id": "evt-trigger"}, {"id": "evt-payoff"}],
+                "edges": [{"from": "evt-trigger", "to": "evt-payoff"}],
+            })
+            write_json(project / "scenes" / "ch01-sc01" / "spec.json", {
+                "id": "ch01-sc01", "required_events": ["evt-payoff"],
+            })
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": 5,
+                "facts_added": [], "facts_removed": [],
+                "knowledge_changes": [{"character": "char-mara", "fact": "fact-earlier"}],
+                "relationship_changes": [], "promises_opened": [],
+                "promises_closed": ["promise-earlier"],
+            })
+            write_json(project / "scenes" / "ch01-sc02" / "spec.json", {
+                "id": "ch01-sc02", "narrative_mode": "analepsis", "fabula_time": 1,
+                "required_events": ["evt-trigger"],
+            })
+            write_json(project / "scenes" / "ch01-sc02" / "state-delta.json", {
+                "scene_id": "ch01-sc02", "time": 1,
+                "facts_added": [{"id": "fact-earlier", "text": "The earlier fact is true."}],
+                "facts_removed": [], "knowledge_changes": [], "relationship_changes": [],
+                "promises_opened": [{
+                    "id": "promise-earlier", "text": "Resolve the earlier signal.",
+                    "trigger_event": "evt-trigger", "payoff_event": "evt-payoff",
+                }],
+                "promises_closed": [],
+            })
+
+            critique = hard_audit.audit_canon(project)
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+            evidence = "\n".join(f["evidence"] for f in critique["findings"])
+            self.assertNotIn("never opened", evidence)
+            self.assertNotIn("does not exist", evidence)
+
+    def test_scene_before_seed_is_material_temporal_error(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01"])
+            write_json(project / "scenes" / "ch01-sc01" / "spec.json", {
+                "id": "ch01-sc01", "narrative_mode": "analepsis", "fabula_time": -1,
+                "required_events": [],
+            })
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": -1,
+                "facts_added": [], "facts_removed": [], "knowledge_changes": [],
+                "relationship_changes": [], "promises_opened": [], "promises_closed": [],
+            })
+            scene_critique = hard_audit.audit_scene(project, "ch01-sc01")
+            canon_critique = hard_audit.audit_canon(project)
+            self.assertTrue(any(
+                f["dimension"] == "temporal" and "precedes seed canon time" in f["evidence"]
+                for f in scene_critique["findings"]
+            ), scene_critique["findings"])
+            self.assertTrue(any(
+                f["dimension"] == "temporal" and "precedes seed" in f["evidence"]
+                for f in canon_critique["findings"]
+            ), canon_critique["findings"])
 
     def test_backward_time_in_linear_narration_still_flagged(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -709,6 +772,10 @@ class HardAuditCanonTests(unittest.TestCase):
     def test_iso_times_compare_chronologically_across_separator_styles(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project = base_project(Path(tmp), ["ch01-sc01", "ch01-sc02"])
+            write(
+                project / "canon" / "timeline.jsonl",
+                json.dumps({"time": "2026-09-28T08:00:00"}) + "\n",
+            )
             write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
                 "scene_id": "ch01-sc01", "time": "2026-09-28T09:00:00",
                 "facts_added": [], "facts_removed": [], "knowledge_changes": [],

@@ -124,6 +124,125 @@ class PromoteTests(unittest.TestCase):
             self.assertTrue(snapshot["binding_critiques"])
             self.assertEqual(integrity.verify_report(project)["status"], "verified")
 
+    def test_historical_insertion_rechecks_later_fabula_acceptance(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp))
+            (project / "canon" / "resources.jsonl").write_text(
+                json.dumps({"id": "res-loaf", "holder": "char-a", "quantity": 1, "unit": "loaf"}) + "\n",
+                encoding="utf-8",
+            )
+            first_delta = valid_delta("ch01-sc01")
+            first_delta["time"] = 5
+            (project / "scenes" / "ch01-sc01" / "state-delta.json").write_text(
+                json.dumps(first_delta), encoding="utf-8"
+            )
+            first = promote_candidate(project, "ch01-sc01", "c.md")
+
+            scene2 = project / "scenes" / "ch01-sc02"
+            (scene2 / "candidates").mkdir(parents=True)
+            (scene2 / "candidates" / "c.md").write_text(PROSE, encoding="utf-8")
+            second_spec = valid_spec("ch01-sc02")
+            second_spec.update({"narrative_mode": "analepsis", "fabula_time": 2})
+            (scene2 / "spec.json").write_text(json.dumps(second_spec), encoding="utf-8")
+            second_delta = valid_delta("ch01-sc02")
+            second_delta["time"] = 2
+            second_delta["resource_changes"] = [{
+                "op": "consume", "resource": "res-loaf", "holder": "char-a",
+                "quantity": 1, "unit": "loaf",
+            }]
+            (scene2 / "state-delta.json").write_text(json.dumps(second_delta), encoding="utf-8")
+            write_review_set(scene2)
+
+            second = promote_candidate(project, "ch01-sc02", "c.md")
+            index = acceptance.load_index(project)
+            self.assertEqual(second["retroactive_fabula_scenes"], ["ch01-sc01"])
+            self.assertEqual(index["acceptance_objects"]["ch01-sc01"], first["acceptance_object"])
+            recheck = index["rechecks_required"]["ch01-sc01"]
+            self.assertEqual(recheck["reason"], "retroactive_fabula_insertion")
+            self.assertTrue(recheck["known_state_dependency"])
+            self.assertEqual(recheck["hard_audit"]["status"], "pass")
+            self.assertEqual(
+                recheck["required_scopes"], ["literary", "reader", "voice", "whole_work"]
+            )
+            before_first = state.reconstruct_state_before(project, "ch01-sc01")
+            self.assertEqual(before_first.applied_scenes, ["ch01-sc02"])
+            self.assertEqual(before_first.resource_quantity("res-loaf", "char-a"), 0)
+
+    def test_live_revision_target_time_controls_reconstruction_boundary(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp))
+            first_delta = valid_delta("ch01-sc01")
+            first_delta["time"] = 2
+            (project / "scenes" / "ch01-sc01" / "state-delta.json").write_text(
+                json.dumps(first_delta), encoding="utf-8"
+            )
+            promote_candidate(project, "ch01-sc01", "c.md")
+
+            scene2 = project / "scenes" / "ch01-sc02"
+            (scene2 / "candidates").mkdir(parents=True)
+            (scene2 / "candidates" / "c.md").write_text(PROSE, encoding="utf-8")
+            (scene2 / "spec.json").write_text(
+                json.dumps(valid_spec("ch01-sc02")), encoding="utf-8"
+            )
+            second_delta = valid_delta("ch01-sc02")
+            second_delta["time"] = 5
+            (scene2 / "state-delta.json").write_text(json.dumps(second_delta), encoding="utf-8")
+            write_review_set(scene2)
+            promote_candidate(project, "ch01-sc02", "c.md")
+
+            live_spec = valid_spec("ch01-sc02")
+            live_spec.update({"narrative_mode": "analepsis", "fabula_time": 1})
+            (scene2 / "spec.json").write_text(json.dumps(live_spec), encoding="utf-8")
+            second_delta["time"] = 1
+            (scene2 / "state-delta.json").write_text(json.dumps(second_delta), encoding="utf-8")
+
+            self.assertEqual(state.scene_fabula_time(project, "ch01-sc02"), 5)
+            self.assertEqual(
+                state.scene_fabula_time(project, "ch01-sc02", prefer_live=True), 1
+            )
+            before = state.reconstruct_state_before(project, "ch01-sc02")
+            self.assertEqual(before.applied_scenes, [])
+            self.assertEqual(before.reconstruction_order, "fabula")
+
+    def test_historical_insertion_retry_finishes_pending_recheck(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp))
+            first_delta = valid_delta("ch01-sc01")
+            first_delta["time"] = 5
+            (project / "scenes" / "ch01-sc01" / "state-delta.json").write_text(
+                json.dumps(first_delta), encoding="utf-8"
+            )
+            promote_candidate(project, "ch01-sc01", "c.md")
+
+            scene2 = project / "scenes" / "ch01-sc02"
+            (scene2 / "candidates").mkdir(parents=True)
+            (scene2 / "candidates" / "c.md").write_text(PROSE, encoding="utf-8")
+            second_spec = valid_spec("ch01-sc02")
+            second_spec.update({"narrative_mode": "analepsis", "fabula_time": 2})
+            (scene2 / "spec.json").write_text(json.dumps(second_spec), encoding="utf-8")
+            second_delta = valid_delta("ch01-sc02")
+            second_delta["time"] = 2
+            (scene2 / "state-delta.json").write_text(json.dumps(second_delta), encoding="utf-8")
+            write_review_set(scene2)
+
+            with mock.patch(
+                "fiction_compiler.promote._refresh_pending_hard_rechecks",
+                side_effect=RuntimeError("recheck crash"),
+            ):
+                with self.assertRaisesRegex(RuntimeError, "recheck crash"):
+                    promote_candidate(project, "ch01-sc02", "c.md")
+
+            committed = acceptance.load_index(project)
+            self.assertEqual(
+                committed["rechecks_required"]["ch01-sc01"]["hard_audit"]["status"], "pending"
+            )
+            retry = promote_candidate(project, "ch01-sc02", "c.md")
+            self.assertTrue(retry["idempotent"])
+            self.assertEqual(retry["retroactive_fabula_scenes"], ["ch01-sc01"])
+            refreshed = acceptance.load_index(project)["rechecks_required"]["ch01-sc01"]
+            self.assertEqual(refreshed["hard_audit"]["status"], "pass")
+            self.assertNotIn("hard", refreshed["required_scopes"])
+
     def test_full_scene_schema_is_enforced(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project = build(Path(tmp))
@@ -258,6 +377,51 @@ class AcceptanceIntegrityTests(unittest.TestCase):
             promote_candidate(project, "ch01-sc01", "revision.md", revision=True)
             recheck = acceptance.load_index(project)["rechecks_required"]["ch01-sc02"]
             self.assertFalse(recheck["known_state_dependency"])
+            self.assertEqual(
+                recheck["required_scopes"], ["literary", "reader", "voice", "whole_work"]
+            )
+
+    def test_revision_rechecks_earlier_discourse_scene_when_it_is_later_in_fabula(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp))
+            first_delta = valid_delta("ch01-sc01")
+            first_delta["time"] = 5
+            (project / "scenes" / "ch01-sc01" / "state-delta.json").write_text(
+                json.dumps(first_delta), encoding="utf-8"
+            )
+            first = promote_candidate(project, "ch01-sc01", "c.md")
+
+            scene2 = project / "scenes" / "ch01-sc02"
+            (scene2 / "candidates").mkdir(parents=True)
+            (scene2 / "candidates" / "c.md").write_text(PROSE, encoding="utf-8")
+            second_spec = valid_spec("ch01-sc02")
+            second_spec.update({"narrative_mode": "analepsis", "fabula_time": 2})
+            (scene2 / "spec.json").write_text(json.dumps(second_spec), encoding="utf-8")
+            second_delta = valid_delta("ch01-sc02", fact_id="fact-before-first")
+            second_delta["time"] = 2
+            (scene2 / "state-delta.json").write_text(json.dumps(second_delta), encoding="utf-8")
+            write_review_set(scene2)
+            promote_candidate(project, "ch01-sc02", "c.md")
+
+            revised_prose = "A different remembered detail surfaced."
+            revised_sha = hashlib.sha256(revised_prose.encode("utf-8")).hexdigest()
+            (scene2 / "candidates" / "revision.md").write_text(revised_prose, encoding="utf-8")
+            revised_delta = valid_delta("ch01-sc02", fact_id="fact-revised-before-first")
+            revised_delta["time"] = 2
+            (scene2 / "state-delta.json").write_text(json.dumps(revised_delta), encoding="utf-8")
+            write_review_set(scene2, candidate_name="revision.md", sha=revised_sha)
+
+            result = promote_candidate(project, "ch01-sc02", "revision.md", revision=True)
+            index = acceptance.load_index(project)
+            self.assertEqual(result["rebased_scenes"], [])
+            self.assertEqual(result["fabula_rechecked_scenes"], ["ch01-sc01"])
+            self.assertEqual(
+                index["acceptance_objects"]["ch01-sc01"], first["acceptance_object"]
+            )
+            recheck = index["rechecks_required"]["ch01-sc01"]
+            self.assertEqual(recheck["reason"], "fabula_revision")
+            self.assertFalse(recheck["fabula_order_changed"])
+            self.assertEqual(recheck["hard_audit"]["status"], "pass")
             self.assertEqual(
                 recheck["required_scopes"], ["literary", "reader", "voice", "whole_work"]
             )
