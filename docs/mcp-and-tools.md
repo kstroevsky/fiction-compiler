@@ -31,6 +31,12 @@ It runs anywhere `python3` runs — no install step.
 | `plan_review_packet` | Build a plan-aware feasibility/intentionality packet with no candidate prose |
 | `record_plan_review` | Persist plan-review evidence bound to the exact plan hash, including “why don't they just…?” assessments |
 | `select_scene_plans` | Explicitly select 1–2 reviewed plans, recording who chose and why; deterministic code does not choose the winner |
+| `freeze_selection_pool` | Freeze exact candidate bytes and generation order for an independent selection-value experiment |
+| `selection_reader_packet` | Reader-safe blinded prose plus counterbalanced pair assignments; no reveal map or generation order |
+| `record_pairwise_preference` | Persist tie/abstain-capable pairwise evidence with human/model and audience/owner provenance |
+| `record_selector_choice` | Bind a critic/editor pick to the frozen pool before reader outcomes exist |
+| `record_selection_operation` | Record known cost/token/provider evidence and failures without converting missing usage to zero |
+| `selection_experiment_report` | Descriptively compare first/random/recorded selectors when independent pair/order coverage supports it |
 | `hard_audit` | Deterministic Audit 1 (knowledge cutoff, causal refs, POV, chronology, promise ledger) |
 | `defaultness_lint` | Model-default tics in prose, with evidence |
 | `evaluate_revision` | Accept/stop decision for a revision (stateless; takes iteration/attempts to reach every branch) |

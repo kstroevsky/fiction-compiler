@@ -34,10 +34,11 @@ mechanical validity, modeled/extracted consistency, and literary preference.
 | Literary review | `role_runner.py`, role personas, review policy | **Implemented as evidence-producing model review** | Role-specific blind packets, immutable attempts, provenance, issue applicability/resolution |
 | Defaultness/style heuristics | `defaultness.py`, catalog | **Advisory by default** | Contextual evidence; a project can explicitly opt into blocking mode |
 | Blind tournament / Pareto | `tournament.py`, `tools.tournament` | **Implemented** | Anonymization, order balancing, complete-matrix checks, eligibility floors, dissent preservation |
+| Selection-value measurement | `selection_eval.py`, `selection_experiment.py`, ADR 0028 | **Implemented as evidence infrastructure; study not yet run** | Frozen generation-order pools, independent pairwise labels, first/random/critic comparison, cost/failure missingness |
 | Anti-obviousness search | `avoid-defaults` skill, premise probes | **Partial/experimental** | Search prompts/probes exist; no validated continuation ensemble or universal originality metric |
 | Knowledge base | `kb/`, source register | **Starter set implemented** | Structured concept cards, conflicts/counterexamples, rights-aware provenance, one owned-scene annotation |
 | Framework regression | `regression.py`, fixtures, critic cases | **Implemented** | Closed checks plus fingerprint of code, schemas, KB, prompts/skills, roster/probes, eval data, scripts, runtime config |
-| Observability | project `.runs/`, trace, review attempts | **Substantial but incomplete** | Candidate-bound request/response packets and collision-safe runs; full token/cost accounting still missing |
+| Observability | project `.runs/`, trace, review attempts | **Substantial but incomplete** | Candidate-bound packets and collision-safe runs; selection experiments can account for known/missing usage, but live transports do not yet capture provider usage automatically |
 | End-to-end projects | `projects/*` | **Present** | Multiple worked projects exercise promotion, state, audits and manuscript assembly |
 
 ---
@@ -143,7 +144,14 @@ test, not just a feature.
 > `persist=true` writing blinded candidate copies + the record to `.runs/`. Role-runner transport now
 > uses role-specific evidence views (experiential reader, canon-aware continuity, style/profile,
 > character-local state, plan-aware architecture) while withholding candidate strategy identity.
-> Still ⬜ in P2: a first-class live pairwise-judgment transport and signed/external judgments.
+> **Selection measurement now has frozen evidence (ADR 0028, audit B1).** An experiment freezes exact
+> candidate bytes plus generation order before readers see them, counterbalances every pair, records
+> human/model and target/expert/owner cohorts separately, and compares compiler-owned first/random
+> baselines with a critic/editor choice bound before reader outcomes. Reports expose incomplete pair/
+> orientation coverage and missing token/cost data rather than treating either as success/zero. This is
+> measurement infrastructure, not a positive result: the independent human study has not been run.
+> Still ⬜ in P2: a live/signed external judgment transport and the powered crossed-brief/run/rater
+> analysis required for a population-level selection claim.
 >
 > **Scene-level composition now has an explicit search layer (ADR 0027, review §6.1).** The compiler
 > stores 3–4 immutable scene-plan alternatives bound to the current spec, requires real batch variation
@@ -207,7 +215,7 @@ test, not just a feature.
 > `0012-human-gate-and-rubric.md`, `0013-operational-cleanups.md`, `0014-prose-audit.md`,
 > `0015-kb-structured-depth.md`, `0024-plan-to-prose-realization-evidence.md`,
 > `0025-typed-promise-obligations.md`, `0026-backward-revision-and-conservative-invalidation.md`,
-> `0027-plan-level-search-before-prose.md`,
+> `0027-plan-level-search-before-prose.md`, `0028-frozen-selection-measurement.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 

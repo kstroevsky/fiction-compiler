@@ -18,7 +18,7 @@ from typing import Any, Callable
 from . import critic_eval as _critic_eval
 from . import critique as _critique
 from . import (defaultness, hard_audit, integrity, issue_resolution, kb, plan_search, reader,
-               regression, revision, safety, schema, trace)
+               regression, revision, safety, schema, selection_eval, trace)
 from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
@@ -317,6 +317,53 @@ def tournament(project: str, scene_id: str, seed: int = 0, persist: bool = False
                                              encoding="utf-8")
         record["persisted_to"] = str(run_dir.relative_to(proj))
     return record
+
+
+def freeze_selection_pool(project: str, scene_id: str, candidates: list[str], seed: int = 0) -> dict:
+    """Freeze an ordered prose-candidate pool for independent selector evaluation."""
+    return selection_eval.freeze_pool(project_dir(project), scene_id, candidates, seed=seed)
+
+
+def selection_reader_packet(project: str, scene_id: str, experiment_id: str) -> dict:
+    """Return blinded frozen prose and counterbalanced pair assignments, with no reveal map."""
+    return selection_eval.reader_packet(project_dir(project), scene_id, experiment_id)
+
+
+def record_pairwise_preference(project: str, scene_id: str, experiment_id: str, rater_id: str,
+                               cohort_kind: str, rater_kind: str, pair_id: str, choice: str,
+                               confidence: float | None = None, reason: str | None = None) -> dict:
+    """Persist one reader preference over a scheduled blinded pair."""
+    return selection_eval.record_preference(
+        project_dir(project), scene_id, experiment_id, rater_id, cohort_kind, rater_kind, pair_id,
+        choice, confidence=confidence, reason=reason,
+    )
+
+
+def record_selector_choice(project: str, scene_id: str, experiment_id: str, selector: str,
+                           candidate: str, provenance: dict | None = None) -> dict:
+    """Bind a critic/editor selector choice to the frozen pool before reader outcomes exist."""
+    return selection_eval.record_selector(
+        project_dir(project), scene_id, experiment_id, selector, candidate, provenance=provenance
+    )
+
+
+def record_selection_operation(project: str, scene_id: str, experiment_id: str, phase: str,
+                               status: str, candidate: str | None = None,
+                               provider: str | None = None, model: str | None = None,
+                               input_tokens: int | None = None, output_tokens: int | None = None,
+                               cost_usd: float | None = None,
+                               failure_reason: str | None = None) -> dict:
+    """Persist generation/review cost and failure evidence, preserving missing usage as unknown."""
+    return selection_eval.record_operation(
+        project_dir(project), scene_id, experiment_id, phase, status, candidate=candidate,
+        provider=provider, model=model, input_tokens=input_tokens, output_tokens=output_tokens,
+        cost_usd=cost_usd, failure_reason=failure_reason,
+    )
+
+
+def selection_experiment_report(project: str, scene_id: str, experiment_id: str) -> dict:
+    """Compare first/random/recorded selectors against independent human pairwise evidence."""
+    return selection_eval.report(project_dir(project), scene_id, experiment_id)
 
 
 def prose_audit(project: str, scene_id: str, claims: dict) -> dict:
@@ -706,6 +753,74 @@ TOOLS: list[dict] = [
            "persist": {"type": "boolean"}, "judges": {"type": "array"}, "judgments": {"type": "array"},
            "judge_rankings": {"type": "array"}},
           ["project", "scene_id"], tournament),
+    _tool("freeze_selection_pool",
+          "Freeze an ordered candidate pool for the audit's selector-value experiment. Copies exact "
+          "candidate bytes to a blinded experiment directory, preserves generation order and hashes, "
+          "and creates counterbalanced left/right pair assignments. Do this BEFORE recording selector "
+          "choices or reader judgments so first/random/critic all refer to the same immutable pool.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "candidates": {"type": "array", "minItems": 2, "maxItems": 26, "uniqueItems": True,
+                          "items": {"type": "string"}},
+           "seed": {"type": "integer"}},
+          ["project", "scene_id", "candidates"], freeze_selection_pool),
+    _tool("selection_reader_packet",
+          "Return the frozen selection experiment in reader-safe form: blinded prose plus scheduled, "
+          "counterbalanced pair orders. Candidate filenames, generation order, and the reveal map are "
+          "withheld so independent readers cannot infer which selector produced which choice.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "experiment_id": {"type": "string",
+                             "pattern": "^selection-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"}},
+          ["project", "scene_id", "experiment_id"], selection_reader_packet),
+    _tool("record_pairwise_preference",
+          "Persist one immutable preference on a scheduled blinded pair. Record human versus model "
+          "probe and target-reader/expert/owner cohort separately; tie and abstain are first-class. "
+          "Audience reports exclude owner and model-probe judgments from the independent human result.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "experiment_id": {"type": "string",
+                             "pattern": "^selection-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"},
+           "rater_id": {"type": "string", "minLength": 1},
+           "cohort_kind": {"type": "string", "enum": ["target_reader", "expert_reader", "owner", "other"]},
+           "rater_kind": {"type": "string", "enum": ["human", "model_probe"]},
+           "pair_id": {"type": "string", "pattern": "^pair-[0-9]{3}-(forward|reverse)$"},
+           "choice": {"type": "string", "enum": ["left", "right", "tie", "abstain"]},
+           "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+           "reason": {"type": "string"}},
+          ["project", "scene_id", "experiment_id", "rater_id", "cohort_kind", "rater_kind",
+           "pair_id", "choice"], record_pairwise_preference),
+    _tool("record_selector_choice",
+          "Record a critic/editor selector's choice against the exact frozen candidate pool. Must be "
+          "called before any reader preference is recorded. The compiler supplies first and seeded-"
+          "random baselines automatically; do not record those names manually.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "experiment_id": {"type": "string",
+                             "pattern": "^selection-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"},
+           "selector": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+           "candidate": {"type": "string"}, "provenance": {"type": "object"}},
+          ["project", "scene_id", "experiment_id", "selector", "candidate"], record_selector_choice),
+    _tool("record_selection_operation",
+          "Record one generation/critique/selection/reader/revision operation for experiment cost "
+          "and failure accounting. Token counts and cost are optional by design: omitted values stay "
+          "unknown in the report rather than being silently converted to zero.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "experiment_id": {"type": "string",
+                             "pattern": "^selection-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"},
+           "phase": {"type": "string", "enum": ["generation", "critique", "selection", "reader", "revision", "other"]},
+           "status": {"type": "string", "enum": ["success", "failure"]},
+           "candidate": {"type": "string"}, "provider": {"type": "string"},
+           "model": {"type": "string"}, "input_tokens": {"type": "integer", "minimum": 0},
+           "output_tokens": {"type": "integer", "minimum": 0},
+           "cost_usd": {"type": "number", "minimum": 0},
+           "failure_reason": {"type": "string", "minLength": 1}},
+          ["project", "scene_id", "experiment_id", "phase", "status"], record_selection_operation),
+    _tool("selection_experiment_report",
+          "Read-only B1 measurement report for one frozen pool. Compares compiler-owned first/random "
+          "baselines and recorded selectors against independent human pairwise preferences, preserves "
+          "tie/abstention/order coverage, reports empirical regret only with complete counterbalanced "
+          "coverage, and reports cost/failure missingness. Descriptive evidence only, not a significance test.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "experiment_id": {"type": "string",
+                             "pattern": "^selection-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"}},
+          ["project", "scene_id", "experiment_id"], selection_experiment_report),
     _tool("assemble",
           "Stitch the accepted (promoted) scenes into a single manuscript.md, in fabula order, "
           "with title and chapter/scene breaks. Returns the path and word count.",
