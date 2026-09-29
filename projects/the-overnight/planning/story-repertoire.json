@@ -1,0 +1,13 @@
+{
+  "project_id": "the-overnight",
+  "evidence_basis": "complete-manuscript",
+  "complete_story": true,
+  "features": {
+    "ending_form_tags": ["small-physical-act", "work-resumption", "artifact-recorded"],
+    "turn_tags": ["self-authored-practical-choice"],
+    "resolution_tags": ["practical-problem-resolved", "recognition-without-triumph"],
+    "object_motifs": ["bread", "hands", "recipe-card", "mixer"],
+    "focalization_tags": ["close-third", "fixed-internal"]
+  },
+  "notes": "Nadia records her own recipe and starts the morning mixer after successfully filling the wake order."
+}

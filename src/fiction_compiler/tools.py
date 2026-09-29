@@ -19,7 +19,7 @@ from . import critic_eval as _critic_eval
 from . import critique as _critique
 from . import (critic_calibration, defaultness, framework_change, hard_audit, integrity,
                issue_resolution, kb, plan_search, post_revision, reader, realization_calibration,
-               regression, revision, run_manifest, safety, schema, selection_eval, trace)
+               regression, repertoire, revision, run_manifest, safety, schema, selection_eval, trace)
 from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
@@ -141,6 +141,11 @@ def contract_coverage(project: str) -> dict:
 def reader_disclosure(project: str) -> dict:
     """Validate structural reader-disclosure/fair-play annotations without inferring comprehension."""
     return reader.disclosure_report(project_dir(project))
+
+
+def repertoire_report(projects: list[str] | None = None) -> dict:
+    """Report repeated cross-project discourse tags without ranking originality or quality."""
+    return repertoire.report(project_ids=projects)
 
 
 def audit(project: str, scene_id: str | None = None) -> dict:
@@ -955,6 +960,13 @@ TOOLS: list[dict] = [
           "Validate reader-disclosure annotations, curiosity-gap ordering, and declared surprise setup. "
           "This is structural evidence only; it does not infer reader comprehension.",
           {"project": {"type": "string"}}, ["project"], reader_disclosure),
+    _tool("repertoire_report",
+          "Count exact ending/turn/resolution/motif/focalization tags across complete project "
+          "manuscripts. Partial stories are reported but excluded from observed-frequency claims. "
+          "This is a repertoire diagnostic, not an originality score or promotion gate.",
+          {"projects": {"type": "array", "uniqueItems": True,
+                        "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}}},
+          [], repertoire_report),
     _tool("hard_audit",
           "Run the deterministic hard audit (Audit 1). With scene_id: audit one scene (knowledge "
           "cutoff, causal refs, POV). Without: audit canon + accepted scenes (chronology, promise "

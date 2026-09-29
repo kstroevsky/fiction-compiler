@@ -1,0 +1,13 @@
+{
+  "project_id": "visiting-order",
+  "evidence_basis": "complete-manuscript",
+  "complete_story": true,
+  "features": {
+    "ending_form_tags": ["small-physical-act", "departure", "relationship-unresolved"],
+    "turn_tags": ["withheld-truth-choice"],
+    "resolution_tags": ["refusal-without-reconciliation", "relationship-unresolved"],
+    "object_motifs": ["photo", "key", "visiting-table", "stamp"],
+    "focalization_tags": ["close-third", "fixed-internal"]
+  },
+  "notes": "Lena leaves after choosing the familiar reassurance; the family imbalance remains unresolved."
+}

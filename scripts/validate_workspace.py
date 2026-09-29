@@ -136,6 +136,9 @@ def validate_projects(errors: list[str]) -> None:
         disclosure_path = project / "planning" / "reader-disclosure.json"
         if disclosure_path.exists():
             check_schema(errors, disclosure_path, read_json(disclosure_path), "reader-disclosure")
+        repertoire_path = project / "planning" / "story-repertoire.json"
+        if repertoire_path.exists():
+            check_schema(errors, repertoire_path, read_json(repertoire_path), "story-repertoire")
 
         ontology_path = project / "canon" / "ontology.json"
         if ontology_path.exists():

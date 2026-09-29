@@ -1,0 +1,13 @@
+{
+  "project_id": "forecourt",
+  "evidence_basis": "complete-manuscript",
+  "complete_story": true,
+  "features": {
+    "ending_form_tags": ["small-physical-act", "routine-return", "ambiguity-preserved"],
+    "turn_tags": ["moral-choice-under-ambiguity"],
+    "resolution_tags": ["recognition-without-resolution", "central-ambiguity-preserved"],
+    "object_motifs": ["glass", "fob", "till", "button"],
+    "focalization_tags": ["close-third", "fixed-internal"]
+  },
+  "notes": "The ending returns Jo to the till after retrieving and pocketing the fob; the man's identity remains unresolved."
+}

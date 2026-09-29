@@ -1,0 +1,13 @@
+{
+  "project_id": "verbatim",
+  "evidence_basis": "complete-manuscript",
+  "complete_story": true,
+  "features": {
+    "ending_form_tags": ["small-physical-act", "external-outcome-withheld", "institutional-process-continues"],
+    "turn_tags": ["ethical-choice-under-ambiguity"],
+    "resolution_tags": ["moral-choice-resolved", "external-outcome-withheld"],
+    "object_motifs": ["word", "water", "microphone", "record"],
+    "focalization_tags": ["close-third", "fixed-internal"]
+  },
+  "notes": "Mira resolves her own rendering choice, drinks the water, and leaves the tribunal's verdict pending."
+}

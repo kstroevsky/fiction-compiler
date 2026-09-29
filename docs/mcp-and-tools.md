@@ -28,6 +28,7 @@ It runs anywhere `python3` runs — no install step.
 | `compile_context` | The minimal, leak-free drafting bundle for a scene |
 | `contract_coverage` | Show how each reader-contract clause is mapped or explicitly untested; mapping never means the clause passed |
 | `reader_disclosure` | Validate discourse-revelation → canonical-fact bindings, explicit non-factual revelations, curiosity gaps, and surprise setup without claiming reader comprehension |
+| `repertoire_report` | Count repeated project-owned ending/turn/resolution/motif/focalization tags across complete manuscripts; partial stories stay visible but are excluded from observed frequencies, and no originality score is produced |
 | `record_scene_plan` | Persist one immutable alternative scene plan bound to the current scene-spec hash |
 | `scene_plan_search` | Inspect 3–4-plan search width, deterministic feasibility, review coverage, and explicit selection without ranking plans |
 | `plan_review_packet` | Build a plan-aware feasibility/intentionality packet with no candidate prose |

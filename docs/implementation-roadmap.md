@@ -38,7 +38,7 @@ mechanical validity, modeled/extracted consistency, and literary preference.
 | Blind tournament / Pareto | `tournament.py`, `tools.tournament` | **Implemented** | Anonymization, order balancing, complete-matrix checks, eligibility floors, dissent preservation |
 | Selection-value measurement | `selection_eval.py`, `selection_experiment.py`, ADR 0028 | **Implemented as evidence infrastructure; study not yet run** | Frozen generation-order pools, independent pairwise labels, first/random/critic comparison, cost/failure missingness |
 | Critic calibration | `critic_calibration.py`, `critic_calibration.py` CLI, ADR 0029 | **Implemented as evidence infrastructure; calibrated study not yet run** | Frozen cases, repeated runs, conditional invariance/directional comparisons, crossed writer/judge families, joint-error bookkeeping, human-label disagreement preserved |
-| Anti-obviousness search | `avoid-defaults` skill, premise probes | **Partial/experimental** | Search prompts/probes exist; no validated continuation ensemble or universal originality metric |
+| Anti-obviousness search / repertoire | `avoid-defaults` skill, premise probes, `repertoire.py`, ADR 0041 | **Cross-project recurrence implemented; generative originality remains experimental** | Complete-story feature tags expose repeated endings/turns/resolutions/motifs/focalization without an originality score or gate |
 | Knowledge base | `kb/`, source register | **Starter set implemented** | Structured concept cards, conflicts/counterexamples, rights-aware provenance, one owned-scene annotation |
 | Framework regression | `regression.py`, fixtures, critic cases | **Implemented** | Closed checks plus fingerprint of code, schemas, KB, prompts/skills, roster/probes, eval data, scripts, runtime config |
 | Observability | project `.runs/`, trace, review attempts | **Substantial** | Candidate-bound packets and collision-safe runs; live role transports preserve provider token metadata/latency when available, and selection experiments keep unknown usage distinct from zero |
@@ -212,6 +212,15 @@ test, not just a feature.
 > clauses explicit. Still ⬜ in Track G: actual prefix-reader probes, target-audience measurement,
 > ambiguity/comprehension evidence, and owner-preference data kept separate from audience outcomes.
 >
+> **Cross-project repertoire is now explicit (ADR 0041, review §6.8 / Track C).** Project-owned
+> ending/turn/resolution/motif/focalization tags are checked against manuscript completeness and counted
+> across complete stories only. The current five complete worked manuscripts reproduce the audit's
+> `small-physical-act` ending recurrence (5/5) and common close-third/fixed-internal focalization;
+> `salt-in-the-wire` remains a partial prefix and is excluded from those frequencies rather than having
+> its ending guessed. The report is descriptive and advisory: no aggregate originality score, promotion
+> gate, or requirement to differ is introduced. Still empirical: whether changing one of these repeated
+> choices improves reader outcomes or merely produces arbitrary novelty.
+>
 > **Revision loop now diffs by finding identity (ADR 0009, P3 slice 1).** `evaluate_revision` gives
 > each finding a fingerprint (dimension + normalized evidence) and classifies fixed / persisted /
 > worsened / newly-introduced, so a *new* material finding is rejected even when the raw count falls
@@ -293,6 +302,7 @@ test, not just a feature.
 > `0035-ordered-event-execution.md`, `0036-ordered-prose-evidence.md`,
 > `0037-declared-story-domains.md`, `0038-fabula-ordered-reconstruction.md`,
 > `0039-resumable-scene-run-provenance.md`, `0040-bind-reader-disclosures-to-discourse.md`,
+> `0041-cross-project-repertoire-diagnostic.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 
