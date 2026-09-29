@@ -3,7 +3,7 @@
 Status assessment and staged plan, measured against `docs/original-design-brief.md`.
 The brief is treated as **product vision**, not a binding spec — deviations are called out explicitly.
 
-Ground-truth snapshot (2026-09-28): the repository has a working deterministic compiler kernel,
+Ground-truth snapshot (2026-09-29): the repository has a working deterministic compiler kernel,
 acceptance/provenance layer, review runner, selection harness, and regression suite. Passing checks
 establish the encoded invariants; they do **not** establish literary quality or the untested empirical
 claims in the audit. Those require independent reader/critic measurement.
@@ -44,6 +44,26 @@ mechanical validity, modeled/extracted consistency, and literary preference.
 | Framework regression | `regression.py`, fixtures, critic cases | **Implemented** | Closed checks plus fingerprint of code, schemas, KB, prompts/skills, roster/probes, eval data, scripts, runtime config |
 | Observability | project `.runs/`, trace, review attempts | **Substantial** | Candidate-bound packets and collision-safe runs; live role transports preserve provider token metadata/latency when available, and selection experiments keep unknown usage distinct from zero |
 | End-to-end projects | `projects/*` | **Present** | Multiple worked projects exercise promotion, state, audits and manuscript assembly |
+
+### Audit §6 implementation status
+
+This table is the current checkpoint for the Sept. 28 review. “Implemented” below means the
+mechanism or evidence-capture path exists and is regression-tested. It does not convert an unrun
+reader/model experiment into a positive result.
+
+| Review item | Current implementation | Evidence still missing |
+|---|---|---|
+| §6.1 plan-level search | **Mechanics implemented** — ADR 0027 records divergent frozen plans, feasibility/review evidence, and explicit selection without a deterministic best-plan score | Equal-cost blind comparison of plan search vs additional prose realizations |
+| §6.2 backward revision | **Mechanics implemented** — ADRs 0026/0031 preserve immutable acceptance history, rebase downstream canon, rerun hard checks, and keep subjective rechecks pending until explicitly resolved | Comparative literary benefit of backward revision on real work |
+| §6.3 plan-to-prose realization | **Calibration infrastructure implemented** — ADRs 0024/0030/0036 separate plan-blind extraction, alignment, ordered evidence, consistency, and coverage | Live/hidden-set calibration with predeclared tolerances before promotion-gate authority |
+| §6.4 reader model | **Structural disclosure + measured-prefix path implemented** — ADRs 0040/0045 deliberately avoid a simulated reader mind | Actual target-audience responses and any predeclared free-text coding protocol |
+| §6.5 contract coverage | **Implemented** — coverage maps deterministic, critic, and reader checks while retaining explicit `untested`/`not_assessed` states | Reader evidence for mapped experiential clauses; broader mappings as projects require them |
+| §6.6 owner taste | **Prospective evidence implemented** — ADR 0042 freezes alternatives, choices/reasons, and choice-hidden critic predictions | Accumulated owner decisions and a prospective critic-prediction study |
+| §6.7 selection thesis | **Measurement harness implemented** — ADR 0028 freezes pools/order, reader comparisons, first/random/critic selectors, and cost/failure missingness | Independent human study with uncertainty; no universal critic-superiority claim is established |
+| §6.8 cross-story repetition | **Descriptive diagnostic implemented** — ADR 0041 records recurring endings/turns/resolutions/motifs/focalization without an originality gate | Reader evidence that changing a repeated choice improves outcomes rather than novelty alone |
+| §6.9 literature control | **First control implemented** — ADRs 0043/0044 enforce rights status and run schema/defaultness probes on Joyce's “Araby” | Live critics, human discourse baselines, and additional unseen permissioned/public-domain controls |
+| §6.10 long-form scale | **Unrun empirical diagnostic** — existing state/provenance mechanics can support it, but no 8–12k-word condition has been executed | One bounded 8–12k-word diagnostic first; broader claims require more than one case |
+| §6.11 writer-family diversity | **Provenance/accounting mechanics exist** — ADRs 0032/0039 can record family/provider and operation cost | Equal-cost multi-family drafting plus edit-vs-regeneration experiment and blind preference evidence |
 
 ---
 
@@ -86,11 +106,15 @@ Ordering principle: build the primitive everything else depends on first
 and only write KB prose once code consumes it. Every stage ends green and adds a regression
 test, not just a feature.
 
-> **Build status (updated 2026-09-28).** Stage 0 ✅, Stage 1 ✅, Stage 2 ✅ are implemented and tested.
-> Stage 3 🟡 has a structured starter KB, rights-aware source register, defaultness catalog and one
-> repository-owned annotation. Stage 4 🟡 has advisory defaultness diagnostics plus deterministic
-> blind-label/order/Pareto tournament mechanics; continuation-prediction/originality experiments
-> remain unvalidated research work.
+> **Build status (updated 2026-09-29).** Stage 0 ✅, Stage 1 ✅, and Stage 2 ✅ are implemented and
+> tested. Stage 3 ✅ has the validated starter KB, rights-aware source register, contextual
+> defaultness catalog, repository-owned annotation, and the first rights-cleared literature control;
+> further corpus growth is evidence-driven expansion rather than a blocker. Stage 4 ✅ for selection
+> mechanics: blind/order-balanced Pareto selection, disagreement preservation, frozen selection
+> experiments, plan-level search, and cross-project repertoire diagnostics are implemented. The
+> empirical studies remain unrun. The old continuation-prediction/`Originality*` proposal is not an
+> active required mechanism: ADRs 0041/0045 use descriptive repertoire evidence and measured prefix
+> readers instead of a speculative originality score or simulated reader-expectation state.
 >
 > **Two self-improvement loops** (see `docs/self-improvement-loops.md`): the **story** PDCA loop's
 > deterministic CHECK/ACT is built (`src/fiction_compiler/revision.py`, `scripts/revise_scene.py`,
@@ -336,62 +360,63 @@ test, not just a feature.
 > `0041-cross-project-repertoire-diagnostic.md`, `0042-record-owner-preference-evidence.md`,
 > `0043-enforce-fiction-corpus-rights-gate.md`,
 > `0044-add-public-domain-literature-control.md`,
-> `0045-measure-prefix-reader-responses.md`,
+> `0045-measure-prefix-reader-responses.md`, `0046-reconcile-roadmap-with-evidence-state.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 
-### Stage 0 — Make the scaffold honest (foundations)
-**Goal:** the checks that pass should mean something.
-- Add `jsonschema`; enforce all 6 schemas in `validate_workspace.py` (and fail on violation).
-- Move logic out of loose scripts into `src/fiction_compiler/` (real package: `state.py`,
-  `validators.py`, `context.py`, `io.py`); scripts become thin CLIs.
-- Create **one real end-to-end example project** (3–4 scenes, full canon + deltas) as a
-  fixture, so every later stage has something to run against.
-- Add tests that fail when a schema is violated and when a scene delta is malformed.
-- **Exit:** `make validate` rejects a deliberately broken fixture; CI-style test proves it.
+### Stage 0 — Make the scaffold honest (foundations) ✅
+**Goal:** checks that pass mean the encoded thing they claim to check.
+- Schemas are enforced by workspace validation; malformed fixtures fail maintained tests.
+- Core behavior lives in `src/fiction_compiler/`; scripts are CLI/tool entry points.
+- Multiple worked projects now exercise full state/spec/delta/manuscript paths.
+- **Exit status:** complete for the current schema surface. New schemas must enter the same validation
+  path rather than relying on directory presence.
 
-### Stage 1 — Event-sourced canon state (**the keystone**)
-**Goal:** implement the brief's `reconstruct_state_before(scene_id)`.
-- `state.py`: fold `timeline.jsonl` + `knowledge-state.jsonl` + `relationship-state.jsonl`
-  + `promises.jsonl` + accepted `state-delta.json` files into a point-in-time state object.
-- Wire `promote_candidate.py` to **append the accepted delta to the canon ledgers**
-  (currently missing) — closing the event-sourcing loop the brief specifies.
-- **Exit:** given scene N, reconstruct state after N−1 deterministically; test proves future
-  facts/knowledge do not leak backward.
+### Stage 1 — Event-sourced canon state (**the keystone**) ✅
+**Goal:** implement the brief's `reconstruct_state_before(scene_id)` without mutable-history leakage.
+- `state.py` reconstructs seed canon plus accepted scene deltas and prefers fabula order when times are
+  comparable, with an explicit discourse fallback when they are not.
+- Promotion no longer follows the early roadmap's literal “append accepted delta to canon ledgers”
+  design. The authority transaction writes an immutable content-addressed acceptance object and
+  atomically updates `canon/index.json` (`accepted_state_deltas`, `acceptance_objects`,
+  `head_acceptance`). State replay reads the frozen delta from the active acceptance object. Revisions
+  preserve superseded objects and rebase the active chain instead of rewriting accepted history.
+- **Exit status:** complete; state-before is deterministic, accepted bytes are tamper-evident, and
+  nonlinear history is reconstructed/invalidation-scheduled in fabula order where defined.
 
-### Stage 2 — Hard audit as code (Audit 1)
-**Goal:** the audit the brief most insists must be code, not an LLM.
-- `validators.py` on top of Stage 1 state: chronology/travel-time monotonicity, knowledge
-  cutoff (scene's `knowledge_required` ⊆ reconstructed character knowledge), POV access,
-  promise created-without-payoff ledger, relationship-state preconditions, causal
-  preconditions satisfied from the event graph. Emit `critique.schema`-valid JSON.
-- Turn `compile_scene_context.py` into a real minimal-context compiler using Stage 1 state
-  (knowledge cutoff enforced → no future-knowledge leak; relevance filter instead of dump).
-- **Exit:** a scene that references an unlearned fact or an unpaid-off promise fails a
-  deterministic check with a machine-readable finding.
+### Stage 2 — Hard audit as code (Audit 1) ✅
+**Goal:** deterministic constraints remain code-owned where the repository has a sound oracle.
+- Hard audit evaluates chronology/state, knowledge and belief access, typed predicates/resources,
+  relationship and promise obligations, ordered event preconditions/effects, POV policy, and declared
+  story domains against reconstructed state.
+- Context compilation uses state-before and relevance filtering rather than exposing future canon.
+- Prose realization has a separate evidence-bound extraction/alignment path; semantic literary effects
+  that code cannot prove remain explicitly empirical.
+- **Exit status:** complete for declared deterministic semantics; richer domain rules are added only
+  when a story makes them load-bearing.
 
-### Stage 3 — Knowledge base content (only what code consumes)
-**Goal:** populate the KB the audits and skills actually retrieve — nothing inert.
-- Level-1 concept cards for the starter set referenced by Stage 2/4: focalization,
-  narrative-distance, causality, character-intentionality, scene-dramaturgy,
-  dialogue-subtext, promise/payoff, eventfulness, surprise-vs-postdictability, and a
-  defaultness catalog. YAML per the brief's Level-1 schema.
-- Populate `source-register.json` with the brief's seed set **plus a German/EU copyright
-  verification field** (implemented by ADR 0043; US-public-domain aggregators stay blocked until a
-  specific title/translation/edition is cleared).
-- Level-0 index + Level-2 notes only for concepts a skill/audit references.
-- **Exit:** each card is cited by at least one audit rule or skill; a test asserts no
-  orphan cards and no dangling source IDs.
+### Stage 3 — Knowledge base content (only what code consumes) ✅ baseline
+**Goal:** maintain a small, validated, evidence-aware KB rather than accumulate inert craft prose.
+- Structured concept cards, conflicting-theory links, defaultness evidence, source provenance, and
+  dangling-reference/orphan checks are in the validation path.
+- ADR 0043 adds EU/DE rights/full-text policy. ADR 0044 adds the first title-specific cleared external
+  literature control; aggregator-level public-domain status alone is insufficient.
+- **Exit status:** starter baseline complete. Open work is empirical expansion: more rights-cleared or
+  repository-owned controls and retrieval/craft additions only when they answer an observed need.
 
-### Stage 4 — Selection & anti-obviousness engine (the "search system")
-**Goal:** stop selecting by vibe.
-- Quality-vector `Q` representation + Pareto selection over candidates.
-- Blind pairwise tournament **harness**: code owns anonymization, order reversal, multi-judge
-  fan-out, and disagreement recording; LLMs only score.
-- Continuation-prediction ensemble + `Originality* = Unexpectedness × RetrospectiveCoherence
-  × CharacterNecessity`; lightweight reader-expectation tracker feeds it.
-- **Exit:** tournament output is reproducible given fixed judge responses; a random-meteor
-  candidate scores near-zero on character necessity in a fixture.
+### Stage 4 — Selection & anti-obviousness engine (the "search system") ✅ mechanics
+**Goal:** make selection evidence inspectable without pretending literary preference has a deterministic
+oracle.
+- Tournament code owns seeded anonymization, forward/reverse presentation orders, deterministic
+  eligibility floors, multidimensional scoring, Pareto fronts, and disagreement preservation.
+- ADR 0028 freezes generation-order candidate pools and separates critic/first/random selectors from
+  subsequent human/model reader outcomes. ADR 0027 adds divergent scene-plan search before prose.
+- ADR 0041 records cross-project repertoire recurrence descriptively. ADR 0045 measures reader
+  expectation/comprehension from accepted prefixes. These supersede the early plan to make
+  `Originality*` or a simulated reader-expectation tracker an architectural gate.
+- **Exit status:** mechanics complete; actual selection benefit, plan-search benefit, critic calibration,
+  and any originality intervention remain empirical studies whose null/unknown outcomes must stay
+  explicit.
 
 ### Stage 5 — Self-improvement & regression harness
 **Goal:** make `retrospective` executable, not aspirational.
