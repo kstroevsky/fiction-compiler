@@ -1,9 +1,11 @@
 """Reader-facing structural evidence without pretending to model comprehension.
 
 The project can declare where each reader-contract clause is checked (or explicitly untested) and
-annotate which canonical facts are available to the reader in discourse order.  These reports only
-verify the annotation structure and its references.  They do not infer what a real reader noticed,
-believed, remembered, or preferred; those remain measured reader/critic questions.
+bind discourse-plan revelations to canonical facts available to the reader.  Revelations that are
+choices, recognitions, or other non-factual discourse moves remain explicitly non-factual rather than
+being forced into the fact ledger.  These reports only verify annotation structure and references.
+They do not infer what a real reader noticed, believed, remembered, or preferred; those remain
+measured reader/critic questions.
 """
 from __future__ import annotations
 
@@ -102,7 +104,7 @@ def _all_fact_ids(project: Path) -> set[str]:
 
 
 def disclosure_report(project: Path) -> dict:
-    """Validate reader-disclosure annotations and fair-play/curiosity ordering references."""
+    """Validate disclosure annotations against discourse-plan revelations and canonical facts."""
     project = Path(project)
     brief = _load(project / "brief" / "project.json", {})
     path = project / "planning" / "reader-disclosure.json"
@@ -121,8 +123,26 @@ def disclosure_report(project: Path) -> dict:
     scene_ids = {path.name for path in (project / "scenes").iterdir() if path.is_dir()} \
         if (project / "scenes").exists() else set()
     fact_ids = _all_fact_ids(project)
+    discourse = _load(project / "planning" / "discourse-plan.json", {})
+    revelation_by_id: dict[str, dict] = {}
+    for item in discourse.get("revelations", []) if isinstance(discourse.get("revelations", []), list) else []:
+        if not isinstance(item, dict):
+            errors.append("discourse-plan revelation must be an object")
+            continue
+        rid = item.get("id")
+        scene_id = item.get("scene")
+        if not isinstance(rid, str) or not rid:
+            errors.append("discourse-plan revelation needs a non-empty id")
+            continue
+        if rid in revelation_by_id:
+            errors.append(f"duplicate discourse-plan revelation id: {rid}")
+        revelation_by_id[rid] = item
+        if scene_id not in scene_ids:
+            errors.append(f"discourse-plan revelation {rid!r} references unknown scene {scene_id!r}")
+
     disclosures = artifact.get("disclosures", [])
     disclosure_by_id: dict[str, dict] = {}
+    fact_bound_revelations: set[str] = set()
     for item in disclosures:
         did = item["id"]
         if did in disclosure_by_id:
@@ -132,6 +152,34 @@ def disclosure_report(project: Path) -> dict:
             errors.append(f"{did} references unknown scene {item['scene_id']!r}")
         if item["fact"] not in fact_ids:
             errors.append(f"{did} references unknown fact {item['fact']!r}")
+        source = item["source_revelation"]
+        revelation = revelation_by_id.get(source)
+        if revelation is None:
+            errors.append(f"{did} references unknown discourse revelation {source!r}")
+        else:
+            fact_bound_revelations.add(source)
+            if revelation.get("scene") != item["scene_id"]:
+                errors.append(
+                    f"{did} scene {item['scene_id']!r} does not match source revelation "
+                    f"{source!r} scene {revelation.get('scene')!r}"
+                )
+
+    non_fact_revelations: set[str] = set()
+    for item in artifact.get("non_fact_revelations", []):
+        rid = item["revelation_id"]
+        if rid in non_fact_revelations:
+            errors.append(f"duplicate non-factual revelation declaration: {rid}")
+        non_fact_revelations.add(rid)
+        if rid not in revelation_by_id:
+            errors.append(f"non-factual declaration references unknown discourse revelation {rid!r}")
+        if rid in fact_bound_revelations:
+            errors.append(f"discourse revelation {rid!r} is both fact-bound and declared non-factual")
+
+    for rid in revelation_by_id:
+        if rid not in fact_bound_revelations and rid not in non_fact_revelations:
+            errors.append(
+                f"discourse revelation {rid!r} has no fact disclosure or explicit non-factual declaration"
+            )
 
     for gap in artifact.get("curiosity_gaps", []):
         if gap["opened_in"] not in scene_ids:
@@ -165,10 +213,16 @@ def disclosure_report(project: Path) -> dict:
         "status": "valid" if not errors else "invalid",
         "errors": errors,
         "counts": {
+            "discourse_revelations": len(revelation_by_id),
+            "fact_bound_revelations": len(fact_bound_revelations),
+            "non_fact_revelations": len(non_fact_revelations),
             "disclosures": len(disclosures),
             "curiosity_gaps": len(artifact.get("curiosity_gaps", [])),
             "surprises": len(artifact.get("surprises", [])),
         },
         "verification": "structural_only",
-        "note": "Annotations support structural checks; they do not prove what a reader noticed, inferred, or remembered.",
+        "note": (
+            "Fact bindings and non-factual declarations account for planned revelations structurally; "
+            "they do not prove what a reader noticed, inferred, understood, or remembered."
+        ),
     }

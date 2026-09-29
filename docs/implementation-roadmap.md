@@ -27,6 +27,7 @@ mechanical validity, modeled/extracted consistency, and literary preference.
 | Schemas | `schemas/*.json` | **Enforced** | Workspace, critique, policy, premise, ontology, claims, judgment and state payloads are validated |
 | Workspace validation | `scripts/validate_workspace.py` | **Implemented** | Schema/integrity checks plus canon verification; maintained tests exercise failures |
 | Minimal context compilation | `src/fiction_compiler/context.py` | **Implemented, coarse relevance** | Replays state-before, filters to participants/required facts, writes collision-safe project-local evidence |
+| Reader/contract structure | `reader.py`, `reader-disclosure.json`, `contract-coverage.json`, ADR 0040 | **Structural evidence implemented; reader measurement unrun** | Discourse revelations bind to canonical disclosures or explicit non-factual declarations; contract clauses keep mapped/untested status separate from verification |
 | Scene-plan search | `plan_search.py`, `schemas/scene-plan*.json`, `generate-scene-plans` skill | **Implemented as experimental evidence workflow** | 3–4-plan divergence floor, typed feasibility, hash-bound plan review, explicit 1–2 selection; no automatic quality ranker |
 | Event-sourced canon / `reconstruct_state_before` | `src/fiction_compiler/state.py` | **Implemented** | Seed state + accepted deltas, typed comparisons/relationships/knowledge, declared value/entity domains, fabula-ordered replay with explicit legacy fallback |
 | Candidate promotion / backward revision | `promote.py`, `acceptance.py`, `integrity.py`, `dependencies.py` | **Implemented, subjective recheck closure remains explicit** | Frozen candidate/spec/delta/review policy/evidence; immutable discourse-order chains, conservative read sets, discourse rebasing plus fabula-aware invalidation |
@@ -64,8 +65,9 @@ storage is available, and do not turn one successful sample into a global stylis
 Treating it as vision, not gospel:
 
 - **Reader-cognition simulation (§2.9)** — a full model of reader knowledge/belief/suspense
-  is speculative and hard to validate. Scope down to a lightweight *reader-expectation*
-  tracker used only by the anti-obviousness engine (Stage 4). Don't build the whole thing.
+  is speculative and hard to validate. Keep the implemented discourse ledger structural, and use
+  prefix-reader probes for measured expectation/comprehension rather than promoting annotations into
+  a simulated reader mind. Don't build the whole thing.
 - **GUI / context viewer (§11 close)** — the brief already defers this. Keep it deferred
   (Stage 6); it is author-experience, not correctness.
 - **Agent count** — the brief's own guidance ("five specialists, not twenty") is right; the
@@ -201,6 +203,15 @@ test, not just a feature.
 > estimates. This remains measurement infrastructure: no qualified human calibration study or repair-
 > benefit experiment has been run, and the report has no promotion-gate authority.
 >
+> **Reader disclosure is now bound to the discourse plan (ADR 0040, review §§6.4–6.5 / Track G).**
+> Every fact disclosure names the planned revelation and exact scene it realizes; every planned
+> revelation must instead be explicitly declared non-factual when it is an enacted choice,
+> recognition, or unresolved ambiguity. The six worked projects now carry structurally valid ledgers
+> with curiosity-gap declarations where applicable. This is `structural_only`: it does not establish
+> what any reader noticed or understood. Existing contract-coverage files continue to keep untested
+> clauses explicit. Still ⬜ in Track G: actual prefix-reader probes, target-audience measurement,
+> ambiguity/comprehension evidence, and owner-preference data kept separate from audience outcomes.
+>
 > **Revision loop now diffs by finding identity (ADR 0009, P3 slice 1).** `evaluate_revision` gives
 > each finding a fingerprint (dimension + normalized evidence) and classifies fixed / persisted /
 > worsened / newly-introduced, so a *new* material finding is rejected even when the raw count falls
@@ -281,7 +292,7 @@ test, not just a feature.
 > `0034-epistemic-and-resource-state.md`,
 > `0035-ordered-event-execution.md`, `0036-ordered-prose-evidence.md`,
 > `0037-declared-story-domains.md`, `0038-fabula-ordered-reconstruction.md`,
-> `0039-resumable-scene-run-provenance.md`,
+> `0039-resumable-scene-run-provenance.md`, `0040-bind-reader-disclosures-to-discourse.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 

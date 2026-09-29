@@ -1,0 +1,39 @@
+{
+  "project_id": "the-overnight",
+  "disclosures": [
+    {
+      "id": "disclosure-dough-ruined",
+      "source_revelation": "rev-dough-ruined",
+      "fact": "fact-dough-ruined",
+      "scene_id": "ch01-sc01",
+      "mode": "stated",
+      "note": "The accepted prose explicitly diagnoses the over-proofed dough as gone."
+    },
+    {
+      "id": "disclosure-own-method",
+      "source_revelation": "rev-her-choice",
+      "fact": "fact-nadia-made-own",
+      "scene_id": "ch01-sc02",
+      "mode": "stated",
+      "note": "The accepted prose shows Nadia set the phone down and make a fast milk bread by her own method."
+    },
+    {
+      "id": "disclosure-loaves-delivered",
+      "source_revelation": "rev-recognition",
+      "fact": "fact-loaves-delivered",
+      "scene_id": "ch01-sc03",
+      "mode": "stated",
+      "note": "The loaves leave with Halloran and Nadia writes her own method onto a recipe card."
+    }
+  ],
+  "non_fact_revelations": [],
+  "curiosity_gaps": [
+    {
+      "id": "gap-wake-order",
+      "question": "Will Nadia produce the twelve wake loaves by six after the overnight dough is lost?",
+      "opened_in": "ch01-sc01",
+      "closed_in": "ch01-sc03"
+    }
+  ],
+  "surprises": []
+}

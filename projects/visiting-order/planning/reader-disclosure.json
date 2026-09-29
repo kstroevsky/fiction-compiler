@@ -1,0 +1,36 @@
+{
+  "project_id": "visiting-order",
+  "disclosures": [
+    {
+      "id": "disclosure-mam-stopped",
+      "source_revelation": "rev-the-weight",
+      "fact": "fact-mam-stopped",
+      "scene_id": "ch01-sc01",
+      "mode": "stated",
+      "note": "The accepted prose directly states that Mam has stopped asking after Danny and saying his name."
+    },
+    {
+      "id": "disclosure-lena-tells-love",
+      "source_revelation": "rev-the-choice",
+      "fact": "fact-lena-tells-love",
+      "scene_id": "ch01-sc02",
+      "mode": "stated",
+      "note": "Lena repeats the familiar false reassurance instead of telling Danny that Mam has stopped asking."
+    }
+  ],
+  "non_fact_revelations": [
+    {
+      "revelation_id": "rev-the-cost",
+      "reason": "The cost is enacted as an emotional/relational consequence rather than one newly disclosed canonical fact."
+    }
+  ],
+  "curiosity_gaps": [
+    {
+      "id": "gap-will-lena-tell",
+      "question": "Will Lena tell Danny that Mam has stopped asking after him?",
+      "opened_in": "ch01-sc01",
+      "closed_in": "ch01-sc02"
+    }
+  ],
+  "surprises": []
+}

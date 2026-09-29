@@ -34,6 +34,12 @@ def build(root: Path) -> Path:
             "facts_added": ([{"id": "fact-answer", "text": "The door was forced."}]
                             if sid == "ch01-sc02" else []),
         })
+    write_json(project / "planning" / "discourse-plan.json", {
+        "revelations": [
+            {"id": "rev-clue", "scene": "ch01-sc01", "to_reader": "the scratch is visible"},
+            {"id": "rev-choice", "scene": "ch01-sc02", "to_reader": "the choice is enacted"},
+        ]
+    })
     return project
 
 
@@ -82,7 +88,11 @@ class ReaderDisclosureTests(unittest.TestCase):
             write_json(project / "planning" / "reader-disclosure.json", {
                 "project_id": "proj",
                 "disclosures": [
-                    {"id": "disclosure-scratch", "fact": "fact-clue", "scene_id": "ch01-sc01", "mode": "implied"}
+                    {"id": "disclosure-scratch", "source_revelation": "rev-clue",
+                     "fact": "fact-clue", "scene_id": "ch01-sc01", "mode": "implied"}
+                ],
+                "non_fact_revelations": [
+                    {"revelation_id": "rev-choice", "reason": "The plan marks an enacted choice, not a canonical fact."}
                 ],
                 "curiosity_gaps": [
                     {"id": "gap-door", "question": "Who forced the door?", "opened_in": "ch01-sc01", "closed_in": "ch01-sc02"}
@@ -102,7 +112,11 @@ class ReaderDisclosureTests(unittest.TestCase):
             write_json(project / "planning" / "reader-disclosure.json", {
                 "project_id": "proj",
                 "disclosures": [
-                    {"id": "disclosure-hidden", "fact": "fact-clue", "scene_id": "ch01-sc01", "mode": "withheld"}
+                    {"id": "disclosure-hidden", "source_revelation": "rev-clue",
+                     "fact": "fact-clue", "scene_id": "ch01-sc01", "mode": "withheld"}
+                ],
+                "non_fact_revelations": [
+                    {"revelation_id": "rev-choice", "reason": "The plan marks an enacted choice, not a canonical fact."}
                 ],
                 "curiosity_gaps": [],
                 "surprises": [
@@ -117,10 +131,61 @@ class ReaderDisclosureTests(unittest.TestCase):
             self.assertTrue(any("withheld disclosure" in error for error in report["errors"]))
             self.assertTrue(any("names no setup" in error for error in report["errors"]))
 
+    def test_every_discourse_revelation_must_be_fact_bound_or_explicitly_non_factual(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp))
+            write_json(project / "planning" / "reader-disclosure.json", {
+                "project_id": "proj",
+                "disclosures": [
+                    {"id": "disclosure-scratch", "source_revelation": "rev-clue",
+                     "fact": "fact-clue", "scene_id": "ch01-sc01", "mode": "stated"}
+                ],
+                "non_fact_revelations": [],
+                "curiosity_gaps": [],
+                "surprises": [],
+            })
+            report = reader.disclosure_report(project)
+            self.assertEqual(report["status"], "invalid")
+            self.assertTrue(any("rev-choice" in error and "no fact disclosure" in error
+                                for error in report["errors"]))
+
+    def test_disclosure_scene_must_match_its_source_revelation(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build(Path(tmp))
+            write_json(project / "planning" / "reader-disclosure.json", {
+                "project_id": "proj",
+                "disclosures": [
+                    {"id": "disclosure-scratch", "source_revelation": "rev-clue",
+                     "fact": "fact-clue", "scene_id": "ch01-sc02", "mode": "stated"}
+                ],
+                "non_fact_revelations": [
+                    {"revelation_id": "rev-choice", "reason": "Non-factual choice."}
+                ],
+                "curiosity_gaps": [],
+                "surprises": [],
+            })
+            report = reader.disclosure_report(project)
+            self.assertEqual(report["status"], "invalid")
+            self.assertTrue(any("does not match source revelation" in error for error in report["errors"]))
+
     def test_tool_registry_exposes_reader_reports(self) -> None:
         names = {item["name"] for item in tools.list_tools()}
         self.assertIn("contract_coverage", names)
         self.assertIn("reader_disclosure", names)
+
+    def test_repository_projects_bind_every_planned_revelation_structurally(self) -> None:
+        for slug in (
+            "forecourt", "salt-in-the-wire", "slack-water", "the-overnight",
+            "verbatim", "visiting-order",
+        ):
+            with self.subTest(project=slug):
+                report = reader.disclosure_report(ROOT / "projects" / slug)
+                self.assertEqual(report["status"], "valid", report["errors"])
+                counts = report["counts"]
+                self.assertEqual(
+                    counts["discourse_revelations"],
+                    counts["fact_bound_revelations"] + counts["non_fact_revelations"],
+                )
 
 
 if __name__ == "__main__":

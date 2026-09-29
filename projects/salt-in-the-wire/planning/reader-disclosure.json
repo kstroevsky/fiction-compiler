@@ -1,0 +1,44 @@
+{
+  "project_id": "salt-in-the-wire",
+  "disclosures": [
+    {
+      "id": "disclosure-cut-by-hand",
+      "source_revelation": "rev-cut-is-deliberate",
+      "fact": "fact-relay-cut-by-hand",
+      "scene_id": "ch01-sc01",
+      "mode": "stated",
+      "note": "The accepted prose shows a clean one-pass blade cut rather than weather damage."
+    },
+    {
+      "id": "disclosure-cut-is-old",
+      "source_revelation": "rev-cut-is-deliberate",
+      "fact": "fact-cut-is-old",
+      "scene_id": "ch01-sc01",
+      "mode": "stated",
+      "note": "Corrosion on the cut faces establishes that the severing predates Mara's posting."
+    },
+    {
+      "id": "disclosure-chart-error",
+      "source_revelation": "rev-why",
+      "fact": "fact-chart-mis-surveyed",
+      "scene_id": "ch01-sc02",
+      "mode": "stated",
+      "note": "The accepted prose explicitly compares the district reef mark with measured soundings."
+    }
+  ],
+  "non_fact_revelations": [
+    {
+      "revelation_id": "rev-maras-choice",
+      "reason": "The revelation is Mara's enacted choice; it is not reducible to one canonical fact disclosure."
+    }
+  ],
+  "curiosity_gaps": [
+    {
+      "id": "gap-why-relay-cut",
+      "question": "Why was the distress relay deliberately disabled?",
+      "opened_in": "ch01-sc01",
+      "closed_in": "ch01-sc02"
+    }
+  ],
+  "surprises": []
+}

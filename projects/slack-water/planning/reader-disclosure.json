@@ -1,0 +1,36 @@
+{
+  "project_id": "slack-water",
+  "disclosures": [
+    {
+      "id": "disclosure-garboard-rot",
+      "source_revelation": "rev-soft-plank",
+      "fact": "fact-garboard-rot",
+      "scene_id": "ch01-sc01",
+      "mode": "implied",
+      "note": "The soft garboard is reader-visible in scene 1; the full rot diagnosis is confirmed later."
+    },
+    {
+      "id": "disclosure-will-swamp",
+      "source_revelation": "rev-rot-proven",
+      "fact": "fact-will-swamp",
+      "scene_id": "ch01-sc02",
+      "mode": "stated",
+      "note": "The hose test and Rennie's explicit consequence establish that the boat would take water and go down."
+    }
+  ],
+  "non_fact_revelations": [
+    {
+      "revelation_id": "rev-honest-launching",
+      "reason": "The ending revelation is an enacted ethical/relational resolution rather than a single fact disclosure."
+    }
+  ],
+  "curiosity_gaps": [
+    {
+      "id": "gap-can-boat-launch",
+      "question": "Can the boat be launched safely on the planned tide?",
+      "opened_in": "ch01-sc01",
+      "closed_in": "ch01-sc02"
+    }
+  ],
+  "surprises": []
+}

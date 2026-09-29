@@ -1,0 +1,32 @@
+{
+  "project_id": "forecourt",
+  "disclosures": [
+    {
+      "id": "disclosure-blood",
+      "source_revelation": "rev-the-blood",
+      "fact": "fact-blood",
+      "scene_id": "ch01-sc01",
+      "mode": "stated",
+      "note": "The accepted prose explicitly shows fresh blood on the man's cuff."
+    }
+  ],
+  "non_fact_revelations": [
+    {
+      "revelation_id": "rev-the-choice",
+      "reason": "The revelation is Jo's enacted decision not to summon help, not a canonical fact assertion."
+    },
+    {
+      "revelation_id": "rev-the-not-knowing",
+      "reason": "The revelation preserves unresolved ambiguity rather than asserting a new fact about the man."
+    }
+  ],
+  "curiosity_gaps": [
+    {
+      "id": "gap-man-nature",
+      "question": "Is the man primarily a victim in danger or a danger to Jo?",
+      "opened_in": "ch01-sc01",
+      "closed_in": null
+    }
+  ],
+  "surprises": []
+}

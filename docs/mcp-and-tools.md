@@ -26,6 +26,8 @@ It runs anywhere `python3` runs — no install step.
 | `kb_sources` | Registered sources (craft-instruction / fiction-corpus / reference) with copyright notes |
 | `state_before` | Event-sourced story state before a scene (facts, per-character knowledge, promises, time) |
 | `compile_context` | The minimal, leak-free drafting bundle for a scene |
+| `contract_coverage` | Show how each reader-contract clause is mapped or explicitly untested; mapping never means the clause passed |
+| `reader_disclosure` | Validate discourse-revelation → canonical-fact bindings, explicit non-factual revelations, curiosity gaps, and surprise setup without claiming reader comprehension |
 | `record_scene_plan` | Persist one immutable alternative scene plan bound to the current scene-spec hash |
 | `scene_plan_search` | Inspect 3–4-plan search width, deterministic feasibility, review coverage, and explicit selection without ranking plans |
 | `plan_review_packet` | Build a plan-aware feasibility/intentionality packet with no candidate prose |

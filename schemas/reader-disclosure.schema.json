@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "reader-disclosure.schema.json",
   "type": "object",
-  "required": ["project_id", "disclosures", "curiosity_gaps", "surprises"],
+  "required": ["project_id", "disclosures", "non_fact_revelations", "curiosity_gaps", "surprises"],
   "additionalProperties": false,
   "properties": {
     "project_id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
@@ -10,14 +10,27 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "fact", "scene_id", "mode"],
+        "required": ["id", "source_revelation", "fact", "scene_id", "mode"],
         "additionalProperties": false,
         "properties": {
           "id": {"type": "string", "pattern": "^disclosure-[a-z0-9-]+$"},
+          "source_revelation": {"type": "string", "pattern": "^rev-[a-z0-9-]+$"},
           "fact": {"type": "string", "pattern": "^fact-[a-z0-9-]+$"},
           "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
           "mode": {"enum": ["stated", "implied", "withheld"]},
           "note": {"type": "string"}
+        }
+      }
+    },
+    "non_fact_revelations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["revelation_id", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "revelation_id": {"type": "string", "pattern": "^rev-[a-z0-9-]+$"},
+          "reason": {"type": "string", "minLength": 1}
         }
       }
     },
