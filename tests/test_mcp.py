@@ -6,6 +6,7 @@ import subprocess
 import sys
 import unittest
 import uuid
+import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -59,12 +60,23 @@ class McpProtocolTests(unittest.TestCase):
         self.assertIn("workspace_validate", tool_names)
         self.assertIn("kb_search", tool_names)
         self.assertIn("hard_audit", tool_names)
+        by_name = {t["name"]: t for t in responses[1]["result"]["tools"]}
+        self.assertTrue(by_name["kb_search"]["annotations"]["readOnlyHint"])
+        self.assertFalse(by_name["candidate_write"]["annotations"]["readOnlyHint"])
+        self.assertFalse(by_name["kb_search"]["annotations"]["openWorldHint"])
 
         call = responses[2]["result"]
         self.assertFalse(call["isError"])
         payload = json.loads(call["content"][0]["text"])
         ids = {r["id"] for r in payload["results"]}
         self.assertIn("focalization-and-knowledge", ids)
+
+    def test_codex_config_trusts_project_owned_mcp_tools(self) -> None:
+        config = tomllib.loads((ROOT / ".codex" / "config.toml").read_text(encoding="utf-8"))
+        server = config["mcp_servers"]["fiction-compiler"]
+        self.assertEqual(server["command"], "python3")
+        self.assertEqual(server["args"], ["scripts/fiction_mcp_launcher.py"])
+        self.assertEqual(server["default_tools_approval_mode"], "approve")
 
     def test_authoring_round_trip_over_mcp(self) -> None:
         slug = f"mcp-test-{uuid.uuid4().hex[:10]}"

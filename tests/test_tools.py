@@ -61,6 +61,33 @@ class ToolDispatchTests(unittest.TestCase):
         for descriptor in tools.list_tools():
             self.assertNotIn("handler", descriptor)  # handlers not exposed over the wire
             self.assertEqual(descriptor["inputSchema"]["type"], "object")
+            annotations = descriptor["annotations"]
+            self.assertEqual(
+                set(annotations),
+                {"readOnlyHint", "destructiveHint", "idempotentHint", "openWorldHint"},
+            )
+            self.assertFalse(annotations["openWorldHint"])
+
+    def test_mcp_annotations_match_tool_behavior(self) -> None:
+        by_name = {tool["name"]: tool["annotations"] for tool in tools.list_tools()}
+        self.assertTrue(by_name["kb_search"]["readOnlyHint"])
+        self.assertTrue(by_name["run_regression"]["readOnlyHint"])
+        self.assertTrue(by_name["project_overview"]["idempotentHint"])
+
+        self.assertFalse(by_name["candidate_write"]["readOnlyHint"])
+        self.assertFalse(by_name["record_revision"]["idempotentHint"])
+        self.assertTrue(by_name["project_write_artifact"]["destructiveHint"])
+        self.assertTrue(by_name["revise_acceptance"]["destructiveHint"])
+        self.assertTrue(by_name["assemble"]["destructiveHint"])
+        self.assertTrue(by_name["rollback_framework_change"]["destructiveHint"])
+        self.assertFalse(by_name["promote"]["destructiveHint"])
+
+        self.assertTrue(tools._READ_ONLY_TOOLS <= set(by_name))
+        self.assertTrue(tools._DESTRUCTIVE_TOOLS <= set(by_name))
+        for name, annotations in by_name.items():
+            self.assertEqual(annotations["readOnlyHint"], name in tools._READ_ONLY_TOOLS, name)
+            self.assertEqual(annotations["destructiveHint"], name in tools._DESTRUCTIVE_TOOLS, name)
+            self.assertEqual(annotations["idempotentHint"], name in tools._READ_ONLY_TOOLS, name)
 
     def test_every_public_tool_handler_is_registered(self) -> None:
         public = {

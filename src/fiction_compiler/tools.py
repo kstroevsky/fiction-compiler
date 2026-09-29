@@ -1015,12 +1015,44 @@ def assemble(project: str) -> dict:
 
 # --- registry ---------------------------------------------------------------
 
+# MCP clients use ToolAnnotations to decide how much friction a call needs. Keep the classification
+# here, next to the public registry, so adding a new handler cannot silently inherit a misleading
+# read/write contract. Everything is repository-local, so no tool is open-world.
+_READ_ONLY_TOOLS = {
+    "project_overview", "premise_report", "candidate_get", "workspace_validate", "kb_search",
+    "kb_get", "kb_sources", "state_before", "compile_context", "scene_plan_search",
+    "plan_review_packet", "contract_coverage", "reader_disclosure", "reader_probe_packet",
+    "reader_probe_report", "repertoire_report", "literature_control_report",
+    "owner_preference_packet", "owner_preference_report", "hard_audit", "defaultness_lint",
+    "evaluate_revision", "revision_status", "post_revision_recheck_packet", "tournament",
+    "selection_reader_packet", "selection_experiment_report", "writer_study_report",
+    "scene_run_status", "scene_run_budget", "realization_extractor_packet",
+    "realization_aligner_packet", "realization_calibration_report", "prose_audit",
+    "prose_claim_bindings", "scene_status", "judge_bundle", "critic_eval",
+    "critic_calibration_packet", "critic_calibration_report", "scene_trace", "role_prompt",
+    "run_regression", "framework_comparison_packet", "framework_change_status",
+}
+
+_DESTRUCTIVE_TOOLS = {
+    # These can replace existing authored/derived bytes or deliberately rewrite accepted history.
+    "project_write_artifact", "seed_canon_write", "character_write", "scene_spec_write",
+    "state_delta_write", "revise_acceptance", "assemble", "rollback_framework_change",
+}
+
+
 def _tool(name: str, description: str, properties: dict, required: list[str], handler: Callable) -> dict:
+    read_only = name in _READ_ONLY_TOOLS
     return {
         "name": name,
         "description": description,
         "inputSchema": {"type": "object", "properties": properties, "required": required,
                         "additionalProperties": False},
+        "annotations": {
+            "readOnlyHint": read_only,
+            "destructiveHint": name in _DESTRUCTIVE_TOOLS,
+            "idempotentHint": read_only,
+            "openWorldHint": False,
+        },
         "handler": handler,
     }
 
@@ -1812,7 +1844,10 @@ _BY_NAME: dict[str, dict] = {t["name"]: t for t in TOOLS}
 
 def list_tools() -> list[dict]:
     """Tool descriptors without the handler (MCP tools/list shape)."""
-    return [{k: t[k] for k in ("name", "description", "inputSchema")} for t in TOOLS]
+    return [
+        {k: t[k] for k in ("name", "description", "inputSchema", "annotations")}
+        for t in TOOLS
+    ]
 
 
 def call_tool(name: str, arguments: dict[str, Any] | None) -> dict:
