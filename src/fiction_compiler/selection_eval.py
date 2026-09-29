@@ -188,6 +188,20 @@ def _load_pool(project: Path, scene_id: str, experiment_id: str) -> tuple[dict |
     return manifest, errors
 
 
+def pool_manifest(project: Path, scene_id: str, experiment_id: str) -> dict:
+    """Return one verified frozen selection-pool manifest for composition by other evidence workflows."""
+    project = Path(project)
+    try:
+        manifest, errors = _load_pool(project, scene_id, experiment_id)
+    except ValueError as exc:
+        return {"error": str(exc)}
+    if manifest is None:
+        return {"error": "selection experiment not found", "details": errors}
+    if errors:
+        return {"status": "invalid", "experiment_id": experiment_id, "errors": errors}
+    return {"status": "valid", "manifest": manifest}
+
+
 def reader_packet(project: Path, scene_id: str, experiment_id: str) -> dict:
     """Return only blinded frozen prose and counterbalanced pair assignments for readers."""
     project = Path(project)

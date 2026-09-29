@@ -48,6 +48,8 @@ It runs anywhere `python3` runs — no install step.
 | `record_selector_choice` | Bind a critic/editor pick to the frozen pool before reader outcomes exist |
 | `record_selection_operation` | Record known cost/token/provider evidence and failures without converting missing usage to zero |
 | `selection_experiment_report` | Descriptively compare first/random/recorded selectors when independent pair/order coverage supports it |
+| `freeze_writer_study` | Freeze writer-family/edit-vs-regeneration arms against exact selection-pool bytes and scene-run provenance before reader outcomes |
+| `writer_study_report` | Check predeclared matched-cost completeness/tolerance and reuse blind reader evidence without ranking writer families |
 | `start_scene_run` | Create/resume an immutable scene-operation plan with optional call/token/cost budgets |
 | `scene_run_status` | Derive completed/failed/pending steps, candidate freshness, evidence integrity, and accounting from append-only artifacts |
 | `scene_run_budget` | Preflight one more operation; missing usage/estimates stay unknown and exhausted limits block continuation |
@@ -94,6 +96,14 @@ generation/revision can remain external or manual and then be bound with `record
 Role-runner attempts are imported with `link_scene_run_review`, which preserves their existing provider
 metadata and source hash rather than repeating the call. `scripts/scene_run.py` exposes the same flow
 for non-MCP callers.
+
+The §6.11 writer comparison composes that provenance with the existing frozen selection experiment.
+`freeze_writer_study` must run before reader preferences exist and binds every frozen candidate to the
+scene run that produced it, its provider/model, declared writer family, and independent-draft,
+regenerate, or edit strategy. An edit arm additionally binds the earlier source-draft hash in the same
+run. `writer_study_report` then checks the predeclared token/cost tolerance and exposes the existing
+blind human preference evidence. Missing provider usage stays unknown, and the report does not infer a
+winning family or a population-level quality effect.
 
 ### Register with Claude Code
 `.mcp.json` at the repo root is auto-detected:

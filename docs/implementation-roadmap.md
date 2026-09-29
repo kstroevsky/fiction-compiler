@@ -63,7 +63,7 @@ reader/model experiment into a positive result.
 | §6.8 cross-story repetition | **Descriptive diagnostic implemented** — ADR 0041 records recurring endings/turns/resolutions/motifs/focalization without an originality gate | Reader evidence that changing a repeated choice improves outcomes rather than novelty alone |
 | §6.9 literature control | **First control implemented** — ADRs 0043/0044 enforce rights status and run schema/defaultness probes on Joyce's “Araby” | Live critics, human discourse baselines, and additional unseen permissioned/public-domain controls |
 | §6.10 long-form scale | **Unrun empirical diagnostic** — existing state/provenance mechanics can support it, but no 8–12k-word condition has been executed | One bounded 8–12k-word diagnostic first; broader claims require more than one case |
-| §6.11 writer-family diversity | **Provenance/accounting mechanics exist** — ADRs 0032/0039 can record family/provider and operation cost | Equal-cost multi-family drafting plus edit-vs-regeneration experiment and blind preference evidence |
+| §6.11 writer-family diversity | **Matched-cost study infrastructure implemented** — ADRs 0032/0039/0047 bind frozen candidates to provider/model/family/strategy scene-run evidence before blind reader outcomes and expose unknown/mismatched cost explicitly | Execute the actual equal-cost multi-family and edit-vs-regeneration experiment; no writer-family preference result exists yet |
 
 ---
 
@@ -127,7 +127,12 @@ test, not just a feature.
 > exact candidate snapshots, failures/retries, provider usage, and declared call/token/cost budgets;
 > existing role-runner attempts link without another call. This closes the missing general accounting
 > mechanism, but a matched-cost study must still actually route/bind every call and run the independent
-> evaluation before it can claim complete expenditure or benefit. Stage 6 (GUI) ⬜.
+> evaluation before it can claim complete expenditure or benefit. **ADR 0047 now makes the §6.11
+> experiment itself freezeable:** every selection-pool candidate can be bound before reader outcomes to
+> an exact scene-run candidate hash, provider/model, declared writer family and drafting/edit strategy;
+> edit arms also bind their earlier source draft. Reports check a predeclared token/cost tolerance and
+> reuse blind selection-reader evidence without choosing a winning family. The actual multi-family and
+> edit-vs-regeneration runs remain unrun. Stage 6 (GUI) ⬜.
 > **Tools for the author.** The deterministic engine is exposed to the LLM as callable tools via
 > a dependency-free MCP server (`scripts/fiction_mcp.py`, wired in `.mcp.json` and `.codex/config.toml`):
 > `kb_search`/`kb_get`, `state_before`, `compile_context`, `hard_audit`, `defaultness_lint`,
@@ -361,6 +366,7 @@ test, not just a feature.
 > `0043-enforce-fiction-corpus-rights-gate.md`,
 > `0044-add-public-domain-literature-control.md`,
 > `0045-measure-prefix-reader-responses.md`, `0046-reconcile-roadmap-with-evidence-state.md`,
+> `0047-bind-matched-cost-writer-study.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 

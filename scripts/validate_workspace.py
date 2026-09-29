@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from fiction_compiler import (integrity, literature_control, ontology, owner_preference, reader_probe,
-                              schema)  # noqa: E402
+                              schema, writer_study)  # noqa: E402
 
 
 def read_json(path: Path) -> Any:
@@ -144,6 +144,8 @@ def validate_projects(errors: list[str]) -> None:
             errors.append(f"{project.name}: owner preference — {message}")
         for message in reader_probe.validation_errors(project):
             errors.append(f"{project.name}: reader probes — {message}")
+        for message in writer_study.validation_errors(project):
+            errors.append(f"{project.name}: writer study — {message}")
 
         ontology_path = project / "canon" / "ontology.json"
         if ontology_path.exists():

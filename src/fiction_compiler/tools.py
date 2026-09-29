@@ -20,7 +20,7 @@ from . import critique as _critique
 from . import (critic_calibration, defaultness, framework_change, hard_audit, integrity,
                issue_resolution, kb, literature_control, owner_preference, plan_search, post_revision,
                reader, reader_probe, realization_calibration, regression, repertoire, revision, run_manifest,
-               safety, schema, selection_eval, trace)
+               safety, schema, selection_eval, trace, writer_study)
 from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
@@ -452,6 +452,22 @@ def record_selection_operation(project: str, scene_id: str, experiment_id: str, 
 def selection_experiment_report(project: str, scene_id: str, experiment_id: str) -> dict:
     """Compare first/random/recorded selectors against independent human pairwise evidence."""
     return selection_eval.report(project_dir(project), scene_id, experiment_id)
+
+
+def freeze_writer_study(project: str, scene_id: str, experiment_id: str, arms: list[dict],
+                        hypotheses: list[str], matching_metric: str,
+                        max_relative_gap: float = 0.1,
+                        included_phases: list[str] | None = None) -> dict:
+    """Freeze writer-family/edit strategy provenance before reader outcomes are recorded."""
+    return writer_study.freeze(
+        project_dir(project), scene_id, experiment_id, arms, hypotheses, matching_metric,
+        max_relative_gap=max_relative_gap, included_phases=included_phases,
+    )
+
+
+def writer_study_report(project: str, scene_id: str, experiment_id: str) -> dict:
+    """Report matched-cost readiness and existing blind reader evidence without ranking families."""
+    return writer_study.report(project_dir(project), scene_id, experiment_id)
 
 
 def start_scene_run(project: str, scene_id: str, steps: list[dict], budgets: dict | None = None,
@@ -1271,6 +1287,43 @@ TOOLS: list[dict] = [
            "experiment_id": {"type": "string",
                              "pattern": "^selection-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"}},
           ["project", "scene_id", "experiment_id"], selection_experiment_report),
+    _tool("freeze_writer_study",
+          "Freeze the audit's writer-family/edit-vs-regeneration study design against an existing "
+          "selection pool BEFORE reader outcomes exist. Every frozen candidate must bind to exact "
+          "scene-run provider/model/candidate evidence. Missing cost remains unknown; this records "
+          "study provenance and does not call a writer or select a winning family.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+           "experiment_id": {"type": "string",
+                             "pattern": "^selection-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"},
+           "arms": {"type": "array", "minItems": 2, "maxItems": 26, "items": {
+               "type": "object", "additionalProperties": False,
+               "required": ["candidate", "run_id", "writer_family", "strategy", "provider", "model"],
+               "properties": {
+                   "candidate": {"type": "string"},
+                   "run_id": {"type": "string", "pattern": "^run-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"},
+                   "writer_family": {"type": "string", "minLength": 1},
+                   "strategy": {"type": "string", "enum": ["independent-draft", "regenerate", "edit"]},
+                   "provider": {"type": "string", "minLength": 1},
+                   "model": {"type": "string", "minLength": 1},
+                   "source_candidate_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+               }}},
+           "hypotheses": {"type": "array", "minItems": 1, "maxItems": 2, "uniqueItems": True,
+                          "items": {"type": "string", "enum": ["writer-family", "edit-vs-regeneration"]}},
+           "matching_metric": {"type": "string", "enum": ["total_tokens", "cost_usd"]},
+           "max_relative_gap": {"type": "number", "minimum": 0, "maximum": 1},
+           "included_phases": {"type": "array", "minItems": 1, "uniqueItems": True,
+                               "items": {"type": "string", "enum": ["generation", "critique", "revision"]}}},
+          ["project", "scene_id", "experiment_id", "arms", "hypotheses", "matching_metric"],
+          freeze_writer_study),
+    _tool("writer_study_report",
+          "Read-only matched-cost writer study report. Rechecks exact scene-run provenance, keeps "
+          "unknown usage distinct from zero, reports whether the predeclared cost tolerance is met, "
+          "and reuses the selection experiment's blind human preference evidence. It does not rank "
+          "writer families or make a population-level quality claim.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+           "experiment_id": {"type": "string",
+                             "pattern": "^selection-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"}},
+          ["project", "scene_id", "experiment_id"], writer_study_report),
     _tool("start_scene_run",
           "Create or idempotently resume a scene-level operational run. The immutable manifest declares "
           "ordered step ids/phases and optional operation/token/cost budgets; it does not call a writer, "

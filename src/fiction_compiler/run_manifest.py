@@ -593,6 +593,37 @@ def status(project: Path, scene_id: str, run_id: str) -> dict:
     }
 
 
+def operation_evidence(project: Path, scene_id: str, run_id: str) -> dict:
+    """Return validated immutable operation records for evidence workflows that compose scene runs."""
+    project = Path(project)
+    current = status(project, scene_id, run_id)
+    if "error" in current:
+        return current
+    if current.get("status") == "invalid":
+        return {
+            "status": "invalid", "run_id": run_id, "scene_id": scene_id,
+            "errors": list(current.get("integrity_errors", [])),
+        }
+    try:
+        manifest, manifest_errors = _manifest(project, scene_id, run_id)
+    except ValueError as exc:
+        return {"error": str(exc)}
+    if manifest is None:
+        return {"error": "scene run does not exist", "details": manifest_errors}
+    operations, operation_errors = _operations(project, manifest)
+    errors = [*manifest_errors, *operation_errors]
+    if errors:
+        return {"status": "invalid", "run_id": run_id, "scene_id": scene_id, "errors": errors}
+    return {
+        "status": "valid",
+        "run_id": run_id,
+        "scene_id": scene_id,
+        "operations": operations,
+        "accounting": current["accounting"],
+        "stale_candidate_bindings": current["stale_candidate_bindings"],
+    }
+
+
 def check_budget(project: Path, scene_id: str, run_id: str, *,
                  estimated_total_tokens: int | None = None,
                  estimated_cost_usd: float | None = None) -> dict:
