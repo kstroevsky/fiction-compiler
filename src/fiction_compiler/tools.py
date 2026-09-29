@@ -18,8 +18,9 @@ from typing import Any, Callable
 from . import critic_eval as _critic_eval
 from . import critique as _critique
 from . import (critic_calibration, defaultness, framework_change, hard_audit, integrity,
-               issue_resolution, kb, plan_search, post_revision, reader, realization_calibration,
-               regression, repertoire, revision, run_manifest, safety, schema, selection_eval, trace)
+               issue_resolution, kb, owner_preference, plan_search, post_revision, reader,
+               realization_calibration, regression, repertoire, revision, run_manifest, safety,
+               schema, selection_eval, trace)
 from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
@@ -146,6 +147,34 @@ def reader_disclosure(project: str) -> dict:
 def repertoire_report(projects: list[str] | None = None) -> dict:
     """Report repeated cross-project discourse tags without ranking originality or quality."""
     return repertoire.report(project_ids=projects)
+
+
+def record_owner_preference(project: str, decision_kind: str, alternatives: list[dict],
+                            chosen_id: str, reason: str, decided_at: str,
+                            metadata: dict | None = None) -> dict:
+    """Persist prospective owner-taste evidence with exact alternative snapshots."""
+    return owner_preference.record_choice(
+        project_dir(project), decision_kind, alternatives, chosen_id, reason, decided_at, metadata
+    )
+
+
+def owner_preference_packet(project: str, preference_id: str) -> dict:
+    """Return exact alternatives while withholding the owner's selected option and reason."""
+    return owner_preference.packet(project_dir(project), preference_id)
+
+
+def record_owner_preference_prediction(project: str, preference_id: str, critic: str,
+                                       packet_sha256: str, predicted_id: str | None = None,
+                                       provenance: dict | None = None) -> dict:
+    """Persist one critic pick/abstention bound to the choice-hidden owner-preference packet."""
+    return owner_preference.record_prediction(
+        project_dir(project), preference_id, critic, packet_sha256, predicted_id, provenance
+    )
+
+
+def owner_preference_report(project: str) -> dict:
+    """Report descriptive critic agreement with this owner's recorded choices."""
+    return owner_preference.report(project_dir(project))
 
 
 def audit(project: str, scene_id: str | None = None) -> dict:
@@ -967,6 +996,52 @@ TOOLS: list[dict] = [
           {"projects": {"type": "array", "uniqueItems": True,
                         "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}}},
           [], repertoire_report),
+    _tool("record_owner_preference",
+          "Record one prospective owner choice with the exact alternatives shown, stated reason, and "
+          "decision date. Alternative text is frozen by content hash. This records owner taste only; "
+          "it is not target-reader or literary-quality evidence.",
+          {"project": {"type": "string"},
+           "decision_kind": {"type": "string",
+                             "enum": ["premise", "ending", "plan", "candidate", "revision", "other"]},
+           "alternatives": {"type": "array", "minItems": 2, "items": {
+               "type": "object", "required": ["id"], "additionalProperties": False,
+               "properties": {
+                   "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"},
+                   "label": {"type": "string", "minLength": 1},
+                   "text": {"type": "string"}, "path": {"type": "string", "minLength": 1},
+               },
+               "oneOf": [
+                   {"required": ["text"], "not": {"required": ["path"]}},
+                   {"required": ["path"], "not": {"required": ["text"]}},
+               ],
+           }},
+           "chosen_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"},
+           "reason": {"type": "string", "minLength": 1},
+           "decided_at": {"type": "string", "minLength": 1},
+           "metadata": {"type": "object"}},
+          ["project", "decision_kind", "alternatives", "chosen_id", "reason", "decided_at"],
+          record_owner_preference),
+    _tool("owner_preference_packet",
+          "Build a critic-calibration packet containing exact frozen alternatives while withholding "
+          "the owner's chosen alternative and stated reason. The returned hash must bind a prediction.",
+          {"project": {"type": "string"},
+           "preference_id": {"type": "string", "pattern": "^pref-[0-9a-f]{32}$"}},
+          ["project", "preference_id"], owner_preference_packet),
+    _tool("record_owner_preference_prediction",
+          "Record one critic prediction for a choice-hidden owner-preference packet. Omit predicted_id "
+          "to abstain. One critic gets one immutable prediction per owner choice.",
+          {"project": {"type": "string"},
+           "preference_id": {"type": "string", "pattern": "^pref-[0-9a-f]{32}$"},
+           "critic": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+           "packet_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+           "predicted_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"},
+           "provenance": {"type": "object"}},
+          ["project", "preference_id", "critic", "packet_sha256"],
+          record_owner_preference_prediction),
+    _tool("owner_preference_report",
+          "Report descriptive per-critic agreement with recorded owner choices, including abstentions. "
+          "This is owner-specific calibration, not audience preference or general literary quality.",
+          {"project": {"type": "string"}}, ["project"], owner_preference_report),
     _tool("hard_audit",
           "Run the deterministic hard audit (Audit 1). With scene_id: audit one scene (knowledge "
           "cutoff, causal refs, POV). Without: audit canon + accepted scenes (chronology, promise "

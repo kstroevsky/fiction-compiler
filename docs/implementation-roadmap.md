@@ -28,6 +28,7 @@ mechanical validity, modeled/extracted consistency, and literary preference.
 | Workspace validation | `scripts/validate_workspace.py` | **Implemented** | Schema/integrity checks plus canon verification; maintained tests exercise failures |
 | Minimal context compilation | `src/fiction_compiler/context.py` | **Implemented, coarse relevance** | Replays state-before, filters to participants/required facts, writes collision-safe project-local evidence |
 | Reader/contract structure | `reader.py`, `reader-disclosure.json`, `contract-coverage.json`, ADR 0040 | **Structural evidence implemented; reader measurement unrun** | Discourse revelations bind to canonical disclosures or explicit non-factual declarations; contract clauses keep mapped/untested status separate from verification |
+| Owner preference evidence | `owner_preference.py`, owner-preference schemas, ADR 0042 | **Prospective evidence implemented; calibration data not yet accumulated** | Exact alternatives, owner choice/reason/date, choice-hidden critic packets, and descriptive agreement stay separate from audience outcomes; no historical backfill |
 | Scene-plan search | `plan_search.py`, `schemas/scene-plan*.json`, `generate-scene-plans` skill | **Implemented as experimental evidence workflow** | 3–4-plan divergence floor, typed feasibility, hash-bound plan review, explicit 1–2 selection; no automatic quality ranker |
 | Event-sourced canon / `reconstruct_state_before` | `src/fiction_compiler/state.py` | **Implemented** | Seed state + accepted deltas, typed comparisons/relationships/knowledge, declared value/entity domains, fabula-ordered replay with explicit legacy fallback |
 | Candidate promotion / backward revision | `promote.py`, `acceptance.py`, `integrity.py`, `dependencies.py` | **Implemented, subjective recheck closure remains explicit** | Frozen candidate/spec/delta/review policy/evidence; immutable discourse-order chains, conservative read sets, discourse rebasing plus fabula-aware invalidation |
@@ -210,7 +211,7 @@ test, not just a feature.
 > with curiosity-gap declarations where applicable. This is `structural_only`: it does not establish
 > what any reader noticed or understood. Existing contract-coverage files continue to keep untested
 > clauses explicit. Still ⬜ in Track G: actual prefix-reader probes, target-audience measurement,
-> ambiguity/comprehension evidence, and owner-preference data kept separate from audience outcomes.
+> and ambiguity/comprehension evidence.
 >
 > **Cross-project repertoire is now explicit (ADR 0041, review §6.8 / Track C).** Project-owned
 > ending/turn/resolution/motif/focalization tags are checked against manuscript completeness and counted
@@ -220,6 +221,15 @@ test, not just a feature.
 > its ending guessed. The report is descriptive and advisory: no aggregate originality score, promotion
 > gate, or requirement to differ is introduced. Still empirical: whether changing one of these repeated
 > choices improves reader outcomes or merely produces arbitrary novelty.
+>
+> **Owner preference is now a prospective evidence stream (ADR 0042, review §6.6 / Track G).** Each
+> new owner decision can freeze the exact alternatives shown together with the selected option, stated
+> reason, and date. A separate packet withholds the choice and reason so critics can predict against the
+> same immutable alternatives; one pick or abstention per critic is then hash-bound to that packet.
+> Reports are descriptive for this owner only and remain separate from audience evaluation. Historical
+> project choices are deliberately not reconstructed from commits or accepted manuscripts because the
+> original alternative sets are unknown. Still empirical: accumulate prospective choices and run the
+> critic-prediction study before claiming predictive value or using this as a premise-generation signal.
 >
 > **Revision loop now diffs by finding identity (ADR 0009, P3 slice 1).** `evaluate_revision` gives
 > each finding a fingerprint (dimension + normalized evidence) and classifies fixed / persisted /
@@ -302,7 +312,7 @@ test, not just a feature.
 > `0035-ordered-event-execution.md`, `0036-ordered-prose-evidence.md`,
 > `0037-declared-story-domains.md`, `0038-fabula-ordered-reconstruction.md`,
 > `0039-resumable-scene-run-provenance.md`, `0040-bind-reader-disclosures-to-discourse.md`,
-> `0041-cross-project-repertoire-diagnostic.md`,
+> `0041-cross-project-repertoire-diagnostic.md`, `0042-record-owner-preference-evidence.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 

@@ -29,6 +29,10 @@ It runs anywhere `python3` runs — no install step.
 | `contract_coverage` | Show how each reader-contract clause is mapped or explicitly untested; mapping never means the clause passed |
 | `reader_disclosure` | Validate discourse-revelation → canonical-fact bindings, explicit non-factual revelations, curiosity gaps, and surprise setup without claiming reader comprehension |
 | `repertoire_report` | Count repeated project-owned ending/turn/resolution/motif/focalization tags across complete manuscripts; partial stories stay visible but are excluded from observed frequencies, and no originality score is produced |
+| `record_owner_preference` | Prospectively freeze the exact alternatives behind one owner choice plus decision kind, chosen option, reason, and date; this is owner-taste evidence only |
+| `owner_preference_packet` | Return the frozen alternatives with the owner's pick and reason withheld, plus a packet hash for blind critic prediction |
+| `record_owner_preference_prediction` | Persist one hash-bound critic pick or abstention per owner choice; one critic gets one immutable prediction for that choice |
+| `owner_preference_report` | Report descriptive critic agreement with recorded owner choices while keeping owner taste separate from target-reader and quality claims |
 | `record_scene_plan` | Persist one immutable alternative scene plan bound to the current scene-spec hash |
 | `scene_plan_search` | Inspect 3–4-plan search width, deterministic feasibility, review coverage, and explicit selection without ranking plans |
 | `plan_review_packet` | Build a plan-aware feasibility/intentionality packet with no candidate prose |
