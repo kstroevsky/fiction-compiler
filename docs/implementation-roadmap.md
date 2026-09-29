@@ -140,7 +140,11 @@ test, not just a feature.
 > append-only prose branches, then use the existing context, scene-plan search, hard/prose/defaultness
 > audits, critique/revision, promotion/backward revision, reader/selection/calibration evidence, and
 > assembly paths. `workspace_validate` exposes the repository validator through the same runtime.
-> The registry test requires every public `fiction_compiler.tools` handler to be MCP-visible. Plus the
+> **ADR 0050 closes the Codex/live-review seam:** tool annotations and project-local Codex trust make
+> the registered surface callable in ordinary Codex runs; every public handler parameter must be
+> represented in its MCP schema; and live single-role/panel review is now exposed with immutable
+> provider attempts plus promotion-trusted provenance. The registry test requires every public
+> `fiction_compiler.tools` handler to be MCP-visible. Plus the
 > `avoid-defaults` anti-obviousness skill (LLM-facing craft, not code).
 > The engine equips the author; it does not replace the creative act. See `docs/mcp-and-tools.md`.
 >

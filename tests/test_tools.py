@@ -5,6 +5,7 @@ import tempfile
 import unittest
 import inspect
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -66,7 +67,9 @@ class ToolDispatchTests(unittest.TestCase):
                 set(annotations),
                 {"readOnlyHint", "destructiveHint", "idempotentHint", "openWorldHint"},
             )
-            self.assertFalse(annotations["openWorldHint"])
+            self.assertEqual(
+                annotations["openWorldHint"], descriptor["name"] in tools._OPEN_WORLD_TOOLS
+            )
 
     def test_mcp_annotations_match_tool_behavior(self) -> None:
         by_name = {tool["name"]: tool["annotations"] for tool in tools.list_tools()}
@@ -81,13 +84,20 @@ class ToolDispatchTests(unittest.TestCase):
         self.assertTrue(by_name["assemble"]["destructiveHint"])
         self.assertTrue(by_name["rollback_framework_change"]["destructiveHint"])
         self.assertFalse(by_name["promote"]["destructiveHint"])
+        self.assertTrue(by_name["run_role_review"]["openWorldHint"])
+        self.assertTrue(by_name["run_review_panel"]["openWorldHint"])
+        self.assertFalse(by_name["run_role_review"]["readOnlyHint"])
+        self.assertFalse(by_name["run_role_review"]["idempotentHint"])
+        self.assertFalse(by_name["role_prompt"]["openWorldHint"])
 
         self.assertTrue(tools._READ_ONLY_TOOLS <= set(by_name))
         self.assertTrue(tools._DESTRUCTIVE_TOOLS <= set(by_name))
+        self.assertTrue(tools._OPEN_WORLD_TOOLS <= set(by_name))
         for name, annotations in by_name.items():
             self.assertEqual(annotations["readOnlyHint"], name in tools._READ_ONLY_TOOLS, name)
             self.assertEqual(annotations["destructiveHint"], name in tools._DESTRUCTIVE_TOOLS, name)
             self.assertEqual(annotations["idempotentHint"], name in tools._READ_ONLY_TOOLS, name)
+            self.assertEqual(annotations["openWorldHint"], name in tools._OPEN_WORLD_TOOLS, name)
 
     def test_every_public_tool_handler_is_registered(self) -> None:
         public = {
@@ -210,6 +220,49 @@ class ToolDispatchTests(unittest.TestCase):
 
 
 class ToolWriteTests(unittest.TestCase):
+    def test_run_role_review_uses_roster_and_records_by_default(self) -> None:
+        sentinel_roster = {"style-editor": object()}
+        expected = {"role": "style-editor", "verdict": "pass", "recorded": {"written": "x.json"}}
+        with patch("fiction_compiler.role_runner.load_roster", return_value=sentinel_roster) as load, \
+             patch("fiction_compiler.role_runner.run_role", return_value=expected) as run:
+            out = tools.run_role_review("project-a", "ch01-sc01", "candidate-a.md", "style-editor")
+
+        self.assertEqual(out, expected)
+        load.assert_called_once_with(None)
+        run.assert_called_once_with(
+            "project-a", "ch01-sc01", "candidate-a.md", "style-editor",
+            roster=sentinel_roster, record=True,
+        )
+
+    def test_run_role_review_returns_vendor_failure_as_tool_error(self) -> None:
+        from fiction_compiler import role_runner
+
+        with patch("fiction_compiler.role_runner.load_roster", return_value={"style-editor": object()}), \
+             patch(
+                 "fiction_compiler.role_runner.run_role",
+                 side_effect=role_runner.VendorUnavailable("OPENAI_API_KEY is not set"),
+             ):
+            out = tools.run_role_review(
+                "project-a", "ch01-sc01", "candidate-a.md", "style-editor", record=False
+            )
+
+        self.assertEqual(out["error"], "VendorUnavailable: OPENAI_API_KEY is not set")
+
+    def test_run_review_panel_preserves_requested_roles_and_record_flag(self) -> None:
+        sentinel_roster = {"a": object(), "b": object()}
+        expected = {"completion": {"requested": 2, "completed": 2, "complete": True}}
+        with patch("fiction_compiler.role_runner.load_roster", return_value=sentinel_roster), \
+             patch("fiction_compiler.role_runner.run_panel", return_value=expected) as run:
+            out = tools.run_review_panel(
+                "project-a", "ch01-sc01", "candidate-a.md", ["a", "b"], record=False
+            )
+
+        self.assertEqual(out, expected)
+        run.assert_called_once_with(
+            "project-a", "ch01-sc01", "candidate-a.md", ["a", "b"],
+            roster=sentinel_roster, record=False,
+        )
+
     def test_record_revision_lints_and_logs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             scene = Path(tmp) / "scenes" / "ch01-sc01"

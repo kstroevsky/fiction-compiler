@@ -29,7 +29,8 @@ claude
 
 The registered `fiction-compiler` MCP server covers project bootstrap through manuscript assembly.
 Codex/Claude can create schema-valid project artifacts and prose branches through MCP, then use the
-same interface for context, audits, revision, promotion, evidence, and validation.
+same interface for context, live multi-vendor review, audits, revision, promotion, evidence, and
+validation.
 
 Suggested first instruction:
 

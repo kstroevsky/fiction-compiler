@@ -64,6 +64,8 @@ class McpProtocolTests(unittest.TestCase):
         self.assertTrue(by_name["kb_search"]["annotations"]["readOnlyHint"])
         self.assertFalse(by_name["candidate_write"]["annotations"]["readOnlyHint"])
         self.assertFalse(by_name["kb_search"]["annotations"]["openWorldHint"])
+        self.assertTrue(by_name["run_role_review"]["annotations"]["openWorldHint"])
+        self.assertTrue(by_name["run_review_panel"]["annotations"]["openWorldHint"])
 
         call = responses[2]["result"]
         self.assertFalse(call["isError"])

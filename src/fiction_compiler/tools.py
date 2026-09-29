@@ -895,6 +895,39 @@ def role_prompt(project: str, scene_id: str, candidate: str, role: str,
     }
 
 
+def run_role_review(project: str, scene_id: str, candidate: str, role: str,
+                    roster: str | None = None, record: bool = True) -> dict:
+    """Run one configured external judge role and optionally record its trusted critique.
+
+    This is the MCP-safe live counterpart to role_prompt. The caller may select a declared roster
+    file but cannot inject a transport or persona. Successful recorded critiques carry the
+    role-runner provenance required by the promotion policy.
+    """
+    from . import role_runner  # lazy: breaks the tools <-> role_runner cycle
+    try:
+        rst = role_runner.load_roster(roster)
+        return role_runner.run_role(
+            project, scene_id, candidate, role, roster=rst, record=record
+        )
+    except (FileNotFoundError, ValueError) as exc:
+        return {"error": str(exc)}
+    except (role_runner.VendorUnavailable, role_runner.MalformedVendorOutput) as exc:
+        return {"error": f"{type(exc).__name__}: {exc}"}
+
+
+def run_review_panel(project: str, scene_id: str, candidate: str, roles: list[str],
+                     roster: str | None = None, record: bool = True) -> dict:
+    """Run several configured judge roles while preserving per-role evidence and disagreement."""
+    from . import role_runner  # lazy: breaks the tools <-> role_runner cycle
+    try:
+        rst = role_runner.load_roster(roster)
+        return role_runner.run_panel(
+            project, scene_id, candidate, roles, roster=rst, record=record
+        )
+    except (FileNotFoundError, ValueError) as exc:
+        return {"error": str(exc)}
+
+
 def run_regression() -> dict:
     """Run the framework regression fixtures (the FRAMEWORK loop's deterministic CHECK).
 
@@ -1017,7 +1050,7 @@ def assemble(project: str) -> dict:
 
 # MCP clients use ToolAnnotations to decide how much friction a call needs. Keep the classification
 # here, next to the public registry, so adding a new handler cannot silently inherit a misleading
-# read/write contract. Everything is repository-local, so no tool is open-world.
+# read/write/network contract.
 _READ_ONLY_TOOLS = {
     "project_overview", "premise_report", "candidate_get", "workspace_validate", "kb_search",
     "kb_get", "kb_sources", "state_before", "compile_context", "scene_plan_search",
@@ -1039,6 +1072,11 @@ _DESTRUCTIVE_TOOLS = {
     "state_delta_write", "revise_acceptance", "assemble", "rollback_framework_change",
 }
 
+_OPEN_WORLD_TOOLS = {
+    # These invoke the vendor/model declared by a human-owned roster and persist immutable attempts.
+    "run_role_review", "run_review_panel",
+}
+
 
 def _tool(name: str, description: str, properties: dict, required: list[str], handler: Callable) -> dict:
     read_only = name in _READ_ONLY_TOOLS
@@ -1051,7 +1089,7 @@ def _tool(name: str, description: str, properties: dict, required: list[str], ha
             "readOnlyHint": read_only,
             "destructiveHint": name in _DESTRUCTIVE_TOOLS,
             "idempotentHint": read_only,
-            "openWorldHint": False,
+            "openWorldHint": name in _OPEN_WORLD_TOOLS,
         },
         "handler": handler,
     }
@@ -1758,6 +1796,24 @@ TOOLS: list[dict] = [
           {"project": {"type": "string"}, "scene_id": {"type": "string"}, "candidate": {"type": "string"},
            "role": {"type": "string"}, "roster": {"type": "string"}},
           ["project", "scene_id", "candidate", "role"], role_prompt),
+    _tool("run_role_review",
+          "LIVE review: send the blind candidate packet to one role's human-owned roster assignment, "
+          "strictly parse the vendor reply, persist an immutable provider attempt, and by default "
+          "record a candidate-hash-bound critique with role_runner provenance that promotion can trust. "
+          "Set record=false to keep only the attempt/result. Transport and persona injection are not exposed.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "candidate": {"type": "string"}, "role": {"type": "string"},
+           "roster": {"type": "string"}, "record": {"type": "boolean"}},
+          ["project", "scene_id", "candidate", "role"], run_role_review),
+    _tool("run_review_panel",
+          "LIVE panel: run several configured judge roles over the same blind candidate, preserving "
+          "per-role verdicts, failures, provenance, and disagreement without averaging. Each attempt "
+          "is persisted; by default successful critiques are also recorded for policy-gate use.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "candidate": {"type": "string"},
+           "roles": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+           "roster": {"type": "string"}, "record": {"type": "boolean"}},
+          ["project", "scene_id", "candidate", "roles"], run_review_panel),
     _tool("run_regression",
           "Run the FRAMEWORK regression fixtures — the deterministic invariants the ADRs pinned "
           "(defaultness, revision identity, tournament selection, ontology). Returns pass/fail per "

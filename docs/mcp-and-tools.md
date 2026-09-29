@@ -15,9 +15,10 @@ talent (continuity slips, forgotten promises, default phrasing) so the model can
 judgment where judgment matters.
 
 The MCP surface now covers the repository-owned lifecycle end to end. It can create and inspect a
-project, persist schema-aware planning/canon/scene artifacts and model-authored prose branches, then
-drive the existing plan-search, audit, revision, promotion, evidence, and assembly tools. There is no
-generic filesystem-write tool: accepted canon and branch history retain their existing invariants.
+project, persist schema-aware planning/canon/scene artifacts and model-authored prose branches, run
+the configured multi-vendor judge roles with promotion-trusted provenance, then drive plan-search,
+audit, revision, promotion, evidence, and assembly. There is no generic filesystem-write tool:
+accepted canon and branch history retain their existing invariants.
 
 ## The MCP server
 `scripts/fiction_mcp.py` is a **dependency-free** MCP stdio server (newline-delimited JSON-RPC).
@@ -86,6 +87,9 @@ Set `FICTION_COMPILER_PYTHON` to override interpreter discovery.
 | `realization_calibration_report` | Separate extractor misses, alignment misses, omissions and unresolved cases without enabling the prose-audit gate |
 | `hard_audit` | Deterministic Audit 1 (knowledge cutoff, causal refs, POV, chronology, promise ledger) |
 | `defaultness_lint` | Model-default tics in prose, with evidence |
+| `role_prompt` | Deterministically preview the exact blind role packet and roster assignment without calling a model |
+| `run_role_review` | Call one configured live judge role, persist the immutable provider attempt, and by default record its candidate-bound critique with trusted role-runner provenance |
+| `run_review_panel` | Call several configured live judge roles while retaining per-role failures, provenance, and disagreement rather than averaging verdicts |
 | `evaluate_revision` | Accept/stop decision for a revision (stateless; takes iteration/attempts to reach every branch) |
 | `record_revision` | Runs one revision iteration, derives iteration/attempts from the scene's `revision-log`, and **persists** it — the history-driven, ESCALATE/STOP-capable path |
 | `promote` | **State-changing, gated by `confirm`** — copies a reviewed candidate into the manuscript and folds its delta into canon |
@@ -121,6 +125,14 @@ Role-runner attempts are imported with `link_scene_run_review`, which preserves 
 metadata and source hash rather than repeating the call. `scripts/scene_run.py` exposes the same flow
 for non-MCP callers.
 
+Live review no longer requires leaving MCP. `run_role_review` and `run_review_panel` delegate to
+the same `role_runner` used by the CLI. The caller may select a confined roster file but cannot inject
+an arbitrary transport or persona. Each live call writes its immutable attempt artifact; successful
+recorded critiques carry candidate hash, packet hash, role, vendor, and model provenance required by
+the promotion policy. Because these tools contact configured model vendors and write attempt evidence,
+their MCP annotations are `openWorldHint=true`, `readOnlyHint=false`, and
+`idempotentHint=false`.
+
 The §6.11 writer comparison composes that provenance with the existing frozen selection experiment.
 `freeze_writer_study` must run before reader preferences exist and binds every frozen candidate to the
 scene run that produced it, its provider/model, declared writer family, and independent-draft,
@@ -142,7 +154,12 @@ Already wired in `.codex/config.toml`:
 [mcp_servers.fiction-compiler]
 command = "python3"
 args = ["scripts/fiction_mcp_launcher.py"]
+default_tools_approval_mode = "approve"
 ```
+
+The project-local approval mode lets ordinary Codex runs call this bounded repository-owned MCP
+surface without per-call approval prompts. Tool annotations still distinguish read-only, destructive,
+idempotent, and networked behavior, and compiler-level confirmation/human gates remain authoritative.
 
 ### Sanity check by hand
 ```bash
