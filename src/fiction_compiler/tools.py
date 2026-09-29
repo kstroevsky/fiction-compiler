@@ -1309,7 +1309,8 @@ TOOLS: list[dict] = [
           "Decide whether a revision should be accepted (stateless). Give the prior and revised "
           "versions' findings (arrays of critique objects) and the target dimension. Pass iteration "
           "/ attempts_at_current_layer to reach the ESCALATE_LAYER and STOP_NO_PROGRESS decisions.",
-          {"before_findings": {"type": "array"}, "after_findings": {"type": "array"}, "target": {"type": "string"},
+          {"before_findings": {"type": "array"}, "after_findings": {"type": "array"},
+           "target": {"type": "string"}, "target_evidence": {"type": "string"},
            "iteration": {"type": "integer"}, "attempts_at_current_layer": {"type": "integer"},
            "max_iterations": {"type": "integer"}, "max_attempts_per_layer": {"type": "integer"},
            "waivers": {"type": "array"}},
@@ -1320,7 +1321,10 @@ TOOLS: list[dict] = [
           "stateless evaluate_revision) to drive the loop with real history — it can ESCALATE/STOP and "
           "leaves a durable trace.",
           {"project": {"type": "string"}, "scene_id": {"type": "string"},
-           "before": {"type": "string"}, "after": {"type": "string"}, "target": {"type": "string"}},
+           "before": {"type": "string"}, "after": {"type": "string"},
+           "target": {"type": "string"}, "target_evidence": {"type": "string"},
+           "max_iterations": {"type": "integer", "minimum": 1},
+           "max_attempts_per_layer": {"type": "integer", "minimum": 1}},
           ["project", "scene_id", "before", "after"], record_revision),
     _tool("promote",
           "Promote a reviewed candidate into the manuscript and fold its state delta into canon. "
@@ -1686,7 +1690,8 @@ TOOLS: list[dict] = [
           "candidate_strategies and internal spec fields (which leak the A/B intent) and never "
           "includes other candidates or a reveal map. Use this to give a judge a leak-free, "
           "injection-safe package instead of hand-assembling one.",
-          {"project": {"type": "string"}, "scene_id": {"type": "string"}, "candidate": {"type": "string"}},
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "candidate": {"type": "string"}, "role": {"type": "string"}},
           ["project", "scene_id", "candidate"], judge_bundle),
     _tool("critic_eval",
           "Screen critics on evals/critic-cases.json: recall on planted defects and specificity on "

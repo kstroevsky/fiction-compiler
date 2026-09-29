@@ -97,6 +97,28 @@ class ToolDispatchTests(unittest.TestCase):
         handlers = {descriptor["handler"].__name__ for descriptor in tools.TOOLS}
         self.assertEqual(public, handlers)
 
+    def test_every_handler_parameter_is_exposed_by_mcp_schema(self) -> None:
+        """Registered locally is insufficient if Codex cannot supply the handler's full API."""
+        for descriptor in tools.TOOLS:
+            signature = inspect.signature(descriptor["handler"])
+            public_parameters = {
+                name
+                for name, parameter in signature.parameters.items()
+                if not name.startswith("_")
+                and parameter.kind in (
+                    inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                    inspect.Parameter.KEYWORD_ONLY,
+                )
+            }
+            required_parameters = {
+                name
+                for name, parameter in signature.parameters.items()
+                if name in public_parameters and parameter.default is inspect.Parameter.empty
+            }
+            schema = descriptor["inputSchema"]
+            self.assertEqual(set(schema["properties"]), public_parameters, descriptor["name"])
+            self.assertEqual(set(schema["required"]), required_parameters, descriptor["name"])
+
     def test_premise_report_is_reachable_through_dispatch(self) -> None:
         candidates = [
             {"id": "a", "logline": "A courier hides a letter and inherits its consequences.",
