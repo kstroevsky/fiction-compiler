@@ -16,8 +16,11 @@ Sources in `source-register.json` carry a `stream`:
   analysis and annotation. See `corpus-notes/README.md`.
 - **reference** — narratology handbooks and the like.
 
-> Copyright discipline: US public-domain status does **not** settle EU/DE status (EU term is life
-> + 70 years). Every source records a `copyright_note`; verify before ingesting full text in the EU.
+> Copyright discipline: US public-domain status does **not** settle EU/DE status. Every
+> `fiction-corpus` source records a machine-readable `rights` object as well as `copyright_note`.
+> Corpus aggregators remain `per-title-verification-required` with full-text ingestion blocked until
+> the specific work/translation/edition is checked; cleared or repository-owned sources record the
+> verification date and an explicit `allowed` policy.
 
 ## Layout (tiers)
 - `index.json` — Level-0 concept map. Every concept names a `used_by` consumer, so no card is inert.

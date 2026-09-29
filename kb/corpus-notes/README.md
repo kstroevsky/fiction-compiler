@@ -6,7 +6,9 @@ and to study patterns (scene structure, distance shifts, reveal scheduling, moti
 ## Discipline
 - External literary sources must be public-domain (`standard-ebooks`, `gutenberg`) with **EU/DE**
   status verified per title (author death + 70). Repository-owned/user-provided fiction may also be
-  annotated when provenance and rights are explicit.
+  annotated when provenance and rights are explicit. The source register enforces a structured
+  `rights` gate: aggregator entries stay blocked until a title-specific source entry is marked
+  `cleared` with `verified_on` and the basis for that determination.
 - Store **abstract observations and annotations**, not wholesale text. A corpus note records *what
   a passage does* (technique, at what distance, to what effect) — not the passage itself beyond the
   minimal quotation needed to make a craft point.

@@ -167,10 +167,49 @@ def validate_projects(errors: list[str]) -> None:
 def validate_source_register(errors: list[str]) -> None:
     path = ROOT / "kb" / "source-register.json"
     data = read_json(path)
-    ids = [source.get("id") for source in data.get("sources", [])]
+    sources = data.get("sources", [])
+    ids = [source.get("id") for source in sources]
     duplicates = [item for item, count in Counter(ids).items() if item and count > 1]
     if duplicates:
         errors.append(f"source-register: duplicate ids {duplicates}")
+    allowed_statuses = {"cleared", "repository-owned", "per-title-verification-required", "not-cleared"}
+    allowed_policies = {"allowed", "blocked-pending-title-check", "blocked"}
+    for source in sources:
+        if source.get("stream") != "fiction-corpus":
+            continue
+        source_id = source.get("id", "<missing-id>")
+        rights = source.get("rights")
+        if not isinstance(rights, dict):
+            errors.append(f"source-register: fiction-corpus source {source_id!r} lacks structured rights")
+            continue
+        status = rights.get("eu_de_status")
+        policy = rights.get("full_text_policy")
+        if status not in allowed_statuses:
+            errors.append(
+                f"source-register: fiction-corpus source {source_id!r} has invalid eu_de_status {status!r}"
+            )
+        if policy not in allowed_policies:
+            errors.append(
+                f"source-register: fiction-corpus source {source_id!r} has invalid full_text_policy {policy!r}"
+            )
+        if not isinstance(rights.get("basis"), str) or not rights["basis"].strip():
+            errors.append(f"source-register: fiction-corpus source {source_id!r} needs a rights basis")
+        if status in {"cleared", "repository-owned"} and not rights.get("verified_on"):
+            errors.append(
+                f"source-register: fiction-corpus source {source_id!r} needs verified_on for status {status!r}"
+            )
+        if status in {"cleared", "repository-owned"} and policy != "allowed":
+            errors.append(
+                f"source-register: fiction-corpus source {source_id!r} is {status!r} but full text is not allowed"
+            )
+        if status == "per-title-verification-required" and policy != "blocked-pending-title-check":
+            errors.append(
+                f"source-register: fiction-corpus source {source_id!r} must block full text pending a title check"
+            )
+        if status == "not-cleared" and policy != "blocked":
+            errors.append(
+                f"source-register: fiction-corpus source {source_id!r} marked not-cleared must block full text"
+            )
 
 
 def validate_kb(errors: list[str]) -> None:
