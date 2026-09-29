@@ -1078,6 +1078,29 @@ _OPEN_WORLD_TOOLS = {
 }
 
 
+def _named_input_schema(name: str) -> dict:
+    """Embed one canonical artifact schema into an MCP tool input without document metadata."""
+    loaded = dict(schema.load_schema(name))
+    loaded.pop("$schema", None)
+    loaded.pop("$id", None)
+    guidance = {
+        "project": "Complete project brief. For project_create, id must exactly equal the slug.",
+        "character": "Complete character sheet. id must use the char- prefix, for example char-mara.",
+        "scene": "Complete scene spec. id must use chNN-scNN, for example ch01-sc01.",
+        "state-delta": "Complete scene delta. scene_id must use chNN-scNN and equal the outer scene_id.",
+    }
+    if name in guidance:
+        loaded["description"] = guidance[name]
+    return loaded
+
+
+_SCENE_ID_INPUT = {
+    "type": "string",
+    "pattern": "^ch[0-9]{2}-sc[0-9]{2}$",
+    "description": "Canonical scene id in chNN-scNN form, for example ch01-sc01.",
+}
+
+
 def _tool(name: str, description: str, properties: dict, required: list[str], handler: Callable) -> dict:
     read_only = name in _READ_ONLY_TOOLS
     return {
@@ -1099,9 +1122,10 @@ TOOLS: list[dict] = [
     _tool("project_create",
           "Create a fiction project from projects/_template, bind all project-owned template ids to "
           "the new slug, and optionally write a schema-valid project brief plus creative brief. "
+          "When project_data is supplied, its id MUST equal slug exactly. "
           "This is the MCP entry point for bootstrap; it never overwrites an existing project.",
           {"slug": {"type": "string", "pattern": "^[a-z0-9-]+$"},
-           "project_data": {"type": "object"},
+           "project_data": _named_input_schema("project"),
            "creative_brief": {"type": "string"}},
           ["slug"], project_create),
     _tool("project_overview",
@@ -1136,33 +1160,35 @@ TOOLS: list[dict] = [
     _tool("character_write",
           "Persist a schema-valid character sheet and add its id to canon/index.json. Existing "
           "characters require overwrite=true before acceptance and cannot be overwritten after any "
-          "scene has been accepted.",
-          {"project": {"type": "string"}, "character": {"type": "object"},
+          "scene has been accepted. Character ids MUST match char-[a-z0-9-]+, e.g. char-mara.",
+          {"project": {"type": "string"}, "character": _named_input_schema("character"),
            "overwrite": {"type": "boolean"}},
           ["project", "character"], character_write),
     _tool("scene_spec_write",
           "Create or explicitly replace a schema-valid scene spec before acceptance. Accepted scene "
-          "specs are immutable and must go through the backward-revision workflow.",
-          {"project": {"type": "string"}, "scene_id": {"type": "string"},
-           "spec": {"type": "object"}, "overwrite": {"type": "boolean"}},
+          "specs are immutable and must go through the backward-revision workflow. The outer scene_id "
+          "and spec.id MUST be the same chNN-scNN id, e.g. ch01-sc01.",
+          {"project": {"type": "string"}, "scene_id": _SCENE_ID_INPUT,
+           "spec": _named_input_schema("scene"), "overwrite": {"type": "boolean"}},
           ["project", "scene_id", "spec"], scene_spec_write),
     _tool("state_delta_write",
           "Create or explicitly replace a schema-valid state-delta for an unaccepted scene. The scene "
-          "spec must already exist; accepted deltas are immutable and use revise_acceptance instead.",
-          {"project": {"type": "string"}, "scene_id": {"type": "string"},
-           "state_delta": {"type": "object"}, "overwrite": {"type": "boolean"}},
+          "spec must already exist; accepted deltas are immutable and use revise_acceptance instead. "
+          "The outer scene_id and state_delta.scene_id MUST match exactly.",
+          {"project": {"type": "string"}, "scene_id": _SCENE_ID_INPUT,
+           "state_delta": _named_input_schema("state-delta"), "overwrite": {"type": "boolean"}},
           ["project", "scene_id", "state_delta"], state_delta_write),
     _tool("candidate_write",
           "Persist one non-empty Markdown prose candidate under the scene's candidates directory. "
           "Existing candidate files are never overwritten, preserving rejected and revised branches.",
-          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+          {"project": {"type": "string"}, "scene_id": _SCENE_ID_INPUT,
            "filename": {"type": "string", "pattern": "^[^/\\\\]+\\.md$"},
            "text": {"type": "string", "minLength": 1}},
           ["project", "scene_id", "filename", "text"], candidate_write),
     _tool("candidate_get",
           "Read one exact scene candidate with its sha256 and word count. Use this when the author, "
           "revision loop, or auditor needs the prose bytes rather than project-level metadata.",
-          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+          {"project": {"type": "string"}, "scene_id": _SCENE_ID_INPUT,
            "candidate": {"type": "string"}},
           ["project", "scene_id", "candidate"], candidate_get),
     _tool("workspace_validate",

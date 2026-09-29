@@ -40,6 +40,12 @@ Set `FICTION_COMPILER_PYTHON` to override interpreter discovery.
 | `candidate_write` | Persist a new Markdown prose branch without overwriting an existing candidate |
 | `candidate_get` | Read one exact prose branch with content hash and word count |
 | `workspace_validate` | Run the repository's canonical workspace/schema/integrity validator through the MCP runtime |
+
+The structured authoring inputs are not advertised as opaque objects. `project_create`,
+`character_write`, `scene_spec_write`, and `state_delta_write` embed the same canonical JSON Schemas
+used by the repository validator, with explicit canonical id guidance (for example `char-mara` and
+`ch01-sc01`). This lets MCP clients construct a valid first write from `tools/list` rather than
+discovering required nested fields by intentionally failing the write path.
 | `kb_search` | Find relevant craft concept cards by keyword/layer |
 | `kb_get` | Full text of one concept card |
 | `kb_sources` | Registered sources (craft-instruction / fiction-corpus / reference) with copyright notes |

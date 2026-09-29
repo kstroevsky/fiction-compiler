@@ -142,7 +142,8 @@ test, not just a feature.
 > assembly paths. `workspace_validate` exposes the repository validator through the same runtime.
 > **ADR 0050 closes the Codex/live-review seam:** tool annotations and project-local Codex trust make
 > the registered surface callable in ordinary Codex runs; every public handler parameter must be
-> represented in its MCP schema; and live single-role/panel review is now exposed with immutable
+> represented in its MCP schema; schema-bearing authoring objects expose their canonical nested
+> requirements and id formats instead of opaque object placeholders; and live single-role/panel review is now exposed with immutable
 > provider attempts plus promotion-trusted provenance. The registry test requires every public
 > `fiction_compiler.tools` handler to be MCP-visible. Plus the
 > `avoid-defaults` anti-obviousness skill (LLM-facing craft, not code).

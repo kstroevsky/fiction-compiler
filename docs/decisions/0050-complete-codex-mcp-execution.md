@@ -25,6 +25,9 @@ Make Codex execution and the live review path first-class MCP behavior:
   bounded repository-owned server while compiler confirmation and human gates remain in force;
 - a registry invariant requires every public handler parameter and required parameter to match its
   MCP schema, preventing Python-only arguments;
+- authoring tools embed the canonical project/character/scene/state-delta schemas instead of opaque
+  `type: object` placeholders, including canonical id patterns and cross-field usage guidance so
+  Codex can construct valid writes from `tools/list` without probing validation errors first;
 - `run_role_review` exposes one live configured role and `run_review_panel` exposes several;
 - both load only the human-owned roster, expose no transport/persona injection, persist the existing
   immutable provider attempt artifacts, and record critiques by default;
@@ -38,9 +41,9 @@ and promotion-gate rules stay centralized.
 ## Evidence
 
 The focused tool/MCP/role-runner suite covers registry shape, annotation behavior, full
-signature/schema parity, live-wrapper delegation, model-provider failure conversion, and existing
-role-runner provenance behavior. The MCP protocol tests verify that the new networked tools are
-advertised with open-world annotations.
+signature/schema parity, canonical nested authoring schemas, live-wrapper delegation, model-provider
+failure conversion, and existing role-runner provenance behavior. The MCP protocol tests verify that
+the new networked tools are advertised with open-world annotations.
 
 Acceptance is also exercised with real Codex against the configured project-local MCP server:
 read-only compiler calls, authoring mutations, candidate retrieval, context compilation, audits,

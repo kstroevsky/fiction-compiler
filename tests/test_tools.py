@@ -129,6 +129,41 @@ class ToolDispatchTests(unittest.TestCase):
             self.assertEqual(set(schema["properties"]), public_parameters, descriptor["name"])
             self.assertEqual(set(schema["required"]), required_parameters, descriptor["name"])
 
+    def test_authoring_tools_expose_canonical_nested_schemas(self) -> None:
+        by_name = {tool["name"]: tool["inputSchema"] for tool in tools.list_tools()}
+
+        character = by_name["character_write"]["properties"]["character"]
+        self.assertEqual(
+            set(character["required"]),
+            {"id", "name", "desire", "values", "beliefs", "constraints", "voice"},
+        )
+        self.assertEqual(set(character["properties"]["voice"]["required"]), {"lexicon", "syntax", "avoid"})
+
+        scene = by_name["scene_spec_write"]["properties"]["spec"]
+        self.assertIn("chapter", scene["required"])
+        self.assertIn("required_events", scene["required"])
+        self.assertEqual(scene["properties"]["id"]["pattern"], "^ch[0-9]{2}-sc[0-9]{2}$")
+
+        delta = by_name["state_delta_write"]["properties"]["state_delta"]
+        self.assertIn("knowledge_changes", delta["required"])
+        self.assertEqual(
+            delta["properties"]["knowledge_changes"]["items"]["required"],
+            ["character", "fact"],
+        )
+
+        project = by_name["project_create"]["properties"]["project_data"]
+        self.assertIn("reader_contract", project["required"])
+        self.assertEqual(project["properties"]["id"]["pattern"], "^[a-z0-9-]+$")
+        self.assertIn("id must exactly equal the slug", project["description"])
+        self.assertIn("char-mara", character["description"])
+
+        for tool_name in ("scene_spec_write", "state_delta_write", "candidate_write", "candidate_get"):
+            self.assertEqual(
+                by_name[tool_name]["properties"]["scene_id"]["pattern"],
+                "^ch[0-9]{2}-sc[0-9]{2}$",
+            )
+            self.assertIn("ch01-sc01", by_name[tool_name]["properties"]["scene_id"]["description"])
+
     def test_premise_report_is_reachable_through_dispatch(self) -> None:
         candidates = [
             {"id": "a", "logline": "A courier hides a letter and inherits its consequences.",
