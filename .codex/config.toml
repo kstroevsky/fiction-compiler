@@ -7,7 +7,7 @@ default_subagent_reasoning_effort = "high"
 # linter, revision evaluator) exposed to the agent over MCP. Dependency-free stdio server.
 [mcp_servers.fiction-compiler]
 command = "python3"
-args = ["scripts/fiction_mcp.py"]
+args = ["scripts/fiction_mcp_launcher.py"]
 
 # Skills are stored in Claude's project skill directory but use the shared Agent Skills format.
 [[skills.config]]

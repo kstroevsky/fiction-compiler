@@ -8,6 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SERVER = ROOT / "scripts" / "fiction_mcp.py"
+LAUNCHER = ROOT / "scripts" / "fiction_mcp_launcher.py"
 
 
 def run_session(messages: list[dict]) -> list[dict]:
@@ -21,6 +22,19 @@ def run_session(messages: list[dict]) -> list[dict]:
 
 
 class McpProtocolTests(unittest.TestCase):
+    def test_configured_launcher_finds_supported_python(self) -> None:
+        payload = json.dumps({
+            "jsonrpc": "2.0", "id": 1, "method": "initialize",
+            "params": {"protocolVersion": "2025-06-18", "capabilities": {}},
+        }) + "\n"
+        result = subprocess.run(
+            ["python3", str(LAUNCHER)], input=payload, capture_output=True, text=True,
+            timeout=30, cwd=ROOT,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        response = json.loads(result.stdout.splitlines()[0])
+        self.assertEqual(response["result"]["serverInfo"]["name"], "fiction-compiler")
+
     def test_handshake_list_and_call(self) -> None:
         responses = run_session([
             {"jsonrpc": "2.0", "id": 1, "method": "initialize",

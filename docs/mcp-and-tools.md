@@ -16,7 +16,9 @@ judgment where judgment matters.
 
 ## The MCP server
 `scripts/fiction_mcp.py` is a **dependency-free** MCP stdio server (newline-delimited JSON-RPC).
-It runs anywhere `python3` runs — no install step.
+The project requires Python >=3.11. `scripts/fiction_mcp_launcher.py` is deliberately compatible with
+older system Python versions and selects `python3.13`, `python3.12`, or `python3.11` when necessary.
+Set `FICTION_COMPILER_PYTHON` to override interpreter discovery.
 
 ### Tools exposed
 | Tool | Purpose |
@@ -118,7 +120,7 @@ Already wired in `.codex/config.toml`:
 ```toml
 [mcp_servers.fiction-compiler]
 command = "python3"
-args = ["scripts/fiction_mcp.py"]
+args = ["scripts/fiction_mcp_launcher.py"]
 ```
 
 ### Sanity check by hand
@@ -127,7 +129,7 @@ printf '%s\n' \
  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{}}}' \
  '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
  '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"kb_search","arguments":{"query":"scene turn"}}}' \
- | python3 scripts/fiction_mcp.py
+ | python3 scripts/fiction_mcp_launcher.py
 ```
 
 ## The same tools without MCP
