@@ -318,6 +318,30 @@
       }
     },
     {
+      "id": "joyce-araby-gutenberg-2814",
+      "title": "Araby, in Dubliners (Project Gutenberg eBook #2814, original English text)",
+      "creator": "James Joyce (1882-1941)",
+      "type": "story",
+      "stream": "fiction-corpus",
+      "license": "public-domain",
+      "location": "https://www.gutenberg.org/ebooks/2814",
+      "domains": [
+        "public-domain-control",
+        "scene-representation",
+        "defaultness-false-positive"
+      ],
+      "notes": "Title-specific literature control for review §6.9. The repository stores only the Araby story extracted from the original-English Dubliners plaintext, split into four analyst-defined segments and hash-bound in kb/corpus-controls/joyce-araby-1914/control.json.",
+      "copyright_note": "Project Gutenberg identifies Dubliners #2814 as public domain in the USA and identifies James Joyce as 1882-1941. EU Directive 2006/116/EC Article 1 sets the author term at life + 70 years; for Joyce's original English text that term has expired. No modern translation is used.",
+      "rights": {
+        "eu_de_status": "cleared",
+        "full_text_policy": "allowed",
+        "verified_on": "2026-09-29",
+        "basis": "Original English text by sole identified author James Joyce, who died in 1941. Directive 2006/116/EC Article 1 provides life + 70 years for an identified literary author. Project Gutenberg eBook #2814 identifies the text, author dates, contents including Araby, and US public-domain status.",
+        "source_url": "https://www.gutenberg.org/ebooks/2814",
+        "legal_basis_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32006L0116"
+      }
+    },
+    {
       "id": "the-overnight-example",
       "title": "The Overnight (repository worked example)",
       "creator": "fiction-compiler (generated in-repo)",

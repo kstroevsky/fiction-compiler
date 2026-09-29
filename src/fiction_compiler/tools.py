@@ -18,9 +18,9 @@ from typing import Any, Callable
 from . import critic_eval as _critic_eval
 from . import critique as _critique
 from . import (critic_calibration, defaultness, framework_change, hard_audit, integrity,
-               issue_resolution, kb, owner_preference, plan_search, post_revision, reader,
-               realization_calibration, regression, repertoire, revision, run_manifest, safety,
-               schema, selection_eval, trace)
+               issue_resolution, kb, literature_control, owner_preference, plan_search, post_revision,
+               reader, realization_calibration, regression, repertoire, revision, run_manifest,
+               safety, schema, selection_eval, trace)
 from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
@@ -147,6 +147,11 @@ def reader_disclosure(project: str) -> dict:
 def repertoire_report(projects: list[str] | None = None) -> dict:
     """Report repeated cross-project discourse tags without ranking originality or quality."""
     return repertoire.report(project_ids=projects)
+
+
+def literature_control_report(control_id: str) -> dict:
+    """Run deterministic evidence and expose manual representation limits for a frozen control."""
+    return literature_control.report(control_id)
 
 
 def record_owner_preference(project: str, decision_kind: str, alternatives: list[dict],
@@ -996,6 +1001,12 @@ TOOLS: list[dict] = [
           {"projects": {"type": "array", "uniqueItems": True,
                         "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}}},
           [], repertoire_report),
+    _tool("literature_control_report",
+          "Run the deterministic defaultness control and show manually annotated story-format limits "
+          "for one rights-cleared, hash-bound literary control. Unrun critic evidence stays explicitly "
+          "unrun; the control is a stress test, not a universal literary-quality gold label.",
+          {"control_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}},
+          ["control_id"], literature_control_report),
     _tool("record_owner_preference",
           "Record one prospective owner choice with the exact alternatives shown, stated reason, and "
           "decision date. Alternative text is frozen by content hash. This records owner taste only; "

@@ -1,0 +1,17 @@
+{
+  "id": "ch01-sc04",
+  "chapter": "araby",
+  "pov": "first-person retrospective narrator / younger experiencing self",
+  "participants": ["boy", "stall-attendant", "young-men"],
+  "purpose": [
+    "Bring the idealized errand into contact with the nearly closed commercial bazaar and end in self-revaluation."
+  ],
+  "entry_state": ["The boy has arrived at Araby late, still oriented toward buying a gift."],
+  "desire": "Find something worth buying before the bazaar closes.",
+  "conflict": "The bazaar is darkening and ordinary commercial indifference offers no support for the meaning he projected onto the errand.",
+  "turn": "He abandons the purchase and experiences a painful self-recognition as the hall goes dark.",
+  "exit_state": ["The gift errand is abandoned; the boy's understanding of his own motive has shifted."],
+  "required_events": [],
+  "forbidden_moves": ["Do not reduce the final image and self-recognition to a binary fact whose truth exhausts the passage's literary effect."],
+  "style_constraints": ["Preserve the relation between commercial anticlimax, darkness, and self-recognition without claiming a single typed interpretation is exhaustive."]
+}

@@ -29,6 +29,7 @@ It runs anywhere `python3` runs — no install step.
 | `contract_coverage` | Show how each reader-contract clause is mapped or explicitly untested; mapping never means the clause passed |
 | `reader_disclosure` | Validate discourse-revelation → canonical-fact bindings, explicit non-factual revelations, curiosity gaps, and surprise setup without claiming reader comprehension |
 | `repertoire_report` | Count repeated project-owned ending/turn/resolution/motif/focalization tags across complete manuscripts; partial stories stay visible but are excluded from observed frequencies, and no originality score is produced |
+| `literature_control_report` | Run deterministic lint and schema-fit probes for a rights-cleared, hash-bound literature control while keeping manual representation limits and unrun critic evidence explicit |
 | `record_owner_preference` | Prospectively freeze the exact alternatives behind one owner choice plus decision kind, chosen option, reason, and date; this is owner-taste evidence only |
 | `owner_preference_packet` | Return the frozen alternatives with the owner's pick and reason withheld, plus a packet hash for blind critic prediction |
 | `record_owner_preference_prediction` | Persist one hash-bound critic pick or abstention per owner choice; one critic gets one immutable prediction for that choice |

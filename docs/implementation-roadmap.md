@@ -40,7 +40,7 @@ mechanical validity, modeled/extracted consistency, and literary preference.
 | Selection-value measurement | `selection_eval.py`, `selection_experiment.py`, ADR 0028 | **Implemented as evidence infrastructure; study not yet run** | Frozen generation-order pools, independent pairwise labels, first/random/critic comparison, cost/failure missingness |
 | Critic calibration | `critic_calibration.py`, `critic_calibration.py` CLI, ADR 0029 | **Implemented as evidence infrastructure; calibrated study not yet run** | Frozen cases, repeated runs, conditional invariance/directional comparisons, crossed writer/judge families, joint-error bookkeeping, human-label disagreement preserved |
 | Anti-obviousness search / repertoire | `avoid-defaults` skill, premise probes, `repertoire.py`, ADR 0041 | **Cross-project recurrence implemented; generative originality remains experimental** | Complete-story feature tags expose repeated endings/turns/resolutions/motifs/focalization without an originality score or gate |
-| Knowledge base | `kb/`, source register, ADR 0043 | **Starter set implemented; fiction-corpus rights gate enforced** | Structured concept cards, conflicts/counterexamples, machine-readable EU/DE corpus clearance state, one owned-scene annotation |
+| Knowledge base / literature controls | `kb/`, `literature_control.py`, ADRs 0043–0044 | **Starter set + first external control implemented; live critic/human baselines unrun** | Machine-readable EU/DE rights gate; hash-bound Joyce/“Araby” control yields 17 minor linter hits, zero blocks, and schema-valid format probes with explicit manual representation losses |
 | Framework regression | `regression.py`, fixtures, critic cases | **Implemented** | Closed checks plus fingerprint of code, schemas, KB, prompts/skills, roster/probes, eval data, scripts, runtime config |
 | Observability | project `.runs/`, trace, review attempts | **Substantial** | Candidate-bound packets and collision-safe runs; live role transports preserve provider token metadata/latency when available, and selection experiments keep unknown usage distinct from zero |
 | End-to-end projects | `projects/*` | **Present** | Multiple worked projects exercise promotion, state, audits and manuscript assembly |
@@ -259,8 +259,16 @@ test, not just a feature.
 > **ADR 0043 makes the copyright prerequisite executable:** every `fiction-corpus` source now declares
 > EU/DE clearance state and a full-text policy. US-public-domain aggregators remain blocked pending a
 > title/translation/edition check; only explicitly cleared or repository-owned sources can declare full
-> text allowed. This is a prerequisite for review §6.9, not evidence that its literature-control study
-> has been run.
+> text allowed.
+>
+> **The first real-literature control is now executable (ADR 0044, review §6.9).** Joyce's “Araby” is
+> stored from the original-English Project Gutenberg #2814 source under a title-specific cleared rights
+> record, split into four explicitly analyst-defined segments, and hash-bound together with four
+> production-schema `scene`/`state-delta` probes. The current defaultness linter reports 17 minor hits
+> (4/3/5/5) but blocks zero segments, while manual format annotations expose typed losses without
+> confusing schema validity with literary adequacy. Live critics remain explicitly `unrun` because no
+> provider credentials were available; human/discourse baselines and unseen permissioned controls are
+> still empirical work.
 >
 > **The hard audit now reads the prose (ADR 0014 + ADR 0024 + ADR 0036, review §§4, 6.3).** A `prose_audit` proves
 > an extraction agent's `prose-claims` (pov, tense, typed factual/epistemic claims with evidence) against
@@ -319,6 +327,7 @@ test, not just a feature.
 > `0039-resumable-scene-run-provenance.md`, `0040-bind-reader-disclosures-to-discourse.md`,
 > `0041-cross-project-repertoire-diagnostic.md`, `0042-record-owner-preference-evidence.md`,
 > `0043-enforce-fiction-corpus-rights-gate.md`,
+> `0044-add-public-domain-literature-control.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 

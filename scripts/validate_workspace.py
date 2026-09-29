@@ -19,7 +19,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from fiction_compiler import integrity, ontology, owner_preference, schema  # noqa: E402
+from fiction_compiler import integrity, literature_control, ontology, owner_preference, schema  # noqa: E402
 
 
 def read_json(path: Path) -> Any:
@@ -210,6 +210,9 @@ def validate_source_register(errors: list[str]) -> None:
             errors.append(
                 f"source-register: fiction-corpus source {source_id!r} marked not-cleared must block full text"
             )
+
+    for message in literature_control.workspace_validation_errors():
+        errors.append(f"literature-control: {message}")
 
 
 def validate_kb(errors: list[str]) -> None:
