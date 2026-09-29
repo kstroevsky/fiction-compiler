@@ -403,6 +403,25 @@ def _revision_fabula_rechecks(project: Path, accepted: list[str], scene_id: str,
     return affected
 
 
+def _recheck_requirements(snapshot: dict) -> dict:
+    """Return post-revision checks required by the policy frozen with one acceptance."""
+    scopes = ["hard", "literary", "reader", "voice", "whole_work"]
+    review = snapshot.get("review_policy", {})
+    artifact = review.get("artifact", {}) if isinstance(review, dict) else {}
+    text = artifact.get("text") if isinstance(artifact, dict) else None
+    if isinstance(text, str):
+        try:
+            frozen_policy = json.loads(text)
+        except json.JSONDecodeError as exc:
+            raise ValueError("accepted review policy artifact is invalid JSON") from exc
+        if isinstance(frozen_policy, dict) and frozen_policy.get("require_prose_audit") is True:
+            scopes.insert(1, "prose_audit")
+    result = {"required_scopes": scopes, "hard_audit": {"status": "pending"}}
+    if "prose_audit" in scopes:
+        result["prose_audit"] = {"status": "pending"}
+    return result
+
+
 def _record_retroactive_fabula_rechecks(project: Path, index: dict, affected: list[str],
                                         scene_id: str, delta: dict) -> dict:
     """Invalidate evidence for scenes whose historical entry state changed after nonlinear insertion."""
@@ -425,8 +444,7 @@ def _record_retroactive_fabula_rechecks(project: Path, index: dict, affected: li
             "reason": "retroactive_fabula_insertion",
             "acceptance_object": object_id,
             "known_state_dependency": dependencies.dependency_match(prior.get("read_set"), changed),
-            "required_scopes": ["hard", "literary", "reader", "voice", "whole_work"],
-            "hard_audit": {"status": "pending"},
+            **_recheck_requirements(prior),
         }
     index["rechecks_required"] = rechecks
     return index
@@ -508,8 +526,7 @@ def _commit_revision_chain(project: Path, index: dict, accepted: list[str],
             "fabula_order_changed": bool(
                 fabula_rechecks.get(downstream_scene, {}).get("fabula_order_changed")
             ),
-            "required_scopes": ["hard", "literary", "reader", "voice", "whole_work"],
-            "hard_audit": {"status": "pending"},
+            **_recheck_requirements(replacement),
         }
         rebased[downstream_scene] = {
             "from": prior_object,
@@ -535,8 +552,7 @@ def _commit_revision_chain(project: Path, index: dict, accepted: list[str],
             "acceptance_object": active_object,
             "known_state_dependency": dependencies.dependency_match(prior.get("read_set"), changed),
             "fabula_order_changed": bool(metadata.get("fabula_order_changed")),
-            "required_scopes": ["hard", "literary", "reader", "voice", "whole_work"],
-            "hard_audit": {"status": "pending"},
+            **_recheck_requirements(prior),
         }
 
     index["acceptance_objects"] = acceptance_objects

@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from fiction_compiler import acceptance, post_revision  # noqa: E402
+from fiction_compiler import acceptance, post_revision, prose_audit, review_policy  # noqa: E402
 from fiction_compiler.promote import promote_candidate  # noqa: E402
 from tests.test_promote import PROSE, build, valid_delta, valid_spec, write_review_set  # noqa: E402
 
@@ -64,6 +64,10 @@ class PostRevisionEvidenceTests(unittest.TestCase):
         pending = acceptance.load_index(self.project)["rechecks_required"]["ch01-sc02"]["required_scopes"]
         self.assertIn("literary", pending)
         self.assertTrue((self.project / evidence["path"]).exists())
+
+    def test_default_policy_does_not_require_post_revision_prose_audit(self) -> None:
+        pending = acceptance.load_index(self.project)["rechecks_required"]["ch01-sc02"]["required_scopes"]
+        self.assertNotIn("prose_audit", pending)
 
     def test_explicit_resolution_closes_only_bound_scope(self) -> None:
         evidence = self.evidence("literary")
@@ -120,6 +124,107 @@ class PostRevisionEvidenceTests(unittest.TestCase):
         status = post_revision.status(self.project)
         self.assertNotIn("ch01-sc02", status["pending_rechecks"])
         self.assertIn("ch01-sc02", status["completed_rechecks"])
+
+
+class RequiredProseAuditRecheckTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.tmp = tempfile.TemporaryDirectory()
+        self.project = build(Path(self.tmp.name), fact_id="fact-plant")
+        policy = {**review_policy.DEFAULT_POLICY, "id": "test-prose-policy@1", "require_prose_audit": True}
+        brief = self.project / "brief"
+        brief.mkdir(parents=True, exist_ok=True)
+        (brief / "review-policy.json").write_text(json.dumps(policy), encoding="utf-8")
+
+        scene1 = self.project / "scenes" / "ch01-sc01"
+        self._write_prose_pass(scene1, "c.md", hashlib.sha256(PROSE.encode()).hexdigest(), "initial")
+
+        scene2 = self.project / "scenes" / "ch01-sc02"
+        (scene2 / "candidates").mkdir(parents=True)
+        (scene2 / "candidates" / "c.md").write_text(PROSE, encoding="utf-8")
+        (scene2 / "spec.json").write_text(json.dumps(valid_spec("ch01-sc02")), encoding="utf-8")
+        (scene2 / "state-delta.json").write_text(json.dumps(valid_delta("ch01-sc02")), encoding="utf-8")
+        write_review_set(scene2)
+        self._write_prose_pass(scene2, "c.md", hashlib.sha256(PROSE.encode()).hexdigest(), "initial")
+
+        promote_candidate(self.project, "ch01-sc01", "c.md")
+        promote_candidate(self.project, "ch01-sc02", "c.md")
+        self.pre_revision_claims = self._claims("ch01-sc02")
+
+        revised = "The brass plant marker caught the light."
+        revised_sha = hashlib.sha256(revised.encode()).hexdigest()
+        (scene1 / "candidates" / "revision.md").write_text(revised, encoding="utf-8")
+        revised_delta = valid_delta("ch01-sc01", fact_id="fact-plant")
+        revised_delta["facts_added"].append({"id": "fact-revised", "text": "The revision changed state."})
+        (scene1 / "state-delta.json").write_text(json.dumps(revised_delta), encoding="utf-8")
+        write_review_set(scene1, candidate_name="revision.md", sha=revised_sha)
+        self._write_prose_pass(scene1, "revision.md", revised_sha, "revision")
+        promote_candidate(self.project, "ch01-sc01", "revision.md", revision=True)
+
+    def tearDown(self) -> None:
+        self.tmp.cleanup()
+
+    @staticmethod
+    def _write_prose_pass(scene: Path, candidate: str, sha: str, suffix: str) -> None:
+        critiques = scene / "critiques"
+        critiques.mkdir(parents=True, exist_ok=True)
+        (critiques / f"prose-audit-{suffix}.json").write_text(json.dumps({
+            "candidate": candidate,
+            "candidate_sha256": sha,
+            "critic": "prose-audit",
+            "audit_class": "hard",
+            "verdict": "pass",
+            "confidence": 1.0,
+            "findings": [],
+        }), encoding="utf-8")
+
+    def _claims(self, scene_id: str) -> dict:
+        bindings = prose_audit.prose_claim_bindings(self.project, scene_id, "c.md")
+        return {
+            "scene_id": scene_id,
+            "candidate": "c.md",
+            **bindings,
+            "pov": "",
+            "tense": "past",
+            "word_count": len(PROSE.split()),
+            "claims": [],
+        }
+
+    def test_revision_marks_policy_required_prose_audit_pending(self) -> None:
+        entry = acceptance.load_index(self.project)["rechecks_required"]["ch01-sc02"]
+        self.assertIn("prose_audit", entry["required_scopes"])
+        self.assertEqual(entry["prose_audit"]["status"], "pending")
+
+    def test_stale_pre_revision_claims_cannot_clear_prose_audit(self) -> None:
+        result = post_revision.recheck_prose_audit(
+            self.project, "ch01-sc02", self.pre_revision_claims
+        )
+        self.assertIn("state_before_sha256", result["error"])
+        entry = acceptance.load_index(self.project)["rechecks_required"]["ch01-sc02"]
+        self.assertIn("prose_audit", entry["required_scopes"])
+
+    def test_mutated_scene_inputs_cannot_be_used_to_clear_prose_audit(self) -> None:
+        spec_path = self.project / "scenes" / "ch01-sc02" / "spec.json"
+        spec = json.loads(spec_path.read_text(encoding="utf-8"))
+        spec["max_words"] = 99
+        spec_path.write_text(json.dumps(spec), encoding="utf-8")
+        claims = self._claims("ch01-sc02")
+        result = post_revision.recheck_prose_audit(self.project, "ch01-sc02", claims)
+        self.assertIn("accepted spec view is missing or changed", result["error"])
+        entry = acceptance.load_index(self.project)["rechecks_required"]["ch01-sc02"]
+        self.assertIn("prose_audit", entry["required_scopes"])
+
+    def test_fresh_rebound_prose_audit_records_evidence_and_clears_scope(self) -> None:
+        claims = self._claims("ch01-sc02")
+        result = post_revision.recheck_prose_audit(self.project, "ch01-sc02", claims)
+        self.assertEqual(result["status"], "pass", result)
+        self.assertTrue((self.project / result["path"]).exists())
+        entry = acceptance.load_index(self.project)["rechecks_required"]["ch01-sc02"]
+        self.assertNotIn("prose_audit", entry["required_scopes"])
+        self.assertEqual(entry["prose_audit"]["status"], "pass")
+        self.assertEqual(
+            entry["prose_audit"]["bindings"]["state_before_sha256"],
+            claims["state_before_sha256"],
+        )
 
 
 if __name__ == "__main__":

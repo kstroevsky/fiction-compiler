@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Inspect, record, and explicitly resolve subjective rechecks after backward revision."""
+"""Inspect and close subjective or policy-required prose rechecks after backward revision."""
 from __future__ import annotations
 
 import argparse
@@ -59,6 +59,11 @@ def main() -> int:
     resolve.add_argument("--decided-by", required=True)
     resolve.add_argument("--reason", required=True)
 
+    prose = sub.add_parser("prose-audit")
+    prose.add_argument("--project", required=True)
+    prose.add_argument("--scene", required=True)
+    prose.add_argument("--claims-json", required=True)
+
     args = parser.parse_args()
     project = project_dir(args.project)
     try:
@@ -71,6 +76,10 @@ def main() -> int:
                 project, args.scope, args.packet_sha256, args.evaluator_kind, args.evaluator_id,
                 args.cohort, args.verdict, _json(args.findings_json, list, "--findings-json"),
                 provenance=_json(args.provenance_json, dict, "--provenance-json"), scene_id=args.scene,
+            ))
+        if args.command == "prose-audit":
+            return _emit(post_revision.recheck_prose_audit(
+                project, args.scene, _json(args.claims_json, dict, "--claims-json")
             ))
         return _emit(post_revision.resolve_scope(project, args.evidence, args.decided_by, args.reason))
     except ValueError as exc:

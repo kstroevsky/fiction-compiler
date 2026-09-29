@@ -367,6 +367,11 @@ def resolve_post_revision_scope(project: str, evidence_id: str, decided_by: str,
     return post_revision.resolve_scope(project_dir(project), evidence_id, decided_by, reason)
 
 
+def recheck_post_revision_prose_audit(project: str, scene_id: str, claims: dict) -> dict:
+    """Re-run a pending policy-required prose audit using freshly rebound extractor claims."""
+    return post_revision.recheck_prose_audit(project_dir(project), scene_id, claims)
+
+
 def tournament(project: str, scene_id: str, seed: int = 0, persist: bool = False,
                judges: list | None = None, judgments: list | None = None,
                judge_rankings: list | None = None) -> dict:
@@ -1162,15 +1167,16 @@ TOOLS: list[dict] = [
     _tool("revise_acceptance",
           "Replace an already accepted scene with newly reviewed bytes, preserve the superseded "
           "acceptance chain as history, rebase every downstream immutable acceptance object, rerun "
-          "deterministic hard audits, and mark literary/reader/voice/whole-work downstream rechecks "
-          "as pending. STATE-CHANGING and gated: requires confirm=true.",
+          "deterministic hard audits, and mark literary/reader/voice/whole-work plus any policy-required "
+          "prose-audit downstream rechecks as pending. STATE-CHANGING and gated: requires confirm=true.",
           {"project": {"type": "string"}, "scene_id": {"type": "string"},
            "candidate_file": {"type": "string"}, "confirm": {"type": "boolean"},
            "approved_by": {"type": "string"}, "rubric_version": {"type": "string"}},
           ["project", "scene_id", "candidate_file"], revise_acceptance),
     _tool("revision_status",
           "Read-only status for backward revision: canonical integrity plus pending downstream "
-          "literary/reader/voice/whole-work rechecks and the preserved revision-event ledger.",
+          "literary/reader/voice/whole-work and policy-required prose-audit rechecks, plus the preserved "
+          "revision-event ledger.",
           {"project": {"type": "string"}}, ["project"], revision_status),
     _tool("post_revision_recheck_packet",
           "Build an exact packet for one pending subjective post-revision recheck. Reader packets "
@@ -1204,6 +1210,14 @@ TOOLS: list[dict] = [
            "decided_by": {"type": "string", "minLength": 1},
            "reason": {"type": "string", "minLength": 1}},
           ["project", "evidence_id", "decided_by", "reason"], resolve_post_revision_scope),
+    _tool("recheck_post_revision_prose_audit",
+          "Re-run a pending deterministic prose-audit after backward revision. Claims must be freshly "
+          "bound to the active accepted candidate, reconstructed state and audit context. A clean pass "
+          "records append-only evidence and clears only the prose_audit scope; stale claims are refused.",
+          {"project": {"type": "string"},
+           "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+           "claims": {"type": "object"}},
+          ["project", "scene_id", "claims"], recheck_post_revision_prose_audit),
     _tool("tournament",
           "Run a blind, Pareto-scored tournament over a scene's candidates from their critiques. "
           "Returns blinded labels + reveal map, forward/reversed presentation orders, per-candidate "

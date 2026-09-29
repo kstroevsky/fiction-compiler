@@ -71,11 +71,12 @@ It runs anywhere `python3` runs — no install step.
 | `evaluate_revision` | Accept/stop decision for a revision (stateless; takes iteration/attempts to reach every branch) |
 | `record_revision` | Runs one revision iteration, derives iteration/attempts from the scene's `revision-log`, and **persists** it — the history-driven, ESCALATE/STOP-capable path |
 | `promote` | **State-changing, gated by `confirm`** — copies a reviewed candidate into the manuscript and folds its delta into canon |
-| `revise_acceptance` | **State-changing, gated by `confirm`** — replace an accepted scene, preserve superseded acceptance objects, rebase downstream canon, rerun hard checks, and invalidate downstream literary/reader/voice evidence |
+| `revise_acceptance` | **State-changing, gated by `confirm`** — replace an accepted scene, preserve superseded acceptance objects, rebase downstream canon, rerun hard checks, and invalidate downstream literary/reader/voice plus policy-required prose-audit evidence |
 | `revision_status` | Read-only view of pending downstream rechecks and the preserved backward-revision event ledger |
 | `post_revision_recheck_packet` | Build exact active-acceptance prose context for a pending subjective scope; reader packets are prefix-only and whole-work is global |
 | `record_post_revision_evidence` | Persist packet-bound reviewer/reader evidence without automatically clearing the scope |
 | `resolve_post_revision_scope` | Explicitly clear a still-current scope from clean pass evidence while recording who decided and why |
+| `recheck_post_revision_prose_audit` | For a pending policy-required prose audit, rerun deterministic checking on freshly rebound extractor claims; stale scene/context hashes are refused and only a clean pass clears this scope |
 | `run_regression` | Run the deterministic framework regression floor and fingerprint the exact behavior-relevant framework |
 | `start_framework_change` | Freeze a clean framework baseline, the eight-field process-change proposal, declared scope, rollback bytes, and blind-comparison thresholds |
 | `evaluate_framework_change` | Bind the edited framework, rerun regression, and detect undeclared behavior-relevant edits |

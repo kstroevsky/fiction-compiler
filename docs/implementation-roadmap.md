@@ -31,7 +31,7 @@ mechanical validity, modeled/extracted consistency, and literary preference.
 | Owner preference evidence | `owner_preference.py`, owner-preference schemas, ADR 0042 | **Prospective evidence implemented; calibration data not yet accumulated** | Exact alternatives, owner choice/reason/date, choice-hidden critic packets, and descriptive agreement stay separate from audience outcomes; no historical backfill |
 | Scene-plan search | `plan_search.py`, `schemas/scene-plan*.json`, `generate-scene-plans` skill | **Implemented as experimental evidence workflow** | 3–4-plan divergence floor, typed feasibility, hash-bound plan review, explicit 1–2 selection; no automatic quality ranker |
 | Event-sourced canon / `reconstruct_state_before` | `src/fiction_compiler/state.py` | **Implemented** | Seed state + accepted deltas, typed comparisons/relationships/knowledge, declared value/entity domains, fabula-ordered replay with explicit legacy fallback |
-| Candidate promotion / backward revision | `promote.py`, `acceptance.py`, `integrity.py`, `dependencies.py` | **Implemented, subjective recheck closure remains explicit** | Frozen candidate/spec/delta/review policy/evidence; immutable discourse-order chains, conservative read sets, discourse rebasing plus fabula-aware invalidation |
+| Candidate promotion / backward revision | `promote.py`, `acceptance.py`, `integrity.py`, `dependencies.py`, `post_revision.py` | **Implemented, subjective recheck closure remains explicit** | Frozen candidate/spec/delta/review policy/evidence; immutable discourse-order chains, conservative read sets, discourse rebasing plus fabula-aware invalidation; policy-required prose audits are rebound and rerun after context-changing revisions |
 | Hard/symbolic audit | `hard_audit.py`, `prose_audit.py` | **Implemented, extraction boundary remains empirical** | Code checks state/event constraints; candidate/spec/state-bound prose claims use exact spans and ordered truth, belief and typed-predicate evidence |
 | Realization calibration | `realization_calibration.py`, planted controls, ADR 0030 | **Evidence infrastructure implemented; live calibration not yet run** | Plan-blind extraction and plan-aware alignment are measured separately; extractor misses cannot become proved omissions |
 | Literary review | `role_runner.py`, role personas, review policy | **Implemented as evidence-producing model review** | Role-specific blind packets, immutable attempts, provenance, issue applicability/resolution |
@@ -54,7 +54,7 @@ reader/model experiment into a positive result.
 | Review item | Current implementation | Evidence still missing |
 |---|---|---|
 | §6.1 plan-level search | **Mechanics implemented** — ADR 0027 records divergent frozen plans, feasibility/review evidence, and explicit selection without a deterministic best-plan score | Equal-cost blind comparison of plan search vs additional prose realizations |
-| §6.2 backward revision | **Mechanics implemented** — ADRs 0026/0031 preserve immutable acceptance history, rebase downstream canon, rerun hard checks, and keep subjective rechecks pending until explicitly resolved | Comparative literary benefit of backward revision on real work |
+| §6.2 backward revision | **Mechanics implemented** — ADRs 0026/0031/0048 preserve immutable acceptance history, rebase downstream canon, rerun hard checks, re-require any prose audit mandated by the scene's frozen policy, and keep subjective rechecks pending until explicitly resolved | Comparative literary benefit of backward revision on real work |
 | §6.3 plan-to-prose realization | **Calibration infrastructure implemented** — ADRs 0024/0030/0036 separate plan-blind extraction, alignment, ordered evidence, consistency, and coverage | Live/hidden-set calibration with predeclared tolerances before promotion-gate authority |
 | §6.4 reader model | **Structural disclosure + measured-prefix path implemented** — ADRs 0040/0045 deliberately avoid a simulated reader mind | Actual target-audience responses and any predeclared free-text coding protocol |
 | §6.5 contract coverage | **Implemented** — coverage maps deterministic, critic, and reader checks while retaining explicit `untested`/`not_assessed` states | Reader evidence for mapped experiential clauses; broader mappings as projects require them |
@@ -280,6 +280,10 @@ test, not just a feature.
 > a conservative fact/predicate/promise read set. Changed typed state marks known dependents, while
 > every downstream scene is still invalidated for literary/reader/voice/whole-work review because the
 > typed read set is not complete for literary effects. Deterministic hard audits rerun immediately.
+> **ADR 0048 closes the deterministic prose-evidence hole for projects that explicitly require it:**
+> the requirement is read from each affected scene's frozen acceptance policy, stale pre-revision
+> extraction bindings cannot clear it, and a fresh `prose-claims` artifact must rebind candidate,
+> spec, entry state, delta, and verifier context before a clean runtime pass removes only that scope.
 > **ADR 0031 now makes the subjective closure path first-class:** literary/voice packets bind the exact
 > active acceptances, reader packets expose only the accepted prefix, and one global whole-work packet
 > binds the complete active manuscript. Evidence is append-only and cannot clear a scope by itself;
@@ -327,8 +331,9 @@ test, not just a feature.
 > literal-realization and oblique-realization controls are presented first to a plan-blind extractor,
 > then to a separate plan-aware aligner with the frozen prose available for targeted re-inspection.
 > Reports distinguish extractor misses from alignment misses and never convert a missed extraction into
-> proof of omission. Still ⬜: run the live/hidden-set calibration and adopt predeclared tolerances before
-> making `prose_audit` a required gate; auto-rerun calibrated prose-reading audits after revision.
+> proof of omission. Projects that already opt into `require_prose_audit` now also receive policy-aware
+> post-revision invalidation and a fresh-claims rerun path (ADR 0048). Still ⬜: run the live/hidden-set
+> calibration and adopt predeclared tolerances before making `prose_audit` globally required by default.
 >
 > **Framework loop now has an executable change transaction (ADR 0011 + ADR 0033, P5).** `scripts/run_regression.py`
 > + the `run_regression` tool run fixed fixtures (`regression/fixtures.json`) that pin the invariants
@@ -366,7 +371,7 @@ test, not just a feature.
 > `0043-enforce-fiction-corpus-rights-gate.md`,
 > `0044-add-public-domain-literature-control.md`,
 > `0045-measure-prefix-reader-responses.md`, `0046-reconcile-roadmap-with-evidence-state.md`,
-> `0047-bind-matched-cost-writer-study.md`,
+> `0047-bind-matched-cost-writer-study.md`, `0048-revalidate-required-prose-audit-after-revision.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 

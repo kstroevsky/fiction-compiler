@@ -1,9 +1,11 @@
-"""Fresh subjective evidence and explicit resolution after backward revision.
+"""Fresh subjective evidence plus deterministic prose revalidation after backward revision.
 
 Backward revision conservatively invalidates literary, reader, voice and whole-work evidence.  This
 module closes the loop without pretending those scopes are deterministic: it builds content-bound
 packets from active immutable acceptances, records append-only evidence, and requires a separate
-explicit resolution transaction before a pending scope is removed.
+explicit resolution transaction before a pending subjective scope is removed. Projects that froze a
+policy requiring prose audit also get a separate deterministic rerun path whose claims must rebind to
+the current accepted scene context.
 """
 from __future__ import annotations
 
@@ -12,7 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from . import acceptance, integrity, schema
+from . import acceptance, integrity, prose_audit, schema
 from .state import scene_sort_key
 from .workspace import validate_scene_id
 
@@ -158,6 +160,10 @@ def _resolution_path(project: Path, resolution_id: str) -> Path:
     return Path(project) / ".runs" / "post-revision" / "resolutions" / f"{resolution_id}.json"
 
 
+def _prose_audit_evidence_path(project: Path, evidence_id: str) -> Path:
+    return Path(project) / ".runs" / "post-revision" / "prose-audit" / f"{evidence_id}.json"
+
+
 def _load_evidence(project: Path, evidence_id: str) -> tuple[dict | None, list[str]]:
     path = _evidence_path(project, evidence_id)
     if not path.exists():
@@ -294,6 +300,114 @@ def resolve_scope(project: Path, evidence_id: str, decided_by: str, reason: str)
                 "resolved_scenes": resolved_scenes, "remaining": {
                     sid: rechecks[sid]["required_scopes"] for sid in resolved_scenes
                 }, "path": str(resolution_path.relative_to(project))}
+
+
+def recheck_prose_audit(project: Path, scene_id: str, claims: dict) -> dict:
+    """Re-run a policy-required prose audit against the current post-revision scene context.
+
+    The extractor must supply newly rebound ``prose-claims``. The deterministic verifier rejects
+    stale state/context hashes; only a clean pass clears the pending ``prose_audit`` scope.
+    """
+    project = Path(project).resolve()
+    validate_scene_id(scene_id)
+    if not isinstance(claims, dict):
+        return {"error": "prose claims must be an object"}
+
+    with integrity.PromotionLock(project):
+        report = integrity.verify_report(project)
+        if report.get("status") != "verified":
+            return {"error": "canon must verify before a post-revision prose audit",
+                    "canon_status": report.get("status")}
+        index = acceptance.load_index(project)
+        rechecks = index.get("rechecks_required", {})
+        if not isinstance(rechecks, dict):
+            return {"error": "canon index rechecks_required is invalid"}
+        entry = rechecks.get(scene_id)
+        if not isinstance(entry, dict) or "prose_audit" not in entry.get("required_scopes", []):
+            return {"error": f"prose_audit is not pending for {scene_id}"}
+
+        mapping = index.get("acceptance_objects", {})
+        object_id = entry.get("acceptance_object")
+        if not isinstance(mapping, dict) or mapping.get(scene_id) != object_id or not isinstance(object_id, str):
+            return {"error": f"pending prose audit for {scene_id} is not bound to the active acceptance"}
+        snapshot = acceptance.load_object(project, object_id)
+        candidate_artifact = snapshot.get("candidate", {})
+        candidate_rel = candidate_artifact.get("path") if isinstance(candidate_artifact, dict) else None
+        candidate_sha = candidate_artifact.get("sha256") if isinstance(candidate_artifact, dict) else None
+        if not isinstance(candidate_rel, str) or not isinstance(candidate_sha, str):
+            return {"error": "active acceptance has no frozen candidate artifact"}
+        candidate_name = Path(candidate_rel).name
+        if claims.get("candidate") != candidate_name or claims.get("candidate_sha256") != candidate_sha:
+            return {"error": "prose claims are not bound to the active accepted candidate"}
+        candidate_path = project / candidate_rel
+        if not candidate_path.exists() or integrity.sha256_file(candidate_path) != candidate_sha:
+            return {"error": "accepted candidate source is missing or changed; restore its frozen bytes before rechecking"}
+        for field, live_path in (
+            ("spec", project / "scenes" / scene_id / "spec.json"),
+            ("state_delta", project / "scenes" / scene_id / "state-delta.json"),
+        ):
+            expected = acceptance.frozen_bytes(snapshot, field)
+            if not live_path.exists() or live_path.read_bytes() != expected:
+                return {"error": f"accepted {field} view is missing or changed; restore the frozen bytes before rechecking"}
+
+        result = prose_audit.audit_prose(project, scene_id, claims)
+        if "error" in result:
+            return result
+        bindings = prose_audit.prose_claim_bindings(project, scene_id, candidate_name)
+        if bindings.get("candidate_sha256") != candidate_sha:
+            return {"error": "accepted candidate changed during prose-audit recheck"}
+        serious = [
+            item for item in result.get("findings", [])
+            if isinstance(item, dict) and item.get("severity") in _SERIOUS
+        ]
+        clean = result.get("verdict") == "pass" and not serious
+        status = "pass" if clean else "needs_attention"
+
+        identity = {
+            "schema_version": 1,
+            "scene_id": scene_id,
+            "acceptance_object": object_id,
+            "head_acceptance": index.get("head_acceptance"),
+            "caused_by_scene": entry.get("caused_by_scene"),
+            "candidate_sha256": candidate_sha,
+            "bindings": bindings,
+            "claims_sha256": acceptance.sha256_bytes(acceptance.canonical_json_bytes(claims)),
+            "claims": claims,
+            "audit_result": result,
+            "status": status,
+        }
+        evidence_id = "prose-recheck-" + acceptance.sha256_bytes(
+            acceptance.canonical_json_bytes(identity)
+        )
+        record = {**identity, "evidence_id": evidence_id, "recorded_at": _now()}
+        errors = schema.validate_named(record, "post-revision-prose-audit")
+        if errors:
+            return {"error": "invalid post-revision prose-audit evidence: " + "; ".join(errors)}
+        path = _prose_audit_evidence_path(project, evidence_id)
+        if not path.exists():
+            acceptance.atomic_write(path, acceptance.canonical_json_bytes(record))
+
+        entry["prose_audit"] = {
+            "status": status,
+            "verdict": result.get("verdict"),
+            "findings": result.get("findings", []),
+            "evidence_id": evidence_id,
+            "bindings": bindings,
+        }
+        if clean:
+            entry["required_scopes"] = [
+                scope for scope in entry.get("required_scopes", []) if scope != "prose_audit"
+            ]
+        acceptance.atomic_write(acceptance.index_path(project), acceptance.canonical_json_bytes(index))
+        return {
+            "scene_id": scene_id,
+            "status": status,
+            "verdict": result.get("verdict"),
+            "evidence_id": evidence_id,
+            "path": str(path.relative_to(project)),
+            "remaining": entry.get("required_scopes", []),
+            "findings": result.get("findings", []),
+        }
 
 
 def status(project: Path) -> dict:
