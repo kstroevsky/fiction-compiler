@@ -3,8 +3,8 @@ enabled = true
 max_concurrent_threads_per_session = 6
 default_subagent_reasoning_effort = "high"
 
-# The fiction-compiler tool surface (KB retrieval, event-sourced state, hard audit, defaultness
-# linter, revision evaluator) exposed to the agent over MCP. Dependency-free stdio server.
+# The full fiction-compiler authoring surface (bootstrap, planning/canon persistence, drafting,
+# context, audits, revision, promotion, evidence, validation) exposed over a dependency-free MCP server.
 [mcp_servers.fiction-compiler]
 command = "python3"
 args = ["scripts/fiction_mcp_launcher.py"]

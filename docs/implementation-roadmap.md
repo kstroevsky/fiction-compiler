@@ -134,11 +134,14 @@ test, not just a feature.
 > reuse blind selection-reader evidence without choosing a winning family. The actual multi-family and
 > edit-vs-regeneration runs remain unrun. Stage 6 (GUI) ⬜.
 > **Tools for the author.** The deterministic engine is exposed to the LLM as callable tools via
-> a dependency-free MCP server (`scripts/fiction_mcp.py`, wired in `.mcp.json` and `.codex/config.toml`):
-> `kb_search`/`kb_get`, `state_before`, `compile_context`, `hard_audit`, `defaultness_lint`,
-> `record_scene_plan`/`scene_plan_search`/`plan_review_packet`/`record_plan_review`/
-> `select_scene_plans`, `evaluate_revision`, `revise_acceptance`, and `revision_status`. Plus the `avoid-defaults`
-> anti-obviousness skill (LLM-facing craft, not code).
+> a dependency-free MCP server (`scripts/fiction_mcp.py`, wired in `.mcp.json` and `.codex/config.toml`).
+> **ADR 0049 closes the bootstrap/drafting seam:** MCP can now create/inspect projects, run premise
+> diagnostics, persist declared planning/canon artifacts, characters, scene specs, state deltas and
+> append-only prose branches, then use the existing context, scene-plan search, hard/prose/defaultness
+> audits, critique/revision, promotion/backward revision, reader/selection/calibration evidence, and
+> assembly paths. `workspace_validate` exposes the repository validator through the same runtime.
+> The registry test requires every public `fiction_compiler.tools` handler to be MCP-visible. Plus the
+> `avoid-defaults` anti-obviousness skill (LLM-facing craft, not code).
 > The engine equips the author; it does not replace the creative act. See `docs/mcp-and-tools.md`.
 >
 > **Promotion is now gated (ADR 0002) and tamper-evident (ADR 0003).** The versioned review policy is

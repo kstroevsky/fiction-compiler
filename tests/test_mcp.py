@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 import sys
 import unittest
+import uuid
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,6 +54,9 @@ class McpProtocolTests(unittest.TestCase):
         self.assertEqual(init["serverInfo"]["name"], "fiction-compiler")
 
         tool_names = {t["name"] for t in responses[1]["result"]["tools"]}
+        self.assertIn("project_create", tool_names)
+        self.assertIn("candidate_write", tool_names)
+        self.assertIn("workspace_validate", tool_names)
         self.assertIn("kb_search", tool_names)
         self.assertIn("hard_audit", tool_names)
 
@@ -60,6 +65,77 @@ class McpProtocolTests(unittest.TestCase):
         payload = json.loads(call["content"][0]["text"])
         ids = {r["id"] for r in payload["results"]}
         self.assertIn("focalization-and-knowledge", ids)
+
+    def test_authoring_round_trip_over_mcp(self) -> None:
+        slug = f"mcp-test-{uuid.uuid4().hex[:10]}"
+        project_dir = ROOT / "projects" / slug
+        project = {
+            "id": slug,
+            "title": "MCP Round Trip",
+            "form": "short-story",
+            "audience": "adult general reader",
+            "reader_contract": ["A choice under uncertainty."],
+            "theme_question": "What does care require?",
+            "constraints": ["single viewpoint"],
+            "human_gates": [],
+        }
+        character = {
+            "id": "char-jo", "name": "Jo", "desire": "Finish the shift safely.",
+            "values": ["care"], "beliefs": ["Choices have costs."],
+            "constraints": ["She is alone."],
+            "voice": {"lexicon": ["plain"], "syntax": ["direct"], "avoid": ["cliche"]},
+        }
+        spec = {
+            "id": "ch01-sc01", "chapter": "1", "pov": "char-jo",
+            "participants": ["char-jo"], "purpose": ["Force a choice."],
+            "entry_state": ["Jo is alone."], "desire": "Stay safe.",
+            "conflict": "Helping may be dangerous.", "turn": "Inaction acquires a cost.",
+            "exit_state": ["Jo acts."], "required_events": [], "forbidden_moves": [],
+        }
+        delta = {
+            "scene_id": "ch01-sc01", "facts_added": [], "facts_removed": [],
+            "knowledge_changes": [], "relationship_changes": [], "promises_opened": [],
+            "promises_closed": [], "time": 1,
+        }
+        messages = [
+            {"jsonrpc": "2.0", "id": 1, "method": "initialize",
+             "params": {"protocolVersion": "2025-06-18", "capabilities": {}}},
+            {"jsonrpc": "2.0", "id": 2, "method": "tools/call",
+             "params": {"name": "project_create", "arguments": {"slug": slug, "project_data": project}}},
+            {"jsonrpc": "2.0", "id": 3, "method": "tools/call",
+             "params": {"name": "character_write", "arguments": {"project": slug, "character": character}}},
+            {"jsonrpc": "2.0", "id": 4, "method": "tools/call",
+             "params": {"name": "scene_spec_write",
+                        "arguments": {"project": slug, "scene_id": "ch01-sc01", "spec": spec}}},
+            {"jsonrpc": "2.0", "id": 5, "method": "tools/call",
+             "params": {"name": "state_delta_write",
+                        "arguments": {"project": slug, "scene_id": "ch01-sc01", "state_delta": delta}}},
+            {"jsonrpc": "2.0", "id": 6, "method": "tools/call",
+             "params": {"name": "candidate_write", "arguments": {
+                 "project": slug, "scene_id": "ch01-sc01", "filename": "candidate-a.md",
+                 "text": "Jo slid the bandage packet through the locked drawer.",
+             }}},
+            {"jsonrpc": "2.0", "id": 7, "method": "tools/call",
+             "params": {"name": "candidate_get", "arguments": {
+                 "project": slug, "scene_id": "ch01-sc01", "candidate": "candidate-a.md",
+             }}},
+            {"jsonrpc": "2.0", "id": 8, "method": "tools/call",
+             "params": {"name": "compile_context", "arguments": {
+                 "project": slug, "scene_id": "ch01-sc01",
+             }}},
+        ]
+        try:
+            responses = run_session(messages)
+            by_id = {response["id"]: response for response in responses}
+            for response_id in range(2, 9):
+                self.assertFalse(by_id[response_id]["result"]["isError"], by_id[response_id])
+            candidate = json.loads(by_id[7]["result"]["content"][0]["text"])
+            self.assertIn("bandage packet", candidate["text"])
+            context = json.loads(by_id[8]["result"]["content"][0]["text"])
+            self.assertEqual(context["scene_id"], "ch01-sc01")
+            self.assertEqual(context["participants"][0]["id"], "char-jo")
+        finally:
+            shutil.rmtree(project_dir, ignore_errors=True)
 
     def test_unknown_method_errors_only_for_requests(self) -> None:
         responses = run_session([

@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 import tempfile
 import unittest
+import inspect
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -50,6 +51,9 @@ class KbRetrievalTests(unittest.TestCase):
 class ToolDispatchTests(unittest.TestCase):
     def test_registry_and_list_shape(self) -> None:
         names = {t["name"] for t in tools.list_tools()}
+        self.assertIn("project_create", names)
+        self.assertIn("candidate_write", names)
+        self.assertIn("workspace_validate", names)
         self.assertIn("kb_search", names)
         self.assertIn("hard_audit", names)
         self.assertIn("revise_acceptance", names)
@@ -57,6 +61,26 @@ class ToolDispatchTests(unittest.TestCase):
         for descriptor in tools.list_tools():
             self.assertNotIn("handler", descriptor)  # handlers not exposed over the wire
             self.assertEqual(descriptor["inputSchema"]["type"], "object")
+
+    def test_every_public_tool_handler_is_registered(self) -> None:
+        public = {
+            name for name, fn in inspect.getmembers(tools, inspect.isfunction)
+            if fn.__module__ == tools.__name__ and not name.startswith("_")
+        } - {"list_tools", "call_tool"}
+        handlers = {descriptor["handler"].__name__ for descriptor in tools.TOOLS}
+        self.assertEqual(public, handlers)
+
+    def test_premise_report_is_reachable_through_dispatch(self) -> None:
+        candidates = [
+            {"id": "a", "logline": "A courier hides a letter and inherits its consequences.",
+             "pov_character": "char-a", "theme_question": "What does concealment cost?"},
+            {"id": "b", "logline": "Three siblings secretly bid against one another for a workshop.",
+             "pov_character": "char-b", "theme_question": "What can inheritance buy?"},
+            {"id": "c", "logline": "A night guard finds one gallery open only on her shifts.",
+             "pov_character": "char-c", "theme_question": "What does attention obligate?"},
+        ]
+        out = tools.call_tool("premise_report", {"candidates": candidates})
+        self.assertTrue(out["floor"]["ok"], out)
 
     def test_call_tool_kb_get(self) -> None:
         out = tools.call_tool("kb_get", {"concept_id": "defaultness"})

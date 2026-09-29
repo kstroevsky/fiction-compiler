@@ -27,6 +27,10 @@ codex
 claude
 ```
 
+The registered `fiction-compiler` MCP server covers project bootstrap through manuscript assembly.
+Codex/Claude can create schema-valid project artifacts and prose branches through MCP, then use the
+same interface for context, audits, revision, promotion, evidence, and validation.
+
 Suggested first instruction:
 
 > Run the bootstrap-story skill for `projects/my-novel`. Interview me until the project brief has no material ambiguities. Do not draft prose yet.

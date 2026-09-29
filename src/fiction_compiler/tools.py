@@ -1,15 +1,17 @@
 """The tool surface the LLM author actually calls.
 
 Thin, JSON-returning wrappers over the deterministic engine, plus a registry (name +
-description + JSON-Schema + handler) that the MCP server exposes. These do not write fiction —
-they hand the model reference (KB), continuity truth (state), guardrail findings (audits), and
-a revision fitness signal, so the *model* can write and revise well.
+description + JSON-Schema + handler) that the MCP server exposes. They do not generate fiction:
+the model supplies creative decisions and prose, while tools provide reference, persistence,
+continuity truth, guardrail findings, evidence, and revision mechanics.
 
 Every handler returns a JSON-serialisable dict. Keep them pure and cheap.
 """
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,7 +19,7 @@ from typing import Any, Callable
 
 from . import critic_eval as _critic_eval
 from . import critique as _critique
-from . import (critic_calibration, defaultness, framework_change, hard_audit, integrity,
+from . import (authoring, critic_calibration, defaultness, framework_change, hard_audit, integrity,
                issue_resolution, kb, literature_control, owner_preference, plan_search, post_revision,
                reader, reader_probe, realization_calibration, regression, repertoire, revision, run_manifest,
                safety, schema, selection_eval, trace, writer_study)
@@ -27,8 +29,70 @@ from .promote import promote_candidate
 from .prose_audit import audit_prose as _audit_prose, prose_claim_bindings as _prose_claim_bindings
 from .state import StoryState, accepted_scene_ids, reconstruct_state_before, scene_sort_key
 from .tournament import run_tournament
-from .workspace import (confine_file, confine_project, project_dir, resolve_scene_candidate,
+from .workspace import (ROOT, confine_file, confine_project, project_dir, resolve_scene_candidate,
                         validate_leaf_filename, validate_scene_id)
+
+
+def project_create(slug: str, project_data: dict | None = None,
+                   creative_brief: str | None = None) -> dict:
+    return authoring.create_project(slug, project_data=project_data, creative_brief=creative_brief)
+
+
+def project_overview(project: str) -> dict:
+    return authoring.project_overview(confine_project(project))
+
+
+def premise_report(candidates: list[dict], profile: str = "core") -> dict:
+    return authoring.premise_report(candidates, profile=profile)
+
+
+def project_write_artifact(project: str, artifact: str, value: Any) -> dict:
+    return authoring.write_project_artifact(confine_project(project), artifact, value)
+
+
+def seed_canon_write(project: str, ledger: str, records: list[dict]) -> dict:
+    return authoring.write_seed_ledger(confine_project(project), ledger, records)
+
+
+def character_write(project: str, character: dict, overwrite: bool = False) -> dict:
+    return authoring.write_character(confine_project(project), character, overwrite=overwrite)
+
+
+def scene_spec_write(project: str, scene_id: str, spec: dict, overwrite: bool = False) -> dict:
+    return authoring.write_scene_spec(confine_project(project), scene_id, spec, overwrite=overwrite)
+
+
+def state_delta_write(project: str, scene_id: str, state_delta: dict,
+                      overwrite: bool = False) -> dict:
+    return authoring.write_state_delta(
+        confine_project(project), scene_id, state_delta, overwrite=overwrite,
+    )
+
+
+def candidate_write(project: str, scene_id: str, filename: str, text: str) -> dict:
+    return authoring.write_candidate(confine_project(project), scene_id, filename, text)
+
+
+def candidate_get(project: str, scene_id: str, candidate: str) -> dict:
+    return authoring.get_candidate(confine_project(project), scene_id, candidate)
+
+
+def workspace_validate() -> dict:
+    """Run the repository's canonical workspace validator with this supported interpreter."""
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "validate_workspace.py")],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=120,
+        check=False,
+    )
+    return {
+        "ok": result.returncode == 0,
+        "returncode": result.returncode,
+        "stdout": result.stdout,
+        "stderr": result.stderr,
+    }
 
 
 def _state_json(state: StoryState) -> dict:
@@ -962,6 +1026,79 @@ def _tool(name: str, description: str, properties: dict, required: list[str], ha
 
 
 TOOLS: list[dict] = [
+    _tool("project_create",
+          "Create a fiction project from projects/_template, bind all project-owned template ids to "
+          "the new slug, and optionally write a schema-valid project brief plus creative brief. "
+          "This is the MCP entry point for bootstrap; it never overwrites an existing project.",
+          {"slug": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+           "project_data": {"type": "object"},
+           "creative_brief": {"type": "string"}},
+          ["slug"], project_create),
+    _tool("project_overview",
+          "Read the author-facing project state needed to plan further work: brief, planning "
+          "artifacts, characters, seed canon, scene specs/deltas, and candidate hashes. Candidate "
+          "prose is intentionally omitted; use candidate_get for one exact branch.",
+          {"project": {"type": "string"}}, ["project"], project_overview),
+    _tool("premise_report",
+          "Run the premise-layer divergence floor and fixed diagnostic probes over a batch of premise "
+          "candidates. Requires no filesystem artifact and never selects or ranks a premise.",
+          {"candidates": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+           "profile": {"type": "string"}},
+          ["candidates"], premise_report),
+    _tool("project_write_artifact",
+          "Write one declared project artifact through its schema/semantic guard. Supported artifacts "
+          "cover the project brief, creative brief, reader-contract coverage, discourse/style/event "
+          "planning, reader evidence plans, repertoire tags, ontology/entity registry, and the "
+          "author-controlled fields of canon/index.json. Protected acceptance fields cannot be edited.",
+          {"project": {"type": "string"},
+           "artifact": {"type": "string", "enum": sorted(authoring.PROJECT_ARTIFACTS)},
+           "value": {"type": ["object", "string"]}},
+          ["project", "artifact", "value"], project_write_artifact),
+    _tool("seed_canon_write",
+          "Replace one declared seed-canon JSONL ledger (facts, knowledge, beliefs, relationships, "
+          "world state, resources, promises, timeline, or propositions) before any scene is accepted. "
+          "The resulting seed state is loaded immediately; seed canon becomes immutable after the "
+          "first accepted scene.",
+          {"project": {"type": "string"},
+           "ledger": {"type": "string", "enum": sorted(authoring.SEED_LEDGERS)},
+           "records": {"type": "array", "items": {"type": "object"}}},
+          ["project", "ledger", "records"], seed_canon_write),
+    _tool("character_write",
+          "Persist a schema-valid character sheet and add its id to canon/index.json. Existing "
+          "characters require overwrite=true before acceptance and cannot be overwritten after any "
+          "scene has been accepted.",
+          {"project": {"type": "string"}, "character": {"type": "object"},
+           "overwrite": {"type": "boolean"}},
+          ["project", "character"], character_write),
+    _tool("scene_spec_write",
+          "Create or explicitly replace a schema-valid scene spec before acceptance. Accepted scene "
+          "specs are immutable and must go through the backward-revision workflow.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "spec": {"type": "object"}, "overwrite": {"type": "boolean"}},
+          ["project", "scene_id", "spec"], scene_spec_write),
+    _tool("state_delta_write",
+          "Create or explicitly replace a schema-valid state-delta for an unaccepted scene. The scene "
+          "spec must already exist; accepted deltas are immutable and use revise_acceptance instead.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "state_delta": {"type": "object"}, "overwrite": {"type": "boolean"}},
+          ["project", "scene_id", "state_delta"], state_delta_write),
+    _tool("candidate_write",
+          "Persist one non-empty Markdown prose candidate under the scene's candidates directory. "
+          "Existing candidate files are never overwritten, preserving rejected and revised branches.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "filename": {"type": "string", "pattern": "^[^/\\\\]+\\.md$"},
+           "text": {"type": "string", "minLength": 1}},
+          ["project", "scene_id", "filename", "text"], candidate_write),
+    _tool("candidate_get",
+          "Read one exact scene candidate with its sha256 and word count. Use this when the author, "
+          "revision loop, or auditor needs the prose bytes rather than project-level metadata.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string"},
+           "candidate": {"type": "string"}},
+          ["project", "scene_id", "candidate"], candidate_get),
+    _tool("workspace_validate",
+          "Run the repository's canonical schema, continuity, rights, ontology, reader-plan, writer-study, "
+          "and canon-integrity validator using the MCP server's supported Python runtime.",
+          {}, [], workspace_validate),
     _tool("kb_search",
           "Search the craft knowledge base for relevant concept cards (focalization, scene "
           "dramaturgy, defaultness, dramatic structure, etc.). Returns card summaries; use kb_get "
@@ -1699,10 +1836,13 @@ def call_tool(name: str, arguments: dict[str, Any] | None) -> dict:
         if isinstance(args.get("roster"), str):
             confine_file(args["roster"])
         if isinstance(args.get("filename"), str):
-            validate_leaf_filename(
-                args["filename"] if args["filename"].endswith(".json") else args["filename"] + ".json",
-                ".json",
-            )
+            if name == "record_critique":
+                validate_leaf_filename(
+                    args["filename"] if args["filename"].endswith(".json") else args["filename"] + ".json",
+                    ".json",
+                )
+            elif name == "candidate_write":
+                validate_leaf_filename(args["filename"], ".md")
         if confined_project is not None and isinstance(args.get("scene_id"), str):
             sid = args["scene_id"]
             for key in ("candidate", "candidate_file", "before", "after", "target_candidate"):

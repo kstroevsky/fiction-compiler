@@ -14,6 +14,11 @@ surprise — stay with the model. The tools remove the failure modes that have n
 talent (continuity slips, forgotten promises, default phrasing) so the model can spend its
 judgment where judgment matters.
 
+The MCP surface now covers the repository-owned lifecycle end to end. It can create and inspect a
+project, persist schema-aware planning/canon/scene artifacts and model-authored prose branches, then
+drive the existing plan-search, audit, revision, promotion, evidence, and assembly tools. There is no
+generic filesystem-write tool: accepted canon and branch history retain their existing invariants.
+
 ## The MCP server
 `scripts/fiction_mcp.py` is a **dependency-free** MCP stdio server (newline-delimited JSON-RPC).
 The project requires Python >=3.11. `scripts/fiction_mcp_launcher.py` is deliberately compatible with
@@ -23,6 +28,17 @@ Set `FICTION_COMPILER_PYTHON` to override interpreter discovery.
 ### Tools exposed
 | Tool | Purpose |
 |---|---|
+| `project_create` | Create a project from the template, retarget project-owned ids, and optionally set the schema-valid project/creative brief |
+| `project_overview` | Read brief, planning state, seed canon, characters, scene specs/deltas, and candidate hashes without expanding all prose |
+| `premise_report` | Run the deterministic premise-divergence floor plus fixed diagnostic probes without selecting a winner |
+| `project_write_artifact` | Persist declared brief/planning/ontology/repertoire artifacts through schema and identity guards |
+| `seed_canon_write` | Replace a declared seed-canon ledger before the first accepted scene; seed canon freezes afterward |
+| `character_write` | Persist a schema-valid character sheet and register the character in canon |
+| `scene_spec_write` | Persist a schema-valid, unaccepted scene specification |
+| `state_delta_write` | Persist a schema-valid, unaccepted scene state delta |
+| `candidate_write` | Persist a new Markdown prose branch without overwriting an existing candidate |
+| `candidate_get` | Read one exact prose branch with content hash and word count |
+| `workspace_validate` | Run the repository's canonical workspace/schema/integrity validator through the MCP runtime |
 | `kb_search` | Find relevant craft concept cards by keyword/layer |
 | `kb_get` | Full text of one concept card |
 | `kb_sources` | Registered sources (craft-instruction / fiction-corpus / reference) with copyright notes |
@@ -93,6 +109,11 @@ The write path now supports both forward acceptance and explicit backward correc
 purely over MCP can persist revision history (`record_revision`), reach the full stop-condition logic,
 promote (`promote`, confirm-gated), and revise accepted history (`revise_acceptance`, confirm-gated)
 without erasing the superseded acceptance chain.
+
+Before that gate, `project_create`, `character_write`, `scene_spec_write`, `state_delta_write`, and
+`candidate_write` provide the missing bootstrap/drafting path. They accept structured author output,
+but they do not invent the story. Accepted inputs become immutable at this authoring boundary and flow
+through the existing revision/promotion machinery instead of being silently rewritten.
 
 Operational provenance is separate from authorship. `start_scene_run` declares a resumable sequence;
 generation/revision can remain external or manual and then be bound with `record_scene_run_operation`.
