@@ -95,9 +95,12 @@ test, not just a feature.
 > PDCA loop (Stage 5) now has a regression-fixture runner, critic-calibration corpus, broad framework
 > fingerprint, and an evidence-bound change transaction (ADR 0033): clean baseline + declared scope,
 > exact rollback snapshots, blind before/after evidence, predeclared thresholds, explicit human
-> approval, and stale-safe restoration. Complete experiment-wide cost manifests remain ⬜.
-> Role-runner provider usage capture is implemented (ADR 0032); generation/revision paths still need
-> the same accounting before a matched-cost study can claim complete expenditure. Stage 6 (GUI) ⬜.
+> approval, and stale-safe restoration. Scene-level resumable operation manifests are now implemented
+> (ADR 0039): generation/revision/manual/provider operations can share one immutable run ledger with
+> exact candidate snapshots, failures/retries, provider usage, and declared call/token/cost budgets;
+> existing role-runner attempts link without another call. This closes the missing general accounting
+> mechanism, but a matched-cost study must still actually route/bind every call and run the independent
+> evaluation before it can claim complete expenditure or benefit. Stage 6 (GUI) ⬜.
 > **Tools for the author.** The deterministic engine is exposed to the LLM as callable tools via
 > a dependency-free MCP server (`scripts/fiction_mcp.py`, wired in `.mcp.json` and `.codex/config.toml`):
 > `kb_search`/`kb_get`, `state_before`, `compile_context`, `hard_audit`, `defaultness_lint`,
@@ -257,9 +260,10 @@ test, not just a feature.
 > invariant fails the run (non-zero exit). `framework_change.py` wraps that floor in a clean-baseline,
 > declared-scope transaction with exact pre-change snapshots, randomized blind A/B output evidence,
 > predeclared evidence thresholds, independent-of-agent-proposer accounting, a separate confirmed
-> human approve/reject decision, and rollback that refuses to clobber post-evaluation edits. Still ⬜
-> in P5: extend ADR 0032's provider-usage provenance across the remaining generation/revision paths so
-> experiment-wide matched-cost accounting is complete, and actually run the independent human studies.
+> human approve/reject decision, and rollback that refuses to clobber post-evaluation edits. ADR 0039
+> now supplies the general generation/revision/run accounting mechanism. Still ⬜ in P5: route a
+> powered matched-cost study through it and run the independent human evaluation. Historical studies
+> with missing usage remain incomplete rather than being backfilled or guessed.
 >
 > See `docs/decisions/0001-structured-state-delta.md`, `0002-promotion-audit-gate.md`,
 > `0003-tamper-evident-promotion.md`, `0004-executable-story-ir.md`, `0005-predicate-ontology.md`,
@@ -277,6 +281,7 @@ test, not just a feature.
 > `0034-epistemic-and-resource-state.md`,
 > `0035-ordered-event-execution.md`, `0036-ordered-prose-evidence.md`,
 > `0037-declared-story-domains.md`, `0038-fabula-ordered-reconstruction.md`,
+> `0039-resumable-scene-run-provenance.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 
@@ -336,8 +341,10 @@ test, not just a feature.
 **Goal:** make `retrospective` executable, not aspirational.
 - ✅ Improvement-transaction record + regression fixture runner + blind before/after harness with
   declared file scope, frozen rollback bytes, predeclared thresholds, and human approval authority.
-- 🟡 Run manifests in `.runs/` carry exact framework fingerprints and role-runner provider usage;
-  generation/revision token and cost provenance is still incomplete.
+- ✅ Scene runs in `.runs/scene-runs/` now provide resumable step state, frozen candidate/source
+  evidence, role-runner import, explicit unknown usage, and call/token/cost budget preflight for
+  generation/revision/review/selection/reader/promotion operations. This is accounting infrastructure;
+  the independent matched-cost studies themselves remain unrun.
 - **Exit status:** mechanical and governance acceptance is implemented; empirical process changes
   still require their actual independent blind evidence rather than infrastructure being counted as
   a positive result.

@@ -37,6 +37,11 @@ It runs anywhere `python3` runs — no install step.
 | `record_selector_choice` | Bind a critic/editor pick to the frozen pool before reader outcomes exist |
 | `record_selection_operation` | Record known cost/token/provider evidence and failures without converting missing usage to zero |
 | `selection_experiment_report` | Descriptively compare first/random/recorded selectors when independent pair/order coverage supports it |
+| `start_scene_run` | Create/resume an immutable scene-operation plan with optional call/token/cost budgets |
+| `scene_run_status` | Derive completed/failed/pending steps, candidate freshness, evidence integrity, and accounting from append-only artifacts |
+| `scene_run_budget` | Preflight one more operation; missing usage/estimates stay unknown and exhausted limits block continuation |
+| `record_scene_run_operation` | Freeze candidate bytes and append provider/manual/compiler success/failure evidence with optional idempotency |
+| `link_scene_run_review` | Link an existing role-runner attempt into the run without another provider call |
 | `start_critic_calibration` | Freeze a B2 critic study and its provisional case labels before live runs |
 | `critic_calibration_packet` | Judge-safe frozen case input with the calibration label/signals withheld |
 | `record_critic_calibration_observation` | Persist repeat/family/transform-bound live critic evidence |
@@ -72,6 +77,12 @@ The write path now supports both forward acceptance and explicit backward correc
 purely over MCP can persist revision history (`record_revision`), reach the full stop-condition logic,
 promote (`promote`, confirm-gated), and revise accepted history (`revise_acceptance`, confirm-gated)
 without erasing the superseded acceptance chain.
+
+Operational provenance is separate from authorship. `start_scene_run` declares a resumable sequence;
+generation/revision can remain external or manual and then be bound with `record_scene_run_operation`.
+Role-runner attempts are imported with `link_scene_run_review`, which preserves their existing provider
+metadata and source hash rather than repeating the call. `scripts/scene_run.py` exposes the same flow
+for non-MCP callers.
 
 ### Register with Claude Code
 `.mcp.json` at the repo root is auto-detected:

@@ -19,7 +19,7 @@ from . import critic_eval as _critic_eval
 from . import critique as _critique
 from . import (critic_calibration, defaultness, framework_change, hard_audit, integrity,
                issue_resolution, kb, plan_search, post_revision, reader, realization_calibration,
-               regression, revision, safety, schema, selection_eval, trace)
+               regression, revision, run_manifest, safety, schema, selection_eval, trace)
 from .assemble import assemble as _assemble
 from .context import compile_bundle
 from .promote import promote_candidate
@@ -393,6 +393,59 @@ def record_selection_operation(project: str, scene_id: str, experiment_id: str, 
 def selection_experiment_report(project: str, scene_id: str, experiment_id: str) -> dict:
     """Compare first/random/recorded selectors against independent human pairwise evidence."""
     return selection_eval.report(project_dir(project), scene_id, experiment_id)
+
+
+def start_scene_run(project: str, scene_id: str, steps: list[dict], budgets: dict | None = None,
+                    run_id: str | None = None) -> dict:
+    """Create or idempotently resume a scene-level operational provenance run."""
+    return run_manifest.start(project_dir(project), scene_id, steps, budgets=budgets, run_id=run_id)
+
+
+def scene_run_status(project: str, scene_id: str, run_id: str) -> dict:
+    """Derive resumable step, candidate-freshness, evidence-integrity, and budget status."""
+    return run_manifest.status(project_dir(project), scene_id, run_id)
+
+
+def scene_run_budget(project: str, scene_id: str, run_id: str,
+                     estimated_total_tokens: int | None = None,
+                     estimated_cost_usd: float | None = None) -> dict:
+    """Preflight one further operation against the run's declared budgets."""
+    return run_manifest.check_budget(
+        project_dir(project), scene_id, run_id,
+        estimated_total_tokens=estimated_total_tokens, estimated_cost_usd=estimated_cost_usd,
+    )
+
+
+def record_scene_run_operation(
+    project: str, scene_id: str, run_id: str, step_id: str, status: str,
+    candidate: str | None = None, executor_kind: str | None = None,
+    provider: str | None = None, model: str | None = None,
+    provider_request_id: str | None = None, response_model: str | None = None,
+    finish_reason: str | None = None, input_tokens: int | None = None,
+    output_tokens: int | None = None, total_tokens: int | None = None,
+    cost_usd: float | None = None, latency_ms: float | None = None,
+    failure_reason: str | None = None, idempotency_key: str | None = None,
+    metadata: dict | None = None,
+) -> dict:
+    """Append immutable generation/review/revision/etc. evidence to a scene run."""
+    return run_manifest.record_operation(
+        project_dir(project), scene_id, run_id, step_id, status, candidate=candidate,
+        executor_kind=executor_kind, provider=provider, model=model,
+        provider_request_id=provider_request_id, response_model=response_model,
+        finish_reason=finish_reason, input_tokens=input_tokens, output_tokens=output_tokens,
+        total_tokens=total_tokens, cost_usd=cost_usd, latency_ms=latency_ms,
+        failure_reason=failure_reason, idempotency_key=idempotency_key, metadata=metadata,
+    )
+
+
+def link_scene_run_review(project: str, scene_id: str, run_id: str, step_id: str,
+                          review_run_id: str, cost_usd: float | None = None,
+                          candidate: str | None = None) -> dict:
+    """Link an existing role-runner attempt into scene-run accounting without a new model call."""
+    return run_manifest.link_review_attempt(
+        project_dir(project), scene_id, run_id, step_id, review_run_id,
+        cost_usd=cost_usd, candidate=candidate,
+    )
 
 
 def start_realization_calibration(project: str, name: str, case_ids: list[str] | None = None,
@@ -1068,6 +1121,73 @@ TOOLS: list[dict] = [
            "experiment_id": {"type": "string",
                              "pattern": "^selection-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"}},
           ["project", "scene_id", "experiment_id"], selection_experiment_report),
+    _tool("start_scene_run",
+          "Create or idempotently resume a scene-level operational run. The immutable manifest declares "
+          "ordered step ids/phases and optional operation/token/cost budgets; it does not call a writer, "
+          "critic, or provider itself.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+           "steps": {"type": "array", "minItems": 1, "items": {
+               "type": "object", "additionalProperties": False,
+               "required": ["step_id", "phase"],
+               "properties": {
+                   "step_id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{0,63}$"},
+                   "phase": {"type": "string", "enum": ["generation", "critique", "revision", "selection", "reader", "promotion", "other"]},
+                   "description": {"type": "string", "minLength": 1},
+               }}},
+           "budgets": {"type": "object", "additionalProperties": False, "properties": {
+               "max_operations": {"type": "integer", "minimum": 0},
+               "max_total_tokens": {"type": "integer", "minimum": 0},
+               "max_cost_usd": {"type": "number", "minimum": 0},
+           }},
+           "run_id": {"type": "string", "pattern": "^run-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"}},
+          ["project", "scene_id", "steps"], start_scene_run),
+    _tool("scene_run_status",
+          "Read a scene run without mutation. Derives completed/failed/pending steps from immutable "
+          "operations, verifies frozen candidate/source hashes, reports stale current candidates, and "
+          "keeps unknown provider usage distinct from zero.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+           "run_id": {"type": "string", "pattern": "^run-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"}},
+          ["project", "scene_id", "run_id"], scene_run_status),
+    _tool("scene_run_budget",
+          "Preflight one additional operation against declared run budgets. Optional token/cost estimates "
+          "produce projected limits; missing prior usage or missing estimates are reported as unknown, never zero.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+           "run_id": {"type": "string", "pattern": "^run-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"},
+           "estimated_total_tokens": {"type": "integer", "minimum": 0},
+           "estimated_cost_usd": {"type": "number", "minimum": 0}},
+          ["project", "scene_id", "run_id"], scene_run_budget),
+    _tool("record_scene_run_operation",
+          "Append one immutable scene-run operation after an external/manual/compiler action. Candidate "
+          "bytes are frozen by SHA-256; failures remain evidence; idempotency_key makes crash/retry safe. "
+          "Recording never hides an operation merely because it exceeded budget.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+           "run_id": {"type": "string", "pattern": "^run-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"},
+           "step_id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{0,63}$"},
+           "status": {"type": "string", "enum": ["success", "failure"]},
+           "candidate": {"type": "string"},
+           "executor_kind": {"type": "string", "enum": ["compiler", "human", "external_model", "role_runner", "unknown"]},
+           "provider": {"type": "string"}, "model": {"type": "string"},
+           "provider_request_id": {"type": "string"}, "response_model": {"type": "string"},
+           "finish_reason": {"type": "string"},
+           "input_tokens": {"type": "integer", "minimum": 0},
+           "output_tokens": {"type": "integer", "minimum": 0},
+           "total_tokens": {"type": "integer", "minimum": 0},
+           "cost_usd": {"type": "number", "minimum": 0},
+           "latency_ms": {"type": "number", "minimum": 0},
+           "failure_reason": {"type": "string", "minLength": 1},
+           "idempotency_key": {"type": "string", "minLength": 1},
+           "metadata": {"type": "object"}},
+          ["project", "scene_id", "run_id", "step_id", "status"], record_scene_run_operation),
+    _tool("link_scene_run_review",
+          "Import an existing role-runner review attempt into scene-run accounting without another "
+          "provider call. Preserves packet/source hashes, latency, request/model metadata and token usage; "
+          "cost remains unknown unless explicitly supplied.",
+          {"project": {"type": "string"}, "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+           "run_id": {"type": "string", "pattern": "^run-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"},
+           "step_id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{0,63}$"},
+           "review_run_id": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+           "cost_usd": {"type": "number", "minimum": 0}, "candidate": {"type": "string"}},
+          ["project", "scene_id", "run_id", "step_id", "review_run_id"], link_scene_run_review),
     _tool("start_realization_calibration",
           "Freeze the ADR 0030 plan-to-prose calibration cases before extractor/aligner observations. "
           "This is evidence infrastructure only and never enables the prose-audit gate by itself.",
