@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "reader-probes.schema.json",
+  "type": "object",
+  "required": ["project_id", "probes"],
+  "additionalProperties": false,
+  "properties": {
+    "project_id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "probes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "after_scene", "questions"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^probe-[a-z0-9-]+$"},
+          "after_scene": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+          "questions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["id", "kind", "prompt", "response_mode"],
+              "additionalProperties": false,
+              "properties": {
+                "id": {"type": "string", "pattern": "^rq-[a-z0-9-]+$"},
+                "kind": {"enum": ["comprehension", "expectation", "ambiguity", "engagement", "affect"]},
+                "prompt": {"type": "string", "minLength": 1},
+                "response_mode": {"enum": ["free_text", "single_choice", "scale_1_5"]},
+                "options": {
+                  "type": "array",
+                  "minItems": 2,
+                  "uniqueItems": true,
+                  "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}
+                },
+                "contract_clause": {"type": "string", "minLength": 1},
+                "note": {"type": "string"}
+              },
+              "allOf": [
+                {
+                  "if": {"properties": {"response_mode": {"const": "single_choice"}}},
+                  "then": {"required": ["options"]}
+                },
+                {
+                  "if": {"properties": {"response_mode": {"enum": ["free_text", "scale_1_5"]}}},
+                  "then": {"not": {"required": ["options"]}}
+                }
+              ]
+            }
+          },
+          "note": {"type": "string"}
+        }
+      }
+    }
+  }
+}

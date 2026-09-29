@@ -27,7 +27,7 @@ mechanical validity, modeled/extracted consistency, and literary preference.
 | Schemas | `schemas/*.json` | **Enforced** | Workspace, critique, policy, premise, ontology, claims, judgment and state payloads are validated |
 | Workspace validation | `scripts/validate_workspace.py` | **Implemented** | Schema/integrity checks plus canon verification; maintained tests exercise failures |
 | Minimal context compilation | `src/fiction_compiler/context.py` | **Implemented, coarse relevance** | Replays state-before, filters to participants/required facts, writes collision-safe project-local evidence |
-| Reader/contract structure | `reader.py`, `reader-disclosure.json`, `contract-coverage.json`, ADR 0040 | **Structural evidence implemented; reader measurement unrun** | Discourse revelations bind to canonical disclosures or explicit non-factual declarations; contract clauses keep mapped/untested status separate from verification |
+| Reader/contract structure and measurement | `reader.py`, `reader_probe.py`, disclosure/coverage/probe schemas, ADRs 0040/0045 | **Structural + prefix-response evidence infrastructure implemented; audience study unrun** | Discourse revelations stay structural; accepted-prefix packets bind observed human/model responses to exact bytes, keep cohorts separate, detect staleness, and never manufacture cognition/quality verdicts |
 | Owner preference evidence | `owner_preference.py`, owner-preference schemas, ADR 0042 | **Prospective evidence implemented; calibration data not yet accumulated** | Exact alternatives, owner choice/reason/date, choice-hidden critic packets, and descriptive agreement stay separate from audience outcomes; no historical backfill |
 | Scene-plan search | `plan_search.py`, `schemas/scene-plan*.json`, `generate-scene-plans` skill | **Implemented as experimental evidence workflow** | 3–4-plan divergence floor, typed feasibility, hash-bound plan review, explicit 1–2 selection; no automatic quality ranker |
 | Event-sourced canon / `reconstruct_state_before` | `src/fiction_compiler/state.py` | **Implemented** | Seed state + accepted deltas, typed comparisons/relationships/knowledge, declared value/entity domains, fabula-ordered replay with explicit legacy fallback |
@@ -210,8 +210,16 @@ test, not just a feature.
 > recognition, or unresolved ambiguity. The six worked projects now carry structurally valid ledgers
 > with curiosity-gap declarations where applicable. This is `structural_only`: it does not establish
 > what any reader noticed or understood. Existing contract-coverage files continue to keep untested
-> clauses explicit. Still ⬜ in Track G: actual prefix-reader probes, target-audience measurement,
-> and ambiguity/comprehension evidence.
+> clauses explicit.
+>
+> **Prefix-reader evidence is now recordable without a simulated reader model (ADR 0045, Track G).**
+> Probe plans bind questions to accepted scene boundaries and optional reader-contract clauses;
+> reader-facing packets expose only the exact accepted prefix and question text. Immutable responses
+> preserve the packet, respondent kind and cohort, become stale when the prefix changes, and are
+> summarized descriptively. Forecourt carries the first two probe points and two contract mappings but
+> deliberately has zero recorded responses. Still ⬜ in Track G: recruit actual target-audience readers,
+> collect comprehension/expectation/ambiguity responses, define any semantic coding protocol before
+> scoring free text, and compare human results with separately labeled model proxies.
 >
 > **Cross-project repertoire is now explicit (ADR 0041, review §6.8 / Track C).** Project-owned
 > ending/turn/resolution/motif/focalization tags are checked against manuscript completeness and counted
@@ -328,6 +336,7 @@ test, not just a feature.
 > `0041-cross-project-repertoire-diagnostic.md`, `0042-record-owner-preference-evidence.md`,
 > `0043-enforce-fiction-corpus-rights-gate.md`,
 > `0044-add-public-domain-literature-control.md`,
+> `0045-measure-prefix-reader-responses.md`,
 > and the worked examples in `projects/salt-in-the-wire/` and
 > `projects/the-overnight/`.
 

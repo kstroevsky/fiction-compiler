@@ -1,0 +1,56 @@
+{
+  "project_id": "forecourt",
+  "probes": [
+    {
+      "id": "probe-forecourt-after-opening",
+      "after_scene": "ch01-sc01",
+      "questions": [
+        {
+          "id": "rq-forecourt-early-expectation",
+          "kind": "expectation",
+          "prompt": "What do you currently expect Jo to do about the man next, and what in the prose makes that expectation plausible?",
+          "response_mode": "free_text",
+          "note": "Exploratory expectation question; no planned answer is supplied to the reader."
+        },
+        {
+          "id": "rq-forecourt-early-ambiguity",
+          "kind": "ambiguity",
+          "prompt": "How certain are you that you understand whether the man is primarily a threat, a person in trouble, or something else? Use 1 for very uncertain and 5 for very certain.",
+          "response_mode": "scale_1_5",
+          "note": "Measures observed uncertainty early; it is not scored against a hidden correct value."
+        }
+      ],
+      "note": "Early prefix probe before later actions can resolve or reshape the reader's expectation."
+    },
+    {
+      "id": "probe-forecourt-after-ending",
+      "after_scene": "ch01-sc03",
+      "questions": [
+        {
+          "id": "rq-forecourt-final-choice",
+          "kind": "comprehension",
+          "prompt": "What concrete decision or action by Jo is the ending built around? Answer in your own words from the prose you read.",
+          "response_mode": "free_text",
+          "contract_clause": "resolves ambiguous: Jo makes one small, concrete decision from behind the glass and is left not knowing; recognition without resolution",
+          "note": "Observed comprehension remains a free-text response; the compiler does not auto-score semantic correctness."
+        },
+        {
+          "id": "rq-forecourt-final-danger-certainty",
+          "kind": "ambiguity",
+          "prompt": "At the end, how certain are you that the man was actually dangerous? Use 1 for very uncertain and 5 for very certain.",
+          "response_mode": "scale_1_5",
+          "contract_clause": "the man stays genuinely ambiguous to the end: never confirmed victim or villain, no twist, no reveal",
+          "note": "A distribution near the uncertain end may support the intended ambiguity, but no threshold is hard-coded as success."
+        },
+        {
+          "id": "rq-forecourt-final-open-question",
+          "kind": "ambiguity",
+          "prompt": "What important question, if any, remains unresolved for you after the ending?",
+          "response_mode": "free_text",
+          "note": "Exploratory ambiguity evidence; semantic interpretation requires a human analysis step."
+        }
+      ],
+      "note": "End-of-story probe for legibility of Jo's action and persistence of uncertainty about the man."
+    }
+  ]
+}

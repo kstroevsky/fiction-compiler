@@ -23,13 +23,23 @@
     },
     {
       "text": "the man stays genuinely ambiguous to the end: never confirmed victim or villain, no twist, no reveal",
-      "coverage": [],
-      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+      "coverage": [
+        {
+          "kind": "reader-question",
+          "ref": "rq-forecourt-final-danger-certainty",
+          "note": "Mapped to a prefix-reader ambiguity question; mapping is not evidence that readers actually remain uncertain."
+        }
+      ]
     },
     {
       "text": "resolves ambiguous: Jo makes one small, concrete decision from behind the glass and is left not knowing; recognition without resolution",
-      "coverage": [],
-      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+      "coverage": [
+        {
+          "kind": "reader-question",
+          "ref": "rq-forecourt-final-choice",
+          "note": "Mapped to an open comprehension question about Jo's concrete ending action; no automatic semantic pass/fail is inferred."
+        }
+      ]
     }
   ]
 }

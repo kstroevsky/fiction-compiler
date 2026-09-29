@@ -28,6 +28,9 @@ It runs anywhere `python3` runs — no install step.
 | `compile_context` | The minimal, leak-free drafting bundle for a scene |
 | `contract_coverage` | Show how each reader-contract clause is mapped or explicitly untested; mapping never means the clause passed |
 | `reader_disclosure` | Validate discourse-revelation → canonical-fact bindings, explicit non-factual revelations, curiosity gaps, and surprise setup without claiming reader comprehension |
+| `reader_probe_packet` | Build an exact accepted-prose prefix with predeclared reader questions while withholding contract bindings, planning notes, later prose and hidden canon |
+| `record_reader_probe_response` | Persist one hash-bound human/model response per respondent and probe, with target-audience and model-proxy cohorts kept distinct |
+| `reader_probe_report` | Report fresh/stale observed responses and descriptive choice/scale distributions; free-text semantics and reader-contract success are not auto-inferred |
 | `repertoire_report` | Count repeated project-owned ending/turn/resolution/motif/focalization tags across complete manuscripts; partial stories stay visible but are excluded from observed frequencies, and no originality score is produced |
 | `literature_control_report` | Run deterministic lint and schema-fit probes for a rights-cleared, hash-bound literature control while keeping manual representation limits and unrun critic evidence explicit |
 | `record_owner_preference` | Prospectively freeze the exact alternatives behind one owner choice plus decision kind, chosen option, reason, and date; this is owner-taste evidence only |

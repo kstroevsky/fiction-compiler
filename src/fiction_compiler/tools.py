@@ -19,7 +19,7 @@ from . import critic_eval as _critic_eval
 from . import critique as _critique
 from . import (critic_calibration, defaultness, framework_change, hard_audit, integrity,
                issue_resolution, kb, literature_control, owner_preference, plan_search, post_revision,
-               reader, realization_calibration, regression, repertoire, revision, run_manifest,
+               reader, reader_probe, realization_calibration, regression, repertoire, revision, run_manifest,
                safety, schema, selection_eval, trace)
 from .assemble import assemble as _assemble
 from .context import compile_bundle
@@ -142,6 +142,26 @@ def contract_coverage(project: str) -> dict:
 def reader_disclosure(project: str) -> dict:
     """Validate structural reader-disclosure/fair-play annotations without inferring comprehension."""
     return reader.disclosure_report(project_dir(project))
+
+
+def reader_probe_packet(project: str, probe_id: str) -> dict:
+    """Return an accepted-prose prefix and predeclared questions without hidden planning metadata."""
+    return reader_probe.packet(project_dir(project), probe_id)
+
+
+def record_reader_probe_response(project: str, probe_id: str, packet_sha256: str,
+                                 respondent_kind: str, respondent_id: str, cohort_kind: str,
+                                 answers: list[dict], provenance: dict | None = None) -> dict:
+    """Persist one observed human/model response bound to an exact reader-prefix packet."""
+    return reader_probe.record_response(
+        project_dir(project), probe_id, packet_sha256, respondent_kind, respondent_id, cohort_kind,
+        answers, provenance=provenance,
+    )
+
+
+def reader_probe_report(project: str) -> dict:
+    """Summarize fresh/stale reader responses descriptively without inferring hidden cognition."""
+    return reader_probe.report(project_dir(project))
 
 
 def repertoire_report(projects: list[str] | None = None) -> dict:
@@ -994,6 +1014,38 @@ TOOLS: list[dict] = [
           "Validate reader-disclosure annotations, curiosity-gap ordering, and declared surprise setup. "
           "This is structural evidence only; it does not infer reader comprehension.",
           {"project": {"type": "string"}}, ["project"], reader_disclosure),
+    _tool("reader_probe_packet",
+          "Return only the accepted manuscript prefix through a predeclared probe point plus the reader "
+          "questions. Contract-clause bindings, planning notes, later prose and hidden canon are omitted.",
+          {"project": {"type": "string"},
+           "probe_id": {"type": "string", "pattern": "^probe-[a-z0-9-]+$"}},
+          ["project", "probe_id"], reader_probe_packet),
+    _tool("record_reader_probe_response",
+          "Record one immutable observed response to the exact current reader-probe packet. Human target "
+          "audiences and model proxies are labeled separately; responses do not themselves prove quality.",
+          {"project": {"type": "string"},
+           "probe_id": {"type": "string", "pattern": "^probe-[a-z0-9-]+$"},
+           "packet_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+           "respondent_kind": {"type": "string", "enum": ["human", "model"]},
+           "respondent_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+           "cohort_kind": {"type": "string",
+                           "enum": ["target-audience", "general-reader", "expert", "model-proxy"]},
+           "answers": {"type": "array", "minItems": 1, "items": {
+               "type": "object", "required": ["question_id"], "additionalProperties": False,
+               "properties": {
+                   "question_id": {"type": "string", "pattern": "^rq-[a-z0-9-]+$"},
+                   "text": {"type": "string", "minLength": 1},
+                   "selected_option": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+                   "scale": {"type": "integer", "minimum": 1, "maximum": 5},
+               },
+           }},
+           "provenance": {"type": "object"}},
+          ["project", "probe_id", "packet_sha256", "respondent_kind", "respondent_id",
+           "cohort_kind", "answers"], record_reader_probe_response),
+    _tool("reader_probe_report",
+          "Summarize fresh versus stale observed prefix-reader responses by human/model and cohort. "
+          "Free-text semantics are not auto-inferred and no reader-contract verdict is manufactured.",
+          {"project": {"type": "string"}}, ["project"], reader_probe_report),
     _tool("repertoire_report",
           "Count exact ending/turn/resolution/motif/focalization tags across complete project "
           "manuscripts. Partial stories are reported but excluded from observed-frequency claims. "

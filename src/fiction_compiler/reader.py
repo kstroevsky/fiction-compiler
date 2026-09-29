@@ -12,7 +12,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from . import schema
+from . import reader_probe, schema
 from .state import scene_sort_key
 
 
@@ -66,6 +66,17 @@ def contract_coverage(project: Path) -> dict:
             continue
         entry = matches[0]
         coverage = entry.get("coverage", [])
+        reader_questions = reader_probe.question_bindings(project)
+        for binding in coverage:
+            if binding.get("kind") != "reader-question":
+                continue
+            ref = binding.get("ref")
+            if ref not in reader_questions:
+                errors.append(f"reader-question coverage references unknown probe question {ref!r}")
+            elif reader_questions[ref] is not None and reader_questions[ref] != text:
+                errors.append(
+                    f"reader-question {ref!r} is declared for a different reader-contract clause"
+                )
         if coverage:
             mapped += 1
             state = "mapped"

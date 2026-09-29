@@ -19,7 +19,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from fiction_compiler import integrity, literature_control, ontology, owner_preference, schema  # noqa: E402
+from fiction_compiler import (integrity, literature_control, ontology, owner_preference, reader_probe,
+                              schema)  # noqa: E402
 
 
 def read_json(path: Path) -> Any:
@@ -141,6 +142,8 @@ def validate_projects(errors: list[str]) -> None:
             check_schema(errors, repertoire_path, read_json(repertoire_path), "story-repertoire")
         for message in owner_preference.persistent_validation_errors(project):
             errors.append(f"{project.name}: owner preference — {message}")
+        for message in reader_probe.validation_errors(project):
+            errors.append(f"{project.name}: reader probes — {message}")
 
         ontology_path = project / "canon" / "ontology.json"
         if ontology_path.exists():
