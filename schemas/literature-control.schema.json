@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "literature-control.schema.json",
+  "type": "object",
+  "required": [
+    "schema_version", "control_id", "source_id", "retrieved_on", "full_story_sha256",
+    "segmentation", "scenes", "critic_evidence", "control_note"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "control_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "source_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "retrieved_on": {"type": "string", "minLength": 1},
+    "full_story_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "segmentation": {
+      "type": "object",
+      "required": ["kind", "reassembly_separator", "note"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {"enum": ["author-marked", "editorial-analysis"]},
+        "reassembly_separator": {"const": "blank-line"},
+        "note": {"type": "string", "minLength": 1}
+      }
+    },
+    "scenes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "path", "sha256", "boundary_note", "format_probe", "representation"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^control-sc[0-9]{2}$"},
+          "path": {"type": "string", "pattern": "^scene-[0-9]{2}\\.txt$"},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "boundary_note": {"type": "string", "minLength": 1},
+          "format_probe": {
+            "type": "object",
+            "required": ["scene_id", "spec_path", "spec_sha256", "delta_path", "delta_sha256"],
+            "additionalProperties": false,
+            "properties": {
+              "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+              "spec_path": {"type": "string", "pattern": "^scene-[0-9]{2}\\.spec\\.json$"},
+              "spec_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "delta_path": {"type": "string", "pattern": "^scene-[0-9]{2}\\.delta\\.json$"},
+              "delta_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          },
+          "representation": {
+            "type": "object",
+            "required": ["assessment_kind", "typed_fit", "not_first_class", "note"],
+            "additionalProperties": false,
+            "properties": {
+              "assessment_kind": {"const": "manual-annotation"},
+              "typed_fit": {"enum": ["adequate", "partial", "poor"]},
+              "not_first_class": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}
+              },
+              "note": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    },
+    "critic_evidence": {
+      "type": "object",
+      "required": ["status", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {"const": "unrun"},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    },
+    "control_note": {"type": "string", "minLength": 1}
+  }
+}

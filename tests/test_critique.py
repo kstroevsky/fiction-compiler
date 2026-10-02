@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import sys
 import tempfile
 import unittest
@@ -17,7 +18,10 @@ def _scene(tmp: str):
     root = Path(tmp)
     scene = root / "scenes" / "ch01-sc01"
     (scene / "candidates").mkdir(parents=True)
-    (scene / "spec.json").write_text(json.dumps({"id": "ch01-sc01"}), encoding="utf-8")
+    (scene / "spec.json").write_text(json.dumps({
+        "id": "ch01-sc01", "chapter": "ch01", "pov": "", "participants": [],
+        "purpose": [], "entry_state": [], "desire": "", "conflict": "", "turn": "",
+        "exit_state": [], "required_events": [], "forbidden_moves": []}), encoding="utf-8")
     (scene / "state-delta.json").write_text(json.dumps({
         "scene_id": "ch01-sc01", "facts_added": [], "facts_removed": [], "knowledge_changes": [],
         "relationship_changes": [], "promises_opened": [], "promises_closed": []}), encoding="utf-8")
@@ -27,6 +31,12 @@ def _scene(tmp: str):
 
 _MATERIAL = {"dimension": "cliche", "severity": "material", "evidence": "heart pounded",
              "diagnosis": "stock", "repair_layer": "prose"}
+
+
+def _provenance(sha: str, role: str = "adversarial-reader") -> dict:
+    return {"source": "role_runner", "run_id": "test", "role": role, "vendor": "offline",
+            "model": "fixture", "candidate_sha256": sha,
+            "packet_sha256": hashlib.sha256(b"packet").hexdigest()}
 
 
 class RecordCritiqueTests(unittest.TestCase):
@@ -82,28 +92,28 @@ class SceneStatusTests(unittest.TestCase):
             st = critique.scene_status(proj, "ch01-sc01", "candidate-a.md")
             self.assertFalse(st["audit_gate"]["ready"])
             joined = " ".join(st["audit_gate"]["reasons"])
-            self.assertIn("hard", joined)
             self.assertIn("literary", joined)
-            self.assertIn("defaultness", joined)
             self.assertFalse(st["promoted"])
 
     def test_ready_when_triple_audit_clean_and_bound(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            proj, _ = _scene(tmp)
-            critique.record_critique(proj, "ch01-sc01", "ch01-sc01", "hard-audit", "pass")
-            critique.record_critique(proj, "ch01-sc01", "candidate-a.md", "defaultness-lint", "pass")
-            critique.record_critique(proj, "ch01-sc01", "candidate-a.md", "adversarial-reader", "pass")
+            proj, scene = _scene(tmp)
+            sha = integrity.sha256_file(scene / "candidates" / "candidate-a.md")
+            critique.record_critique(
+                proj, "ch01-sc01", "candidate-a.md", "adversarial-reader", "pass",
+                _provenance=_provenance(sha), _bound_candidate_sha256=sha)
             st = critique.scene_status(proj, "ch01-sc01", "candidate-a.md")
             self.assertTrue(st["audit_gate"]["ready"], st["audit_gate"]["reasons"])
-            self.assertEqual(len(st["binding_critiques"]), 3)
+            self.assertEqual(len(st["binding_critiques"]), 1)
 
     def test_stale_sha_is_not_credited(self) -> None:
         """A critique recorded, then the candidate edited: the gate must stop crediting it."""
         with tempfile.TemporaryDirectory() as tmp:
             proj, scene = _scene(tmp)
-            critique.record_critique(proj, "ch01-sc01", "ch01-sc01", "hard-audit", "pass")
-            critique.record_critique(proj, "ch01-sc01", "candidate-a.md", "defaultness-lint", "pass")
-            critique.record_critique(proj, "ch01-sc01", "candidate-a.md", "adversarial-reader", "pass")
+            sha = integrity.sha256_file(scene / "candidates" / "candidate-a.md")
+            critique.record_critique(
+                proj, "ch01-sc01", "candidate-a.md", "adversarial-reader", "pass",
+                _provenance=_provenance(sha), _bound_candidate_sha256=sha)
             (scene / "candidates" / "candidate-a.md").write_text("Edited prose after judging.", encoding="utf-8")
             st = critique.scene_status(proj, "ch01-sc01", "candidate-a.md")
             self.assertFalse(st["audit_gate"]["ready"])  # sha no longer matches the judged bytes

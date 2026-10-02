@@ -1,11 +1,14 @@
 # Corpus Notes (fiction-corpus stream)
 
-Annotations extracted from **public-domain** stories, used to ground craft claims in real texts
+Annotations extracted from **rights-cleared** stories, used to ground craft claims in real texts
 and to study patterns (scene structure, distance shifts, reveal scheduling, motif systems).
 
 ## Discipline
-- Only public-domain sources (`standard-ebooks`, `gutenberg`), and only after the **EU/DE** status
-  is verified per title (author death + 70), since our operator is in Germany.
+- External literary sources must be public-domain (`standard-ebooks`, `gutenberg`) with **EU/DE**
+  status verified per title (author death + 70). Repository-owned/user-provided fiction may also be
+  annotated when provenance and rights are explicit. The source register enforces a structured
+  `rights` gate: aggregator entries stay blocked until a title-specific source entry is marked
+  `cleared` with `verified_on` and the basis for that determination.
 - Store **abstract observations and annotations**, not wholesale text. A corpus note records *what
   a passage does* (technique, at what distance, to what effect) — not the passage itself beyond the
   minimal quotation needed to make a craft point.
@@ -21,5 +24,6 @@ observation:      abstract description of what the text does and why it works
 concept_links:    [[narrative-distance]], [[showing-and-telling]], ...
 ```
 
-No corpus annotations are seeded yet — this stream is opt-in per project and per verified title.
-The craft-instruction stream (see `../README.md`) already supplies the heuristics the pipeline uses.
+One repository-owned annotation is seeded (`the-overnight-ch01-sc02.md`) as a structural example,
+not a style rule. External corpus additions remain opt-in per project and per rights-verified title.
+The craft-instruction stream (see `../README.md`) supplies the current operational heuristics.

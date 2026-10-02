@@ -10,7 +10,7 @@ one manuscript.
 | Improves | the manuscript | the compiler (prompts, rubrics, schemas) |
 | Trigger | any critique on a candidate | *repeated, evidenced* failures across scenes |
 | Cycle | PLAN → DO → CHECK → ACT per scene | improvement transaction (8 fields) |
-| Code | `src/fiction_compiler/revision.py`, `scripts/revise_scene.py` | (deferred) regression-fixture runner |
+| Code | `src/fiction_compiler/revision.py`, `scripts/revise_scene.py` | `regression.py`, `framework_change.py`, `scripts/framework_change.py` |
 | Record | `scenes/<id>/revision-log.jsonl` | `constitution/change-policy.md`, `docs/decisions/*.md` |
 | Decides | accept / route lower / stop (deterministic CHECK+ACT) | **human** (agents may propose only) |
 | Danger | revising toward blandness | silently rewriting the constitution |
@@ -40,6 +40,20 @@ observed failure, exact evidence, root-layer diagnosis, minimal change, a **new 
 blind before/after outputs, known trade-offs, and **human approval**. Agents write proposals; they
 do not approve their own constitutional changes. ADR `docs/decisions/0001-structured-state-delta.md`
 is a worked example of the transaction.
+
+ADR 0033 makes that transaction executable. `start_framework_change` refuses a dirty regression
+baseline and freezes the declared framework files before editing. `evaluate_framework_change` reruns
+the deterministic floor and refuses undeclared behavior-relevant edits. Before/after outputs are
+stored behind randomized A/B labels; an agent proposer's own model judgment is retained as evidence
+but does not count toward its approval threshold. A separate, confirmed human decision is required
+for approval. Rejected experiments can restore the exact frozen bytes with
+`rollback_framework_change`, which refuses to overwrite files changed again after evaluation.
+Python-source experiments also require a fresh interpreter at evaluation time so a long-lived tool
+server cannot hash new source while accidentally executing its previously imported implementation.
+
+The transaction does not make taste deterministic. Its comparison threshold is a predeclared study
+rule and its final decision remains human. For changes whose value is empirical, insufficient or
+mixed blind evidence remains a reason not to approve yet, not a regression-harness failure.
 
 ## The one healthy coupling
 The loops meet in exactly one place: **the story loop's evidence feeds the framework loop.** When

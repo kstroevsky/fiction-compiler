@@ -144,6 +144,355 @@ class HardAuditExecutableEventTests(unittest.TestCase):
             self.assertTrue(any(f["dimension"] == "causal" and f["severity"] == "material"
                                 and "effect" in f["evidence"] for f in critique["findings"]))
 
+    def test_typed_precondition_compares_declared_value(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut",
+                     "preconditions": [{"predicate": "trusts", "subject": "char-mara",
+                                        "object": "char-jonas", "value": "total"}],
+                     "effects": []}
+            world = json.dumps({"predicate": "trusts", "subject": "char-mara",
+                                "object": "char-jonas", "value": "none"}) + "\n"
+            project = self._project(Path(tmp), event, {}, world_state=world)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any("precondition" in f["evidence"] for f in critique["findings"]))
+
+    def test_typed_effect_compares_declared_value(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": [],
+                     "effects": [{"op": "add", "predicate": "trusts", "subject": "char-mara",
+                                  "object": "char-jonas", "value": True}]}
+            delta_extra = {"predicate_changes": [
+                {"op": "add", "predicate": "trusts", "subject": "char-mara",
+                 "object": "char-jonas", "value": False},
+            ]}
+            project = self._project(Path(tmp), event, delta_extra)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any("effect" in f["evidence"] for f in critique["findings"]))
+
+    def test_typed_effect_does_not_treat_boolean_as_numeric_zero(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": [],
+                     "effects": [{"op": "add", "predicate": "enabled", "subject": "obj-relay",
+                                  "value": False}]}
+            delta_extra = {"predicate_changes": [
+                {"op": "add", "predicate": "enabled", "subject": "obj-relay", "value": 0},
+            ]}
+            project = self._project(Path(tmp), event, delta_extra)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any("effect" in f["evidence"] for f in critique["findings"]))
+
+    def test_predicate_at_event_cannot_satisfy_an_earlier_event(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01"])
+            events = [
+                {"id": "evt-first", "preconditions": [],
+                 "effects": [{"op": "add", "predicate": "offline", "subject": "obj-relay"}]},
+                {"id": "evt-second", "preconditions": [],
+                 "effects": [{"op": "add", "predicate": "offline", "subject": "obj-relay"}]},
+            ]
+            write_json(project / "planning" / "event-graph.json", {"events": events, "edges": []})
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": 1, "facts_added": [], "facts_removed": [],
+                "knowledge_changes": [], "relationship_changes": [], "promises_opened": [],
+                "promises_closed": [], "predicate_changes": [{
+                    "op": "add", "predicate": "offline", "subject": "obj-relay", "at_event": "evt-second",
+                }],
+            })
+            write_json(project / "scenes" / "ch01-sc01" / "spec.json", {
+                "id": "ch01-sc01", "pov": "char-mara", "participants": ["char-mara"],
+                "required_events": ["evt-first", "evt-second"], "knowledge_required": [],
+            })
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any(
+                f["dimension"] == "causal" and "evt-first effect" in f["evidence"]
+                for f in critique["findings"]
+            ))
+
+    def test_predicate_at_event_must_carry_matching_effect(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": [], "effects": []}
+            project = self._project(Path(tmp), event, {"predicate_changes": [{
+                "op": "add", "predicate": "offline", "subject": "obj-relay", "at_event": "evt-relay-cut",
+            }]})
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any(
+                "does not carry the matching typed effect" in f["diagnosis"]
+                for f in critique["findings"]
+            ))
+
+    def test_unresolved_fact_precondition_and_event_cause_are_material(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": ["fact-never-established"],
+                     "effects": [], "causes": ["evt-does-not-exist"]}
+            project = self._project(Path(tmp), event, {})
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            evidence = "\n".join(f["evidence"] for f in critique["findings"])
+            self.assertIn("fact-never-established", evidence)
+            self.assertIn("evt-does-not-exist", evidence)
+
+    def test_knows_effect_must_use_knowledge_changes_and_replays(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": [],
+                     "effects": [
+                         {"op": "add", "fact": "fact-relay-cut"},
+                         {"op": "add", "predicate": "knows", "subject": "char-mara",
+                          "object": "fact-relay-cut"},
+                     ]}
+            delta_extra = {
+                "facts_added": [{"id": "fact-relay-cut", "text": "Relay cut by hand."}],
+                "knowledge_changes": [{
+                    "character": "char-mara", "fact": "fact-relay-cut", "at_event": "evt-relay-cut"
+                }],
+            }
+            project = self._project(Path(tmp), event, delta_extra)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+            after = hard_audit.reconstruct_state_before(project, "ch01-sc99")
+            self.assertTrue(after.knows("char-mara", "fact-relay-cut"))
+
+    def test_knowledge_at_event_must_match_event_effect(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": [],
+                     "effects": [{"op": "add", "fact": "fact-relay-cut"}]}
+            delta_extra = {
+                "facts_added": [{"id": "fact-relay-cut", "text": "Relay cut by hand."}],
+                "knowledge_changes": [{
+                    "character": "char-mara", "fact": "fact-relay-cut", "at_event": "evt-relay-cut"
+                }],
+            }
+            project = self._project(Path(tmp), event, delta_extra)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any(
+                "does not carry the matching factive knowledge effect" in f["diagnosis"]
+                for f in critique["findings"]
+            ))
+
+    def test_knows_effect_written_as_generic_predicate_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": [],
+                     "effects": [
+                         {"op": "add", "fact": "fact-relay-cut"},
+                         {"op": "add", "predicate": "knows", "subject": "char-mara",
+                          "object": "fact-relay-cut"},
+                     ]}
+            delta_extra = {"predicate_changes": [
+                {"op": "add", "predicate": "knows", "subject": "char-mara", "object": "fact-relay-cut"},
+            ]}
+            project = self._project(Path(tmp), event, delta_extra)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any("knowledge_changes" in f["diagnosis"] for f in critique["findings"]))
+
+    def test_factive_knowledge_effect_can_use_explicit_belief_update(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": [],
+                     "effects": [
+                         {"op": "add", "fact": "fact-relay-cut"},
+                         {"op": "add", "predicate": "knows", "subject": "char-mara",
+                          "object": "fact-relay-cut"},
+                     ]}
+            delta_extra = {
+                "facts_added": [{"id": "fact-relay-cut", "text": "Relay cut by hand."}],
+                "belief_changes": [{
+                    "op": "set", "character": "char-mara", "fact": "fact-relay-cut",
+                    "value": True, "source": "perception", "at_event": "evt-relay-cut"
+                }],
+            }
+            project = self._project(Path(tmp), event, delta_extra)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+            after = hard_audit.reconstruct_state_before(project, "ch01-sc99")
+            self.assertTrue(after.knows("char-mara", "fact-relay-cut"))
+
+    def test_false_belief_effect_is_distinct_from_world_truth(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": [],
+                     "effects": [{"op": "add", "predicate": "believes", "subject": "char-mara",
+                                  "object": "fact-door-open", "value": False}]}
+            delta_extra = {
+                "propositions_defined": [{"id": "fact-door-open", "text": "The east door is open."}],
+                "belief_changes": [{
+                    "op": "set", "character": "char-mara", "fact": "fact-door-open",
+                    "value": False, "source": "inference", "at_event": "evt-relay-cut"
+                }],
+            }
+            project = self._project(Path(tmp), event, delta_extra)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+            after = hard_audit.reconstruct_state_before(project, "ch01-sc99")
+            self.assertTrue(after.believes("char-mara", "fact-door-open", False))
+            self.assertFalse(after.fact_exists("fact-door-open"))
+            self.assertFalse(after.knows("char-mara", "fact-door-open"))
+
+    def test_belief_at_event_must_match_event_effect(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": [], "effects": []}
+            delta_extra = {
+                "propositions_defined": [{"id": "fact-door-open", "text": "The east door is open."}],
+                "belief_changes": [{
+                    "op": "set", "character": "char-mara", "fact": "fact-door-open",
+                    "value": False, "source": "inference", "at_event": "evt-relay-cut"
+                }],
+            }
+            project = self._project(Path(tmp), event, delta_extra)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any(
+                "does not carry a matching belief/knowledge effect" in f["diagnosis"]
+                for f in critique["findings"]
+            ))
+
+    def test_belief_source_event_is_provenance_not_execution_binding(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": [], "effects": []}
+            delta_extra = {
+                "propositions_defined": [{"id": "fact-door-open", "text": "The east door is open."}],
+                "belief_changes": [{
+                    "op": "set", "character": "char-mara", "fact": "fact-door-open",
+                    "value": False, "source": "inference", "event": "evt-relay-cut"
+                }],
+            }
+            project = self._project(Path(tmp), event, delta_extra)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+
+    def test_resource_changes_are_ordered_and_underflow_is_material(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": [], "effects": []}
+            project = self._project(Path(tmp), event, {"resource_changes": [
+                {"op": "acquire", "resource": "res-loaf", "holder": "char-mara", "quantity": 2},
+                {"op": "consume", "resource": "res-loaf", "holder": "char-mara", "quantity": 2},
+            ]})
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+
+            delta_path = project / "scenes" / "ch01-sc01" / "state-delta.json"
+            delta = json.loads(delta_path.read_text())
+            delta["resource_changes"] = [
+                {"op": "consume", "resource": "res-loaf", "holder": "char-mara", "quantity": 1}
+            ]
+            write_json(delta_path, delta)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any(f["dimension"] == "resource" and "underflows" in f["evidence"]
+                                for f in critique["findings"]), critique["findings"])
+
+    def test_load_bearing_resource_requirement_checks_seed_quantity(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            event = {"id": "evt-relay-cut", "preconditions": [], "effects": []}
+            project = self._project(Path(tmp), event, {})
+            write(project / "canon" / "resources.jsonl", json.dumps({
+                "id": "res-loaf", "holder": "char-mara", "quantity": 12, "unit": "loaf"
+            }) + "\n")
+            spec_path = project / "scenes" / "ch01-sc01" / "spec.json"
+            spec = json.loads(spec_path.read_text())
+            spec["resource_requirements"] = [{
+                "resource": "res-loaf", "holder": "char-mara",
+                "comparison": "exactly", "quantity": 12, "unit": "loaf"
+            }]
+            write_json(spec_path, spec)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+
+            spec["resource_requirements"][0]["quantity"] = 13
+            write_json(spec_path, spec)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any(f["dimension"] == "resource" for f in critique["findings"]))
+
+    def test_required_events_execute_effects_in_declared_order(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01"])
+            events = [
+                {"id": "evt-open", "preconditions": [],
+                 "effects": [{"op": "add", "predicate": "open", "subject": "obj-door"}],
+                 "causes": []},
+                {"id": "evt-enter",
+                 "preconditions": [{"predicate": "open", "subject": "obj-door"}],
+                 "effects": [{"op": "add", "predicate": "inside", "subject": "char-mara"}],
+                 "causes": ["evt-open"]},
+            ]
+            write_json(project / "planning" / "event-graph.json", {"events": events, "edges": []})
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": 1, "facts_added": [], "facts_removed": [],
+                "knowledge_changes": [], "relationship_changes": [], "promises_opened": [],
+                "promises_closed": [], "predicate_changes": [
+                    {"op": "add", "predicate": "open", "subject": "obj-door"},
+                    {"op": "add", "predicate": "inside", "subject": "char-mara"},
+                ],
+            })
+            spec_path = project / "scenes" / "ch01-sc01" / "spec.json"
+            spec = {"id": "ch01-sc01", "pov": "char-mara", "participants": ["char-mara"],
+                    "required_events": ["evt-open", "evt-enter"], "knowledge_required": []}
+            write_json(spec_path, spec)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+
+            spec["required_events"] = ["evt-enter", "evt-open"]
+            write_json(spec_path, spec)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "revise")
+            evidence = "\n".join(f["evidence"] for f in critique["findings"])
+            self.assertIn("evt-enter cause 'evt-open'", evidence)
+            self.assertIn("evt-enter precondition open(obj-door)", evidence)
+
+    def test_fact_effect_can_establish_later_event_precondition(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01"])
+            events = [
+                {"id": "evt-discover", "preconditions": [],
+                 "effects": [{"op": "add", "fact": "fact-code-known"}], "causes": []},
+                {"id": "evt-use-code", "preconditions": ["fact-code-known"],
+                 "effects": [], "causes": ["evt-discover"]},
+            ]
+            write_json(project / "planning" / "event-graph.json", {"events": events, "edges": []})
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": 1,
+                "facts_added": [{"id": "fact-code-known", "text": "The access code is known."}],
+                "facts_removed": [], "knowledge_changes": [], "relationship_changes": [],
+                "promises_opened": [], "promises_closed": [],
+            })
+            write_json(project / "scenes" / "ch01-sc01" / "spec.json", {
+                "id": "ch01-sc01", "pov": "char-mara", "participants": ["char-mara"],
+                "required_events": ["evt-discover", "evt-use-code"], "knowledge_required": [],
+            })
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+
+    def test_prior_world_event_must_be_referenced_not_executed_again(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01", "ch01-sc02"])
+            clean_deltas(project)
+            write_json(project / "scenes" / "ch01-sc01" / "spec.json", {
+                "id": "ch01-sc01", "pov": "char-mara", "participants": ["char-mara"],
+                "required_events": ["evt-relay-cut"], "knowledge_required": [],
+            })
+            second_spec = {
+                "id": "ch01-sc02", "narrative_mode": "analepsis", "fabula_time": 2,
+                "pov": "char-mara",
+                "participants": ["char-mara"], "required_events": ["evt-relay-cut"],
+                "knowledge_required": [],
+            }
+            spec_path = project / "scenes" / "ch01-sc02" / "spec.json"
+            write_json(spec_path, second_spec)
+            critique = hard_audit.audit_scene(project, "ch01-sc02")
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any("executes 'evt-relay-cut' again" in f["evidence"]
+                                for f in critique["findings"]), critique["findings"])
+
+            second_spec["required_events"] = []
+            second_spec["event_references"] = ["evt-relay-cut"]
+            write_json(spec_path, second_spec)
+            critique = hard_audit.audit_scene(project, "ch01-sc02")
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+
     def test_prose_precondition_earns_migration_advisory(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             event = {"id": "evt-relay-cut", "preconditions": ["jonas is the station operator"], "effects": []}
@@ -208,6 +557,78 @@ class HardAuditOntologyTests(unittest.TestCase):
             critique = hard_audit.audit_scene(project, "ch01-sc01")
             self.assertFalse(any(f["dimension"] == "ontology" for f in critique["findings"]), critique["findings"])
 
+    def test_closed_entity_registry_rejects_unknown_location(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            world = json.dumps({"predicate": "located_at", "subject": "char-jonas", "object": "loc-ghost"}) + "\n"
+            project = self._project(Path(tmp),
+                                    {"predicate": "located_at", "subject": "char-jonas", "object": "loc-ghost"},
+                                    with_ontology=True, world=world)
+            write_json(project / "canon" / "entity-registry.json", {
+                "closed_types": ["loc"],
+                "entities": [{"id": "loc-station", "type": "loc"}],
+            })
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertTrue(any(
+                f["dimension"] == "ontology" and "closed entity registry" in f["evidence"]
+                for f in critique["findings"]
+            ), critique["findings"])
+
+    def test_numeric_value_domain_and_comparison_are_executable(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            world = json.dumps({
+                "predicate": "temperature", "subject": "obj-relay", "value": -2,
+            }) + "\n"
+            project = self._project(Path(tmp), {
+                "predicate": "temperature", "subject": "obj-relay", "value": 0, "comparison": "lt",
+            }, with_ontology=True, world=world)
+            write_json(project / "canon" / "ontology.json", {"predicates": [{
+                "name": "temperature", "arity": "unary", "subject_types": ["obj"],
+                "value_type": "number", "minimum": -20, "maximum": 50,
+            }]})
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+
+    def test_value_domain_rejects_wrong_typed_precondition(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            world = json.dumps({
+                "predicate": "temperature", "subject": "obj-relay", "value": -2,
+            }) + "\n"
+            project = self._project(Path(tmp), {
+                "predicate": "temperature", "subject": "obj-relay", "value": False,
+            }, with_ontology=True, world=world)
+            write_json(project / "canon" / "ontology.json", {"predicates": [{
+                "name": "temperature", "arity": "unary", "subject_types": ["obj"],
+                "value_type": "number",
+            }]})
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertTrue(any(
+                f["dimension"] == "ontology" and "not number" in f["evidence"]
+                for f in critique["findings"]
+            ), critique["findings"])
+
+    def test_declared_exclusive_location_rejects_two_active_targets(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            world = json.dumps({"predicate": "located_at", "subject": "char-jonas", "object": "loc-a"}) + "\n"
+            project = self._project(Path(tmp),
+                                    {"predicate": "located_at", "subject": "char-jonas", "object": "loc-a"},
+                                    with_ontology=True, world=world)
+            write_json(project / "canon" / "ontology.json", {"predicates": [{
+                "name": "located_at", "arity": "binary", "subject_types": ["char"],
+                "object_types": ["loc"], "value_type": "boolean",
+                "exclusive_object_per_subject": True,
+            }]})
+            delta_path = project / "scenes" / "ch01-sc01" / "state-delta.json"
+            delta = json.loads(delta_path.read_text())
+            delta["predicate_changes"] = [{
+                "op": "add", "predicate": "located_at", "subject": "char-jonas", "object": "loc-b",
+            }]
+            write_json(delta_path, delta)
+            critique = hard_audit.audit_scene(project, "ch01-sc01")
+            self.assertTrue(any(
+                f["dimension"] == "ontology" and "multiple active objects" in f["evidence"]
+                for f in critique["findings"]
+            ), critique["findings"])
+
 
 class HardAuditCanonTests(unittest.TestCase):
     def test_clean_canon_only_flags_nothing_material(self) -> None:
@@ -216,6 +637,22 @@ class HardAuditCanonTests(unittest.TestCase):
             clean_deltas(project)
             critique = hard_audit.audit_canon(project)
             self.assertEqual(critique["verdict"], "pass", critique["findings"])
+
+    def test_event_graph_cycle_and_unresolved_edge_are_material(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), [])
+            write_json(project / "planning" / "event-graph.json", {
+                "events": [
+                    {"id": "evt-a", "causes": ["evt-b"]},
+                    {"id": "evt-b", "causes": ["evt-a"]},
+                ],
+                "edges": [{"from": "evt-a", "to": "evt-missing"}],
+            })
+            critique = hard_audit.audit_canon(project)
+            self.assertEqual(critique["verdict"], "revise")
+            evidence = "\n".join(f["evidence"] for f in critique["findings"])
+            self.assertIn("event cycle involves", evidence)
+            self.assertIn("evt-missing", evidence)
 
     def test_backward_time_and_unopened_promise_and_ghost_fact(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -251,10 +688,72 @@ class HardAuditCanonTests(unittest.TestCase):
                 "knowledge_changes": [], "relationship_changes": [], "promises_opened": [], "promises_closed": [],
             })
             write_json(project / "scenes" / "ch01-sc02" / "spec.json", {
-                "id": "ch01-sc02", "narrative_mode": "analepsis", "required_events": [],
+                "id": "ch01-sc02", "narrative_mode": "analepsis", "fabula_time": 1,
+                "required_events": [],
             })
             critique = hard_audit.audit_canon(project)
             self.assertFalse(any(f["dimension"] == "temporal" for f in critique["findings"]), critique["findings"])
+
+    def test_canon_cross_scene_checks_follow_fabula_order(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01", "ch01-sc02"])
+            write_json(project / "planning" / "event-graph.json", {
+                "events": [{"id": "evt-trigger"}, {"id": "evt-payoff"}],
+                "edges": [{"from": "evt-trigger", "to": "evt-payoff"}],
+            })
+            write_json(project / "scenes" / "ch01-sc01" / "spec.json", {
+                "id": "ch01-sc01", "required_events": ["evt-payoff"],
+            })
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": 5,
+                "facts_added": [], "facts_removed": [],
+                "knowledge_changes": [{"character": "char-mara", "fact": "fact-earlier"}],
+                "relationship_changes": [], "promises_opened": [],
+                "promises_closed": ["promise-earlier"],
+            })
+            write_json(project / "scenes" / "ch01-sc02" / "spec.json", {
+                "id": "ch01-sc02", "narrative_mode": "analepsis", "fabula_time": 1,
+                "required_events": ["evt-trigger"],
+            })
+            write_json(project / "scenes" / "ch01-sc02" / "state-delta.json", {
+                "scene_id": "ch01-sc02", "time": 1,
+                "facts_added": [{"id": "fact-earlier", "text": "The earlier fact is true."}],
+                "facts_removed": [], "knowledge_changes": [], "relationship_changes": [],
+                "promises_opened": [{
+                    "id": "promise-earlier", "text": "Resolve the earlier signal.",
+                    "trigger_event": "evt-trigger", "payoff_event": "evt-payoff",
+                }],
+                "promises_closed": [],
+            })
+
+            critique = hard_audit.audit_canon(project)
+            self.assertEqual(critique["verdict"], "pass", critique["findings"])
+            evidence = "\n".join(f["evidence"] for f in critique["findings"])
+            self.assertNotIn("never opened", evidence)
+            self.assertNotIn("does not exist", evidence)
+
+    def test_scene_before_seed_is_material_temporal_error(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01"])
+            write_json(project / "scenes" / "ch01-sc01" / "spec.json", {
+                "id": "ch01-sc01", "narrative_mode": "analepsis", "fabula_time": -1,
+                "required_events": [],
+            })
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": -1,
+                "facts_added": [], "facts_removed": [], "knowledge_changes": [],
+                "relationship_changes": [], "promises_opened": [], "promises_closed": [],
+            })
+            scene_critique = hard_audit.audit_scene(project, "ch01-sc01")
+            canon_critique = hard_audit.audit_canon(project)
+            self.assertTrue(any(
+                f["dimension"] == "temporal" and "precedes seed canon time" in f["evidence"]
+                for f in scene_critique["findings"]
+            ), scene_critique["findings"])
+            self.assertTrue(any(
+                f["dimension"] == "temporal" and "precedes seed" in f["evidence"]
+                for f in canon_critique["findings"]
+            ), canon_critique["findings"])
 
     def test_backward_time_in_linear_narration_still_flagged(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -270,6 +769,26 @@ class HardAuditCanonTests(unittest.TestCase):
             critique = hard_audit.audit_canon(project)
             self.assertTrue(any(f["dimension"] == "temporal" for f in critique["findings"]))
 
+    def test_iso_times_compare_chronologically_across_separator_styles(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01", "ch01-sc02"])
+            write(
+                project / "canon" / "timeline.jsonl",
+                json.dumps({"time": "2026-09-28T08:00:00"}) + "\n",
+            )
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": "2026-09-28T09:00:00",
+                "facts_added": [], "facts_removed": [], "knowledge_changes": [],
+                "relationship_changes": [], "promises_opened": [], "promises_closed": [],
+            })
+            write_json(project / "scenes" / "ch01-sc02" / "state-delta.json", {
+                "scene_id": "ch01-sc02", "time": "2026-09-28 10:00:00",
+                "facts_added": [], "facts_removed": [], "knowledge_changes": [],
+                "relationship_changes": [], "promises_opened": [], "promises_closed": [],
+            })
+            critique = hard_audit.audit_canon(project)
+            self.assertFalse(any(f["dimension"] == "temporal" for f in critique["findings"]), critique["findings"])
+
     def test_open_promise_reported_as_minor(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project = base_project(Path(tmp), ["ch01-sc01"])
@@ -282,6 +801,92 @@ class HardAuditCanonTests(unittest.TestCase):
             critique = hard_audit.audit_canon(project)
             self.assertTrue(any(f["dimension"] == "promise" and f["severity"] == "minor"
                                 for f in critique["findings"]))
+
+    def test_triggered_promise_unpaid_at_end_is_material(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01"])
+            write_json(project / "planning" / "event-graph.json", {
+                "events": [{"id": "evt-trigger"}, {"id": "evt-payoff"}], "edges": []})
+            write_json(project / "scenes" / "ch01-sc01" / "spec.json", {
+                "id": "ch01-sc01", "required_events": ["evt-trigger"]})
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": 1,
+                "facts_added": [], "facts_removed": [], "knowledge_changes": [],
+                "relationship_changes": [],
+                "promises_opened": [{"id": "promise-triggered", "text": "Answer the signal.",
+                                      "trigger_event": "evt-trigger", "payoff_event": "evt-payoff"}],
+                "promises_closed": [],
+            })
+            critique = hard_audit.audit_canon(project)
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any(f["dimension"] == "promise" and f["severity"] == "material"
+                                and "triggered by evt-trigger" in f["evidence"]
+                                for f in critique["findings"]), critique["findings"])
+
+    def test_payoff_event_must_close_promise_in_same_scene(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01", "ch01-sc02"])
+            write_json(project / "planning" / "event-graph.json", {
+                "events": [{"id": "evt-trigger"}, {"id": "evt-payoff"}], "edges": []})
+            write_json(project / "scenes" / "ch01-sc01" / "spec.json", {
+                "id": "ch01-sc01", "required_events": ["evt-trigger"]})
+            write_json(project / "scenes" / "ch01-sc02" / "spec.json", {
+                "id": "ch01-sc02", "required_events": ["evt-payoff"]})
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": 1, "facts_added": [], "facts_removed": [],
+                "knowledge_changes": [], "relationship_changes": [],
+                "promises_opened": [{"id": "promise-triggered", "text": "Answer the signal.",
+                                      "trigger_event": "evt-trigger", "payoff_event": "evt-payoff"}],
+                "promises_closed": [],
+            })
+            write_json(project / "scenes" / "ch01-sc02" / "state-delta.json", {
+                "scene_id": "ch01-sc02", "time": 2, "facts_added": [], "facts_removed": [],
+                "knowledge_changes": [], "relationship_changes": [], "promises_opened": [],
+                "promises_closed": [],
+            })
+            critique = hard_audit.audit_canon(project)
+            self.assertTrue(any("payoff event" in f["diagnosis"] for f in critique["findings"]), critique["findings"])
+
+    def test_promise_event_references_must_resolve(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01"])
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": 1, "facts_added": [], "facts_removed": [],
+                "knowledge_changes": [], "relationship_changes": [],
+                "promises_opened": [{"id": "promise-bad", "text": "Mystery",
+                                      "trigger_event": "evt-missing"}],
+                "promises_closed": [],
+            })
+            critique = hard_audit.audit_canon(project)
+            self.assertTrue(any("does not resolve" in f["diagnosis"] for f in critique["findings"]), critique["findings"])
+
+    def test_fact_id_cannot_change_meaning(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = base_project(Path(tmp), ["ch01-sc01", "ch01-sc02"])
+            write(project / "canon" / "facts.jsonl",
+                  json.dumps({"id": "fact-code", "text": "Door code is 1111"}) + "\n")
+            write(project / "canon" / "knowledge-state.jsonl",
+                  json.dumps({"character": "char-mara", "fact": "fact-code"}) + "\n")
+            write_json(project / "scenes" / "ch01-sc01" / "state-delta.json", {
+                "scene_id": "ch01-sc01", "time": 1,
+                "facts_added": [{"id": "fact-code", "text": "Door code is 2222"}],
+                "facts_removed": [], "knowledge_changes": [], "relationship_changes": [],
+                "promises_opened": [], "promises_closed": [],
+            })
+            write_json(project / "scenes" / "ch01-sc02" / "state-delta.json", {
+                "scene_id": "ch01-sc02", "time": 2,
+                "facts_added": [], "facts_removed": [], "knowledge_changes": [],
+                "relationship_changes": [], "promises_opened": [], "promises_closed": [],
+            })
+
+            critique = hard_audit.audit_canon(project)
+            self.assertEqual(critique["verdict"], "revise")
+            self.assertTrue(any(f["dimension"] == "factual" and "fact-code" in f["evidence"]
+                                for f in critique["findings"]))
+
+            before_second = hard_audit.reconstruct_state_before(project, "ch01-sc02")
+            self.assertEqual(before_second.facts["fact-code"], "Door code is 1111")
+            self.assertTrue(before_second.knows("char-mara", "fact-code"))
 
 
 if __name__ == "__main__":

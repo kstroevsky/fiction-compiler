@@ -7,11 +7,12 @@ the reconstructed state *before* the scene, so it can never contain what a later
 from __future__ import annotations
 
 import json
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
+from . import plan_search
 from .state import reconstruct_state_before
-from .workspace import RUNS
 
 _PROJECT_KEEP = ["id", "title", "form", "audience", "reader_contract", "theme_question", "constraints", "desired_affect"]
 
@@ -34,7 +35,16 @@ def compile_bundle(project: Path, scene_id: str) -> dict:
             character_sheets.append(data)
 
     before = reconstruct_state_before(project, scene_id)
-    knowledge = {c: sorted(before.knowledge.get(c, set())) for c in participant_set if c in before.knowledge}
+    knowledge_view = before.knowledge
+    knowledge = {c: sorted(knowledge_view.get(c, set())) for c in participant_set if c in knowledge_view}
+    memory = {c: sorted(before.memory.get(c, set())) for c in participant_set if c in before.memory}
+    beliefs = {
+        c: [
+            {"fact": fact_id, "value": value, **before.belief_sources.get(c, {}).get(fact_id, {})}
+            for fact_id, value in sorted(before.beliefs.get(c, {}).items())
+        ]
+        for c in participant_set if c in before.beliefs
+    }
     relationships = [
         {"subject": subject, "object": obj, "dimensions": dims}
         for (subject, obj), dims in before.relationships.items()
@@ -44,6 +54,11 @@ def compile_bundle(project: Path, scene_id: str) -> dict:
         {"predicate": predicate, "subject": subject, "object": obj, "value": value}
         for (predicate, subject, obj), value in before.predicates.items()
         if subject in participant_set or obj in participant_set
+    ]
+    resources = [
+        {"resource": resource, "holder": holder, "quantity": quantity,
+         **({"unit": before.resource_units[resource]} if resource in before.resource_units else {})}
+        for (resource, holder), quantity in sorted(before.resources.items())
     ]
     canon_index = _load(project / "canon" / "index.json", {})
 
@@ -60,6 +75,17 @@ def compile_bundle(project: Path, scene_id: str) -> dict:
         context_manifest.append({"kind": "fact", "ref": fact_id,
                                  "reason": "required knowledge for the scene" if needed else "established before the scene",
                                  "priority": "required" if needed else "background", "source": "canon"})
+    for character, items in beliefs.items():
+        for belief in items:
+            context_manifest.append({
+                "kind": "belief", "ref": f"{character}:{belief['fact']}",
+                "reason": "participant epistemic state", "priority": "reference",
+                "source": "reconstructed state"})
+    for item in resources:
+        context_manifest.append({
+            "kind": "resource", "ref": f"{item['resource']}@{item['holder']}",
+            "reason": "declared load-bearing quantity", "priority": "reference",
+            "source": "reconstructed state"})
     for promise_id in before.open_promises:
         context_manifest.append({"kind": "promise", "ref": promise_id, "reason": "open obligation",
                                  "priority": "reference", "source": "canon"})
@@ -77,28 +103,43 @@ def compile_bundle(project: Path, scene_id: str) -> dict:
         "participants": character_sheets,
         "state_before": {
             "time": before.time,
+            "reconstruction_order": before.reconstruction_order,
+            "reconstruction_issues": before.reconstruction_issues,
             "facts": before.facts,
             "participant_knowledge": knowledge,
+            "participant_memory": memory,
+            "participant_beliefs": beliefs,
             "relationships": relationships,
             "predicates": predicates,
+            "resources": resources,
             "open_promises": before.open_promises,
+            "promise_definitions": {
+                promise_id: before.promise_definitions.get(promise_id, {"id": promise_id, "text": text})
+                for promise_id, text in before.open_promises.items()
+            },
         },
         "world_rules": canon_index.get("world_rules", []),
         "context_manifest": context_manifest,
         "discourse_plan": _load(project / "planning" / "discourse-plan.json", {}),
         "style_profile": _load(project / "planning" / "style-profile.json", {}),
+        "selected_scene_plans": plan_search.selected_plans(project, scene_id),
         "note": (
-            "state_before is reconstructed from seed canon + accepted deltas only; it cannot "
-            "contain anything a later scene introduces. Add targeted missing canon if needed; "
-            "never paste the whole project."
+            "state_before is reconstructed from seed canon + accepted deltas, using fabula order "
+            "when comparable timestamps are available; reconstruction_issues exposes any legacy "
+            "fallback. Current truth, retained memory, possibly "
+            "mistaken belief, and declared load-bearing resources are represented separately. "
+            "Add targeted missing canon if needed; "
+            "never paste the whole project. selected_scene_plans contains only an explicitly "
+            "reviewed/selected plan set when this project uses plan-level search."
         ),
         "generated_at": datetime.now(timezone.utc).isoformat(),
     }
 
 
-def write_bundle(bundle: dict, scene_id: str) -> Path:
-    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    out_dir = RUNS / run_id / scene_id
+def write_bundle(bundle: dict, project: Path, scene_id: str) -> Path:
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
+    run_id = f"{stamp}-{uuid.uuid4().hex[:12]}"
+    out_dir = project / ".runs" / "context" / scene_id / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
     out = out_dir / "context-bundle.json"
     out.write_text(json.dumps(bundle, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

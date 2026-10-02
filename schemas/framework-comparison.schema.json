@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "framework-comparison.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "change_id", "comparison_id", "objective", "prepared_by", "baseline_fingerprint", "after_fingerprint", "outputs", "label_map", "prepared_at"],
+  "properties": {
+    "schema_version": {"type": "integer", "minimum": 1, "maximum": 1},
+    "change_id": {"type": "string", "minLength": 1},
+    "comparison_id": {"type": "string", "pattern": "^comparison-[0-9a-f]{32}$"},
+    "objective": {"type": "string", "minLength": 1},
+    "prepared_by": {"type": "string", "minLength": 1},
+    "baseline_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "after_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["before", "after"],
+      "properties": {
+        "before": {"type": "object", "required": ["text", "sha256"], "properties": {"text": {"type": "string"}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+        "after": {"type": "object", "required": ["text", "sha256"], "properties": {"text": {"type": "string"}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}
+      }
+    },
+    "label_map": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["A", "B"],
+      "properties": {"A": {"enum": ["before", "after"]}, "B": {"enum": ["before", "after"]}}
+    },
+    "prepared_at": {"type": "string", "minLength": 1}
+  }
+}

@@ -38,6 +38,9 @@ def main() -> int:
         raise SystemExit("prose-claims artifact is invalid:\n" + "\n".join(errors))
 
     critique = prose_audit.audit_prose(project, args.scene_id, claims)
+    if "error" in critique:
+        print(f"[ERROR] {args.scene_id} prose-audit: {critique['error']}")
+        return 2
     print(f"[{critique['verdict'].upper()}] {args.scene_id} prose-audit ({len(critique['findings'])} findings)")
     for finding in critique["findings"]:
         print(f"  - {finding['severity']:8} {finding['dimension']:11} {finding['evidence']}")

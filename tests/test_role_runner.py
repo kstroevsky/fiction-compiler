@@ -5,7 +5,9 @@ import os
 import sys
 import tempfile
 import unittest
+import urllib.error
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -75,6 +77,16 @@ class ParseTests(unittest.TestCase):
         with self.assertRaises(MalformedVendorOutput):
             role_runner.parse_vendor_critique("   ")
 
+    def test_rejects_non_finite_confidence_and_incomplete_findings(self) -> None:
+        with self.assertRaises(MalformedVendorOutput):
+            role_runner.parse_vendor_critique(
+                '{"verdict":"pass","confidence":NaN,"findings":[]}'
+            )
+        with self.assertRaises(MalformedVendorOutput):
+            role_runner.parse_vendor_critique(
+                '{"verdict":"revise","confidence":0.5,"findings":[{"severity":"material"}]}'
+            )
+
 
 class RosterTests(unittest.TestCase):
     def test_loads_repo_roster_with_derived_audit_class(self) -> None:
@@ -127,7 +139,72 @@ class PersonaAndMessageTests(unittest.TestCase):
             # candidate_strategies must not survive as a data key in the brief the judge is handed
             self.assertNotIn("SECRET A/B intent", user)
             self.assertNotIn("candidate_strategies", json.loads(user)["scene_brief"])
+            self.assertEqual(json.loads(user)["candidate"]["name"], "submission.md")
+            self.assertNotIn("candidate-a.md", user)
             self.assertIn("UNTRUSTED", user)  # candidate is fenced as data
+
+    def test_role_specific_packets_separate_reader_plan_and_reviewer_evidence(self) -> None:
+        from fiction_compiler.tools import judge_bundle
+        with tempfile.TemporaryDirectory() as tmp:
+            root, _ = _scene(tmp)
+            (root / "brief").mkdir(parents=True)
+            (root / "brief" / "project.json").write_text(json.dumps({
+                "reader_contract": "Reader should experience uncertainty.",
+                "desired_affect": "dread",
+                "theme_question": "Who is responsible?",
+            }), encoding="utf-8")
+            (root / "planning").mkdir(parents=True)
+            (root / "planning" / "style-profile.json").write_text(json.dumps({"voice": "plain"}), encoding="utf-8")
+            (root / "planning" / "discourse-plan.json").write_text(json.dumps({"order": ["ch01-sc01"]}), encoding="utf-8")
+
+            reader = judge_bundle(str(root), "ch01-sc01", "candidate-a.md", role="adversarial-reader")
+            self.assertEqual(reader["view"], "experiential-reader")
+            self.assertNotIn("scene_brief", reader)
+            self.assertNotIn("desired_affect", reader["contract"])
+            self.assertNotIn("theme_question", reader["contract"])
+
+            style = judge_bundle(str(root), "ch01-sc01", "candidate-a.md", role="style-editor")
+            self.assertEqual(style["style_profile"], {"voice": "plain"})
+            self.assertNotIn("turn", style["scene_brief"])
+
+            architect = judge_bundle(str(root), "ch01-sc01", "candidate-a.md", role="narrative-architect")
+            self.assertIn("turn", architect["scene_brief"])
+            self.assertEqual(architect["discourse_plan"], {"order": ["ch01-sc01"]})
+
+            for packet in (reader, style, architect):
+                encoded = json.dumps(packet)
+                self.assertNotIn("SECRET A/B intent", encoded)
+                self.assertNotIn("candidate-a.md", encoded)
+
+    def test_continuity_and_character_packets_include_local_state(self) -> None:
+        from fiction_compiler.tools import judge_bundle
+        with tempfile.TemporaryDirectory() as tmp:
+            root, _ = _scene(tmp)
+            canon = root / "canon"
+            canon.mkdir(parents=True)
+            (canon / "index.json").write_text(json.dumps({"accepted_state_deltas": []}), encoding="utf-8")
+            (canon / "facts.jsonl").write_text("", encoding="utf-8")
+            (canon / "knowledge-state.jsonl").write_text("", encoding="utf-8")
+            (canon / "relationship-state.jsonl").write_text("", encoding="utf-8")
+            (canon / "promises.jsonl").write_text("", encoding="utf-8")
+            (canon / "timeline.jsonl").write_text("", encoding="utf-8")
+            (canon / "characters").mkdir()
+            (canon / "characters" / "jo.json").write_text(json.dumps({"id": "Jo", "values": ["duty"]}), encoding="utf-8")
+
+            continuity = judge_bundle(str(root), "ch01-sc01", "candidate-a.md", role="continuity-auditor")
+            self.assertEqual(continuity["view"], "canon-aware-continuity")
+            self.assertIn("state_before", continuity)
+            self.assertIn("participants", continuity)
+
+            character = judge_bundle(str(root), "ch01-sc01", "candidate-a.md", role="character-simulator")
+            self.assertEqual(character["view"], "character-local-state")
+            self.assertEqual(character["participants"][0]["id"], "Jo")
+            self.assertIn("participant_knowledge", character["state_before"])
+
+    def test_explicit_persona_path_cannot_escape_repo(self) -> None:
+        a = Assignment("style-editor", "gemini", "m", persona_file="/etc/passwd")
+        with self.assertRaisesRegex(ValueError, "escapes"):
+            role_runner.resolve_persona(a)
 
 
 class RunRoleTests(unittest.TestCase):
@@ -141,6 +218,8 @@ class RunRoleTests(unittest.TestCase):
             self.assertIsNone(r["consistency_problem"])
             self.assertEqual(r["provenance"]["vendor"], "anthropic")
             self.assertEqual(r["provenance"]["model"], "claude-opus-4-8")
+            self.assertEqual(r["provenance"]["provider_response"]["usage"], {})
+            self.assertGreaterEqual(r["provenance"]["provider_response"]["latency_ms"], 0)
             self.assertEqual(r["provenance"]["candidate_sha256"],
                              integrity.sha256_file(scene / "candidates" / "candidate-a.md"))
             self.assertIsNone(r["recorded"])
@@ -207,6 +286,90 @@ class RunRoleTests(unittest.TestCase):
                                      roster=_roster(), transport=OfflineTransport(responder={"*": "{}"}))
             self.assertIn("error", r)
 
+    def test_candidate_replaced_during_vendor_call_remains_bound_to_sent_bytes(self) -> None:
+        class MutatingTransport:
+            def __init__(self, path: Path):
+                self.path = path
+
+            def complete(self, system: str, user: str, model: str, **params: object) -> str:
+                self.path.write_text("Replacement prose.", encoding="utf-8")
+                return '{"verdict":"pass","confidence":0.9,"findings":[]}'
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root, scene = _scene(tmp)
+            candidate = scene / "candidates" / "candidate-a.md"
+            sent_sha = integrity.sha256_file(candidate)
+            result = role_runner.run_role(
+                str(root), "ch01-sc01", "candidate-a.md", "adversarial-reader",
+                roster=_roster(), transport=MutatingTransport(candidate), record=True)
+            self.assertEqual(result["provenance"]["candidate_sha256"], sent_sha)
+            self.assertTrue(result["recorded"]["stale_input"])
+            recorded = json.loads((root / result["recorded"]["written"]).read_text())
+            self.assertEqual(recorded["candidate_sha256"], sent_sha)
+            self.assertNotEqual(recorded["candidate_sha256"], integrity.sha256_file(candidate))
+            self.assertTrue((root / result["provenance"]["attempt_artifact"]).exists())
+            from fiction_compiler import critique
+            status = critique.scene_status(root, "ch01-sc01", "candidate-a.md")
+            self.assertFalse(status["audit_gate"]["ready"])
+
+    def test_completion_usage_is_preserved_in_attempt_and_recorded_provenance(self) -> None:
+        class MeteredTransport:
+            def complete(self, system: str, user: str, model: str, **params: object):
+                return role_runner.CompletionResult(
+                    text='{"verdict":"pass","confidence":0.9,"findings":[]}',
+                    input_tokens=120,
+                    output_tokens=30,
+                    total_tokens=150,
+                    provider_request_id="req-test",
+                    response_model="provider-model-version",
+                    finish_reason="stop",
+                )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root, _ = _scene(tmp)
+            result = role_runner.run_role(
+                str(root), "ch01-sc01", "candidate-a.md", "adversarial-reader",
+                roster=_roster(), transport=MeteredTransport(), record=True)
+            provider = result["provenance"]["provider_response"]
+            self.assertEqual(provider["usage"], {
+                "input_tokens": 120, "output_tokens": 30, "total_tokens": 150,
+            })
+            self.assertEqual(provider["provider_request_id"], "req-test")
+            attempt = json.loads((root / result["provenance"]["attempt_artifact"]).read_text())
+            self.assertEqual(attempt["provider_response"]["usage"]["total_tokens"], 150)
+            recorded = json.loads((root / result["recorded"]["written"]).read_text())
+            self.assertEqual(recorded["provenance"]["provider_response"]["usage"], provider["usage"])
+
+    def test_malformed_output_still_preserves_provider_usage(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root, _ = _scene(tmp)
+            tp = OfflineTransport(responder=lambda *args: role_runner.CompletionResult(
+                text="not json", input_tokens=17, output_tokens=3))
+            with self.assertRaises(MalformedVendorOutput):
+                role_runner.run_role(
+                    str(root), "ch01-sc01", "candidate-a.md", "adversarial-reader",
+                    roster=_roster(), transport=tp)
+            attempts = list((root / ".runs" / "reviews" / "ch01-sc01").glob("*.json"))
+            self.assertEqual(len(attempts), 1)
+            attempt = json.loads(attempts[0].read_text())
+            self.assertEqual(attempt["validation"]["status"], "invalid")
+            self.assertEqual(attempt["provider_response"]["usage"], {
+                "input_tokens": 17, "output_tokens": 3, "total_tokens": 20,
+            })
+
+    def test_transport_failure_records_attempt_without_invented_usage(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root, _ = _scene(tmp)
+            with self.assertRaises(VendorUnavailable):
+                role_runner.run_role(
+                    str(root), "ch01-sc01", "candidate-a.md", "adversarial-reader",
+                    roster=_roster(), transport=_BoomTransport())
+            attempts = list((root / ".runs" / "reviews" / "ch01-sc01").glob("*.json"))
+            self.assertEqual(len(attempts), 1)
+            attempt = json.loads(attempts[0].read_text())
+            self.assertEqual(attempt["validation"]["status"], "transport_error")
+            self.assertEqual(attempt["provider_response"]["usage"], {})
+
 
 class PanelTests(unittest.TestCase):
     def test_disagreement_is_reported_not_averaged(self) -> None:
@@ -242,6 +405,17 @@ class PanelTests(unittest.TestCase):
             self.assertEqual(len(errored), 1)
             self.assertIn("VendorUnavailable", errored[0]["error"])
             self.assertEqual(panel["verdicts"], {"style-editor": "pass"})
+            self.assertFalse(panel["completion"]["complete"])
+
+    def test_total_panel_failure_is_incomplete_not_unanimous(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root, _ = _scene(tmp)
+            panel = role_runner.run_panel(
+                str(root), "ch01-sc01", "candidate-a.md", ["adversarial-reader", "style-editor"],
+                roster=_roster(), transport_for=lambda role: _BoomTransport())
+            self.assertEqual(panel["completion"]["completed"], 0)
+            self.assertFalse(panel["completion"]["complete"])
+            self.assertFalse(panel["disagreement"]["unanimous"])
 
 
 class _BoomTransport:
@@ -270,6 +444,61 @@ class TransportTests(unittest.TestCase):
         self.assertEqual(tp.complete("s", "u", "other"), "DEFAULT")
         with self.assertRaises(VendorUnavailable):
             OfflineTransport(responder={"model-x": "X"}).complete("s", "u", "no-match")
+
+    def test_http_errors_redact_query_credentials(self) -> None:
+        with mock.patch("urllib.request.urlopen", side_effect=urllib.error.URLError("offline")):
+            with self.assertRaises(VendorUnavailable) as ctx:
+                role_runner._http_post_json(
+                    "https://example.invalid/path?key=super-secret", {}, {"x": 1})
+        self.assertNotIn("super-secret", str(ctx.exception))
+
+    def test_anthropic_normalizes_usage_and_response_metadata(self) -> None:
+        payload = {
+            "id": "msg_123", "model": "claude-test", "stop_reason": "end_turn",
+            "content": [{"type": "text", "text": "ok"}],
+            "usage": {"input_tokens": 11, "output_tokens": 7},
+        }
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test"}), \
+                mock.patch.object(role_runner, "_http_post_json", return_value=payload):
+            result = role_runner.AnthropicHTTP().complete("s", "u", "claude-test")
+        self.assertEqual(result.text, "ok")
+        self.assertEqual((result.input_tokens, result.output_tokens, result.total_tokens), (11, 7, 18))
+        self.assertEqual(result.provider_request_id, "msg_123")
+        self.assertEqual(result.finish_reason, "end_turn")
+
+    def test_openai_normalizes_usage_without_coercing_invalid_counts(self) -> None:
+        payload = {
+            "id": "chatcmpl_123", "model": "gpt-test",
+            "choices": [{"message": {"content": "ok"}, "finish_reason": "stop"}],
+            "usage": {"prompt_tokens": 9, "completion_tokens": True, "total_tokens": "10"},
+        }
+        with mock.patch.dict(os.environ, {"OPENAI_API_KEY": "test"}), \
+                mock.patch.object(role_runner, "_http_post_json", return_value=payload):
+            result = role_runner.OpenAIHTTP().complete("s", "u", "gpt-test")
+        self.assertEqual(result.input_tokens, 9)
+        self.assertIsNone(result.output_tokens)
+        self.assertIsNone(result.total_tokens)
+        self.assertEqual(result.response_model, "gpt-test")
+
+    def test_gemini_normalizes_usage_and_metadata(self) -> None:
+        payload = {
+            "responseId": "resp-123", "modelVersion": "gemini-test-001",
+            "candidates": [{
+                "content": {"parts": [{"text": "o"}, {"text": "k"}]},
+                "finishReason": "STOP",
+            }],
+            "usageMetadata": {
+                "promptTokenCount": 8, "candidatesTokenCount": 4, "totalTokenCount": 12,
+            },
+        }
+        with mock.patch.dict(os.environ, {"GEMINI_API_KEY": "test"}), \
+                mock.patch.object(role_runner, "_http_post_json", return_value=payload):
+            result = role_runner.GeminiHTTP().complete("s", "u", "gemini-test")
+        self.assertEqual(result.text, "ok")
+        self.assertEqual((result.input_tokens, result.output_tokens, result.total_tokens), (8, 4, 12))
+        self.assertEqual(result.provider_request_id, "resp-123")
+        self.assertEqual(result.response_model, "gemini-test-001")
+        self.assertEqual(result.finish_reason, "STOP")
 
 
 if __name__ == "__main__":

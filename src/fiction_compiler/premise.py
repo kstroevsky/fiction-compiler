@@ -37,15 +37,18 @@ PROBES_PATH = ROOT / "premise-probes.json"
 # whose candidates collapse to fewer than MIN_DISTINCT_SIGNATURES architectures, is a search that
 # never really diverged.
 MIN_CANDIDATES = 3
-MIN_DISTINCT_SIGNATURES = 3
+MIN_DISTINCT_LOGLINES = 3
 
 
-def load_probes(path: Path | None = None) -> list[dict]:
+def load_probes(path: Path | None = None, *, profile: str = "core") -> list[dict]:
     """The fixed diagnostic rubric (data, not code). Returns [] if the file is absent."""
     path = path or PROBES_PATH
     if not path.exists():
         return []
-    return json.loads(path.read_text(encoding="utf-8")).get("probes", [])
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if profile == "core":
+        return data.get("probes", [])
+    return data.get("profiles", {}).get(profile, [])
 
 
 def architecture_signature(candidate: dict) -> tuple:
@@ -56,10 +59,16 @@ def architecture_signature(candidate: dict) -> tuple:
     story approaches its feeling directly or obliquely.
     """
     return (
-        candidate.get("pov_character") == candidate.get("transforming_character"),
+        candidate.get("pov_character") == candidate.get("transforming_character")
+        if candidate.get("transforming_character") is not None else None,
         candidate.get("conflict_type"),
         candidate.get("obliqueness"),
+        candidate.get("resolution_type"),
     )
+
+
+def _normalized_logline(candidate: dict) -> str:
+    return " ".join(str(candidate.get("logline", "")).lower().split())
 
 
 def diversity_floor(candidates: list[dict]) -> dict:
@@ -77,27 +86,24 @@ def diversity_floor(candidates: list[dict]) -> dict:
         errs = schema.validate_named(cand, "premise")
         if errs:
             issues.append(f"candidate {label!r}: invalid premise ({'; '.join(errs)})")
-        if not str(cand.get("why_not_default", "")).strip():
-            issues.append(
-                f"candidate {label!r}: missing 'why_not_default' — state how it departs from the "
-                "first, most-probable premise"
-            )
     signatures = {architecture_signature(c) for c in candidates}
-    if candidates and len(signatures) < MIN_DISTINCT_SIGNATURES:
+    loglines = {_normalized_logline(c) for c in candidates if _normalized_logline(c)}
+    if candidates and len(loglines) < MIN_DISTINCT_LOGLINES:
         issues.append(
-            f"premise batch collapsed toward one shape: only {len(signatures)} distinct "
-            f"architecture(s) across {len(candidates)} candidate(s) (need {MIN_DISTINCT_SIGNATURES}); "
-            "vary the on-/off-camera arc, the conflict type, and the obliqueness"
+            f"premise batch contains only {len(loglines)} distinct normalized logline(s) across "
+            f"{len(candidates)} candidate(s) (need {MIN_DISTINCT_LOGLINES}); relabeling the same "
+            "premise does not count as wider search"
         )
     return {
         "ok": not issues,
         "issues": issues,
         "distinct_architectures": len(signatures),
+        "distinct_loglines": len(loglines),
         "candidates": len(candidates),
     }
 
 
-def probe_report(candidates: list[dict], path: Path | None = None) -> dict:
+def probe_report(candidates: list[dict], path: Path | None = None, *, profile: str = "core") -> dict:
     """Pair the fixed rubric with the batch for the human gate. Diagnoses; does not select.
 
     Returns the divergence-floor result plus the probe questions, so the human ``premise`` gate sees
@@ -106,7 +112,8 @@ def probe_report(candidates: list[dict], path: Path | None = None) -> dict:
     """
     return {
         "floor": diversity_floor(candidates),
-        "probes": load_probes(path),
-        "note": "The floor is deterministic and only forces divergence; the probes only diagnose. "
-                "Selection is the human premise gate.",
+        "probe_profile": profile,
+        "probes": load_probes(path, profile=profile),
+        "note": "The floor verifies search evidence only; declared tags and probes diagnose. "
+                "They do not establish quality or select a premise.",
     }

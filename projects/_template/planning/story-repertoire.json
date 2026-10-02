@@ -1,0 +1,13 @@
+{
+  "project_id": "replace-me",
+  "evidence_basis": "plan-only",
+  "complete_story": false,
+  "features": {
+    "ending_form_tags": [],
+    "turn_tags": [],
+    "resolution_tags": [],
+    "object_motifs": [],
+    "focalization_tags": []
+  },
+  "notes": "Use project-local descriptive tags. Do not treat repetition as a quality failure or optimize for detector evasion."
+}

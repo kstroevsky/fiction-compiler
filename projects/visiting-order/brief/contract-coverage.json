@@ -1,0 +1,35 @@
+{
+  "project_id": "visiting-order",
+  "clauses": [
+    {
+      "text": "6-8 pages, single sitting",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "close third person, one focalizer (Lena)",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "strictly linear: one afternoon, arrival to leaving; no flashback, no framing device",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "an interpersonal problem that no proof can settle; the turn is Lena's choice, made on camera",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "sensory, plainspoken prose; feeling carried by the mechanics of the visit and physical detail, never named",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "resolves by refusal: nothing is forgiven, the mother is not restored, the old imbalance is not healed, and Danny never learns the truth",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    }
+  ]
+}

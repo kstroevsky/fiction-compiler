@@ -23,6 +23,7 @@ _CAP_PER_CATEGORY = 8
 _SEVERITY_RANK = {"minor": 0, "material": 1, "fatal": 2}
 _SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+")
 _OPENER_RUN = 3  # this many consecutive sentences sharing an opener == monotony
+_DOUBLE_QUOTED = re.compile(r'"[^"\n]*"|“[^”\n]*”')
 
 
 def load_catalog() -> dict:
@@ -44,14 +45,24 @@ def _word_count(text: str) -> int:
     return len(re.findall(r"\b\w+\b", text))
 
 
+def _inside_quotation(line: str, start: int, end: int) -> bool:
+    """Whether a match is fully inside a same-line double-quoted span."""
+    return any(span.start() <= start and end <= span.end() for span in _DOUBLE_QUOTED.finditer(line))
+
+
 def _scan_lines(text: str, category: str, spec: dict, findings: list[dict]) -> None:
     severity = spec.get("severity", "minor")
     compiled = [re.compile(p, re.IGNORECASE) for p in spec.get("patterns", [])]
-    hits: list[tuple[int, str, str]] = []  # (line_no, matched_text, line_text)
+    hits: list[tuple[int, str, str, bool]] = []  # line_no, matched_text, line_text, quoted
     for line_no, line in enumerate(text.splitlines(), start=1):
         for pattern in compiled:
             for match in pattern.finditer(line):
-                hits.append((line_no, match.group(0), line.strip()))
+                hits.append((
+                    line_no,
+                    match.group(0),
+                    line.strip(),
+                    _inside_quotation(line, match.start(), match.end()),
+                ))
 
     # Density-gated categories only fire when they exceed a per-1000-words rate.
     density_limit = spec.get("density_per_1000_words")
@@ -68,11 +79,21 @@ def _scan_lines(text: str, category: str, spec: dict, findings: list[dict]) -> N
         ))
         return
 
-    for line_no, matched, line_text in hits[:_CAP_PER_CATEGORY]:
+    for line_no, matched, line_text, quoted in hits[:_CAP_PER_CATEGORY]:
+        finding_severity = "minor" if quoted and severity in ("material", "fatal") else severity
+        diagnosis = _DIAGNOSIS.get(
+            category,
+            "Model-default phrasing; verify it earns its place or repair a lower layer.",
+        )
+        if quoted:
+            diagnosis = (
+                "Quoted language may be character voice, citation, parody, or deliberate cliché; "
+                "treat this match as contextual evidence, not a mechanical prose defect. " + diagnosis
+            )
         findings.append(_finding(
-            severity,
+            finding_severity,
             f"L{line_no}: {matched!r} in “{line_text[:120]}”",
-            _DIAGNOSIS.get(category, "Model-default phrasing; verify it earns its place or repair a lower layer."),
+            diagnosis,
         ))
     extra = len(hits) - _CAP_PER_CATEGORY
     if extra > 0:

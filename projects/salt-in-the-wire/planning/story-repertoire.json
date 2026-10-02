@@ -1,0 +1,13 @@
+{
+  "project_id": "salt-in-the-wire",
+  "evidence_basis": "partial-manuscript",
+  "complete_story": false,
+  "features": {
+    "ending_form_tags": [],
+    "turn_tags": ["evidence-forces-reframing"],
+    "resolution_tags": [],
+    "object_motifs": ["relay", "chart", "water"],
+    "focalization_tags": ["close-third", "fixed-internal"]
+  },
+  "notes": "Only two of three planned scenes are present in the manuscript; ending and final resolution tags remain unknown and are excluded from complete-story frequency claims."
+}

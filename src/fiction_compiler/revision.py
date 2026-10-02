@@ -145,6 +145,7 @@ def evaluate_revision(
     after: list[dict],
     *,
     target_dimension: str | None = None,
+    target_evidence: str | None = None,
     iteration: int = 1,
     max_iterations: int = 3,
     max_attempts_per_layer: int = 2,
@@ -153,11 +154,18 @@ def evaluate_revision(
 ) -> RevisionOutcome:
     """Decide the fate of one revision against the previous version's critiques.
 
-    ``target_dimension`` is the defect the revision was meant to fix (e.g. "defaultness",
-    "knowledge"). If omitted, the target is the total count of serious (material+fatal) findings.
+    ``target_dimension`` is the defect family the revision was meant to fix (e.g. "defaultness",
+    "knowledge"). ``target_evidence`` optionally pins one exact finding identity within that
+    dimension. Without exact evidence, acceptance requires all serious pre-existing findings in the
+    target dimension to be fixed (or all target findings when none are serious), so removing an
+    unrelated minor sibling cannot masquerade as repairing a material target. If the dimension is
+    omitted, the target is the total set of serious (material+fatal) findings.
     ``waivers`` are findings (by dimension + evidence) deliberately accepted with a reason; a waived
     finding neither blocks acceptance nor counts as a regression.
     """
+    if target_evidence is not None and target_dimension is None:
+        raise ValueError("target_evidence requires target_dimension")
+
     b, a = tally(before), tally(after)
 
     if target_dimension:
@@ -185,12 +193,22 @@ def evaluate_revision(
     regression_dims = sorted({f.get("dimension") for f in new_serious + worsened_serious})
     fixed = sorted({f.get("dimension") for f in diff["fixed"] if f.get("severity") in _SERIOUS})
 
-    # Acceptance operates on issue IDENTITY: the target defect must have a finding actually resolved
-    # (by fingerprint) with no unwaived serious regression in that dimension.
+    # Acceptance operates on issue IDENTITY. A coarse dimension-only target is intentionally
+    # conservative when several findings share that dimension; callers can pin one issue with
+    # target_evidence when a bounded revision is supposed to fix only that finding.
     if target_dimension:
-        target_fixed = [f for f in diff["fixed"] if f.get("dimension") == target_dimension]
-        target_regressed = [f for f in new_serious + worsened_serious if f.get("dimension") == target_dimension]
-        target_resolved = bool(target_fixed) and not target_regressed
+        before_target = [f for f in _flatten(before) if f.get("dimension") == target_dimension]
+        fixed_fingerprints = {finding_fingerprint(f) for f in diff["fixed"]}
+        before_fingerprints = {finding_fingerprint(f) for f in before_target}
+        if target_evidence is not None:
+            target_fingerprint = (target_dimension, _normalize_evidence(target_evidence))
+            target_resolved = target_fingerprint in before_fingerprints and target_fingerprint in fixed_fingerprints
+        else:
+            serious_target = [f for f in before_target if f.get("severity") in _SERIOUS]
+            required_target = serious_target or before_target
+            target_resolved = bool(required_target) and all(
+                finding_fingerprint(f) in fixed_fingerprints for f in required_target
+            )
     else:
         target_resolved = any(f.get("severity") in _SERIOUS for f in diff["fixed"]) \
             and not new_serious and not worsened_serious
@@ -204,6 +222,8 @@ def evaluate_revision(
         reason = f"revision caused a material/fatal regression by identity in {where}; do not accept"
     elif a["fatal"] == 0 and target_resolved:
         label = target_dimension or "serious findings"
+        if target_evidence is not None:
+            label = f"{label}: {target_evidence}"
         waived_note = f" ({len(waived)} waived)" if waived else ""
         reason = f"target '{label}' resolved by identity ({target_before}->{target_after} count), no unwaived regressions{waived_note}"
         decision = ACCEPT

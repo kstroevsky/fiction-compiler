@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "post-revision-evidence.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "evidence_id", "scope", "packet_sha256", "packet", "evaluator_kind",
+    "evaluator_id", "cohort_kind", "verdict", "findings", "provenance", "recorded_at"
+  ],
+  "properties": {
+    "schema_version": {"type": "integer", "minimum": 1, "maximum": 1},
+    "evidence_id": {"type": "string", "pattern": "^recheck-[0-9a-f]{64}$"},
+    "scope": {"enum": ["literary", "reader", "voice", "whole_work"]},
+    "target_scene": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+    "packet_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "packet": {"type": "object"},
+    "evaluator_kind": {"enum": ["human", "role_runner", "model_probe"]},
+    "evaluator_id": {"type": "string", "minLength": 1},
+    "cohort_kind": {"enum": ["target_reader", "expert_reader", "owner", "other"]},
+    "verdict": {"enum": ["pass", "revise", "reject", "uncertain"]},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dimension", "severity", "evidence", "diagnosis", "repair_layer"],
+        "properties": {
+          "dimension": {"type": "string", "minLength": 1},
+          "severity": {"enum": ["minor", "material", "fatal"]},
+          "evidence": {"type": "string"},
+          "diagnosis": {"type": "string"},
+          "repair_layer": {"type": "string", "minLength": 1},
+          "target_scene": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"}
+        }
+      }
+    },
+    "provenance": {"type": "object"},
+    "recorded_at": {"type": "string", "minLength": 1}
+  }
+}

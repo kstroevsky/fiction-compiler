@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "framework-change-evaluation.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "change_id", "evaluation_id", "baseline_fingerprint", "after_fingerprint", "regression", "changed_framework_paths", "unexpected_framework_paths", "declared_path_states", "declared_changes", "mechanically_ready", "evaluated_at"],
+  "properties": {
+    "schema_version": {"type": "integer", "minimum": 1, "maximum": 1},
+    "change_id": {"type": "string", "minLength": 1},
+    "evaluation_id": {"type": "string", "pattern": "^evaluation-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"},
+    "baseline_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "after_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "regression": {"type": "object"},
+    "changed_framework_paths": {"type": "array", "items": {"type": "string"}},
+    "unexpected_framework_paths": {"type": "array", "items": {"type": "string"}},
+    "declared_path_states": {"type": "array", "items": {"type": "object"}},
+    "declared_changes": {"type": "array", "items": {"type": "string"}},
+    "mechanically_ready": {"type": "boolean"},
+    "evaluated_at": {"type": "string", "minLength": 1}
+  }
+}

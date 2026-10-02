@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from . import acceptance
 from .state import scene_sort_key
 
 SCENE_BREAK = "\n\n· · ·\n\n"  # a quiet centered break between scenes in a chapter
@@ -25,9 +26,13 @@ def assemble(project: Path) -> dict:
     brief = _load(project / "brief" / "project.json", {})
     accepted = sorted(index.get("accepted_state_deltas", []), key=scene_sort_key)
 
-    # An accepted scene with no manuscript is corruption, not something to quietly omit: canon says
-    # it was promoted but the prose is gone. Refuse to assemble a manuscript that silently drops it.
-    missing = [s for s in accepted if not (project / "manuscript" / "chapters" / f"{s}.md").exists()]
+    # Legacy scenes still depend on their manuscript view. Current acceptances carry prose in the
+    # immutable snapshot, so assembly remains correct even if a derived chapter needs repair.
+    missing = [
+        s for s in accepted
+        if acceptance.load_scene_snapshot(project, s) is None
+        and not (project / "manuscript" / "chapters" / f"{s}.md").exists()
+    ]
     if missing:
         raise ValueError(
             f"accepted scene(s) missing a manuscript file: {missing}; canon records them as promoted "
@@ -45,7 +50,13 @@ def assemble(project: Path) -> dict:
             prev_chapter = chapter
         elif pieces:
             pieces.append(SCENE_BREAK)
-        pieces.append(md.read_text(encoding="utf-8").strip())
+        frozen = acceptance.load_scene_snapshot(project, scene_id)
+        if frozen is not None:
+            _, snapshot = frozen
+            text = acceptance.frozen_bytes(snapshot, "candidate").decode("utf-8")
+        else:
+            text = md.read_text(encoding="utf-8")
+        pieces.append(text.strip())
         included.append(scene_id)
 
     title = brief.get("title", "Untitled")

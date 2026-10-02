@@ -134,6 +134,20 @@ class JudgeAndPersistenceTests(unittest.TestCase):
             for md in blind.glob("*.md"):
                 self.assertNotIn("candidate-", md.read_text())
 
+    def test_persisted_tournaments_do_not_overwrite_same_moment_runs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            scene = Path(tmp) / "scenes" / "ch01-sc01"
+            (scene / "candidates").mkdir(parents=True)
+            (scene / "critiques").mkdir(parents=True)
+            (scene / "candidates" / "candidate-a.md").write_text("Clean prose.")
+            (scene / "critiques" / "a.json").write_text(json.dumps(
+                {"candidate": "candidate-a.md", "findings": []}))
+            first = tools.tournament(str(Path(tmp)), "ch01-sc01", persist=True)
+            second = tools.tournament(str(Path(tmp)), "ch01-sc01", persist=True)
+            self.assertNotEqual(first["persisted_to"], second["persisted_to"])
+            self.assertTrue((Path(tmp) / first["persisted_to"] / "record.json").exists())
+            self.assertTrue((Path(tmp) / second["persisted_to"] / "record.json").exists())
+
 
 class CriticDrivesSelectionTests(unittest.TestCase):
     """The strong LLM critic drives selection, behind the deterministic floor (ADR 0016)."""
@@ -162,8 +176,8 @@ class CriticDrivesSelectionTests(unittest.TestCase):
 
     def test_floor_excludes_a_candidate_even_if_the_critic_prefers_it(self) -> None:
         critiques = [
-            {"candidate": "candidate-a.md", "critic": "defaultness-lint", "findings": []},
-            {"candidate": "candidate-b.md", "critic": "defaultness-lint",
+            {"candidate": "candidate-a.md", "critic": "prose-audit", "findings": []},
+            {"candidate": "candidate-b.md", "critic": "prose-audit",
              "findings": [{"dimension": "cliche", "severity": "material"}]}]  # B fails the floor
         labels = tournament.run_tournament(critiques, seed=0)["blind_labels"]
         judgment = {"scene_id": "ch01-sc01", "judge": "x", "scores": {
@@ -172,13 +186,33 @@ class CriticDrivesSelectionTests(unittest.TestCase):
         self.assertIn("candidate-b.md", r["floor_failed"])
         self.assertEqual(r["recommendation"]["candidate"], "candidate-a.md")  # B excluded despite the critic
 
+    def test_generic_defaultness_finding_is_penalty_not_floor_veto(self) -> None:
+        critiques = [
+            {"candidate": "candidate-a.md", "critic": "defaultness-lint", "findings": []},
+            {"candidate": "candidate-b.md", "critic": "defaultness-lint",
+             "findings": [{"dimension": "defaultness", "severity": "material"}]},
+        ]
+        r = tournament.run_tournament(critiques, seed=0)
+        self.assertEqual(r["floor_failed"], [])
+        self.assertEqual(r["recommendation"]["candidate"], "candidate-a.md")
+
     def test_all_candidates_failing_the_floor_yields_no_eligible(self) -> None:
         critiques = [
-            {"candidate": "candidate-a.md", "critic": "defaultness-lint",
+            {"candidate": "candidate-a.md", "critic": "prose-audit",
              "findings": [{"dimension": "cliche", "severity": "material"}]},
             {"candidate": "candidate-b.md", "critic": "prose-audit",
              "findings": [{"dimension": "knowledge", "severity": "fatal"}]}]
         r = tournament.run_tournament(critiques, seed=0)
+        self.assertEqual(r["recommendation"]["decision"], "no_eligible_candidates")
+
+    def test_scene_level_hard_failure_blocks_every_candidate(self) -> None:
+        critiques = self._clean("candidate-a.md", "candidate-b.md") + [
+            {"candidate": "ch01-sc01", "critic": "hard-audit", "verdict": "reject",
+             "findings": [{"dimension": "knowledge", "severity": "fatal"}]},
+        ]
+        r = tournament.run_tournament(critiques, seed=0)
+        self.assertEqual(r["floor_eligible"], [])
+        self.assertTrue(r["scene_hard_failed"])
         self.assertEqual(r["recommendation"]["decision"], "no_eligible_candidates")
 
     def test_judges_split_forces_human_decision(self) -> None:
@@ -190,6 +224,28 @@ class CriticDrivesSelectionTests(unittest.TestCase):
         r = tournament.run_tournament(critiques, seed=0, judgments=judgments)
         self.assertTrue(r["disagreement"])
         self.assertFalse(r["judge_disagreement"]["agree_on_winner"])
+        self.assertEqual(r["recommendation"]["decision"], "human_decision_required")
+
+    def test_asymmetric_judge_split_does_not_auto_select_mean_winner(self) -> None:
+        critiques = self._clean("candidate-a.md", "candidate-b.md")
+        labels = tournament.run_tournament(critiques, seed=0)["blind_labels"]
+        a, b = labels["candidate-a.md"], labels["candidate-b.md"]
+        judgments = [
+            {"judge": "j1", "scores": {a: {"q": 5}, b: {"q": 1}}},
+            {"judge": "j2", "scores": {a: {"q": 2}, b: {"q": 3}}},
+        ]
+        r = tournament.run_tournament(critiques, seed=0, judgments=judgments)
+        self.assertEqual(r["pareto_front"], ["candidate-a.md"])
+        self.assertFalse(r["judge_disagreement"]["agree_on_winner"])
+        self.assertEqual(r["recommendation"]["decision"], "human_decision_required")
+
+    def test_partial_judgment_matrix_cannot_select_only_scored_candidate(self) -> None:
+        critiques = self._clean("candidate-a.md", "candidate-b.md")
+        labels = tournament.run_tournament(critiques, seed=0)["blind_labels"]
+        judgment = {"judge": "j1", "scores": {labels["candidate-a.md"]: {"q": 5}}}
+        r = tournament.run_tournament(critiques, seed=0, judgments=[judgment])
+        self.assertTrue(r["judgment_matrix_problems"])
+        self.assertEqual(r["recommendation"]["decision"], "human_decision_required")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "story-repertoire.schema.json",
+  "type": "object",
+  "required": ["project_id", "evidence_basis", "complete_story", "features"],
+  "additionalProperties": false,
+  "properties": {
+    "project_id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "evidence_basis": {"enum": ["complete-manuscript", "partial-manuscript", "plan-only"]},
+    "complete_story": {"type": "boolean"},
+    "features": {
+      "type": "object",
+      "required": ["ending_form_tags", "turn_tags", "resolution_tags", "object_motifs", "focalization_tags"],
+      "additionalProperties": false,
+      "properties": {
+        "ending_form_tags": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}},
+        "turn_tags": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}},
+        "resolution_tags": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}},
+        "object_motifs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}},
+        "focalization_tags": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}}
+      }
+    },
+    "notes": {"type": "string"}
+  }
+}

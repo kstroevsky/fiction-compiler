@@ -1,0 +1,17 @@
+{
+  "id": "ch01-sc03",
+  "chapter": "araby",
+  "pov": "first-person retrospective narrator / younger experiencing self",
+  "participants": ["boy", "aunt", "uncle", "mrs-mercer", "train-passengers"],
+  "purpose": [
+    "Convert anticipation into delay, irritation, and a late journey whose practical constraints erode the fantasy before arrival."
+  ],
+  "entry_state": ["The boy expects to attend Araby on Saturday evening and needs money from his uncle."],
+  "desire": "Reach Araby before it closes and fulfill the promised gift errand.",
+  "conflict": "His uncle returns late, domestic waiting consumes the evening, and travel time leaves the bazaar nearly closed.",
+  "turn": "The long wait ends in a rushed departure, but the trip itself makes the lateness irreversible.",
+  "exit_state": ["The boy reaches the bazaar late with very little time remaining."],
+  "required_events": [],
+  "forbidden_moves": ["Do not treat compressed waiting time and narrated duration as equivalent to a single typed world-state change."],
+  "style_constraints": ["Preserve the pressure created by unequal narrative duration across waiting and travel."]
+}

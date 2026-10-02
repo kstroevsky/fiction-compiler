@@ -14,6 +14,16 @@
           "arity": {"enum": ["unary", "binary"]},
           "subject_types": {"type": "array", "items": {"type": "string"}},
           "object_types": {"type": "array", "items": {"type": "string"}},
+          "value_type": {"enum": ["boolean", "number", "integer", "string"]},
+          "allowed_values": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": ["boolean", "number", "string"]}
+          },
+          "minimum": {"type": "number"},
+          "maximum": {"type": "number"},
+          "exclusive_object_per_subject": {"type": "boolean"},
           "relationship": {"type": "boolean"},
           "description": {"type": "string"}
         }

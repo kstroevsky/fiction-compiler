@@ -1,0 +1,47 @@
+{
+  "project_id": "verbatim",
+  "disclosures": [
+    {
+      "id": "disclosure-double-sense",
+      "source_revelation": "rev-steering",
+      "fact": "fact-double-sense-word",
+      "scene_id": "ch01-sc01",
+      "mode": "stated",
+      "note": "The accepted prose explicitly gives both senses of vedel."
+    },
+    {
+      "id": "disclosure-josif-steering",
+      "source_revelation": "rev-steering",
+      "fact": "fact-josif-steering",
+      "scene_id": "ch01-sc01",
+      "mode": "implied",
+      "note": "Mira infers from Josif's word choice and look that he selected the ambiguity deliberately."
+    },
+    {
+      "id": "disclosure-radan-sluice",
+      "source_revelation": "rev-why",
+      "fact": "fact-radan-opened-sluice",
+      "scene_id": "ch01-sc02",
+      "mode": "implied",
+      "note": "The corridor saying and Mira's inference reveal Radan as the one who led the raiders."
+    },
+    {
+      "id": "disclosure-mira-ambiguity",
+      "source_revelation": "rev-rendering",
+      "fact": "fact-mira-flagged-ambiguity",
+      "scene_id": "ch01-sc03",
+      "mode": "stated",
+      "note": "Mira explicitly gives the court both senses instead of resolving the word toward conviction."
+    }
+  ],
+  "non_fact_revelations": [],
+  "curiosity_gaps": [
+    {
+      "id": "gap-mira-rendering",
+      "question": "How will Mira render the decisive ambiguous word when the court demands one meaning?",
+      "opened_in": "ch01-sc01",
+      "closed_in": "ch01-sc03"
+    }
+  ],
+  "surprises": []
+}

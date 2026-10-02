@@ -2,29 +2,24 @@
 from __future__ import annotations
 
 import argparse
-import json
-import re
-import shutil
 from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from fiction_compiler import authoring  # noqa: E402
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Create a fiction project from projects/_template")
     parser.add_argument("slug")
     args = parser.parse_args()
-    if not re.fullmatch(r"[a-z0-9-]+", args.slug):
-        parser.error("slug must match [a-z0-9-]+")
-    root = Path(__file__).resolve().parents[1]
-    source = root / "projects" / "_template"
-    target = root / "projects" / args.slug
-    if target.exists():
-        raise SystemExit(f"Project already exists: {target}")
-    shutil.copytree(source, target)
-    project_file = target / "brief" / "project.json"
-    data = json.loads(project_file.read_text(encoding="utf-8"))
-    data["id"] = args.slug
-    project_file.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(target)
+    try:
+        authoring.create_project(args.slug)
+    except ValueError as exc:
+        parser.error(str(exc))
+    print(ROOT / "projects" / args.slug)
     return 0
 
 

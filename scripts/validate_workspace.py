@@ -19,7 +19,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from fiction_compiler import integrity, schema  # noqa: E402
+from fiction_compiler import (integrity, literature_control, ontology, owner_preference, reader_probe,
+                              schema, writer_study)  # noqa: E402
 
 
 def read_json(path: Path) -> Any:
@@ -85,6 +86,25 @@ def validate_scenes(errors: list[str], project: Path) -> list[str]:
         for critique in sorted((scene_dir / "critiques").glob("*.json")):
             check_schema(errors, critique, read_json(critique), "critique")
 
+        plans_dir = scene_dir / "plans"
+        for plan_path in sorted((plans_dir / "candidates").glob("*.json")):
+            check_schema(errors, plan_path, read_json(plan_path), "scene-plan")
+        for review_path in sorted((plans_dir / "reviews").glob("*.json")):
+            check_schema(errors, review_path, read_json(review_path), "plan-review")
+        selection_paths = sorted((plans_dir / "selections").glob("*.json"))
+        if selection_paths:
+            # Lazy import keeps the legacy JSON/workspace validator startable under older system
+            # Pythons when no plan-search artifacts exist. Plan-search itself requires the project's
+            # declared Python >=3.11 runtime because it imports typed story-state machinery.
+            from fiction_compiler import plan_search  # noqa: E402
+        for selection_path in selection_paths:
+            selection = read_json(selection_path)
+            check_schema(errors, selection_path, selection, "plan-selection")
+            for message in plan_search.selection_errors(project, scene_dir.name, selection):
+                errors.append(
+                    f"{project.name}/{scene_dir.name}: plan selection {selection_path.name} — {message}"
+                )
+
         manuscript = project / "manuscript" / "chapters" / f"{scene_dir.name}.md"
         if manuscript.exists() and not delta_path.exists():
             errors.append(f"{project.name}/{scene_dir.name}: promoted scene lacks state-delta.json")
@@ -111,9 +131,34 @@ def validate_projects(errors: list[str]) -> None:
         if data.get("id") != project.name:
             errors.append(f"{project.name}: project id must equal directory name")
 
+        coverage_path = project / "brief" / "contract-coverage.json"
+        if coverage_path.exists():
+            check_schema(errors, coverage_path, read_json(coverage_path), "contract-coverage")
+        disclosure_path = project / "planning" / "reader-disclosure.json"
+        if disclosure_path.exists():
+            check_schema(errors, disclosure_path, read_json(disclosure_path), "reader-disclosure")
+        repertoire_path = project / "planning" / "story-repertoire.json"
+        if repertoire_path.exists():
+            check_schema(errors, repertoire_path, read_json(repertoire_path), "story-repertoire")
+        for message in owner_preference.persistent_validation_errors(project):
+            errors.append(f"{project.name}: owner preference — {message}")
+        for message in reader_probe.validation_errors(project):
+            errors.append(f"{project.name}: reader probes — {message}")
+        for message in writer_study.validation_errors(project):
+            errors.append(f"{project.name}: writer study — {message}")
+
         ontology_path = project / "canon" / "ontology.json"
         if ontology_path.exists():
-            check_schema(errors, ontology_path, read_json(ontology_path), "ontology")
+            ontology_data = read_json(ontology_path)
+            check_schema(errors, ontology_path, ontology_data, "ontology")
+            for message in ontology.ontology_definition_errors(ontology_data):
+                errors.append(f"{project.name}: ontology semantics — {message}")
+        entity_registry_path = project / "canon" / "entity-registry.json"
+        if entity_registry_path.exists():
+            registry_data = read_json(entity_registry_path)
+            check_schema(errors, entity_registry_path, registry_data, "entity-registry")
+            for message in ontology.entity_registry_errors(registry_data):
+                errors.append(f"{project.name}: entity registry semantics — {message}")
 
         validate_characters(errors, project)
         validate_event_graph(errors, project)
@@ -127,10 +172,52 @@ def validate_projects(errors: list[str]) -> None:
 def validate_source_register(errors: list[str]) -> None:
     path = ROOT / "kb" / "source-register.json"
     data = read_json(path)
-    ids = [source.get("id") for source in data.get("sources", [])]
+    sources = data.get("sources", [])
+    ids = [source.get("id") for source in sources]
     duplicates = [item for item, count in Counter(ids).items() if item and count > 1]
     if duplicates:
         errors.append(f"source-register: duplicate ids {duplicates}")
+    allowed_statuses = {"cleared", "repository-owned", "per-title-verification-required", "not-cleared"}
+    allowed_policies = {"allowed", "blocked-pending-title-check", "blocked"}
+    for source in sources:
+        if source.get("stream") != "fiction-corpus":
+            continue
+        source_id = source.get("id", "<missing-id>")
+        rights = source.get("rights")
+        if not isinstance(rights, dict):
+            errors.append(f"source-register: fiction-corpus source {source_id!r} lacks structured rights")
+            continue
+        status = rights.get("eu_de_status")
+        policy = rights.get("full_text_policy")
+        if status not in allowed_statuses:
+            errors.append(
+                f"source-register: fiction-corpus source {source_id!r} has invalid eu_de_status {status!r}"
+            )
+        if policy not in allowed_policies:
+            errors.append(
+                f"source-register: fiction-corpus source {source_id!r} has invalid full_text_policy {policy!r}"
+            )
+        if not isinstance(rights.get("basis"), str) or not rights["basis"].strip():
+            errors.append(f"source-register: fiction-corpus source {source_id!r} needs a rights basis")
+        if status in {"cleared", "repository-owned"} and not rights.get("verified_on"):
+            errors.append(
+                f"source-register: fiction-corpus source {source_id!r} needs verified_on for status {status!r}"
+            )
+        if status in {"cleared", "repository-owned"} and policy != "allowed":
+            errors.append(
+                f"source-register: fiction-corpus source {source_id!r} is {status!r} but full text is not allowed"
+            )
+        if status == "per-title-verification-required" and policy != "blocked-pending-title-check":
+            errors.append(
+                f"source-register: fiction-corpus source {source_id!r} must block full text pending a title check"
+            )
+        if status == "not-cleared" and policy != "blocked":
+            errors.append(
+                f"source-register: fiction-corpus source {source_id!r} marked not-cleared must block full text"
+            )
+
+    for message in literature_control.workspace_validation_errors():
+        errors.append(f"literature-control: {message}")
 
 
 def validate_kb(errors: list[str]) -> None:

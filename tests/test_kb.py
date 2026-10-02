@@ -14,6 +14,7 @@ class KnowledgeBaseTests(unittest.TestCase):
     def setUp(self) -> None:
         self.index = json.loads((KB / "index.json").read_text(encoding="utf-8"))
         register = json.loads((KB / "source-register.json").read_text(encoding="utf-8"))
+        self.sources = register["sources"]
         self.source_ids = {s["id"] for s in register["sources"]}
 
     def test_starter_concepts_present(self) -> None:
@@ -41,6 +42,27 @@ class KnowledgeBaseTests(unittest.TestCase):
             if card.name.lower() == "readme.md":
                 continue
             self.assertIn(card.resolve(), referenced, f"orphan card: kb/{card.relative_to(KB)}")
+
+    def test_fiction_corpus_has_machine_readable_eu_de_rights_gate(self) -> None:
+        for source in self.sources:
+            if source.get("stream") != "fiction-corpus":
+                continue
+            with self.subTest(source=source["id"]):
+                rights = source.get("rights")
+                self.assertIsInstance(rights, dict)
+                self.assertIn(rights.get("eu_de_status"), {
+                    "cleared", "repository-owned", "per-title-verification-required", "not-cleared",
+                })
+                self.assertTrue(rights.get("basis"))
+                status = rights["eu_de_status"]
+                policy = rights.get("full_text_policy")
+                if status in {"cleared", "repository-owned"}:
+                    self.assertEqual(policy, "allowed")
+                    self.assertTrue(rights.get("verified_on"))
+                elif status == "per-title-verification-required":
+                    self.assertEqual(policy, "blocked-pending-title-check")
+                else:
+                    self.assertEqual(policy, "blocked")
 
 
 if __name__ == "__main__":

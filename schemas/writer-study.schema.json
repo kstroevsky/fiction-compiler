@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "writer-study.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "scene_id", "selection_experiment_id", "pool_fingerprint",
+    "hypotheses", "matching_metric", "max_relative_gap", "included_phases", "arms", "created_at"
+  ],
+  "properties": {
+    "schema_version": {"type": "integer", "minimum": 1, "maximum": 1},
+    "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+    "selection_experiment_id": {
+      "type": "string",
+      "pattern": "^selection-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"
+    },
+    "pool_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "hypotheses": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": {"enum": ["writer-family", "edit-vs-regeneration"]}
+    },
+    "matching_metric": {"enum": ["total_tokens", "cost_usd"]},
+    "max_relative_gap": {"type": "number", "minimum": 0, "maximum": 1},
+    "included_phases": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"enum": ["generation", "critique", "revision"]}
+    },
+    "arms": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 26,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "arm_id", "candidate", "candidate_sha256", "run_id", "writer_family",
+          "strategy", "provider", "model", "operation_ids", "operations_sha256"
+        ],
+        "properties": {
+          "arm_id": {"type": "string", "pattern": "^arm-[0-9]{2}$"},
+          "candidate": {"type": "string", "pattern": "^[^/\\\\]+\\.md$"},
+          "candidate_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "run_id": {"type": "string", "pattern": "^run-[0-9]{8}T[0-9]{12}Z-[0-9a-f]{12}$"},
+          "writer_family": {"type": "string", "minLength": 1},
+          "strategy": {"enum": ["independent-draft", "regenerate", "edit"]},
+          "provider": {"type": "string", "minLength": 1},
+          "model": {"type": "string", "minLength": 1},
+          "source_candidate_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "operation_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": "string", "pattern": "^op-[0-9a-f]{32}$"}
+          },
+          "operations_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "created_at": {"type": "string", "minLength": 1}
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "control_id": "joyce-araby-1914",
+  "source_id": "joyce-araby-gutenberg-2814",
+  "retrieved_on": "2026-09-29",
+  "full_story_sha256": "1c1179769c641f4480d537f8fd5a9a8f75a71aa93cde3080b9c3df616248cae9",
+  "segmentation": {
+    "kind": "editorial-analysis",
+    "reassembly_separator": "blank-line",
+    "note": "Project Gutenberg CRLF was normalized to LF. Each stored segment has one terminal newline and reassembly inserts one additional newline between segments. Araby has no author-supplied scene IDs; these four boundaries isolate the habitual opening, the promise and anticipation, the delayed journey, and the bazaar/epiphany for framework analysis and are not claimed as Joyce's formal segmentation."
+  },
+  "scenes": [
+    {
+      "id": "control-sc01",
+      "path": "scene-01.txt",
+      "sha256": "39a1ea46122d89eebc25fa7044cb680039f1e7e62287e6e90b1d8f316af24e80",
+      "boundary_note": "Opening through the narrator's solitary rainy-evening reflection, before Mangan's sister first speaks to him.",
+      "format_probe": {
+        "scene_id": "ch01-sc01",
+        "spec_path": "scene-01.spec.json",
+        "spec_sha256": "25ceefb8d6c75ae40dc89f121592af39063238a09ad628af1d93b64007dc2216",
+        "delta_path": "scene-01.delta.json",
+        "delta_sha256": "fb092e55482da6b402dbd1803430ced068a4718eb5e8124707886b8b12e073e8"
+      },
+      "representation": {
+        "assessment_kind": "manual-annotation",
+        "typed_fit": "partial",
+        "not_first_class": ["retrospective-narrator-vs-experiencing-self", "iterative-habitual-summary"],
+        "note": "The current scene spec can describe POV, purpose and events in free text, but it has no typed distinction between the retrospective narrator and the younger experiencing focalizer, and its singular scene fields do not model iterative/habitual summary as a first-class discourse mode."
+      }
+    },
+    {
+      "id": "control-sc02",
+      "path": "scene-02.txt",
+      "sha256": "660ac4f52a32e14f90e6d767668cd9bed7f50fe767d804b1be8dcd51e095f18d",
+      "boundary_note": "Mangan's sister asks about Araby; the narrator promises a gift and anticipation displaces ordinary school life.",
+      "format_probe": {
+        "scene_id": "ch01-sc02",
+        "spec_path": "scene-02.spec.json",
+        "spec_sha256": "1311c7039d93e8c1c0ff746caf832b0f446006436b92e80646185a41a0df0ba5",
+        "delta_path": "scene-02.delta.json",
+        "delta_sha256": "ac58856a64e8bff3702e1a3f97efc14ef94c889172f9eafc4b864e8a4645d365"
+      },
+      "representation": {
+        "assessment_kind": "manual-annotation",
+        "typed_fit": "partial",
+        "not_first_class": ["retrospective-narrator-vs-experiencing-self", "attention-affect-progression"],
+        "note": "The promise and external actions can be represented, while the widening gap between narrated action and the boy's obsessive attention/affect is mostly relegated to free-text purpose, desire or turn fields rather than typed state."
+      }
+    },
+    {
+      "id": "control-sc03",
+      "path": "scene-03.txt",
+      "sha256": "24e05b7f2c7fbd3becc5cba68432c086050d1f97fb9022ec86b8ad9f82ff8e71",
+      "boundary_note": "Saturday waiting, the uncle's delay, the late departure and train journey, ending just before entry to the bazaar.",
+      "format_probe": {
+        "scene_id": "ch01-sc03",
+        "spec_path": "scene-03.spec.json",
+        "spec_sha256": "1ba4cbd1f9f4fb4dbdfffb8458a36299a8e9bcf6a03625a4cff51baac844e757",
+        "delta_path": "scene-03.delta.json",
+        "delta_sha256": "e67ac0fd29fcc8f578e3a71ad43b69240fa97579c2b9d29a98d7e3ab89284111"
+      },
+      "representation": {
+        "assessment_kind": "manual-annotation",
+        "typed_fit": "partial",
+        "not_first_class": ["attention-affect-progression", "narrative-duration-shift"],
+        "note": "Chronological events and resource facts are representable, but the scene schema has no typed duration/pacing model for the long wait compressed against the short journey, and affective pressure remains largely descriptive rather than testable state."
+      }
+    },
+    {
+      "id": "control-sc04",
+      "path": "scene-04.txt",
+      "sha256": "8a2804f9a421ced51800966ddee9b7d9393024d74b97ef525261abd446bf9ba4",
+      "boundary_note": "Entry to the nearly closed bazaar through the final self-recognition in darkness.",
+      "format_probe": {
+        "scene_id": "ch01-sc04",
+        "spec_path": "scene-04.spec.json",
+        "spec_sha256": "05e10d7ad6dea10ee231f333bd917d354b2594afb29267498419926aaaaabb0d",
+        "delta_path": "scene-04.delta.json",
+        "delta_sha256": "5ba574f086b14fc03d83c0543b2d27b00d277868c0f78e4aa99a693d2f7cd3e1"
+      },
+      "representation": {
+        "assessment_kind": "manual-annotation",
+        "typed_fit": "partial",
+        "not_first_class": ["epiphanic-revaluation", "symbolic-image-progression"],
+        "note": "Observable actions and even a proposition about changed self-understanding could be encoded, but the literary function of the epiphany and the accumulated light/dark imagery are not first-class typed constraints; representing them as facts would overstate what the state model proves."
+      }
+    }
+  ],
+  "critic_evidence": {
+    "status": "unrun",
+    "reason": "No live critic provider credentials were available for this control run. The report must not infer critic approval from the work's reputation or from deterministic lint results."
+  },
+  "control_note": "Public-domain literature is used here as a challenging false-positive and representation control, not as an error-free or universally preferred gold standard. Model familiarity with Joyce is a confound for any later live-critic result."
+}

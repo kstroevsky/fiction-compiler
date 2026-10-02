@@ -1,15 +1,15 @@
-"""Critic calibration: measure whether critics catch KNOWN planted defects (agents-best-practices
-evals). The project's premise — *the LLM is a strong critic* — is otherwise an unmeasured assumption.
+"""Critic screening: measure whether critics catch planted diagnostic defects.
 
-A gold corpus (``evals/critic-cases.json``) pins planted defects and clean controls. Deterministic
+A diagnostic corpus (``evals/critic-cases.json``) pins planted defects and clean controls. Deterministic
 detectors (defaultness, prose knowledge-leak, ontology, injection) are scored here and pinned in the
-regression harness as recall/specificity invariants. LLM-persona cases carry the same gold labels and
-are scored with ``score_findings`` when a live critic's findings are supplied — turning a persona's
-calibration into a number instead of a hope.
+regression harness as recall/specificity invariants. LLM-persona cases carry provisional fixture
+expectations and are scored with ``score_findings`` when live findings are supplied. They are useful
+for screening but do not substitute for qualified human calibration; ADR 0029 owns that evidence.
 """
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from . import defaultness, ontology, prose_audit, safety
@@ -30,6 +30,38 @@ def _blocking(findings: list[dict]) -> list[dict]:
     return [f for f in findings if f.get("severity") in ("material", "fatal")]
 
 
+def _asserts_signal(text: str, signal: str) -> bool:
+    """Whether free-form text asserts a signal rather than clearly negating it."""
+    hay = text.lower()
+    needle = signal.lower().strip()
+    if not needle:
+        return False
+    pattern = re.compile(rf"(?<!\w){re.escape(needle)}(?!\w)")
+    for match in pattern.finditer(hay):
+        prefix = hay[max(0, match.start() - 48):match.start()]
+        if re.search(
+            r"(?:\bno\b|\bnot\b|\bnever\b|\bwithout\b|\blacks?\b|"
+            r"\blacking\b|\babsence\s+of\b)(?:\W+\w+){0,3}\W*$",
+            prefix,
+        ):
+            continue
+        return True
+    return False
+
+
+def matching_signals(case: dict, findings: list[dict]) -> list[str]:
+    """Return planted-defect signals positively localized by blocking findings."""
+    signals = [str(s).lower() for s in case.get("signals", []) if str(s).strip()]
+    matched: set[str] = set()
+    for finding in _blocking(findings):
+        dimension = str(finding.get("dimension", "")).lower()
+        prose = " ".join(str(finding.get(k, "")) for k in ("diagnosis", "evidence"))
+        for signal in signals:
+            if _asserts_signal(dimension, signal) or _asserts_signal(prose, signal):
+                matched.add(signal)
+    return sorted(matched)
+
+
 def score_findings(case: dict, findings: list[dict]) -> bool:
     """Did a critic's findings catch this case's planted defect?
 
@@ -41,11 +73,7 @@ def score_findings(case: dict, findings: list[dict]) -> bool:
     signals = [s.lower() for s in case.get("signals", [])]
     if not signals:
         return bool(blocking)
-    for finding in blocking:
-        hay = " ".join(str(finding.get(k, "")) for k in ("dimension", "diagnosis", "evidence")).lower()
-        if any(sig in hay for sig in signals):
-            return True
-    return False
+    return bool(matching_signals(case, blocking))
 
 
 def run_deterministic_case(case: dict) -> bool:
@@ -59,9 +87,16 @@ def run_deterministic_case(case: dict) -> bool:
     if detector == "injection":
         return len(safety.scan_injection(inp.get("text", ""))) > 0
     if detector == "ontology":
-        ont = {p["name"]: p for p in inp.get("ontology", {}).get("predicates", [])}
         atom = inp.get("atom", {})
-        return bool(ontology.check_atom(ont, atom.get("predicate"), atom.get("subject"), atom.get("object")))
+        kwargs = {"registry": inp.get("entity_registry"), "op": atom.get("op")}
+        if "value" in atom:
+            kwargs["value"] = atom["value"]
+        if "comparison" in atom:
+            kwargs["comparison"] = atom["comparison"]
+        return bool(ontology.check_atom(
+            inp.get("ontology", {}), atom.get("predicate"), atom.get("subject"), atom.get("object"),
+            **kwargs,
+        ))
     raise ValueError(f"non-deterministic or unknown detector {detector!r}")
 
 
@@ -76,16 +111,20 @@ def run_corpus(cases: list[dict] | None = None, live_findings: dict | None = Non
     results: list[dict] = []
     for case in cases:
         detector = case.get("detector")
+        matched_signals: list[str] = []
         if detector == "llm":
             if case["id"] in live_findings:
-                caught, status = score_findings(case, live_findings[case["id"]]), "scored"
+                supplied = live_findings[case["id"]]
+                caught, status = score_findings(case, supplied), "scored"
+                matched_signals = matching_signals(case, supplied)
             else:
                 caught, status = None, "needs_live"
         else:
             caught, status = run_deterministic_case(case), "scored"
         expect = case.get("expect_caught", True)
         results.append({"id": case["id"], "critic": case.get("critic"), "kind": case.get("kind", "defect"),
-                        "caught": caught, "status": status,
+                        "caught": caught, "status": status, "matched_signals": matched_signals,
+                        "label_source": case.get("label_source", "mechanical_fixture"),
                         "correct": None if caught is None else (caught == expect)})
 
     scored = [r for r in results if r["status"] == "scored"]

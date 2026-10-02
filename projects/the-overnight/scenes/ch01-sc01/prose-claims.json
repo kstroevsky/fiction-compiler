@@ -2,32 +2,40 @@
   "scene_id": "ch01-sc01",
   "candidate": "candidate-a-r1.md",
   "candidate_sha256": "aa9bcd920e3e4fb6fc6066c36a96818051b869d70f4f562d9057fa1b6b220440",
+  "spec_sha256": "c45417c04771f2f471cb65b8aca6d4911ac520465a17db6b5074295691f72de2",
+  "state_before_sha256": "7c95ed7f73e4f539f60c37086444dca1e9dcd93f56792251e718ba2b7a2c723c",
+  "state_delta_sha256": "b7f5c451485de5946b4dba8298fdb2d144ffbbed38ef11d4f4f6bcc606fa9746",
+  "audit_context_sha256": "61b389a8c09eb26fd7be52e8d27704a5452702dc98acf96eb778b2bca2f2c770",
   "pov": "char-nadia",
   "tense": "past",
-  "word_count": 495,
+  "word_count": 521,
   "claims": [
     {
       "type": "character_present",
       "subject": "char-nadia",
-      "evidence": "the shop belonged to no one but Nadia"
+      "evidence": "the shop belonged to no one but Nadia",
+      "evidence_span": {"start": 31, "end": 68}
     },
     {
       "type": "focalizer_knows",
       "subject": "char-nadia",
       "object": "fact-wake-order",
-      "evidence": "Twelve was the Halloran order, milk loaves for the wake, due at the counter by six"
+      "evidence": "Twelve was the Halloran order, milk loaves for the wake, due at the counter by six",
+      "evidence_span": {"start": 433, "end": 515}
     },
     {
       "type": "focalizer_knows",
       "subject": "char-nadia",
       "object": "fact-proofer-drifts",
-      "evidence": "the way it always drifted, and Esther was not there to bring it down by hand"
+      "evidence": "the way it always drifted, and Esther was not there to bring it down by hand",
+      "evidence_span": {"start": 1926, "end": 2002}
     },
     {
       "type": "focalizer_knows",
       "subject": "char-nadia",
       "object": "fact-dough-ruined",
-      "evidence": "Over-proofed. Gone."
+      "evidence": "Over-proofed. Gone.",
+      "evidence_span": {"start": 1783, "end": 1802}
     }
   ]
 }

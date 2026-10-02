@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "owner-preference.schema.json",
+  "type": "object",
+  "required": ["schema_version", "preference_id", "project_id", "decision_kind", "alternatives", "chosen_id", "reason", "decided_at", "recorded_at"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "preference_id": {"type": "string", "pattern": "^pref-[0-9a-f]{32}$"},
+    "project_id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "decision_kind": {"enum": ["premise", "ending", "plan", "candidate", "revision", "other"]},
+    "alternatives": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["id", "sha256", "snapshot", "source_kind"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"},
+          "label": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "snapshot": {"type": "string", "pattern": "^decisions/preferences/artifacts/[0-9a-f]{64}\\.txt$"},
+          "source_kind": {"enum": ["inline_text", "project_file"]},
+          "source_path": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "chosen_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"},
+    "reason": {"type": "string", "minLength": 1},
+    "decided_at": {"type": "string", "minLength": 1},
+    "recorded_at": {"type": "string", "minLength": 1},
+    "metadata": {"type": "object"}
+  }
+}

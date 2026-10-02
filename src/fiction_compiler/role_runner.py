@@ -33,14 +33,18 @@ Boundaries kept (agents-best-practices — untrusted content, no hidden dictator
 from __future__ import annotations
 
 import json
+import math
 import os
+import time
 import urllib.error
+import urllib.parse
 import urllib.request
+import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
 
-from . import critique as _critique
+from . import acceptance, critique as _critique
 from . import schema, trace
 from .promote import AUDIT_CLASS_BY_CRITIC
 from .tools import judge_bundle
@@ -72,6 +76,71 @@ class VendorUnavailable(RuntimeError):
 
 class MalformedVendorOutput(ValueError):
     """The vendor returned something that is not a schema-shaped critique object."""
+
+
+@dataclass(frozen=True)
+class CompletionResult:
+    """Provider response text plus normalized, non-invented execution metadata.
+
+    Token fields are optional because providers, replay transports, and failures do not always expose
+    usage. Unknown values stay absent from ``usage`` rather than becoming zero. ``total_tokens`` may
+    be provider-reported or derived only when both input and output counts are known.
+    """
+
+    text: str
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    total_tokens: int | None = None
+    provider_request_id: str | None = None
+    response_model: str | None = None
+    finish_reason: str | None = None
+
+    def metadata(self, latency_ms: float) -> dict:
+        total_tokens = self.total_tokens
+        if total_tokens is None and self.input_tokens is not None and self.output_tokens is not None:
+            total_tokens = self.input_tokens + self.output_tokens
+        usage = {
+            key: value for key, value in {
+                "input_tokens": self.input_tokens,
+                "output_tokens": self.output_tokens,
+                "total_tokens": total_tokens,
+            }.items() if value is not None
+        }
+        result: dict = {"latency_ms": latency_ms, "usage": usage}
+        for key, value in {
+            "provider_request_id": self.provider_request_id,
+            "response_model": self.response_model,
+            "finish_reason": self.finish_reason,
+        }.items():
+            if value is not None:
+                result[key] = value
+        return result
+
+
+def _usage_count(value: object) -> int | None:
+    """Accept an actual non-negative integer token count; never coerce guesses or booleans."""
+    return value if isinstance(value, int) and not isinstance(value, bool) and value >= 0 else None
+
+
+def _normalized_usage(input_value: object, output_value: object,
+                      total_value: object = None) -> tuple[int | None, int | None, int | None]:
+    input_tokens = _usage_count(input_value)
+    output_tokens = _usage_count(output_value)
+    total_tokens = _usage_count(total_value)
+    if total_tokens is None and input_tokens is not None and output_tokens is not None:
+        total_tokens = input_tokens + output_tokens
+    return input_tokens, output_tokens, total_tokens
+
+
+def _normalize_completion(value: object) -> CompletionResult:
+    """Keep legacy/injected transports returning strings backward compatible."""
+    if isinstance(value, CompletionResult):
+        return value
+    if isinstance(value, str):
+        return CompletionResult(text=value)
+    raise VendorUnavailable(
+        f"transport returned unsupported result type {type(value).__name__}; expected str or CompletionResult"
+    )
 
 
 # --- roster -----------------------------------------------------------------------------------
@@ -146,6 +215,9 @@ def resolve_persona(assignment: Assignment, agents_dir: Path = AGENTS_DIR) -> st
     path = Path(ref) if ref else agents_dir / f"{assignment.role}.md"
     if not path.is_absolute():
         path = ROOT / path
+    path = path.resolve()
+    if ref is not None and not path.is_relative_to(ROOT.resolve()):
+        raise ValueError(f"persona path escapes the repository root: {path}")
     if path.exists():
         return _strip_frontmatter(path.read_text(encoding="utf-8"))
     raise ValueError(
@@ -198,15 +270,17 @@ def _http_post_json(url: str, headers: dict, payload: dict, timeout: float = 60.
             return json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8", "replace")[:500]
-        raise VendorUnavailable(f"{url} -> HTTP {exc.code}: {detail}") from exc
+        safe_url = urllib.parse.urlunsplit((*urllib.parse.urlsplit(url)[:3], "", ""))
+        raise VendorUnavailable(f"{safe_url} -> HTTP {exc.code}: {detail}") from exc
     except urllib.error.URLError as exc:
-        raise VendorUnavailable(f"{url} unreachable: {exc.reason}") from exc
+        safe_url = urllib.parse.urlunsplit((*urllib.parse.urlsplit(url)[:3], "", ""))
+        raise VendorUnavailable(f"{safe_url} unreachable: {exc.reason}") from exc
 
 
 class AnthropicHTTP:
     """Anthropic Messages API. Key: ``$ANTHROPIC_API_KEY``. (Live path unexercised in the test env.)"""
 
-    def complete(self, system: str, user: str, model: str, **params: object) -> str:
+    def complete(self, system: str, user: str, model: str, **params: object) -> CompletionResult:
         key = _require_key("ANTHROPIC_API_KEY")
         payload: dict = {"model": model, "max_tokens": params.get("max_tokens", 2048),
                          "system": system, "messages": [{"role": "user", "content": user}]}
@@ -214,13 +288,25 @@ class AnthropicHTTP:
             payload["temperature"] = params["temperature"]
         data = _http_post_json("https://api.anthropic.com/v1/messages",
                                {"x-api-key": key, "anthropic-version": "2023-06-01"}, payload)
-        return "".join(b.get("text", "") for b in data.get("content", []) if b.get("type") == "text")
+        usage = data.get("usage") if isinstance(data.get("usage"), dict) else {}
+        input_tokens, output_tokens, total_tokens = _normalized_usage(
+            usage.get("input_tokens"), usage.get("output_tokens")
+        )
+        return CompletionResult(
+            text="".join(b.get("text", "") for b in data.get("content", []) if b.get("type") == "text"),
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            total_tokens=total_tokens,
+            provider_request_id=data.get("id") if isinstance(data.get("id"), str) else None,
+            response_model=data.get("model") if isinstance(data.get("model"), str) else None,
+            finish_reason=data.get("stop_reason") if isinstance(data.get("stop_reason"), str) else None,
+        )
 
 
 class OpenAIHTTP:
     """OpenAI Chat Completions API. Key: ``$OPENAI_API_KEY``. (Live path unexercised in the test env.)"""
 
-    def complete(self, system: str, user: str, model: str, **params: object) -> str:
+    def complete(self, system: str, user: str, model: str, **params: object) -> CompletionResult:
         key = _require_key("OPENAI_API_KEY")
         payload: dict = {"model": model,
                          "messages": [{"role": "system", "content": system},
@@ -230,13 +316,26 @@ class OpenAIHTTP:
                 payload[opt] = params[opt]
         data = _http_post_json("https://api.openai.com/v1/chat/completions",
                                {"authorization": f"Bearer {key}"}, payload)
-        return data["choices"][0]["message"]["content"]
+        choice = data["choices"][0]
+        usage = data.get("usage") if isinstance(data.get("usage"), dict) else {}
+        input_tokens, output_tokens, total_tokens = _normalized_usage(
+            usage.get("prompt_tokens"), usage.get("completion_tokens"), usage.get("total_tokens")
+        )
+        return CompletionResult(
+            text=choice["message"]["content"],
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            total_tokens=total_tokens,
+            provider_request_id=data.get("id") if isinstance(data.get("id"), str) else None,
+            response_model=data.get("model") if isinstance(data.get("model"), str) else None,
+            finish_reason=choice.get("finish_reason") if isinstance(choice.get("finish_reason"), str) else None,
+        )
 
 
 class GeminiHTTP:
     """Google Gemini generateContent API. Key: ``$GEMINI_API_KEY``. (Live path unexercised here.)"""
 
-    def complete(self, system: str, user: str, model: str, **params: object) -> str:
+    def complete(self, system: str, user: str, model: str, **params: object) -> CompletionResult:
         key = _require_key("GEMINI_API_KEY")
         url = (f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
                f"?key={key}")
@@ -250,8 +349,21 @@ class GeminiHTTP:
         if gen:
             payload["generationConfig"] = gen
         data = _http_post_json(url, {}, payload)
-        parts = data["candidates"][0]["content"]["parts"]
-        return "".join(p.get("text", "") for p in parts)
+        candidate = data["candidates"][0]
+        parts = candidate["content"]["parts"]
+        usage = data.get("usageMetadata") if isinstance(data.get("usageMetadata"), dict) else {}
+        input_tokens, output_tokens, total_tokens = _normalized_usage(
+            usage.get("promptTokenCount"), usage.get("candidatesTokenCount"), usage.get("totalTokenCount")
+        )
+        return CompletionResult(
+            text="".join(p.get("text", "") for p in parts),
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            total_tokens=total_tokens,
+            provider_request_id=data.get("responseId") if isinstance(data.get("responseId"), str) else None,
+            response_model=data.get("modelVersion") if isinstance(data.get("modelVersion"), str) else None,
+            finish_reason=candidate.get("finishReason") if isinstance(candidate.get("finishReason"), str) else None,
+        )
 
 
 TRANSPORTS: dict[str, Callable[[], object]] = {
@@ -319,6 +431,18 @@ def parse_vendor_critique(raw: str) -> dict:
         confidence = float(confidence)
     except (TypeError, ValueError) as exc:
         raise MalformedVendorOutput("'confidence' must be a number") from exc
+    if not math.isfinite(confidence) or not 0 <= confidence <= 1:
+        raise MalformedVendorOutput("'confidence' must be a finite number between 0 and 1")
+    probe = {
+        "candidate": "submission.md",
+        "critic": "vendor-output",
+        "verdict": verdict,
+        "confidence": confidence,
+        "findings": findings,
+    }
+    errors = schema.validate_named(probe, "critique")
+    if errors:
+        raise MalformedVendorOutput("invalid critique payload: " + "; ".join(errors))
     return {"verdict": verdict, "confidence": confidence, "findings": findings}
 
 
@@ -340,36 +464,102 @@ def run_role(project: str, scene_id: str, candidate: str, role: str, *,
         return {"error": f"role {role!r} not in roster; known: {sorted(roster)}"}
     assignment = roster[role]
 
-    bundle = judge_bundle(project, scene_id, candidate)
+    proj_path = project_dir(project)
+    bundle = judge_bundle(project, scene_id, candidate, role=role)
     if "error" in bundle:
         return bundle
 
     persona = resolve_persona(assignment, agents_dir)
     system, user = build_messages(persona, bundle)
+    run_id = uuid.uuid4().hex
+    cand = bundle["candidate"]
+    packet = {
+        "run_id": run_id,
+        "scene_id": scene_id,
+        "role": role,
+        "vendor": assignment.vendor,
+        "model": assignment.model,
+        "params": assignment.params,
+        "candidate": {"name": cand["name"], "sha256": cand["sha256"]},
+        "messages": {"system": system, "user": user},
+    }
+    packet_sha256 = acceptance.sha256_bytes(acceptance.canonical_json_bytes(packet))
     tp = transport if transport is not None else make_transport(assignment.vendor)
-    raw = tp.complete(system, user, assignment.model, **assignment.params)
-    parsed = parse_vendor_critique(raw)
+    attempt_path = proj_path / ".runs" / "reviews" / scene_id / f"{run_id}.json"
+    started = time.monotonic()
+    try:
+        completion = _normalize_completion(tp.complete(system, user, assignment.model, **assignment.params))
+    except VendorUnavailable as exc:
+        latency_ms = (time.monotonic() - started) * 1000
+        attempt = {
+            "packet": packet,
+            "packet_sha256": packet_sha256,
+            "provider_response": {"latency_ms": latency_ms, "usage": {}},
+            "validation": {
+                "status": "transport_error",
+                "error_type": type(exc).__name__,
+                "error": str(exc),
+            },
+        }
+        acceptance.atomic_write(
+            attempt_path,
+            (json.dumps(attempt, indent=2, ensure_ascii=False) + "\n").encode("utf-8"),
+        )
+        raise
+    latency_ms = (time.monotonic() - started) * 1000
+    provider_response = completion.metadata(latency_ms)
+    raw = completion.text
+    try:
+        parsed = parse_vendor_critique(raw)
+        validation = {"status": "valid"}
+    except MalformedVendorOutput as exc:
+        validation = {"status": "invalid", "error": str(exc)}
+        attempt = {"packet": packet, "packet_sha256": packet_sha256,
+                   "provider_response": provider_response,
+                   "raw_response": raw, "validation": validation}
+        acceptance.atomic_write(
+            attempt_path,
+            (json.dumps(attempt, indent=2, ensure_ascii=False) + "\n").encode("utf-8"),
+        )
+        raise
+
+    attempt = {"packet": packet, "packet_sha256": packet_sha256,
+               "provider_response": provider_response,
+               "raw_response": raw, "parsed": parsed, "validation": validation}
+    acceptance.atomic_write(
+        attempt_path,
+        (json.dumps(attempt, indent=2, ensure_ascii=False) + "\n").encode("utf-8"),
+    )
 
     consistency = _critique.consistency_problem(parsed["verdict"], parsed["findings"])
-    cand = bundle["candidate"]
-    provenance = {"role": role, "vendor": assignment.vendor, "model": assignment.model,
-                  "candidate": cand["name"], "candidate_sha256": cand["sha256"],
-                  "audit_class": assignment.audit_class}
+    provenance = {
+        "source": "role_runner",
+        "run_id": run_id,
+        "role": role,
+        "vendor": assignment.vendor,
+        "model": assignment.model,
+        "candidate_sha256": cand["sha256"],
+        "packet_sha256": packet_sha256,
+        "attempt_artifact": str(attempt_path.relative_to(proj_path)),
+        "provider_response": provider_response,
+    }
     result: dict = {"role": role, "verdict": parsed["verdict"], "confidence": parsed["confidence"],
                     "findings": parsed["findings"], "consistency_problem": consistency,
                     "provenance": provenance, "recorded": None}
 
     if record:
-        proj_path = project_dir(project)
         recorded = _critique.record_critique(
-            proj_path, scene_id, cand["name"], critic=role, verdict=parsed["verdict"],
+            proj_path, scene_id, candidate, critic=role, verdict=parsed["verdict"],
             findings=parsed["findings"], confidence=parsed["confidence"],
-            audit_class=assignment.audit_class)
+            audit_class=assignment.audit_class, _provenance=provenance,
+            _bound_candidate_sha256=cand["sha256"])
         result["recorded"] = recorded
         if "error" not in recorded:
             trace.log(proj_path, scene_id, "vendor_critique", role=role, vendor=assignment.vendor,
                       model=assignment.model, verdict=parsed["verdict"],
-                      candidate_sha256=cand["sha256"], findings=len(parsed["findings"]))
+                      candidate_sha256=cand["sha256"], findings=len(parsed["findings"]),
+                      provider_usage=provider_response["usage"],
+                      latency_ms=provider_response["latency_ms"])
     return result
 
 
@@ -394,6 +584,7 @@ def run_panel(project: str, scene_id: str, candidate: str, roles: list[str], *,
 
     verdicts = {r["role"]: r["verdict"] for r in per_role if "verdict" in r}
     distinct = sorted(set(verdicts.values()))
+    failed_roles = [r["role"] for r in per_role if "verdict" not in r]
     dissenting = [r["role"] for r in per_role
                   if r.get("verdict") in {"revise", "reject"} or r.get("consistency_problem")]
     return {
@@ -401,9 +592,15 @@ def run_panel(project: str, scene_id: str, candidate: str, roles: list[str], *,
         "candidate": candidate,
         "roles": per_role,
         "verdicts": verdicts,
+        "completion": {
+            "requested": len(roles),
+            "completed": len(verdicts),
+            "failed_roles": failed_roles,
+            "complete": len(verdicts) == len(roles),
+        },
         "disagreement": {
             "distinct_verdicts": distinct,
-            "unanimous": len(distinct) <= 1,
+            "unanimous": bool(verdicts) and len(distinct) <= 1,
             "dissenting_roles": dissenting,
         },
         "note": ("Disagreement is information — recorded per role, never collapsed into an average or "

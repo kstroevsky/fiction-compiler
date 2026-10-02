@@ -91,6 +91,34 @@
       "expect": true
     },
     {
+      "name": "ontology rejects boolean zero as a numeric predicate value (ADR 0037)",
+      "check": "ontology_valid",
+      "input": {
+        "ontology": {"predicates": [{"name": "temperature", "arity": "unary", "subject_types": ["obj"], "value_type": "number"}]},
+        "atom": {"predicate": "temperature", "subject": "obj-relay", "value": false}
+      },
+      "expect": false
+    },
+    {
+      "name": "ontology accepts an ordered numeric predicate comparison (ADR 0037)",
+      "check": "ontology_valid",
+      "input": {
+        "ontology": {"predicates": [{"name": "temperature", "arity": "unary", "subject_types": ["obj"], "value_type": "number", "minimum": -20, "maximum": 50}]},
+        "atom": {"predicate": "temperature", "subject": "obj-relay", "value": 0, "comparison": "lt"}
+      },
+      "expect": true
+    },
+    {
+      "name": "ontology rejects an undeclared id for a closed entity type (ADR 0037)",
+      "check": "ontology_valid",
+      "input": {
+        "ontology": {"predicates": [{"name": "located_at", "arity": "binary", "subject_types": ["char"], "object_types": ["loc"]}]},
+        "entity_registry": {"closed_types": ["loc"], "entities": [{"id": "loc-station", "type": "loc"}]},
+        "atom": {"predicate": "located_at", "subject": "char-jonas", "object": "loc-ghost"}
+      },
+      "expect": false
+    },
+    {
       "name": "prose audit flags a focalizer knowing an ungranted fact (ADR 0014, review §4)",
       "check": "prose_knowledge_leak",
       "input": {"pov_knows_before": false, "granted_this_scene": false},
@@ -114,17 +142,17 @@
       "name": "tournament reports no eligible candidate when all fail the deterministic floor (ADR 0016)",
       "check": "tournament_selected",
       "input": {"critiques": [
-        {"candidate": "candidate-a.md", "critic": "defaultness-lint", "findings": [{"dimension": "x", "severity": "material"}]},
+        {"candidate": "candidate-a.md", "critic": "prose-audit", "findings": [{"dimension": "x", "severity": "material"}]},
         {"candidate": "candidate-b.md", "critic": "prose-audit", "findings": [{"dimension": "y", "severity": "fatal"}]}]},
       "expect": "no_eligible_candidates"
     },
     {
-      "name": "premise divergence floor rejects a batch collapsed to one architecture (ADR 0017)",
+      "name": "premise search floor rejects relabeled copies of one premise",
       "check": "premise_diversity",
       "input": {"candidates": [
         {"id": "p1", "logline": "A woman confronts a rival.", "pov_character": "char-a", "transforming_character": "char-b", "conflict_type": "interpersonal", "obliqueness": "direct", "resolution_type": "clever", "theme_question": "who wins?", "why_not_default": "n/a"},
-        {"id": "p2", "logline": "A man confronts a rival.", "pov_character": "char-c", "transforming_character": "char-d", "conflict_type": "interpersonal", "obliqueness": "direct", "resolution_type": "clever", "theme_question": "who wins?", "why_not_default": "n/a"},
-        {"id": "p3", "logline": "A stranger confronts a rival.", "pov_character": "char-e", "transforming_character": "char-f", "conflict_type": "interpersonal", "obliqueness": "direct", "resolution_type": "clever", "theme_question": "who wins?", "why_not_default": "n/a"}]},
+        {"id": "p2", "logline": "A woman confronts a rival.", "pov_character": "char-c", "transforming_character": "char-c", "conflict_type": "internal", "obliqueness": "oblique", "resolution_type": "ambiguous", "theme_question": "who wins?", "why_not_default": "n/a"},
+        {"id": "p3", "logline": "A woman confronts a rival.", "pov_character": "char-e", "transforming_character": "char-f", "conflict_type": "character-vs-society", "obliqueness": "direct", "resolution_type": "refusal", "theme_question": "who wins?", "why_not_default": "n/a"}]},
       "expect": false
     },
     {
@@ -212,6 +240,50 @@
       "check": "vendor_output",
       "input": {"raw": "Sure! Overall this candidate reads well and I would pass it."},
       "expect": "malformed"
+    },
+    {
+      "name": "fabula replay survives repeated flashbacks (ADR 0038)",
+      "check": "fabula_replay",
+      "input": {
+        "seed_time": 0,
+        "accepted": ["ch01-sc01", "ch01-sc02", "ch01-sc03", "ch01-sc04"],
+        "scenes": {
+          "ch01-sc01": {
+            "spec": {"id": "ch01-sc01"},
+            "delta": {"scene_id": "ch01-sc01", "time": 10,
+                      "facts_added": [{"id": "fact-late-one", "text": "Late one."}],
+                      "facts_removed": [], "knowledge_changes": [], "relationship_changes": [],
+                      "promises_opened": [], "promises_closed": []}
+          },
+          "ch01-sc02": {
+            "spec": {"id": "ch01-sc02", "narrative_mode": "analepsis", "fabula_time": 2},
+            "delta": {"scene_id": "ch01-sc02", "time": 2,
+                      "facts_added": [{"id": "fact-early-marker", "text": "The early marker exists."}],
+                      "facts_removed": [], "knowledge_changes": [], "relationship_changes": [],
+                      "promises_opened": [], "promises_closed": []}
+          },
+          "ch01-sc03": {
+            "spec": {"id": "ch01-sc03"},
+            "delta": {"scene_id": "ch01-sc03", "time": 12,
+                      "facts_added": [{"id": "fact-late-two", "text": "Late two."}],
+                      "facts_removed": [], "knowledge_changes": [], "relationship_changes": [],
+                      "promises_opened": [], "promises_closed": []}
+          },
+          "ch01-sc04": {
+            "spec": {"id": "ch01-sc04", "narrative_mode": "analepsis", "fabula_time": 5},
+            "delta": {"scene_id": "ch01-sc04", "time": 5,
+                      "facts_added": [{"id": "fact-middle", "text": "The middle fact exists."}],
+                      "facts_removed": ["fact-early-marker"], "knowledge_changes": [],
+                      "relationship_changes": [], "promises_opened": [], "promises_closed": []}
+          }
+        }
+      },
+      "expect": {
+        "applied_scenes": ["ch01-sc02", "ch01-sc04", "ch01-sc01", "ch01-sc03"],
+        "facts": ["fact-late-one", "fact-late-two", "fact-middle"],
+        "reconstruction_order": "fabula",
+        "issues": []
+      }
     }
   ]
 }

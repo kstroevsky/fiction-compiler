@@ -9,14 +9,19 @@ three independently and preserve disagreement.
    <project> <scene>`. Knowledge cutoff, causal refs, POV, chronology, promise ledger. **A fatal
    finding blocks promotion** — fix it before anything else.
    - **Prose audit (extract → code).** The hard audit above reads the spec, not the text. To check the
-     *prose*, extract a `prose-claims` artifact from the candidate (pov, tense, word_count, and typed
+     *prose*, first do a **plan-blind extraction** into `prose-claims`: pov, tense, word_count, typed
      claims: character_present / focalizer_knows / interiority_of / located_at / closes_promise /
-     states_fact, each with an evidence span — schema `prose-claims`), then run
+     states_fact, plus `observed_events` with exact evidence spans. Only after that extraction is
+     frozen, inspect the scene plan and add `event_alignment` entries that mark required events
+     `realized`, `omitted`, or `unverified`. A `realized` alignment must point to an observed event;
+     do not invent an observation from the plan. Then run
      `prose_audit(project, scene, claims)` (MCP) or `scripts/prose_audit.py <project> <scene>
      <claims.json>`. Deterministic code proves the claims against state-before + spec: a focalizer
      knowing an ungranted fact, an unplanned character, head-hopping, a tense break, a spatial
-     contradiction, or an unrecorded promise closure is material. Extract honestly — the audit only
-     proves the claims you give it.
+     contradiction, an unrecorded promise closure, or an explicitly aligned required-event omission
+     is material. Missing extraction/alignment produces `uncertain`, not a fabricated omission.
+     Free-text turn/exit-state realization remains `unverified` for literary review. Extract honestly —
+     the audit only proves the evidence you give it.
 2. **Defaultness (code).** `defaultness_lint` each candidate (or `scripts/defaultness_lint.py
    <project> <scene>`). Surface tics only; the literary read below finds the deeper defaults.
 3. **Literary audit (LLM).** Delegate to the specialist agents — this is what code cannot check:

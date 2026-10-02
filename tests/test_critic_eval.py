@@ -28,6 +28,23 @@ class DeterministicCaseTests(unittest.TestCase):
         self.assertTrue(critic_eval.run_deterministic_case(
             {"detector": "prose_knowledge_leak", "input": {"pov_knows_before": False, "granted_this_scene": False}}))
 
+    def test_ontology_detector_uses_typed_value_and_closed_entity_semantics(self) -> None:
+        case = {
+            "detector": "ontology",
+            "input": {
+                "ontology": {"predicates": [{
+                    "name": "enabled", "arity": "unary", "subject_types": ["obj"],
+                    "value_type": "boolean",
+                }]},
+                "entity_registry": {
+                    "closed_types": ["obj"],
+                    "entities": [{"id": "obj-relay", "type": "obj"}],
+                },
+                "atom": {"predicate": "enabled", "subject": "obj-ghost", "value": 0},
+            },
+        }
+        self.assertTrue(critic_eval.run_deterministic_case(case))
+
     def test_llm_detector_is_not_deterministic(self) -> None:
         with self.assertRaises(ValueError):
             critic_eval.run_deterministic_case({"detector": "llm", "input": {"text": "x"}})
@@ -67,6 +84,26 @@ class ScoreFindingsTests(unittest.TestCase):
         row = next(r for r in report["results"] if r["id"] == case["id"])
         self.assertEqual(row["status"], "scored")
         self.assertTrue(row["caught"])
+
+    def test_negated_signal_does_not_count_as_detection(self) -> None:
+        case = {"signals": ["theme"]}
+        findings = [{
+            "severity": "material",
+            "dimension": "style",
+            "evidence": "No theme problem exists; the actual issue is spelling.",
+            "diagnosis": "No thematic defect is present.",
+        }]
+        self.assertFalse(critic_eval.score_findings(case, findings))
+
+    def test_signal_in_dimension_is_strong_localization_evidence(self) -> None:
+        case = {"signals": ["theme"]}
+        findings = [{
+            "severity": "material",
+            "dimension": "spoken-theme",
+            "evidence": "The dialogue states the governing idea.",
+            "diagnosis": "The theme is stated rather than enacted.",
+        }]
+        self.assertTrue(critic_eval.score_findings(case, findings))
 
 
 if __name__ == "__main__":

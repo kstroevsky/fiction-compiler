@@ -1,0 +1,13 @@
+{
+  "project_id": "slack-water",
+  "evidence_basis": "complete-manuscript",
+  "complete_story": true,
+  "features": {
+    "ending_form_tags": ["small-physical-act", "practical-aftercare"],
+    "turn_tags": ["evidence-forces-reframing", "refusal-of-unsafe-action"],
+    "resolution_tags": ["practical-problem-contained", "recognition-without-triumph"],
+    "object_motifs": ["boat", "wood", "tide", "cover"],
+    "focalization_tags": ["close-third", "fixed-internal"]
+  },
+  "notes": "The final action is leaving the cover off so the boat can dry after the unsafe launch is refused."
+}

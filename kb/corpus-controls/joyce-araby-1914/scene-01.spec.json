@@ -1,0 +1,17 @@
+{
+  "id": "ch01-sc01",
+  "chapter": "araby",
+  "pov": "first-person retrospective narrator / younger experiencing self",
+  "participants": ["boy", "mangans-sister", "aunt", "uncle", "neighborhood-boys"],
+  "purpose": [
+    "Establish the street, household residue, habitual play, and the boy's idealizing attention to Mangan's sister."
+  ],
+  "entry_state": ["The boy lives with his aunt and uncle on North Richmond Street."],
+  "desire": "Remain near and privately attend to Mangan's sister without yet having a direct relationship with her.",
+  "conflict": "His romanticized inward attention has almost no direct outlet in the ordinary street and household world.",
+  "turn": "The habitual watching and private devotion intensify into solitary, quasi-religious self-awareness before she speaks to him.",
+  "exit_state": ["The boy's private fascination dominates his attention."],
+  "required_events": [],
+  "forbidden_moves": ["Do not collapse retrospective narration into proof that the younger self already possesses the narrator's later interpretation."],
+  "style_constraints": ["Preserve the distinction between observable routine and retrospective figurative framing."]
+}

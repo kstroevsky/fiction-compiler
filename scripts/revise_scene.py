@@ -23,6 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from fiction_compiler import defaultness, revision  # noqa: E402
+from fiction_compiler.workspace import resolve_scene_candidate, validate_scene_id  # noqa: E402
 
 
 def resolve_project(arg: str) -> Path:
@@ -30,12 +31,13 @@ def resolve_project(arg: str) -> Path:
 
 
 def resolve_candidate(project: Path, scene: str, arg: str) -> Path:
-    candidate = Path(arg)
+    validate_scene_id(scene)
+    try:
+        candidate = resolve_scene_candidate(project, scene, arg)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
     if candidate.exists():
         return candidate
-    in_scene = project / "scenes" / scene / "candidates" / arg
-    if in_scene.exists():
-        return in_scene
     raise SystemExit(f"Candidate not found: {arg}")
 
 
@@ -54,6 +56,7 @@ def main() -> int:
     parser.add_argument("--before", required=True, help="prior candidate (file or candidates/<name>)")
     parser.add_argument("--after", required=True, help="revised candidate")
     parser.add_argument("--target", help="dimension the revision targets, e.g. defaultness, knowledge")
+    parser.add_argument("--target-evidence", help="exact evidence text of the target finding within --target")
     parser.add_argument("--before-critiques", nargs="*", help="extra critique JSON globs for the prior version")
     parser.add_argument("--after-critiques", nargs="*", help="extra critique JSON globs for the revised version")
     parser.add_argument("--max-iter", type=int, default=3)
@@ -71,11 +74,16 @@ def main() -> int:
 
     history = revision.revision_history(scene_dir)
     iteration = len(history) + 1
-    attempts_at_layer = 1 + sum(1 for h in history if h.get("target_dimension") == args.target)
+    attempts_at_layer = 1 + sum(
+        1 for h in history
+        if h.get("target_dimension") == args.target
+        and (args.target_evidence is None or h.get("target_evidence") == args.target_evidence)
+    )
 
     outcome = revision.evaluate_revision(
         before, after,
         target_dimension=args.target,
+        target_evidence=args.target_evidence,
         iteration=iteration,
         max_iterations=args.max_iter,
         max_attempts_per_layer=args.max_attempts,
@@ -96,6 +104,7 @@ def main() -> int:
             "before": str(before_path.name),
             "after": str(after_path.name),
             "target_dimension": args.target,
+            "target_evidence": args.target_evidence,
             "counts": outcome.counts(b, a),
             "decision": outcome.decision,
             "reason": outcome.reason,

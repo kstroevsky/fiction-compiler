@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "reader-probe-response.schema.json",
+  "type": "object",
+  "required": [
+    "schema_version", "response_id", "project_id", "probe_id", "packet_sha256", "packet",
+    "respondent_kind", "respondent_id", "cohort_kind", "answers", "provenance", "recorded_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "response_id": {"type": "string", "pattern": "^readerresp-[0-9a-f]{64}$"},
+    "project_id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "probe_id": {"type": "string", "pattern": "^probe-[a-z0-9-]+$"},
+    "packet_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "packet": {"type": "object"},
+    "respondent_kind": {"enum": ["human", "model"]},
+    "respondent_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "cohort_kind": {"enum": ["target-audience", "general-reader", "expert", "model-proxy"]},
+    "answers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["question_id"],
+        "additionalProperties": false,
+        "properties": {
+          "question_id": {"type": "string", "pattern": "^rq-[a-z0-9-]+$"},
+          "text": {"type": "string", "minLength": 1},
+          "selected_option": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+          "scale": {"type": "integer", "minimum": 1, "maximum": 5}
+        }
+      }
+    },
+    "provenance": {"type": "object"},
+    "recorded_at": {"type": "string", "minLength": 1}
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "project_id": "the-overnight",
+  "clauses": [
+    {
+      "text": "5-8 pages, single sitting",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "close third person, one focalizer (Nadia)",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "strictly linear: one night, 2 a.m. to dawn; no flashback, no framing device",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "a concrete problem with a clear cause and a clear, earned turn",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "accessible, sensory prose; feeling is carried by the hands' work, not named",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    },
+    {
+      "text": "a quiet, legible ending: recognition, not triumph; no twist, no cryptic withholding",
+      "coverage": [],
+      "untested_reason": "No explicit deterministic check, critic question, reader probe, or human-review binding has been recorded yet."
+    }
+  ]
+}

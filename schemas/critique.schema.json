@@ -10,6 +10,64 @@
     "audit_class": {"enum": ["hard", "literary", "defaultness"]},
     "verdict": {"enum": ["pass", "revise", "reject", "uncertain"]},
     "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "realization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_events", "unplanned_consequential", "turn", "exit_state"],
+      "properties": {
+        "required_events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["event_id", "status"],
+            "additionalProperties": false,
+            "properties": {
+              "event_id": {"type": "string"},
+              "status": {"enum": ["realized", "omitted", "unverified"]},
+              "observed_id": {"type": "string"}
+            }
+          }
+        },
+        "unplanned_consequential": {"type": "array", "items": {"type": "string"}},
+        "turn": {"enum": ["unverified"]},
+        "exit_state": {"enum": ["unverified"]}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "run_id", "role", "vendor", "model", "candidate_sha256", "packet_sha256"],
+      "properties": {
+        "source": {"enum": ["role_runner"]},
+        "run_id": {"type": "string", "minLength": 1},
+        "role": {"type": "string", "minLength": 1},
+        "vendor": {"type": "string", "minLength": 1},
+        "model": {"type": "string", "minLength": 1},
+        "candidate_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "packet_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "attempt_artifact": {"type": "string", "minLength": 1},
+        "provider_response": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["latency_ms", "usage"],
+          "properties": {
+            "latency_ms": {"type": "number", "minimum": 0},
+            "provider_request_id": {"type": "string", "minLength": 1},
+            "response_model": {"type": "string", "minLength": 1},
+            "finish_reason": {"type": "string", "minLength": 1},
+            "usage": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "input_tokens": {"type": "integer", "minimum": 0},
+                "output_tokens": {"type": "integer", "minimum": 0},
+                "total_tokens": {"type": "integer", "minimum": 0}
+              }
+            }
+          }
+        }
+      }
+    },
     "findings": {
       "type": "array",
       "items": {

@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "reader-disclosure.schema.json",
+  "type": "object",
+  "required": ["project_id", "disclosures", "non_fact_revelations", "curiosity_gaps", "surprises"],
+  "additionalProperties": false,
+  "properties": {
+    "project_id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "disclosures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "source_revelation", "fact", "scene_id", "mode"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^disclosure-[a-z0-9-]+$"},
+          "source_revelation": {"type": "string", "pattern": "^rev-[a-z0-9-]+$"},
+          "fact": {"type": "string", "pattern": "^fact-[a-z0-9-]+$"},
+          "scene_id": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+          "mode": {"enum": ["stated", "implied", "withheld"]},
+          "note": {"type": "string"}
+        }
+      }
+    },
+    "non_fact_revelations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["revelation_id", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "revelation_id": {"type": "string", "pattern": "^rev-[a-z0-9-]+$"},
+          "reason": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "curiosity_gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "question", "opened_in", "closed_in"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^gap-[a-z0-9-]+$"},
+          "question": {"type": "string", "minLength": 1},
+          "opened_in": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+          "closed_in": {"type": ["string", "null"], "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"}
+        }
+      }
+    },
+    "surprises": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "reveal_scene", "requires_setup", "setup_disclosures"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^surprise-[a-z0-9-]+$"},
+          "reveal_scene": {"type": "string", "pattern": "^ch[0-9]{2}-sc[0-9]{2}$"},
+          "requires_setup": {"type": "boolean"},
+          "setup_disclosures": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^disclosure-[a-z0-9-]+$"}
+          },
+          "note": {"type": "string"}
+        }
+      }
+    }
+  }
+}

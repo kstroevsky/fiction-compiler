@@ -65,6 +65,7 @@ class StateReconstructionTests(unittest.TestCase):
             self.assertTrue(before.knows("char-mara", "fact-relay-cut"))
             self.assertEqual(before.relationship("char-mara", "char-jonas"), "wary")
             self.assertTrue(before.promise_is_open("promise-who-cut-it"))
+            self.assertEqual(before.promise_definitions["promise-who-cut-it"]["text"], "Who cut the relay?")
             self.assertEqual(before.time, 1)
 
     def test_no_future_knowledge_leak(self) -> None:
@@ -94,6 +95,36 @@ class StateReconstructionTests(unittest.TestCase):
             self.assertFalse(before.fact_exists("fact-relay-cut"))
             self.assertEqual(before.relationship("char-mara", "char-jonas"), "colleagues")
             self.assertEqual(before.time, 0)
+
+    def test_flashback_uses_historical_state_and_full_replay_uses_fabula_order(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build_project(Path(tmp))
+            first = json.loads((project / "scenes" / "ch01-sc01" / "state-delta.json").read_text())
+            first["time"] = 5
+            first["facts_added"].append({"id": "fact-future", "text": "The later fact exists."})
+            first["facts_removed"] = ["fact-old-marker"]
+            write_delta(project, "ch01-sc01", first)
+
+            second = json.loads((project / "scenes" / "ch01-sc02" / "state-delta.json").read_text())
+            second["time"] = 2
+            second["facts_added"] = [{"id": "fact-old-marker", "text": "The old marker exists."}]
+            second["facts_removed"] = []
+            write_delta(project, "ch01-sc02", second)
+            write(project / "scenes" / "ch01-sc02" / "spec.json", json.dumps({
+                "id": "ch01-sc02", "narrative_mode": "analepsis", "fabula_time": 2,
+            }))
+
+            before_flashback = state.reconstruct_state_before(project, "ch01-sc02")
+            self.assertEqual(before_flashback.reconstruction_order, "fabula")
+            self.assertEqual(before_flashback.applied_scenes, [])
+            self.assertFalse(before_flashback.fact_exists("fact-future"))
+
+            final = state.reconstruct(project)
+            self.assertEqual(final.reconstruction_order, "fabula")
+            self.assertEqual(final.applied_scenes, ["ch01-sc02", "ch01-sc01"])
+            self.assertTrue(final.fact_exists("fact-future"))
+            self.assertFalse(final.fact_exists("fact-old-marker"))
+            self.assertEqual(final.time, 5)
 
 
 def build_typed_project(root: Path) -> Path:
@@ -126,9 +157,28 @@ class TypedIRStateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             before = state.reconstruct_state_before(build_typed_project(Path(tmp)), "ch01-sc01")
             self.assertTrue(before.holds("located_at", "char-jonas", "loc-station"))
+            self.assertTrue(before.holds("located_at", "char-jonas", "loc-station", value=True))
+            self.assertFalse(before.holds("located_at", "char-jonas", "loc-station", value=False))
             self.assertEqual(before.relationship_directed("char-mara", "char-jonas", "trusts"), "high")
+            self.assertTrue(before.holds("trusts", "char-mara", "char-jonas", value="high"))
+            self.assertFalse(before.holds("trusts", "char-mara", "char-jonas", value="broken"))
             # Directional: trust does not imply the reverse edge exists.
             self.assertIsNone(before.relationship_directed("char-jonas", "char-mara", "trusts"))
+
+    def test_typed_value_comparison_does_not_coerce_boolean_and_zero(self) -> None:
+        current = state.StoryState()
+        current.predicates[("temperature", "obj-relay", None)] = -2
+        current.predicates[("enabled", "obj-relay", None)] = False
+        current.predicates[("mode", "obj-relay", None)] = "manual"
+
+        self.assertTrue(current.holds("temperature", "obj-relay", value=0, comparison="lt"))
+        self.assertTrue(current.holds("temperature", "obj-relay", value=-2))
+        self.assertFalse(current.holds("temperature", "obj-relay", value=False))
+        self.assertTrue(current.holds("enabled", "obj-relay", value=False))
+        self.assertFalse(current.holds("enabled", "obj-relay", value=0))
+        self.assertTrue(current.holds("mode", "obj-relay", value="manual"))
+        self.assertTrue(current.holds("mode", "obj-relay", value="automatic", comparison="ne"))
+        self.assertFalse(current.holds("mode", "obj-relay", value="zzz", comparison="lt"))
 
     def test_delta_predicate_add_and_remove(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -143,6 +193,96 @@ class TypedIRStateTests(unittest.TestCase):
             before = state.reconstruct_state_before(project, "ch01-sc02")
             self.assertTrue(before.holds("knows", "char-mara", "fact-relay-cut"))
             self.assertFalse(before.holds("knows", "char-mara", "fact-jonas-confesses"))
+            self.assertTrue(before.holds("knows", "char-mara", "fact-jonas-confesses", value=False))
+
+    def test_knowledge_change_can_explicitly_remove_knowledge(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build_project(Path(tmp))
+            delta = json.loads((project / "scenes" / "ch01-sc02" / "state-delta.json").read_text())
+            delta["knowledge_changes"].append(
+                {"op": "remove", "character": "char-mara", "fact": "fact-relay-cut"}
+            )
+            write_delta(project, "ch01-sc02", delta)
+            final = state.reconstruct(project)
+            self.assertFalse(final.knows("char-mara", "fact-relay-cut"))
+
+
+    def test_removed_truth_remains_memory_and_belief_but_not_knowledge(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build_project(Path(tmp))
+            delta = json.loads((project / "scenes" / "ch01-sc02" / "state-delta.json").read_text())
+            delta["facts_removed"] = ["fact-relay-cut"]
+            write_delta(project, "ch01-sc02", delta)
+            final = state.reconstruct(project)
+            self.assertFalse(final.fact_exists("fact-relay-cut"))
+            self.assertTrue(final.remembers("char-mara", "fact-relay-cut"))
+            self.assertTrue(final.believes("char-mara", "fact-relay-cut"))
+            self.assertFalse(final.knows("char-mara", "fact-relay-cut"))
+
+    def test_false_belief_can_be_corrected_then_forgotten(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build_project(Path(tmp))
+            canon = project / "canon"
+            write(canon / "propositions.jsonl", json.dumps({
+                "id": "fact-door-open", "text": "The east door is open."
+            }) + "\n")
+            write(canon / "belief-state.jsonl", json.dumps({
+                "op": "set", "character": "char-mara", "fact": "fact-door-open",
+                "value": True, "source": "testimony"
+            }) + "\n")
+
+            seed = state.reconstruct_state_before(project, "ch01-sc01")
+            self.assertFalse(seed.fact_exists("fact-door-open"))
+            self.assertTrue(seed.remembers("char-mara", "fact-door-open"))
+            self.assertTrue(seed.believes("char-mara", "fact-door-open", True))
+            self.assertFalse(seed.knows("char-mara", "fact-door-open"))
+
+            first = json.loads((project / "scenes" / "ch01-sc01" / "state-delta.json").read_text())
+            first["belief_changes"] = [{
+                "op": "set", "character": "char-mara", "fact": "fact-door-open",
+                "value": False, "source": "correction"
+            }]
+            write_delta(project, "ch01-sc01", first)
+            corrected = state.reconstruct_state_before(project, "ch01-sc02")
+            self.assertTrue(corrected.remembers("char-mara", "fact-door-open"))
+            self.assertTrue(corrected.believes("char-mara", "fact-door-open", False))
+            self.assertFalse(corrected.holds("believes", "char-mara", "fact-door-open", value=True))
+            self.assertTrue(corrected.holds("believes", "char-mara", "fact-door-open", value=False))
+
+            second = json.loads((project / "scenes" / "ch01-sc02" / "state-delta.json").read_text())
+            second["belief_changes"] = [{
+                "op": "forget", "character": "char-mara", "fact": "fact-door-open",
+                "source": "forgetting"
+            }]
+            write_delta(project, "ch01-sc02", second)
+            final = state.reconstruct(project)
+            self.assertFalse(final.remembers("char-mara", "fact-door-open"))
+            self.assertIsNone(final.belief("char-mara", "fact-door-open"))
+
+    def test_resource_transfers_conserve_and_ordered_use_checks_underflow(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project = build_project(Path(tmp))
+            write(project / "canon" / "resources.jsonl", json.dumps({
+                "id": "res-loaf", "holder": "char-mara", "quantity": 12, "unit": "loaf"
+            }) + "\n")
+            first = json.loads((project / "scenes" / "ch01-sc01" / "state-delta.json").read_text())
+            first["resource_changes"] = [{
+                "op": "transfer", "resource": "res-loaf", "from": "char-mara",
+                "to": "customer", "quantity": 11, "unit": "loaf"
+            }]
+            write_delta(project, "ch01-sc01", first)
+            before_second = state.reconstruct_state_before(project, "ch01-sc02")
+            self.assertEqual(before_second.resource_quantity("res-loaf", "char-mara"), 1)
+            self.assertEqual(before_second.resource_quantity("res-loaf", "customer"), 11)
+            self.assertEqual(sum(q for (resource, _), q in before_second.resources.items() if resource == "res-loaf"), 12)
+            self.assertEqual(state.resource_change_errors(before_second, [
+                {"op": "acquire", "resource": "res-loaf", "holder": "char-mara", "quantity": 1},
+                {"op": "consume", "resource": "res-loaf", "holder": "char-mara", "quantity": 2},
+            ]), [])
+            errors = state.resource_change_errors(before_second, [
+                {"op": "consume", "resource": "res-loaf", "holder": "char-mara", "quantity": 2}
+            ])
+            self.assertTrue(any("underflows" in error for error in errors), errors)
 
 
 if __name__ == "__main__":

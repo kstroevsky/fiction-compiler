@@ -1,0 +1,17 @@
+{
+  "id": "ch01-sc02",
+  "chapter": "araby",
+  "pov": "first-person retrospective narrator / younger experiencing self",
+  "participants": ["boy", "mangans-sister", "schoolmaster", "classmates"],
+  "purpose": [
+    "Turn private fascination into an explicit errand when Mangan's sister mentions Araby and the boy promises to bring her something."
+  ],
+  "entry_state": ["The boy is preoccupied with Mangan's sister but has barely spoken with her."],
+  "desire": "Go to Araby and return with a gift that can embody his idealized feeling.",
+  "conflict": "Anticipation of the bazaar displaces his attention from ordinary schoolwork and daily routine.",
+  "turn": "A brief conversation produces the promise to bring something from Araby, giving the fantasy a concrete objective.",
+  "exit_state": ["The bazaar errand has become the boy's overriding immediate aim."],
+  "required_events": [],
+  "forbidden_moves": ["Do not encode the retrospective narrator's judgment of the obsession as knowledge already available to the younger self."],
+  "style_constraints": ["Keep the external promise distinct from the larger affective meaning the narrator gives it."]
+}

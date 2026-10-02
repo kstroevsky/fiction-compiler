@@ -290,7 +290,12 @@
         "public-domain"
       ],
       "notes": "US-public-domain texts for corpus analysis (annotation and abstract feature extraction, not wholesale reproduction into prompts).",
-      "copyright_note": "US public domain. EU/DE status must be verified per author death date before ingesting any specific title."
+      "copyright_note": "US public domain. EU/DE status must be verified per author death date before ingesting any specific title.",
+      "rights": {
+        "eu_de_status": "per-title-verification-required",
+        "full_text_policy": "blocked-pending-title-check",
+        "basis": "Corpus-level US public-domain status does not establish EU/DE status for a specific work, translation, or edition."
+      }
     },
     {
       "id": "gutenberg",
@@ -305,7 +310,36 @@
         "public-domain"
       ],
       "notes": "Large PD text corpus for pattern analysis. Licensing is US-centric.",
-      "copyright_note": "Status determined by US copyright. From Germany, verify EU/DE status (author death + 70) per title before ingesting."
+      "copyright_note": "Status determined by US copyright. From Germany, verify EU/DE status (author death + 70) per title before ingesting.",
+      "rights": {
+        "eu_de_status": "per-title-verification-required",
+        "full_text_policy": "blocked-pending-title-check",
+        "basis": "Project Gutenberg's corpus status is US-centric; each work, translation, and edition needs a separate EU/DE check before full-text ingestion."
+      }
+    },
+    {
+      "id": "joyce-araby-gutenberg-2814",
+      "title": "Araby, in Dubliners (Project Gutenberg eBook #2814, original English text)",
+      "creator": "James Joyce (1882-1941)",
+      "type": "story",
+      "stream": "fiction-corpus",
+      "license": "public-domain",
+      "location": "https://www.gutenberg.org/ebooks/2814",
+      "domains": [
+        "public-domain-control",
+        "scene-representation",
+        "defaultness-false-positive"
+      ],
+      "notes": "Title-specific literature control for review §6.9. The repository stores only the Araby story extracted from the original-English Dubliners plaintext, split into four analyst-defined segments and hash-bound in kb/corpus-controls/joyce-araby-1914/control.json.",
+      "copyright_note": "Project Gutenberg identifies Dubliners #2814 as public domain in the USA and identifies James Joyce as 1882-1941. EU Directive 2006/116/EC Article 1 sets the author term at life + 70 years; for Joyce's original English text that term has expired. No modern translation is used.",
+      "rights": {
+        "eu_de_status": "cleared",
+        "full_text_policy": "allowed",
+        "verified_on": "2026-09-29",
+        "basis": "Original English text by sole identified author James Joyce, who died in 1941. Directive 2006/116/EC Article 1 provides life + 70 years for an identified literary author. Project Gutenberg eBook #2814 identifies the text, author dates, contents including Araby, and US public-domain status.",
+        "source_url": "https://www.gutenberg.org/ebooks/2814",
+        "legal_basis_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32006L0116"
+      }
     },
     {
       "id": "the-overnight-example",
@@ -322,7 +356,13 @@
         "showing-and-telling"
       ],
       "copyright_note": "Generated within this repository; no external rights. Safe to quote and annotate.",
-      "notes": "First seeded corpus annotation. Analyze abstract craft features; it is a single sample."
+      "notes": "First seeded corpus annotation. Analyze abstract craft features; it is a single sample.",
+      "rights": {
+        "eu_de_status": "repository-owned",
+        "full_text_policy": "allowed",
+        "verified_on": "2026-09-29",
+        "basis": "Generated within this repository; no external literary source is being ingested."
+      }
     },
     {
       "id": "audit26-tian-discourse",

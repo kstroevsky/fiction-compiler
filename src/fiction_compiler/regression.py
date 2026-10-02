@@ -15,12 +15,14 @@ the runner fails and the framework change must be rejected or rolled back.
 from __future__ import annotations
 
 import json
+import platform
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
 from . import (critic_eval, critique, defaultness, integrity, ontology, premise, prose_audit,
-               revision, tournament)
-from .workspace import KB, ROOT, SCHEMAS
+               revision, state, tournament)
+from .workspace import ROOT
 
 FIXTURES = ROOT / "regression" / "fixtures.json"
 
@@ -46,9 +48,15 @@ def _tournament_decision(inp: dict) -> str:
 
 
 def _ontology_valid(inp: dict) -> bool:
-    ont = {p["name"]: p for p in inp["ontology"].get("predicates", [])}
     atom = inp["atom"]
-    return not ontology.check_atom(ont, atom.get("predicate"), atom.get("subject"), atom.get("object"))
+    kwargs = {"registry": inp.get("entity_registry"), "op": atom.get("op")}
+    if "value" in atom:
+        kwargs["value"] = atom["value"]
+    if "comparison" in atom:
+        kwargs["comparison"] = atom["comparison"]
+    return not ontology.check_atom(
+        inp["ontology"], atom.get("predicate"), atom.get("subject"), atom.get("object"), **kwargs
+    )
 
 
 def _prose_knowledge_leak(inp: dict) -> bool:
@@ -90,6 +98,36 @@ def _tournament_selected(inp: dict) -> str:
     return rec.get("candidate", rec["decision"])
 
 
+def _fabula_replay(inp: dict) -> dict:
+    """Run an isolated canonical replay fixture through the production state engine."""
+    with tempfile.TemporaryDirectory() as tmp:
+        project = Path(tmp) / "project"
+        canon = project / "canon"
+        canon.mkdir(parents=True)
+        (canon / "index.json").write_text(
+            json.dumps({"accepted_state_deltas": inp.get("accepted", [])}), encoding="utf-8"
+        )
+        (canon / "timeline.jsonl").write_text(
+            json.dumps({"time": inp.get("seed_time", 0)}) + "\n", encoding="utf-8"
+        )
+        for scene_id, scene in inp.get("scenes", {}).items():
+            scene_dir = project / "scenes" / scene_id
+            scene_dir.mkdir(parents=True)
+            (scene_dir / "spec.json").write_text(
+                json.dumps(scene.get("spec", {"id": scene_id})), encoding="utf-8"
+            )
+            (scene_dir / "state-delta.json").write_text(
+                json.dumps(scene["delta"]), encoding="utf-8"
+            )
+        replayed = state.reconstruct(project)
+        return {
+            "applied_scenes": replayed.applied_scenes,
+            "facts": sorted(replayed.facts),
+            "reconstruction_order": replayed.reconstruction_order,
+            "issues": replayed.reconstruction_issues,
+        }
+
+
 CHECKS = {
     "defaultness_verdict": _defaultness_verdict,
     "revision_decision": _revision_decision,
@@ -101,43 +139,145 @@ CHECKS = {
     "critique_consistency": _critique_consistency,
     "critic_case": _critic_case,
     "vendor_output": _vendor_output,
+    "fabula_replay": _fabula_replay,
 }
 
 
 # --- provenance -------------------------------------------------------------------------------
 
-def _hash_dir(paths) -> str:
+def _hash_paths(root: Path, paths) -> str:
     combined = []
-    for path in sorted(paths, key=lambda p: p.name):
+    for path in sorted(paths, key=lambda p: p.relative_to(root).as_posix()):
         if path.is_file():
-            combined.append(f"{path.name}:{integrity.sha256_file(path)}")
+            rel = path.relative_to(root).as_posix()
+            combined.append(f"{rel}:{integrity.sha256_file(path)}")
     return integrity.sha256_bytes("\n".join(combined).encode("utf-8"))
 
 
-def framework_manifest() -> dict:
-    """A content fingerprint of the deterministic framework (schemas + KB index + package source).
+def _framework_groups(root: Path) -> dict[str, list[Path]]:
+    return {
+        "schemas": list((root / "schemas").glob("*.json")),
+        "knowledge_base": [
+            path for path in (root / "kb").rglob("*") if path.suffix in {".json", ".md"}
+        ],
+        "source": list((root / "src" / "fiction_compiler").rglob("*.py")),
+        "scripts": list((root / "scripts").rglob("*.py")),
+        "configuration": [
+            *list((root / "config").rglob("*.json")),
+            root / "premise-probes.json",
+        ],
+        "evaluation_data": [
+            *list((root / "evals").rglob("*.json")),
+            *list((root / "regression").rglob("*.json")),
+        ],
+        "agent_instructions": [
+            *list((root / ".claude" / "agents").rglob("*.md")),
+            *list((root / ".agents" / "skills").glob("*/SKILL.md")),
+            root / "AGENTS.md",
+            root / "CLAUDE.md",
+            *list((root / "constitution").rglob("*.md")),
+        ],
+        "runtime_config": [root / "pyproject.toml"],
+    }
 
-    Changes whenever any pinned component changes, so a regression run is anchored to *what* was
-    running. This is the "record versions / context hashes" the review asked for, deterministically.
+
+def is_framework_path(relative_path: str) -> bool:
+    """Whether a repository-relative path belongs to the behavior-relevant framework surface.
+
+    This mirrors ``_framework_groups`` lexically so a transaction can declare a file that does not
+    exist yet without allowing unrelated documentation or arbitrary workspace files into scope.
     """
-    schemas = _hash_dir(SCHEMAS.glob("*.json"))
-    kb_index_path = KB / "index.json"
-    kb_index = integrity.sha256_file(kb_index_path) if kb_index_path.exists() else ""
-    source = _hash_dir((ROOT / "src" / "fiction_compiler").glob("*.py"))
-    combined = integrity.sha256_bytes(f"{schemas}:{kb_index}:{source}".encode("utf-8"))
+    path = Path(relative_path)
+    parts = path.parts
+    if not parts or path.is_absolute() or ".." in parts:
+        return False
+    posix = path.as_posix()
+    if len(parts) == 2 and parts[0] == "schemas" and path.suffix == ".json":
+        return True
+    if parts[0] == "kb" and path.suffix in {".json", ".md"}:
+        return True
+    if len(parts) >= 3 and parts[:2] == ("src", "fiction_compiler") and path.suffix == ".py":
+        return True
+    if parts[0] == "scripts" and path.suffix == ".py":
+        return True
+    if parts[0] == "config" and path.suffix == ".json":
+        return True
+    if posix == "premise-probes.json":
+        return True
+    if parts[0] in {"evals", "regression"} and path.suffix == ".json":
+        return True
+    if len(parts) >= 3 and parts[:2] == (".claude", "agents") and path.suffix == ".md":
+        return True
+    if len(parts) == 4 and parts[:2] == (".agents", "skills") and parts[-1] == "SKILL.md":
+        return True
+    if posix in {"AGENTS.md", "CLAUDE.md", "pyproject.toml"}:
+        return True
+    if parts[0] == "constitution" and path.suffix == ".md":
+        return True
+    return False
+
+
+def framework_file_manifest(root: Path | None = None) -> dict[str, str]:
+    """Return the exact behavior-relevant files behind the aggregate framework fingerprint."""
+    root = (root or ROOT).resolve()
+    files: dict[str, str] = {}
+    for paths in _framework_groups(root).values():
+        for path in paths:
+            if path.is_file():
+                files[path.relative_to(root).as_posix()] = integrity.sha256_file(path)
+    return dict(sorted(files.items()))
+
+
+# Captured once when this Python process imports the regression module. A long-lived MCP server may
+# otherwise read a new source fingerprint from disk while still executing old imported functions.
+_RUNTIME_SOURCE_SHA256 = _hash_paths(
+    ROOT.resolve(), _framework_groups(ROOT.resolve())["source"]
+)
+
+
+def runtime_source_status(root: Path | None = None) -> dict:
+    root = (root or ROOT).resolve()
+    if root != ROOT.resolve():
+        return {
+            "checked": False,
+            "fresh": None,
+            "reason": "alternate test root does not correspond to this interpreter's imported package",
+        }
+    disk_sha256 = _hash_paths(root, _framework_groups(root)["source"])
+    return {
+        "checked": True,
+        "fresh": disk_sha256 == _RUNTIME_SOURCE_SHA256,
+        "imported_source_sha256": _RUNTIME_SOURCE_SHA256,
+        "disk_source_sha256": disk_sha256,
+    }
+
+
+def framework_manifest(root: Path | None = None) -> dict:
+    """Fingerprint every repository artifact that can change framework behavior.
+
+    The fingerprint includes deterministic code plus the external policy/prompt/configuration files
+    that steer generation and evaluation. ``root`` is injectable so tests can prove that each class
+    of external artifact participates without mutating the checked-out repository.
+    """
+    root = (root or ROOT).resolve()
+    groups = _framework_groups(root)
+    hashes = {name: _hash_paths(root, paths) for name, paths in groups.items()}
+    runtime = f"{platform.python_implementation()} {platform.python_version()}"
+    combined_input = "\n".join([*(f"{name}:{hashes[name]}" for name in sorted(hashes)),
+                                  f"python_runtime:{runtime}"])
+    combined = integrity.sha256_bytes(combined_input.encode("utf-8"))
     return {
         "framework_fingerprint": combined,
-        "schemas_sha256": schemas,
-        "kb_index_sha256": kb_index,
-        "source_sha256": source,
+        **{f"{name}_sha256": digest for name, digest in hashes.items()},
+        "python_runtime": runtime,
         "generated_at": datetime.now(timezone.utc).isoformat(),
     }
 
 
 # --- runner -----------------------------------------------------------------------------------
 
-def load_fixtures(path: Path | None = None) -> list[dict]:
-    path = path or FIXTURES
+def load_fixtures(path: Path | None = None, root: Path | None = None) -> list[dict]:
+    path = path or ((root or ROOT) / "regression" / "fixtures.json")
     if not path.exists():
         return []
     return json.loads(path.read_text(encoding="utf-8")).get("fixtures", [])
@@ -156,13 +296,14 @@ def run_fixture(fixture: dict) -> dict:
     return {"name": name, "check": check, "expected": expected, "actual": actual, "passed": actual == expected}
 
 
-def run_regressions(fixtures: list[dict] | None = None) -> dict:
+def run_regressions(fixtures: list[dict] | None = None, root: Path | None = None) -> dict:
     """Run every fixture and report pass/fail against the current framework fingerprint."""
-    fixtures = load_fixtures() if fixtures is None else fixtures
+    fixtures = load_fixtures(root=root) if fixtures is None else fixtures
     results = [run_fixture(f) for f in fixtures]
     passed = sum(1 for r in results if r["passed"])
     return {
-        "manifest": framework_manifest(),
+        "manifest": framework_manifest(root),
+        "runtime_source": runtime_source_status(root),
         "total": len(results),
         "passed": passed,
         "failed": len(results) - passed,

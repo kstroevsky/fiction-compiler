@@ -25,7 +25,7 @@ def main() -> int:
     args = parser.parse_args()
     project = (ROOT / args.project_dir).resolve() if not Path(args.project_dir).is_absolute() else Path(args.project_dir)
     bundle = compile_bundle(project, args.scene_id)
-    print(write_bundle(bundle, args.scene_id))
+    print(write_bundle(bundle, project, args.scene_id))
     return 0
 
 

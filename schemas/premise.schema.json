@@ -2,18 +2,19 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "premise.schema.json",
   "type": "object",
-  "comment": "A premise/architecture candidate emitted at the premise layer (ADR 0017). The structural tags let the deterministic divergence floor confirm the batch explored genuinely different shapes; they are NOT a quality score and nothing here selects a winner.",
-  "required": ["id", "logline", "pov_character", "transforming_character", "conflict_type", "obliqueness", "resolution_type", "theme_question", "why_not_default"],
+  "comment": "A premise/architecture candidate emitted at the premise layer. The schema validates declared structure; it does not claim those tags prove artistic diversity or quality.",
+  "required": ["id", "logline", "pov_character", "theme_question"],
   "additionalProperties": false,
   "properties": {
     "id": {"type": "string", "minLength": 1},
     "logline": {"type": "string", "minLength": 1},
     "pov_character": {"type": "string", "minLength": 1},
-    "transforming_character": {"type": "string", "minLength": 1, "comment": "Who actually changes. If this is not the pov_character, the arc is off-camera."},
-    "conflict_type": {"enum": ["internal", "interpersonal", "character-vs-situation", "character-vs-nature", "character-vs-society"]},
-    "obliqueness": {"enum": ["direct", "oblique"], "comment": "Does the story walk straight at its core feeling, or approach it from the side?"},
-    "resolution_type": {"enum": ["humble", "clever", "ambiguous", "refusal"]},
+    "transforming_character": {"type": ["string", "null"], "minLength": 1, "comment": "Optional declared locus of change; null supports static, ensemble, or collective structures."},
+    "conflict_type": {"type": "string", "minLength": 1},
+    "obliqueness": {"type": "string", "minLength": 1, "comment": "Optional descriptive tag; no value is privileged by the schema."},
+    "resolution_type": {"type": "string", "minLength": 1, "comment": "Open descriptive tag; the schema does not prescribe a resolution taxonomy."},
     "theme_question": {"type": "string", "minLength": 1},
-    "why_not_default": {"type": "string", "minLength": 1, "comment": "How this departs from the first, most-probable premise a model would reach for."}
+    "why_not_default": {"type": "string", "minLength": 1, "comment": "Optional diagnostic note about predictability; expected genre developments are allowed."},
+    "formal_intent": {"type": "string", "minLength": 1, "comment": "Optional statement of the formal or genre effect the premise intends."}
   }
 }

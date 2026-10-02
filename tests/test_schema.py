@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import sys
 import unittest
 from pathlib import Path
@@ -41,6 +42,28 @@ class ValidatorKeywordTests(unittest.TestCase):
         self.assertEqual(schema.validate({"a": "ok"}, s), [])
         self.assertTrue(any("additional property 'b'" in e for e in schema.validate({"a": "ok", "b": 1}, s)))
 
+    def test_composition_conditionals_const_and_exclusive_bounds(self) -> None:
+        s = {
+            "type": "object",
+            "required": ["kind", "value"],
+            "properties": {
+                "kind": {"type": "string"},
+                "value": {"type": "number", "exclusiveMinimum": 0},
+            },
+            "allOf": [{
+                "if": {"properties": {"kind": {"const": "fixed"}}},
+                "then": {"properties": {"value": {"const": 1}}},
+            }],
+        }
+        self.assertEqual(schema.validate({"kind": "fixed", "value": 1}, s), [])
+        self.assertTrue(schema.validate({"kind": "fixed", "value": 2}, s))
+        self.assertTrue(any("exclusiveMinimum" in e for e in schema.validate({"kind": "other", "value": 0}, s)))
+        one_of = {"oneOf": [{"const": "a"}, {"const": "b"}]}
+        self.assertEqual(schema.validate("a", one_of), [])
+        self.assertTrue(any("oneOf" in e for e in schema.validate("c", one_of)))
+        self.assertEqual(schema.validate({}, {"not": {"required": ["x"]}}), [])
+        self.assertTrue(schema.validate({"x": 1}, {"not": {"required": ["x"]}}))
+
     def test_state_delta_relationship_pair_must_be_two_distinct_chars(self) -> None:
         # The review's concrete example: a relationship pair of length != 2 (or a self-pair) is now caught.
         base = {"scene_id": "ch01-sc01", "facts_added": [], "facts_removed": [], "knowledge_changes": [],
@@ -50,10 +73,46 @@ class ValidatorKeywordTests(unittest.TestCase):
         base["relationship_changes"] = [{"pair": ["char-a"], "state": "x"}]
         self.assertTrue(any("minItems" in e for e in schema.validate_named(base, "state-delta")))
 
+    def test_state_delta_belief_and_resource_shapes_are_enforced(self) -> None:
+        base = {"scene_id": "ch01-sc01", "facts_added": [], "facts_removed": [],
+                "knowledge_changes": [], "relationship_changes": [],
+                "promises_opened": [], "promises_closed": []}
+        valid = dict(base, belief_changes=[{
+            "op": "set", "character": "char-a", "fact": "fact-door-open",
+            "value": False, "source": "correction",
+        }], resource_changes=[{
+            "op": "transfer", "resource": "res-loaf", "from": "char-a", "to": "customer",
+            "quantity": 1,
+        }])
+        self.assertEqual(schema.validate_named(valid, "state-delta"), [])
+
+        missing_source = dict(base, belief_changes=[{
+            "op": "set", "character": "char-a", "fact": "fact-door-open", "value": True,
+        }])
+        self.assertTrue(any("source" in e for e in schema.validate_named(missing_source, "state-delta")))
+
+        zero_quantity = dict(base, resource_changes=[{
+            "op": "consume", "resource": "res-loaf", "holder": "char-a", "quantity": 0,
+        }])
+        self.assertTrue(any("exclusiveMinimum" in e or "oneOf" in e
+                            for e in schema.validate_named(zero_quantity, "state-delta")))
+
+    def test_nonlinear_scene_requires_planning_fabula_time(self) -> None:
+        scene = {
+            "id": "ch01-sc02", "chapter": "ch01", "narrative_mode": "analepsis",
+            "pov": "", "participants": [], "purpose": [], "entry_state": [], "desire": "",
+            "conflict": "", "turn": "", "exit_state": [], "required_events": [],
+            "forbidden_moves": [],
+        }
+        self.assertTrue(any("fabula_time" in e for e in schema.validate_named(scene, "scene")))
+        scene["fabula_time"] = 2
+        self.assertEqual(schema.validate_named(scene, "scene"), [])
+
 
 class SchemaValidatorTests(unittest.TestCase):
     def test_all_repo_schemas_load(self) -> None:
-        for name in ["project", "character", "scene", "event", "state-delta", "critique"]:
+        for name in ["project", "character", "scene", "event", "state-delta", "critique",
+                     "ontology", "entity-registry"]:
             self.assertIsInstance(schema.load_schema(name), dict)
 
     def test_valid_project_passes(self) -> None:
@@ -91,6 +150,30 @@ class SchemaValidatorTests(unittest.TestCase):
         event["time"] = True  # bool is not a valid number here
         self.assertTrue(schema.validate_named(event, "event"))
 
+    def test_event_schema_accepts_fact_effect_and_rejects_shape_without_target(self) -> None:
+        event = {
+            "id": "evt-x", "time": 1, "actors": ["char-a"], "preconditions": [],
+            "action": "discover", "effects": [{"op": "add", "fact": "fact-code-known"}],
+            "causes": [],
+        }
+        self.assertEqual(schema.validate_named(event, "event"), [])
+        event["effects"] = [{"op": "add"}]
+        self.assertTrue(any("oneOf" in error for error in schema.validate_named(event, "event")))
+
+    def test_event_schema_accepts_declared_comparison_and_rejects_unknown_operator(self) -> None:
+        event = {
+            "id": "evt-x", "time": 1, "actors": ["char-a"],
+            "preconditions": [{
+                "predicate": "temperature", "subject": "obj-relay", "value": 0,
+                "comparison": "lt",
+            }],
+            "action": "check", "effects": [], "causes": [],
+        }
+        self.assertEqual(schema.validate_named(event, "event"), [])
+        event["preconditions"][0]["comparison"] = "approximately"
+        self.assertTrue(any("comparison" in error or "not one of" in error
+                            for error in schema.validate_named(event, "event")))
+
     def test_nested_findings_and_numeric_range(self) -> None:
         critique = {
             "candidate": "c",
@@ -112,6 +195,12 @@ class SchemaValidatorTests(unittest.TestCase):
         self.assertTrue(any("maximum" in e for e in errors))
         self.assertTrue(any("severity" in e for e in errors))
         self.assertTrue(any("repair_layer" in e for e in errors))
+
+    def test_non_finite_numbers_are_rejected(self) -> None:
+        for value in (math.nan, math.inf, -math.inf):
+            with self.subTest(value=value):
+                errors = schema.validate(value, {"type": "number", "minimum": 0, "maximum": 1})
+                self.assertTrue(any("finite" in e for e in errors), errors)
 
 
 if __name__ == "__main__":

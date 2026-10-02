@@ -37,15 +37,19 @@ def _error(mid: object, code: int, message: str) -> dict:
     return {"jsonrpc": "2.0", "id": mid, "error": {"code": code, "message": message}}
 
 
-def handle(message: dict) -> dict | None:
+def handle(message: object) -> dict | None:
+    if not isinstance(message, dict):
+        return _error(None, -32600, "invalid request: JSON-RPC message must be an object")
     method = message.get("method")
     mid = message.get("id")
     is_request = "id" in message
 
     if method == "initialize":
-        requested = (message.get("params") or {}).get("protocolVersion") or DEFAULT_PROTOCOL
+        params = message.get("params") or {}
+        if not isinstance(params, dict):
+            return _error(mid, -32602, "invalid initialize params")
         return _result(mid, {
-            "protocolVersion": requested,
+            "protocolVersion": DEFAULT_PROTOCOL,
             "capabilities": {"tools": {"listChanged": False}},
             "serverInfo": SERVER_INFO,
         })
@@ -57,8 +61,12 @@ def handle(message: dict) -> dict | None:
         return _result(mid, {"tools": tools.list_tools()})
     if method == "tools/call":
         params = message.get("params") or {}
+        if not isinstance(params, dict):
+            return _error(mid, -32602, "invalid tools/call params")
         name = params.get("name")
         arguments = params.get("arguments") or {}
+        if not isinstance(name, str) or not isinstance(arguments, dict):
+            return _error(mid, -32602, "tools/call requires string name and object arguments")
         try:
             output = tools.call_tool(name, arguments)
             is_error = isinstance(output, dict) and set(output) == {"error"}
@@ -91,6 +99,9 @@ def main() -> int:
             log(f"parse error: {exc}")
             continue
         if isinstance(message, list):  # legacy batch
+            if not message:
+                _emit(_error(None, -32600, "invalid request: empty batch"))
+                continue
             for response in (handle(m) for m in message):
                 if response is not None:
                     _emit(response)
